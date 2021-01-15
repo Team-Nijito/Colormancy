@@ -31,7 +31,7 @@ public class PlayerController : MonoBehaviour
         GetMovement();
         GetShooting();
 
-        camera.transform.position = transform.position + new Vector3(-20, 20, -20);
+        camera.transform.position = transform.position + new Vector3(-10, 10, -10);
     }
 
     void GetMovement()
@@ -60,7 +60,7 @@ public class PlayerController : MonoBehaviour
 
     void GetShooting()
     {
-        if (Input.GetKey(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space))
         {
             Rigidbody paintballRigidbody = Instantiate(paintball, transform.position + lastDirection, transform.rotation);
             paintballRigidbody.AddForce(lastDirection * 10, ForceMode.VelocityChange);

@@ -136,8 +136,6 @@
 
                 col.rgb += ShadeSH9(half4(i.normal, 1));
                 
-                
-
                 return col;
             }
             ENDCG
