@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 6225313193489255387}
   - component: {fileID: 6225313193489255384}
   - component: {fileID: 6225313193489255385}
-  - component: {fileID: 906260701}
+  - component: {fileID: 2082788255}
   m_Layer: 0
   m_Name: Paintball
   m_TagString: Player
@@ -111,7 +111,7 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &906260701
+--- !u!114 &2082788255
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -120,9 +120,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 6225313193489255382}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8c4088e3ac7b1f44481757a4e8b2e22e, type: 3}
+  m_Script: {fileID: 11500000, guid: ea95b5657e42e874da2d4fde1196fa92, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  paintColor: {r: 0.93333334, g: 0.16470587, b: 0.22078705, a: 0}
-  explosionRadius: 1.5
-  centerThreshold: 0.6
+  paintColor: {r: 1, g: 0, b: 0, a: 0}
+  explosionRadius: 1
+  centerThreshold: 0.5
