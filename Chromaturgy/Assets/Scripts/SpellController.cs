@@ -1,12 +1,48 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-public class PaintballController : MonoBehaviour
+public class SpellController : MonoBehaviour
 {
-    public Color paintColor;
+    public enum SpellColor
+    {
+        Red,
+        Orange,
+        Yellow,
+        Green,
+        Blue,
+        Violet,
+        Brown,
+        Silver,
+        Maroon
+    }
+
+    public Mesh[] spellMeshes;
+    public Material[] spellMaterials;
+
+    private SpellColor greater;
+    private SpellColor lesser;
+    private SpellColor shape;
+
+    private Color paintColor;
+
     public float explosionRadius;
     public float centerThreshold;
+
+    // call this right after initialization and before the next frame
+    public void SetSpellColors(SpellColor g, SpellColor l, SpellColor s)
+    {
+        greater = g;
+        lesser = l;
+        shape = s;
+    }
+
+    void Start()
+    {
+        // load in the correct model based on the shape
+        GetComponent<MeshFilter>().mesh = spellMeshes[(int)shape];
+
+        // load in the material with the proper shader
+        GetComponent<Renderer>().material = spellMaterials[(int)shape];
+    }
 
     void OnCollisionEnter(Collision collision)
     {

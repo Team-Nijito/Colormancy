@@ -73,10 +73,10 @@ Material:
     - _NormalComparison: 0.07
     - _OcclusionStrength: 1
     - _Parallax: 0.02
-    - _ShadowStrength: 0.101
+    - _ShadowStrength: 0.42
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
-    - _SpecularStrength: 0.229
+    - _SpecularStrength: 0.261
     - _SrcBlend: 1
     - _Tiling: 14.99
     - _UVSec: 0

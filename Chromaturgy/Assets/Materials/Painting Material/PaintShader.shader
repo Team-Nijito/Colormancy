@@ -130,14 +130,13 @@
             {
                 float4 col = 1;
 
-                float3 binormal = cross(i.normal, i.tangent);
-                float3x3 rotation = float3x3(i.tangent, binormal, i.normal);
-
                 float noiseLerp = (perlinNoise(i.worldPosition.xyz * 10) + 1) / 2;
                 noiseLerp = smoothstep(0, 1, noiseLerp);
                 noiseLerp = smoothstep(0, 1, noiseLerp);
 
-                // calculate "normal" value using tangent space lol
+                // calculate bumped normal using tangent space lol
+                float3 binormal = cross(i.normal, i.tangent);
+
                 float3 v1t = i.worldPosition.xyz + i.tangent * _NormalComparison;
                 float3 v2t = i.worldPosition.xyz - i.tangent * _NormalComparison;
                 float3 v1b = i.worldPosition.xyz + binormal * _NormalComparison;
@@ -152,29 +151,27 @@
 
                 // use half lambertian
                 half nl = pow(max(0, dot(i.normal, _WorldSpaceLightPos0.xyz)) * 0.5 + 0.5, 2);
-                fixed shadow = pow(SHADOW_ATTENUATION(i) * _ShadowStrength + (1 - _ShadowStrength), 2);
+                fixed shadow = SHADOW_ATTENUATION(i) * _ShadowStrength + (1 - _ShadowStrength);
 
-                // specular calculation
+                // specular
                 half s = 0;
 
-
+                // dark spots are the ones that are painted
                 float g = 1 - i.color.a;
                 if (noiseLerp < g) {
                     col.rgb = i.color.rgb;
                     // normal is in same direction as light or shadowed
                     if (dot(i.normal, _WorldSpaceLightPos0.xyz) > 0) {
-                        nl = pow(max(0, dot(bump, _WorldSpaceLightPos0.xyz)) * 0.5 + 0.5, 2);
-                        s = pow(max(0, dot(reflect(-normalize(_WorldSpaceLightPos0.xyz), bump), normalize(_WorldSpaceCameraPos - i.worldPosition))), 2) * _SpecularStrength;
+                        // bumps should not be visible in the shadows
+                        float3 normalShadowLerp = lerp(bump, i.normal, 1 - SHADOW_ATTENUATION(i));
+
+                        nl = pow(max(0, dot(normalShadowLerp, _WorldSpaceLightPos0.xyz)) * 0.5 + 0.5, 2);
+                        s = pow(max(0, dot(reflect(-normalize(_WorldSpaceLightPos0.xyz), normalShadowLerp), normalize(_WorldSpaceCameraPos - i.worldPosition))), 2) * _SpecularStrength;
                     }
-                }
-                // possible fix darker color by changing hue?
-                if (i.color.a == 1) {
-                    col.rgb = 1;
                 }
                 
                 col *= (nl + s) * _LightColor0 * shadow;
-                col.rgb += ShadeSH9(half4(i.normal, 1));
-                
+                col.rgb += ShadeSH9(float4(i.normal, 1));
 
                 return col;
             }

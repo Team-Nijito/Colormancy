@@ -65,8 +65,8 @@ public class PlayerController : MonoBehaviour
             Rigidbody paintballRigidbody = Instantiate(paintball, transform.position + lastDirection, transform.rotation);
             paintballRigidbody.AddForce(lastDirection * 10, ForceMode.VelocityChange);
 
-            PaintballController pc = paintballRigidbody.gameObject.GetComponent<PaintballController>();
-            pc.paintColor = paintColor;
+            SpellController pc = paintballRigidbody.gameObject.GetComponent<SpellController>();
+            pc.SetSpellColors(SpellController.SpellColor.Orange, SpellController.SpellColor.Orange, SpellController.SpellColor.Orange);
         }
     }
 
