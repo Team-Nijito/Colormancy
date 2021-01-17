@@ -31,7 +31,7 @@ public class PaintballController : MonoBehaviour
                     originalColors = new Color[originalVertices.Length];
 
                     for (int i = 0; i < originalColors.Length; i++)
-                        originalColors[i] = new Color(1, 1, 1, 0);
+                        originalColors[i] = new Color(1, 1, 1, 1);
                 }
                 Color[] colors = new Color[originalVertices.Length];
 
@@ -42,18 +42,18 @@ public class PaintballController : MonoBehaviour
 
                     if (Vector3.Distance(worldVertex, collision.GetContact(0).point) < explosionRadius)
                     {
-                        float l = Vector3.Distance(worldVertex, collision.GetContact(0).point) / explosionRadius;
-                        if (l < centerThreshold)
-                            l = 0;
+                        float l = (explosionRadius - Vector3.Distance(worldVertex, collision.GetContact(0).point)) / explosionRadius;
+                        if (l > centerThreshold)
+                            l = 1;
                         // Perlin smoothstep 
                         l = l * l * l * (l * (l * 6 - 15) + 10);
 
                         // jank smoothing calculation to create solid center
                         // use bitmask for lerp
-                        colors[i].r = Mathf.Lerp(paintColor.r, originalColors[i].r, Mathf.Clamp(1 - (1 - l) * 2, 0, 1));
-                        colors[i].g = Mathf.Lerp(paintColor.g, originalColors[i].g, Mathf.Clamp(1 - (1 - l) * 2, 0, 1));
-                        colors[i].b = Mathf.Lerp(paintColor.b, originalColors[i].b, Mathf.Clamp(1 - (1 - l) * 2, 0, 1));
-                        colors[i].a = Mathf.Clamp(1 - l + originalColors[i].a, 0, 1);
+                        colors[i].r = Mathf.Lerp(paintColor.r, originalColors[i].r, Mathf.Clamp(1 - l * 2, 0, 1));
+                        colors[i].g = Mathf.Lerp(paintColor.g, originalColors[i].g, Mathf.Clamp(1 - l * 2, 0, 1));
+                        colors[i].b = Mathf.Lerp(paintColor.b, originalColors[i].b, Mathf.Clamp(1 - l * 2, 0, 1));
+                        colors[i].a = Mathf.Clamp(originalColors[i].a - l, 0, 1);
                     }
                     else
                         colors[i] = originalColors[i];
