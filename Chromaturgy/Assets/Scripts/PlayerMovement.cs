@@ -1,17 +1,17 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 [RequireComponent(typeof(CharacterController))]
 public class PlayerMovement : MonoBehaviour
 {
-    [SerializeField] private float walkSpeed = 0f;
-    [SerializeField] private float RunSpeed = 0f;
+    public float m_walkSpeed = 0f;
+    public float m_runSpeed = 0f;
+    [SerializeField] private float m_gravity = 9.81f;
 
-    private CharacterController controller = null;
-
+    private CharacterController m_controller = null;
+    private float m_vSpeed = 0f; // current vertical velocity
+    
     // Start is called before the first frame update
-    void Start() => controller = GetComponent<CharacterController>();
+    void Start() => m_controller = GetComponent<CharacterController>();
 
     // Update is called once per frame
     void Update()
@@ -27,20 +27,21 @@ public class PlayerMovement : MonoBehaviour
         Vector3 movement = new Vector3
         {
             x = Input.GetAxisRaw("Horizontal"),
-            y = 0f,
+            y = 0,
             z = Input.GetAxisRaw("Vertical")
         }.normalized;
 
-        
+        //CONVERT direction from local to world relative to camera
+        movement = Camera.main.transform.TransformDirection(movement);
+
+        // Calculate gravity + update m_vSpeed and movement.y
+        m_vSpeed -= m_gravity * Time.deltaTime;
+        if (m_controller.isGrounded) m_vSpeed = 0;
+        movement.y = m_vSpeed;
+
         if (Input.GetKey(KeyCode.LeftShift))
-        {
-            controller.Move(movement * RunSpeed * Time.deltaTime);
-        }
+            m_controller.Move(movement * m_runSpeed * Time.deltaTime);
         else
-        {
-            controller.Move(movement * walkSpeed * Time.deltaTime);
-        }
+            m_controller.Move(movement * m_walkSpeed * Time.deltaTime);
     }
-
-
 }
