@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 6225313193489255385}
   - component: {fileID: 906260701}
   m_Layer: 0
-  m_Name: Paintball
+  m_Name: Spell
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -123,6 +123,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8c4088e3ac7b1f44481757a4e8b2e22e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  paintColor: {r: 0.93333334, g: 0.16470587, b: 0.22078705, a: 0}
+  spellMeshes:
+  - {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+  - {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  spellMaterials:
+  - {fileID: 2100000, guid: 831e4ea6beda02947bdca5aeb8543156, type: 2}
+  - {fileID: 2100000, guid: 246a20100f0871e4eb00abaa25f75e6a, type: 2}
+  - {fileID: 2100000, guid: c14837dfa515883428e5652d93e80c72, type: 2}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   explosionRadius: 1.5
   centerThreshold: 0.6

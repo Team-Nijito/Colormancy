@@ -49,7 +49,7 @@ public class SpellController : MonoBehaviour
         if (collision.gameObject.tag != "Player")
         {
             Matrix4x4 localToWorld = collision.transform.localToWorldMatrix;
-            
+
             Collider[] hitColliders = Physics.OverlapSphere(collision.GetContact(0).point, explosionRadius);
 
             // check all colliders in area
