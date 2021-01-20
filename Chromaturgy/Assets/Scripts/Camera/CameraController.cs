@@ -48,13 +48,13 @@ public class CameraController : MonoBehaviour
 
     private void HandleCameraZoom()
     {
-        if (Input.mouseScrollDelta.y < 0)
+        if (Input.GetAxis("Mouse ScrollWheel") < 0)
         {
             // zoom out
             if ((m_newZoom - m_zoomAmount).y <= m_maxZoom)
                 m_newZoom -= m_zoomAmount;
         }
-        else if (Input.mouseScrollDelta.y > 0)
+        else if (Input.GetAxis("Mouse ScrollWheel") > 0)
         {
             // zoom in
             if ((m_newZoom + m_zoomAmount).y >= m_minZoom)
