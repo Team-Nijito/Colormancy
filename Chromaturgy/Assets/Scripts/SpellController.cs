@@ -1,19 +1,55 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-public class PaintballController : MonoBehaviour
+public class SpellController : MonoBehaviour
 {
-    public Color paintColor;
+    public enum SpellColor
+    {
+        Red,
+        Orange,
+        Yellow,
+        Green,
+        Blue,
+        Violet,
+        Brown,
+        Silver,
+        Maroon
+    }
+
+    public Mesh[] spellMeshes;
+    public Material[] spellMaterials;
+
+    private SpellColor greater;
+    private SpellColor lesser;
+    private SpellColor shape;
+
+    private Color paintColor;
+
     public float explosionRadius;
     public float centerThreshold;
+
+    // call this right after initialization and before the next frame
+    public void SetSpellColors(SpellColor g, SpellColor l, SpellColor s)
+    {
+        greater = g;
+        lesser = l;
+        shape = s;
+    }
+
+    void Start()
+    {
+        // load in the correct model based on the shape
+        GetComponent<MeshFilter>().mesh = spellMeshes[(int)shape];
+
+        // load in the material with the proper shader
+        GetComponent<Renderer>().material = spellMaterials[(int)shape];
+    }
 
     void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.tag != "Player")
         {
             Matrix4x4 localToWorld = collision.transform.localToWorldMatrix;
-            
+
             Collider[] hitColliders = Physics.OverlapSphere(collision.GetContact(0).point, explosionRadius);
 
             // check all colliders in area
@@ -31,7 +67,7 @@ public class PaintballController : MonoBehaviour
                     originalColors = new Color[originalVertices.Length];
 
                     for (int i = 0; i < originalColors.Length; i++)
-                        originalColors[i] = new Color(1, 1, 1, 0);
+                        originalColors[i] = new Color(1, 1, 1, 1);
                 }
                 Color[] colors = new Color[originalVertices.Length];
 
@@ -42,18 +78,18 @@ public class PaintballController : MonoBehaviour
 
                     if (Vector3.Distance(worldVertex, collision.GetContact(0).point) < explosionRadius)
                     {
-                        float l = Vector3.Distance(worldVertex, collision.GetContact(0).point) / explosionRadius;
-                        if (l < centerThreshold)
-                            l = 0;
+                        float l = (explosionRadius - Vector3.Distance(worldVertex, collision.GetContact(0).point)) / explosionRadius;
+                        if (l > centerThreshold)
+                            l = 1;
                         // Perlin smoothstep 
                         l = l * l * l * (l * (l * 6 - 15) + 10);
 
                         // jank smoothing calculation to create solid center
                         // use bitmask for lerp
-                        colors[i].r = Mathf.Lerp(paintColor.r, originalColors[i].r, Mathf.Clamp(1 - (1 - l) * 2, 0, 1));
-                        colors[i].g = Mathf.Lerp(paintColor.g, originalColors[i].g, Mathf.Clamp(1 - (1 - l) * 2, 0, 1));
-                        colors[i].b = Mathf.Lerp(paintColor.b, originalColors[i].b, Mathf.Clamp(1 - (1 - l) * 2, 0, 1));
-                        colors[i].a = Mathf.Clamp(1 - l + originalColors[i].a, 0, 1);
+                        colors[i].r = Mathf.Lerp(paintColor.r, originalColors[i].r, Mathf.Clamp(1 - l * 2, 0, 1));
+                        colors[i].g = Mathf.Lerp(paintColor.g, originalColors[i].g, Mathf.Clamp(1 - l * 2, 0, 1));
+                        colors[i].b = Mathf.Lerp(paintColor.b, originalColors[i].b, Mathf.Clamp(1 - l * 2, 0, 1));
+                        colors[i].a = Mathf.Clamp(originalColors[i].a - l, 0, 1);
                     }
                     else
                         colors[i] = originalColors[i];

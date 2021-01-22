@@ -5,6 +5,9 @@
         _MainTex("Main Texture", 2D) = "white" {}
         _Tiling("Tiling", float) = 1
         _ShadowStrength("Shadow Strength", Range(0, 1)) = 1
+        _SpecularStrength("Specular Strength", Range(0, 1)) = 1
+        _Bumpiness("Bumpiness", float) = 2
+        _NormalComparison("Normal Comparison", float) = 0.1
     }
     SubShader
     {
@@ -26,6 +29,7 @@
                 float3 normal : NORMAL;
                 float2 uv : TEXCOORD0;
                 float4 color : COLOR;
+                float3 tangent : TANGENT;
             };
 
             struct v2f
@@ -33,7 +37,9 @@
                 float4 color : COLOR;
                 float2 uv : TEXCOORD0;
                 SHADOW_COORDS(1)
+                float4 worldPosition : TEXCOORD2;
                 float3 normal : NORMAL;
+                float3 tangent : TANGENT;
                 float4 pos : SV_POSITION;
             };
 
@@ -46,97 +52,126 @@
                 o.color = v.color;
                 o.normal = UnityObjectToWorldNormal(v.normal);
                 o.uv = v.uv;
+                o.worldPosition = mul(unity_ObjectToWorld, v.vertex);
+                o.tangent = UnityObjectToWorldNormal(v.tangent);
                 TRANSFER_SHADOW(o)
                 return o;
             }
 
-            // simplex noise function based on the one from https://github.com/ashima/webgl-noise
-            float3 mod289(float3 x) {
-                return x - floor(x * (1.0 / 289.0)) * 289.0;
+            // perlin noise function by ronja
+            float rand3dTo1d(float3 value, float3 dotDir = float3(12.9898, 78.233, 37.719)) {
+                //make value smaller to avoid artefacts
+                float3 smallValue = sin(value);
+                //get scalar value from 3d vector
+                float random = dot(smallValue, dotDir);
+                //make value more random by making it bigger and then taking the factional part
+                random = frac(sin(random) * 143758.5453);
+                return random;
             }
 
-            float2 mod289(float2 x) {
-                return x - floor(x * (1.0 / 289.0)) * 289.0;
+            float3 rand3dTo3d(float3 value) {
+                return float3(
+                    rand3dTo1d(value, float3(12.989, 78.233, 37.719)),
+                    rand3dTo1d(value, float3(39.346, 11.135, 83.155)),
+                    rand3dTo1d(value, float3(73.156, 52.235, 09.151))
+                    );
             }
 
-            float3 permute(float3 x) {
-                return mod289(((x * 34.0) + 1.0) * x);
+            float easeIn(float interpolator) {
+                return interpolator * interpolator * interpolator * interpolator * interpolator;
             }
 
-            float snoise(float2 v)
-            {
-                const float4 C = float4(0.211324865405187,  // (3.0-sqrt(3.0))/6.0
-                    0.366025403784439,  // 0.5*(sqrt(3.0)-1.0)
-                    -0.577350269189626,  // -1.0 + 2.0 * C.x
-                    0.024390243902439); // 1.0 / 41.0
-                // First corner
-                float2 i = floor(v + dot(v, C.yy));
-                float2 x0 = v - i + dot(i, C.xx);
+            float easeOut(float interpolator) {
+                return 1 - easeIn(1 - interpolator);
+            }
 
-                // Other corners
-                float2 i1;
-                //i1.x = step( x0.y, x0.x ); // x0.x > x0.y ? 1.0 : 0.0
-                //i1.y = 1.0 - i1.x;
-                i1 = (x0.x > x0.y) ? float2(1.0, 0.0) : float2(0.0, 1.0);
-                // x0 = x0 - 0.0 + 0.0 * C.xx ;
-                // x1 = x0 - i1 + 1.0 * C.xx ;
-                // x2 = x0 - 1.0 + 2.0 * C.xx ;
-                float4 x12 = x0.xyxy + C.xxzz;
-                x12.xy -= i1;
+            float easeInOut(float interpolator) {
+                float easeInValue = easeIn(interpolator);
+                float easeOutValue = easeOut(interpolator);
+                return lerp(easeInValue, easeOutValue, interpolator);
+            }
 
-                // Permutations
-                i = mod289(i); // Avoid truncation effects in permutation
-                float3 p = permute(permute(i.y + float3(0.0, i1.y, 1.0))
-                    + i.x + float3(0.0, i1.x, 1.0));
+            float perlinNoise(float3 value) {
+                float3 fraction = frac(value);
 
-                float3 m = max(0.5 - float3(dot(x0, x0), dot(x12.xy, x12.xy), dot(x12.zw, x12.zw)), 0.0);
-                m = m * m;
-                m = m * m;
+                float interpolatorX = easeInOut(fraction.x);
+                float interpolatorY = easeInOut(fraction.y);
+                float interpolatorZ = easeInOut(fraction.z);
 
-                // Gradients: 41 points uniformly over a line, mapped onto a diamond.
-                // The ring size 17*17 = 289 is close to a multiple of 41 (41*7 = 287)
-
-                float3 x = 2.0 * frac(p * C.www) - 1.0;
-                float3 h = abs(x) - 0.5;
-                float3 ox = floor(x + 0.5);
-                float3 a0 = x - ox;
-
-                // Normalise gradients implicitly by scaling m
-                // Approximation of: m *= inversesqrt( a0*a0 + h*h );
-                m *= 1.79284291400159 - 0.85373472095314 * (a0 * a0 + h * h);
-
-                // Compute final noise value at P
-                float3 g;
-                g.x = a0.x * x0.x + h.x * x0.y;
-                g.yz = a0.yz * x12.xz + h.yz * x12.yw;
-                return 130.0 * dot(m, g);
+                float3 cellNoiseZ[2];
+                [unroll]
+                for (int z = 0; z <= 1; z++) {
+                    float3 cellNoiseY[2];
+                    [unroll]
+                    for (int y = 0; y <= 1; y++) {
+                        float3 cellNoiseX[2];
+                        [unroll]
+                        for (int x = 0; x <= 1; x++) {
+                            float3 cell = floor(value) + float3(x, y, z);
+                            float3 cellDirection = rand3dTo3d(cell) * 2 - 1;
+                            float3 compareVector = fraction - float3(x, y, z);
+                            cellNoiseX[x] = dot(cellDirection, compareVector);
+                        }
+                        cellNoiseY[y] = lerp(cellNoiseX[0], cellNoiseX[1], interpolatorX);
+                    }
+                    cellNoiseZ[z] = lerp(cellNoiseY[0], cellNoiseY[1], interpolatorY);
+                }
+                float3 noise = lerp(cellNoiseZ[0], cellNoiseZ[1], interpolatorZ);
+                return noise;
             }
 
             float _Tiling;
             float _ShadowStrength;
+            float _SpecularStrength;
+            float _Bumpiness;
+            float _NormalComparison;
 
             float4 frag (v2f i) : SV_Target
             {
                 float4 col = 1;
 
-                float noiseLerp = (snoise(i.uv * _Tiling) + 1) / 2;
+                float noiseLerp = (perlinNoise(i.worldPosition.xyz * 10) + 1) / 2;
+                noiseLerp = smoothstep(0, 1, noiseLerp);
+                noiseLerp = smoothstep(0, 1, noiseLerp);
 
-                float g = i.color.a;
-                if (noiseLerp < g)
-                    // possible fix darker color by changing hue?
-                    col.rgb = lerp(i.color.rgb, i.color.rgb / 3 * 2, noiseLerp/g);
-                if (i.color.r + i.color.g + i.color.b > 2.9)
-                    col.rgb = 1;
+                // calculate bumped normal using tangent space lol
+                float3 binormal = cross(i.normal, i.tangent);
+
+                float3 v1t = i.worldPosition.xyz + i.tangent * _NormalComparison;
+                float3 v2t = i.worldPosition.xyz - i.tangent * _NormalComparison;
+                float3 v1b = i.worldPosition.xyz + binormal * _NormalComparison;
+                float3 v2b = i.worldPosition.xyz - binormal * _NormalComparison;
+
+                v1t = v1t + i.normal * (perlinNoise(v1t * 10) + 1) / 2 * _Bumpiness;
+                v2t = v2t + i.normal * (perlinNoise(v2t * 10) + 1) / 2 * _Bumpiness;
+                v1b = v1b + i.normal * (perlinNoise(v1b * 10) + 1) / 2 * _Bumpiness;
+                v2b = v2b + i.normal * (perlinNoise(v2b * 10) + 1) / 2 * _Bumpiness;
+
+                float3 bump = normalize(cross(v2t - v1t, v2b - v1b));
 
                 // use half lambertian
-                
-                fixed shadow = pow(SHADOW_ATTENUATION(i) * _ShadowStrength + (1 - _ShadowStrength), 2);
                 half nl = pow(max(0, dot(i.normal, _WorldSpaceLightPos0.xyz)) * 0.5 + 0.5, 2);
-                col *= nl * _LightColor0 * shadow;
+                fixed shadow = SHADOW_ATTENUATION(i) * _ShadowStrength + (1 - _ShadowStrength);
 
-                col.rgb += ShadeSH9(half4(i.normal, 1));
+                // specular
+                half s = 0;
+
+                // dark spots are the ones that are painted
+                float g = 1 - i.color.a;
+                if (noiseLerp < g) {
+                    col.rgb = i.color.rgb;
+                    // normal is in same direction as light or shadowed
+                    if (dot(i.normal, _WorldSpaceLightPos0.xyz) > 0) {
+                        // bumps should not be visible in the shadows
+                        float3 normalShadowLerp = lerp(bump, i.normal, 1 - SHADOW_ATTENUATION(i));
+
+                        nl = pow(max(0, dot(normalShadowLerp, _WorldSpaceLightPos0.xyz)) * 0.5 + 0.5, 2);
+                        s = pow(max(0, dot(reflect(-normalize(_WorldSpaceLightPos0.xyz), normalShadowLerp), normalize(_WorldSpaceCameraPos - i.worldPosition))), 2) * _SpecularStrength;
+                    }
+                }
                 
-                
+                col *= (nl + s) * _LightColor0 * shadow;
+                col.rgb += ShadeSH9(float4(i.normal, 1));
 
                 return col;
             }
