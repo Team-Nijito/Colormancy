@@ -3,32 +3,39 @@
 public class PlayerMouse : MonoBehaviour
 {
     // Handles the behavior of mouse reticle, and turning the player (towards the mouse)
-
-    //public GameObject m_thingToSpawn = null;
-    public bool m_isPlayerFacingMouse = false;
-
-    [SerializeField]
     private GameObject m_playerCharacter = null;
 
+    private PlayerMovement m_pmScript;
     private RaycastHit m_data;
+    private Animator m_animator;
+
+    private void Start()
+    {
+        m_pmScript = GetComponent<PlayerMovement>();
+        m_animator = GetComponentInChildren<Animator>();
+        m_playerCharacter = m_pmScript.m_character;
+    }
 
     // Update is called once per frame
     void Update()
     {
         Vector3 mousePosition = GetMouseWorldPosition();
 
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0) && !m_pmScript.m_isMoving)
         {
-            //Instantiate(m_thingToSpawn, mousePosition, Quaternion.identity);
+            // Cannot attack while moving
+
+            PlayerFacingMouse(mousePosition);
+            
+            // Trigger attack animation 
+            m_animator.SetInteger("Action", 1);
+            m_animator.SetTrigger("AttackTrigger");
+
             if (m_data.collider.gameObject)
             {
                 //print(m_data.collider.name);
                 DebugClickDamage(5);
             }
-        }
-        if (m_isPlayerFacingMouse)
-        {
-            PlayerFacingMouse(mousePosition);
         }
     }
 
@@ -73,7 +80,9 @@ public class PlayerMouse : MonoBehaviour
     {
         if (m_playerCharacter && mousePos != Vector3.zero)
         {
-            Vector3 targetPosition = new Vector3(mousePos.x, transform.position.y, mousePos.z);
+            // if you're testing out local player, and the among us-looking character is always looking down
+            // replace the 0 below (2nd argument in Vector3 constructor) with transform.position.y
+            Vector3 targetPosition = new Vector3(mousePos.x, 0, mousePos.z);
             m_playerCharacter.transform.LookAt(targetPosition);
         }
     }
