@@ -3,14 +3,21 @@
 public class PlayerMouse : MonoBehaviour
 {
     // Handles the behavior of mouse reticle, and turning the player (towards the mouse)
+    [SerializeField]
+    private float m_basicClickDamage = 5f;
+    [SerializeField]
+    private float m_basicClickManaConsumption = 10f;
+
     private GameObject m_playerCharacter = null;
 
     private PlayerMovement m_pmScript;
+    private ManaScript m_mScript;
     private RaycastHit m_data;
     private Animator m_animator;
 
     private void Start()
     {
+        m_mScript = GetComponent<ManaScript>();
         m_pmScript = GetComponent<PlayerMovement>();
         m_animator = GetComponentInChildren<Animator>();
         m_playerCharacter = m_pmScript.m_character;
@@ -21,7 +28,7 @@ public class PlayerMouse : MonoBehaviour
     {
         Vector3 mousePosition = GetMouseWorldPosition();
 
-        if (Input.GetMouseButtonDown(0) && !m_pmScript.m_isMoving)
+        if (Input.GetMouseButtonDown(0)) //  && !m_pmScript.m_isMoving
         {
             // Cannot attack while moving
 
@@ -34,20 +41,23 @@ public class PlayerMouse : MonoBehaviour
             if (m_data.collider.gameObject)
             {
                 //print(m_data.collider.name);
-                DebugClickDamage(5);
+                DebugClickDamage(m_basicClickDamage);
             }
         }
     }
 
-    private void DebugClickDamage(int damage)
+    private void DebugClickDamage(float damage)
     {
         // the collider is attached to an enemy IF
         // 1) the current gameObject the collider is attached to has a healthscript
         // 2) the current gameObject is a child (or descendent) of any gameObject that has a healthscript
         HealthScript hscript = m_data.collider.gameObject.GetComponent<HealthScript>();
         hscript = hscript == null ? m_data.collider.gameObject.GetComponentInParent<HealthScript>() : hscript;
-        if (hscript)
+
+        // test: each attack consumes 10 mana
+        if (hscript && m_mScript.GetEffectiveMana() >= m_basicClickManaConsumption)
         {
+            m_mScript.ConsumeMana(10);
             hscript.TakeDamage(damage);
         }
     }
