@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
+using Photon.Pun;
 
 [RequireComponent(typeof(CharacterController))]
-public class PlayerMovement : MonoBehaviour
+public class PlayerMovement : MonoBehaviourPunCallbacks
 {
     public float m_walkSpeed = 0f;
     public float m_runSpeed = 0f;
@@ -9,14 +10,15 @@ public class PlayerMovement : MonoBehaviour
 
     private CharacterController m_controller = null;
     private float m_vSpeed = 0f; // current vertical velocity
-    
+
     // Start is called before the first frame update
     void Start() => m_controller = GetComponent<CharacterController>();
 
     // Update is called once per frame
     void Update()
     {
-        ProcessPlayerInput();
+        if (photonView.IsMine && PhotonNetwork.IsConnected)
+            ProcessPlayerInput();
     }
 
     // Takes in player's iputs for movement

@@ -46,7 +46,14 @@ public class GameManager : MonoBehaviourPunCallbacks
         {
             if (PlayerController.LocalPlayerInstance == null)
             {
-                PhotonNetwork.Instantiate(this.playerPrefab.name, new Vector3(0f, 1f, 0f), Quaternion.identity, 0);
+                if (HealthScript.LocalPlayerInstance == null)
+                {
+                    PhotonNetwork.Instantiate(this.playerPrefab.name, new Vector3(0f, 2f, 0f), Quaternion.identity, 0);
+                }
+                else
+                {
+                    Debug.LogFormat("Ignoring scene load for {0}", SceneManagerHelper.ActiveSceneName);
+                }
             }
             else
             {

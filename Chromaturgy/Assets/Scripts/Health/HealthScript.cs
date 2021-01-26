@@ -1,12 +1,15 @@
 ﻿using System;
 using UnityEngine;
 using UnityEngine.UI;
+using Photon.Pun;
 
-public class HealthScript : MonoBehaviour
+public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
 {
     // manages the "health" for any object
     // includes: damage, healing, armor? (damage reduction)
     // only works on gameobjects with a child canvas and UI slider
+
+    public static GameObject LocalPlayerInstance;
 
     [SerializeField]
     private float m_baseHealth = 100f;
@@ -35,6 +38,28 @@ public class HealthScript : MonoBehaviour
 
     private Slider m_healthBar;
     private Transform m_healthBarTransform;
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            stream.SendNext(m_effectiveHealth);
+        }
+        else
+        {
+            this.m_effectiveHealth = (float)stream.ReceiveNext();
+        }
+    }
+
+    private void Awake()
+    {
+        if (photonView.IsMine)
+        {
+            HealthScript.LocalPlayerInstance = this.gameObject;
+        }
+
+        DontDestroyOnLoad(this.gameObject);
+    }
 
     // Start is called before the first frame update
     void Start()

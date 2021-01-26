@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
+using Photon.Pun;
+using Photon.Realtime;
 
-public class CameraController : MonoBehaviour
+public class CameraController : MonoBehaviourPunCallbacks
 {
     // This script should be a player component, and a camera should be a child of the player
     [SerializeField]
@@ -21,19 +23,39 @@ public class CameraController : MonoBehaviour
     private Vector3 m_newZoom = Vector3.zero;
     private Quaternion m_newRotation = Quaternion.identity;
 
+    private bool isFollowing;
+
     private void Start()
     {
+        //m_TCamera = Camera.main.transform.gameObject;
+        //m_TCameraTransform = m_TCamera.transform;
+        //m_newZoom = m_TCameraTransform.localPosition;
+        //m_newRotation = transform.rotation;
+
+        //if (m_TCamera) InitialCameraTrackPlayer();
+
+        if (photonView.IsMine)
+        {
+            StartFollowing();
+        }
+    }
+
+    public void StartFollowing()
+    {
         m_TCamera = Camera.main.transform.gameObject;
+        m_TCamera.transform.parent = transform;
         m_TCameraTransform = m_TCamera.transform;
         m_newZoom = m_TCameraTransform.localPosition;
         m_newRotation = transform.rotation;
 
         if (m_TCamera) InitialCameraTrackPlayer();
+
+        isFollowing = true;
     }
 
     private void Update()
     {
-        if (m_TCamera)
+        if (m_TCamera && isFollowing)
         {
             HandleCameraZoom();
             HandleCameraRotation();

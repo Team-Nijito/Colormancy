@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
+using Photon.Pun;
 
-public class PlayerMouse : MonoBehaviour
+public class PlayerMouse : MonoBehaviourPunCallbacks
 {
     // Handles the behavior of mouse reticle, and turning the player (towards the mouse)
 
@@ -26,7 +27,7 @@ public class PlayerMouse : MonoBehaviour
                 DebugClickDamage(5);
             }
         }
-        if (m_isPlayerFacingMouse)
+        if (m_isPlayerFacingMouse && photonView.IsMine && PhotonNetwork.IsConnected)
         {
             PlayerFacingMouse(mousePosition);
         }
