@@ -17,26 +17,27 @@ public class PlayerMovement : MonoBehaviour
 
     // Components
     public GameObject m_character = null;
-    private CharacterController m_controller = null;
-    
-    [HideInInspector] public Animator m_animator;
     public PlayerState m_playerState;
 
+    [HideInInspector] public Animator m_animator;
+    private CharacterController m_controller;
+
     // Movement
-    private readonly float m_rotationSpeed = 40f; // from WarriorMovementControllerFREE.cs
     public float m_walkSpeed = 0f;
     public float m_runSpeed = 0f;
-    [SerializeField] private float m_gravity = 9.81f;
-
-    private float m_vSpeed = 0f; // current vertical velocity
 
     [HideInInspector] public bool m_isMoving = false;
     [HideInInspector] public bool m_canMove = true;
     [HideInInspector] public bool m_canAction = true;
-
     [HideInInspector] public bool m_isDashing = false;
+
     [HideInInspector] public Vector3 m_movement = Vector3.zero;
+
+    [SerializeField] private float m_gravity = 9.81f;
+
     private Vector3 m_movementNoGrav = Vector3.zero;
+    private readonly float m_rotationSpeed = 40f; // from WarriorMovementControllerFREE.cs
+    private float m_vSpeed = 0f; // current vertical velocity
 
     private void Awake()
     {

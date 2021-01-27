@@ -307,6 +307,7 @@ GameObject:
   - component: {fileID: 4833525621509879211}
   - component: {fileID: 4833525621509879204}
   - component: {fileID: 4833525621509879205}
+  - component: {fileID: 7502254584846440937}
   m_Layer: 0
   m_Name: LocalPlayer
   m_TagString: Player
@@ -362,16 +363,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_character: {fileID: 4353344659090997352}
-  m_animator: {fileID: 0}
   m_playerState: 0
-  m_walkSpeed: 5
+  m_animator: {fileID: 0}
+  m_walkSpeed: 10
   m_runSpeed: 10
-  m_gravity: 9.81
   m_isMoving: 0
   m_canMove: 1
   m_canAction: 1
   m_isDashing: 0
   m_movement: {x: 0, y: 0, z: 0}
+  m_gravity: 9.81
 --- !u!114 &4833525621509879211
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -402,6 +403,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 04a166642d05e444899fc9f6c34bb8e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_basicClickDamage: 5
+  m_basicClickManaConsumption: 10
 --- !u!114 &4833525621509879205
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -415,10 +418,26 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_baseHealth: 100
-  m_initialHealthDeduction: 0
+  m_initialHealthDeduction: 99
   m_armorPercentage: 0
-  m_isRegenHealth: 0
-  m_regenHealthPercentage: 1
+  m_isRegenHealth: 1
+  m_regenHealthPercentage: 4
+--- !u!114 &7502254584846440937
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4833525621509879215}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa3325f80b788e249a028729cb8cafa0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_baseMana: 100
+  m_initialManaDeduction: 0
+  m_isRegenMana: 1
+  m_regenManaPercentage: 4
 --- !u!1 &4833525621966242387
 GameObject:
   m_ObjectHideFlags: 0
@@ -500,7 +519,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 0}
   m_FillRect: {fileID: 4833525622333626198}
   m_HandleRect: {fileID: 0}
-  m_Direction: 1
+  m_Direction: 0
   m_MinValue: 0
   m_MaxValue: 100
   m_WholeNumbers: 0
@@ -631,7 +650,7 @@ GameObject:
   - component: {fileID: 4833525622875849794}
   - component: {fileID: 4833525622875849793}
   m_Layer: 0
-  m_Name: Canvas
+  m_Name: FloatingHealthBar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
