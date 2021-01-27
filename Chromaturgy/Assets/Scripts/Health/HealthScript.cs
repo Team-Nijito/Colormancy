@@ -117,6 +117,7 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
         m_armorPercentage = armorPercent;
     }
 
+    public float GetMaxEffectiveHealth() { return m_maxEffectiveHealth; }
     public float GetEffectiveHealth() { return m_effectiveHealth; }
     public float GetArmorPercentage() { return m_armorPercentage; }
 
