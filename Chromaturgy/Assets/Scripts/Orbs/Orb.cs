@@ -24,7 +24,7 @@ public abstract class Orb
     public delegate void GreaterCast(GameObject hit, int orbAmount);
     public delegate void LesserCast(GameObject hit, int orbAmount);
 
-    public abstract void CastShape(GreaterCast greaterEfectMethod, LesserCast lesserEffectMethod, int greaterEffectAmnt, int lesserEffectAmnt, int shapeAmnt);
+    public abstract void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, int greaterEffectAmnt, int lesserEffectAmnt, int shapeAmnt);
     public abstract void CastGreaterEffect(GameObject hit, int orbAmount);
     //Will have to do something different and send over server for this one since most are for allies
     public abstract void CastLesserEffect(GameObject hit, int orbAmount);
