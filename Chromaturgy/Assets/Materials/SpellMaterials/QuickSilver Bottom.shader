@@ -28,6 +28,7 @@
             {
                 float2 uv : TEXCOORD0;
                 float4 vertex : SV_POSITION;
+                float3 objPos : TEXCOORD1;
             };
 
             sampler2D _MainTex;
@@ -40,6 +41,7 @@
                 v2f o;
                 o.vertex = UnityObjectToClipPos(v.vertex);
                 o.uv = v.uv;
+                o.objPos = v.vertex;
                 return o;
             }
 
