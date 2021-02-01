@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 
 using Photon.Pun;
@@ -11,6 +9,7 @@ public class GameManager : MonoBehaviourPunCallbacks
 {
     #region Public Fields
 
+    [Tooltip("The prefab to use for representing the player")]
     public GameObject playerPrefab;
 
     #endregion

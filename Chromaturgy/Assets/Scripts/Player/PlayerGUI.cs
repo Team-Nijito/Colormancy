@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using Photon.Pun;
+using Photon.Realtime;
 
 public class PlayerGUI : MonoBehaviour
 {
@@ -27,7 +29,6 @@ public class PlayerGUI : MonoBehaviour
                 // if we were to networked this, we would use "Photon.ismine" to determine that this
                 // is the player whose health/mana we want to track
                 m_player = players[ind];
-                break;
             }
             if (m_player)
             {

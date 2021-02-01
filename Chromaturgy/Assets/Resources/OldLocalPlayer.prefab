@@ -96,7 +96,7 @@ MonoBehaviour:
   m_zoomAmount: {x: 0, y: -10, z: 10}
   m_minZoom: 10
   m_maxZoom: 150
-  m_rotationAmount: 5
+  m_rotationAmount: 2
   m_camSpeed: 10
 --- !u!114 &1833296143097912680
 MonoBehaviour:

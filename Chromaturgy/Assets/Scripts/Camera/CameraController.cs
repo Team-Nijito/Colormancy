@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using Photon.Pun;
-using Photon.Realtime;
 
 namespace Chromaturgy
 {
@@ -8,6 +7,20 @@ namespace Chromaturgy
     public class CameraController : MonoBehaviourPunCallbacks
     {
         // This script should be a player component, and a camera should be a child of the player
+        public enum CameraZoom
+        {
+            Stationary,
+            In,
+            Out
+        }
+
+        public enum CameraSpin
+        {
+            Stationary,
+            Left,
+            Right
+        }
+
         [SerializeField]
         private Vector3 m_initialCameraOffset = Vector3.zero;
         [SerializeField]
@@ -26,17 +39,12 @@ namespace Chromaturgy
         private Vector3 m_newZoom = Vector3.zero;
         private Quaternion m_newRotation = Quaternion.identity;
 
-        private bool isFollowing;
+        private bool m_isFollowing;
+        private CameraZoom m_currentZoom = CameraZoom.Stationary;
+        private CameraSpin m_currentSpin = CameraSpin.Stationary;
 
         private void Start()
         {
-            //m_TCamera = Camera.main.transform.gameObject;
-            //m_TCameraTransform = m_TCamera.transform;
-            //m_newZoom = m_TCameraTransform.localPosition;
-            //m_newRotation = transform.rotation;
-
-            //if (m_TCamera) InitialCameraTrackPlayer();
-
             if (photonView.IsMine)
             {
                 StartFollowing();
@@ -45,20 +53,30 @@ namespace Chromaturgy
 
         public void StartFollowing()
         {
+            // set variables
             m_TCamera = Camera.main.transform.gameObject;
-            m_TCamera.transform.parent = transform;
             m_TCameraTransform = m_TCamera.transform;
-            m_newZoom = m_TCameraTransform.localPosition;
+            m_TCameraTransform.parent = transform;
             m_newRotation = transform.rotation;
 
-            if (m_TCamera) InitialCameraTrackPlayer();
+            InitialCameraTrackPlayer();
+            m_newZoom = m_TCameraTransform.localPosition;
 
-            isFollowing = true;
+            m_isFollowing = true;
         }
 
         private void Update()
         {
-            if (m_TCamera && isFollowing)
+            if (m_TCamera && m_isFollowing)
+            {
+                HandleCameraZoomInputs();
+                HandleCameraRotationInputs();
+            }
+        }
+
+        void FixedUpdate()
+        {
+            if (m_TCamera && m_isFollowing)
             {
                 HandleCameraZoom();
                 HandleCameraRotation();
@@ -67,38 +85,70 @@ namespace Chromaturgy
 
         private void InitialCameraTrackPlayer()
         {
-            m_TCameraTransform.position = transform.position + m_initialCameraOffset + m_newZoom;
+            m_TCameraTransform.position = transform.position + m_initialCameraOffset;
             m_TCameraTransform.LookAt(transform);
+        }
+
+        private void HandleCameraZoomInputs()
+        {
+            m_currentZoom = CameraZoom.Stationary;
+            if (Input.GetAxis("Mouse ScrollWheel") < 0)
+            {
+                m_currentZoom = CameraZoom.Out;
+            }
+            else if (Input.GetAxis("Mouse ScrollWheel") > 0)
+            {
+                m_currentZoom = CameraZoom.In;
+            }
         }
 
         private void HandleCameraZoom()
         {
-            if (Input.GetAxis("Mouse ScrollWheel") < 0)
+            if (m_currentZoom != CameraZoom.Stationary)
             {
-                // zoom out
-                if ((m_newZoom - m_zoomAmount).y <= m_maxZoom)
-                    m_newZoom -= m_zoomAmount;
+                if (m_currentZoom == CameraZoom.In)
+                {
+                    // zoom in
+                    if ((m_newZoom + m_zoomAmount).y >= m_minZoom)
+                        m_newZoom += m_zoomAmount;
+                }
+                else
+                {
+                    // zoom out
+                    if ((m_newZoom - m_zoomAmount).y <= m_maxZoom)
+                        m_newZoom -= m_zoomAmount;
+                }
+                m_TCameraTransform.localPosition = m_newZoom;
             }
-            else if (Input.GetAxis("Mouse ScrollWheel") > 0)
+        }
+
+        private void HandleCameraRotationInputs()
+        {
+            m_currentSpin = CameraSpin.Stationary;
+            if (Input.GetKey(KeyCode.Q))
             {
-                // zoom in
-                if ((m_newZoom + m_zoomAmount).y >= m_minZoom)
-                    m_newZoom += m_zoomAmount;
+                m_currentSpin = CameraSpin.Left;
             }
-            m_TCameraTransform.localPosition = m_newZoom;
+            else if (Input.GetKey(KeyCode.E))
+            {
+                m_currentSpin = CameraSpin.Right;
+            }
         }
 
         private void HandleCameraRotation()
         {
-            if (Input.GetKey(KeyCode.Q))
+            if (m_currentSpin != CameraSpin.Stationary)
             {
-                m_newRotation *= Quaternion.Euler(Vector3.up * m_rotationAmount);
+                if (m_currentSpin == CameraSpin.Left)
+                {
+                    m_newRotation *= Quaternion.Euler(Vector3.up * m_rotationAmount);
+                }
+                else
+                {
+                    m_newRotation *= Quaternion.Euler(Vector3.up * -m_rotationAmount);
+                }
+                transform.rotation = Quaternion.Lerp(transform.rotation, m_newRotation, Time.deltaTime * m_camSpeed);
             }
-            else if (Input.GetKey(KeyCode.E))
-            {
-                m_newRotation *= Quaternion.Euler(Vector3.up * -m_rotationAmount);
-            }
-            transform.rotation = Quaternion.Lerp(transform.rotation, m_newRotation, Time.deltaTime * m_camSpeed);
         }
     }
 }

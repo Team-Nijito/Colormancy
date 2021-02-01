@@ -303,11 +303,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d936d2e9c3ef3594f9e970317f86a89b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_initialCameraOffset: {x: 0, y: 20, z: -20}
+  m_initialCameraOffset: {x: 0, y: 5, z: -5}
   m_zoomAmount: {x: 0, y: -1, z: 1}
-  m_minZoom: 10
-  m_maxZoom: 150
-  m_rotationAmount: 5
+  m_minZoom: 5
+  m_maxZoom: 25
+  m_rotationAmount: 2
   m_camSpeed: 10
 --- !u!114 &4833525621509879204
 MonoBehaviour:
