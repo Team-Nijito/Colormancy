@@ -33,12 +33,14 @@ public class RedOrb : Orb
         throw new System.NotImplementedException();
     }
 
-    public override void CastShape(GreaterCast greaterEfectMethod, LesserCast lesserEffectMethod, int greaterEffectAmnt, int lesserEffectAmnt, int shapeAmnt)
+    public override void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, (int, int, int) amounts, Transform t)
     {
         //Cast specific orb shape depending on shapeAmnt
         //For any enemies hit
         //greaterEffectMethod(enemy game object, greaterEffectAmnt);
         //For any allies hit 
         //lesserEffectMethod(ally game object, lesserEffectAmnt);
+
+        GameObject g = Object.Instantiate(Resources.Load("Orb/RedOrb", typeof(GameObject)), t.position, t.rotation) as GameObject;
     }
 }
