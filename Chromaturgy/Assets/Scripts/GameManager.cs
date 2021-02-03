@@ -50,7 +50,7 @@ public class GameManager : MonoBehaviourPunCallbacks
             {
                 if (HealthScript.LocalPlayerInstance == null)
                 {
-                    GameObject player = PhotonNetwork.Instantiate(this.playerPrefab.name, new Vector3(0f, 2f, 0f), Quaternion.identity, 0);
+                    GameObject player = PhotonNetwork.Instantiate(this.playerPrefab.name, new Vector3(0f, 3f, 0f), Quaternion.identity, 0);
 
                     // Instantiate the health/mana GUI after instantiating the player
                     GameObject playerUI = Instantiate(healthManaBarPrefab);

@@ -13,7 +13,7 @@ public class PlayerMouse : MonoBehaviourPunCallbacks
     private float m_basicClickManaConsumption = 10f;
     
 
-    private GameObject m_playerCharacter = null;
+    private GameObject m_playerCharacter;
 
     private PlayerMovement m_pmScript;
     private ManaScript m_mScript;
@@ -41,9 +41,11 @@ public class PlayerMouse : MonoBehaviourPunCallbacks
                 PlayerFacingMouse(mousePosition);
             }
             
-            // Trigger attack animation 
-            m_animator.SetInteger("Action", 1);
-            m_animator.SetTrigger("AttackTrigger");
+            if (m_animator)
+            {
+                // Trigger attack animation 
+                photonView.RPC("TriggerPlayerAttackAnim", RpcTarget.All);
+            }
 
             if (m_data.collider.gameObject)
             {
@@ -104,5 +106,13 @@ public class PlayerMouse : MonoBehaviourPunCallbacks
             Vector3 targetPosition = new Vector3(mousePos.x, 0, mousePos.z);
             m_playerCharacter.transform.LookAt(targetPosition);
         }
+    }
+
+    [PunRPC]
+    public void TriggerPlayerAttackAnim()
+    {
+        // Trigger attack animation 
+        m_animator.SetInteger("Action", 1);
+        m_animator.SetTrigger("AttackTrigger");
     }
 }

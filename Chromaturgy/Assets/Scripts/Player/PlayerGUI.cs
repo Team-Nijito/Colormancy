@@ -1,7 +1,5 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using Photon.Pun;
-using Photon.Realtime;
 
 public class PlayerGUI : MonoBehaviour
 {
@@ -38,8 +36,19 @@ public class PlayerGUI : MonoBehaviour
     // just call this whenever we know for sure that m_player exists
     void AssignLocalVariables()
     {
-        m_playerHealth = m_playerTarget.GetComponent<HealthScript>();
+        m_playerHealth = m_playerTarget.transform.GetComponent<HealthScript>();
         m_playerMana = m_playerTarget.GetComponent<ManaScript>();
+
+        string characterName = "Mage"; // name of character in Player prefab
+        // if the components are not located in the parent GameObject, they should be attached to the character
+        if (!m_playerHealth)
+        {
+            m_playerHealth = m_playerTarget.transform.Find(characterName).GetComponent<HealthScript>();
+        }
+        if (!m_playerMana)
+        {
+            m_playerMana = m_playerTarget.transform.Find(characterName).GetComponent<ManaScript>();
+        }
     }
 
     public void SetTarget(GameObject _target)
