@@ -139,7 +139,7 @@ namespace Chromaturgy
         {
             if (m_currentSpin != CameraSpin.Stationary)
             {
-                if (m_currentSpin == CameraSpin.Left)
+                if (m_currentSpin == CameraSpin.Right)
                 {
                     m_newRotation *= Quaternion.Euler(Vector3.up * m_rotationAmount);
                 }

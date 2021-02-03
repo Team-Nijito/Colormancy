@@ -41,14 +41,14 @@ public class PlayerMouse : MonoBehaviourPunCallbacks
                 PlayerFacingMouse(mousePosition);
             }
             
-            if (m_animator)
+            if (m_data.collider.gameObject && m_data.collider.gameObject.tag != "Player")
             {
-                // Trigger attack animation 
-                photonView.RPC("TriggerPlayerAttackAnim", RpcTarget.All);
-            }
+                if (m_animator)
+                {
+                    // Trigger attack animation 
+                    photonView.RPC("TriggerPlayerAttackAnim", RpcTarget.All);
+                }
 
-            if (m_data.collider.gameObject)
-            {
                 //print(m_data.collider.name);
                 DebugClickDamage(m_basicClickDamage);
             }
