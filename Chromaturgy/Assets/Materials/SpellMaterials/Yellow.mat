@@ -67,11 +67,13 @@ Material:
     - _Mode: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.02
+    - _RotationSpeed: 2.26
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _UVSec: 0
     - _ZWrite: 1
     m_Colors:
-    - _Color: {r: 0.9433962, g: 0.9318789, b: 0.6096476, a: 1}
+    - _Color: {r: 0.9245283, g: 0.9061209, b: 0.39684942, a: 1}
+    - _ColorFresnel: {r: 0.9155225, g: 0.9339623, b: 0.73571557, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
