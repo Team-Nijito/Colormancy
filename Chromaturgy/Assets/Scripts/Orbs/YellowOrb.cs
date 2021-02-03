@@ -33,7 +33,7 @@ public class YellowOrb : Orb
         throw new System.NotImplementedException();
     }
 
-    public override void CastShape(GreaterCast greaterEfectMethod, LesserCast lesserEffectMethod, int greaterEffectAmnt, int lesserEffectAmnt, int shapeAmnt)
+    public override void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, (int, int, int) amounts, Transform t)
     {
         //Cast specific orb shape depending on shapeAmnt
         //For any enemies hit

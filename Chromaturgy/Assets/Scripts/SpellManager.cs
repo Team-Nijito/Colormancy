@@ -29,9 +29,9 @@ public class SpellManager : MonoBehaviour
             SpellCooldown = BASE_COOLDOWN * orbs[2].CooldownMod;
         }
 
-        public void Cast()
+        public void Cast(Transform t)
         {
-            orbs[2].CastShape(orbs[0].CastGreaterEffect, orbs[1].CastLesserEffect, orbDict[orbs[0].OrbElement], orbDict[orbs[1].OrbElement], orbDict[orbs[2].OrbElement]);
+            orbs[2].CastShape(orbs[0].CastGreaterEffect, orbs[1].CastLesserEffect, (orbDict[orbs[0].OrbElement], orbDict[orbs[1].OrbElement], orbDict[orbs[2].OrbElement]), t);
         }
     }
 
