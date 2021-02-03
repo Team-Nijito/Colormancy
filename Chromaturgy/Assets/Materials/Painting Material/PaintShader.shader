@@ -20,6 +20,7 @@
 
                 #include "UnityCG.cginc"
                 #include "UnityLightingCommon.cginc"
+            #pragma multi_compile_fwdbase nolightmap nodirlightmap nodynlightmap novertexlight
                 #include "AutoLight.cginc"
 
                 struct appdata
@@ -204,6 +205,7 @@
 
                 #include "UnityCG.cginc"
                 #include "UnityLightingCommon.cginc"
+                #pragma multi_compile_fwdadd_fullshadows
                 #include "AutoLight.cginc"
 
                 struct appdata
