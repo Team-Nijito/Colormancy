@@ -104,7 +104,7 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
 
                 // bootleg respawn which doesn't work b/c we're syncing transforms and health
                 //transform.position = new Vector3(0, 5, 0);
-                //m_effectiveHealth = m_maxEffectiveHealth;
+                photonView.RPC("RespawnPlayer", RpcTarget.All, new Vector3(0, 5, 0));
             }
             else
             {
@@ -172,5 +172,13 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
         if (damageValue <= 0)
             throw new ArgumentException(string.Format("{0} should be greater than zero", damageValue), "damageValue");
         m_effectiveHealth -= (damageValue - (m_armorPercentage / 100 * damageValue));
+    }
+
+    [PunRPC]
+    public void RespawnPlayer(Vector3 position)
+    {
+        // doesn't work, transform is synced
+        transform.position = position;
+        m_effectiveHealth = m_maxEffectiveHealth;
     }
 }
