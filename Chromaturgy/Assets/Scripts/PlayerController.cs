@@ -62,7 +62,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             GetShooting();
         }
 
-        if (this.isShooting)
+        if (isShooting)
         {
             GameObject paintBallGo = PhotonNetwork.Instantiate(paintball.name, transform.position + lastDirection, transform.rotation, 0);
             Rigidbody paintballRigidbody = paintBallGo.GetComponent<Rigidbody>();
@@ -105,11 +105,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         else
         {
             isShooting = false;
-            Rigidbody paintballRigidbody = Instantiate(paintball, transform.position + lastDirection, transform.rotation);
-            paintballRigidbody.AddForce(lastDirection * 10, ForceMode.VelocityChange);
+            //Rigidbody paintballRigidbody = Instantiate(paintball, transform.position + lastDirection, transform.rotation);
+            //paintballRigidbody.AddForce(lastDirection * 10, ForceMode.VelocityChange);
 
-            SpellController pc = paintballRigidbody.gameObject.GetComponent<SpellController>();
-            pc.SetSpellColors(SpellController.SpellColor.Orange, SpellController.SpellColor.Orange, SpellController.SpellColor.Orange);
+            //SpellController pc = paintballRigidbody.gameObject.GetComponent<SpellController>();
+            //pc.SetSpellColors(SpellController.SpellColor.Orange, SpellController.SpellColor.Orange, SpellController.SpellColor.Orange);
         }
     }
 

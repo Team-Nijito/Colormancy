@@ -11,9 +11,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
     {
         Idle = 0,
         Move = 1,
-        Jump = 2,
-        DoubleJump = 3,
-        Fall = 4,
+        Fall = 2,
     }
 
     // Components
@@ -29,7 +27,6 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
 
     [HideInInspector] public bool m_isMoving = false;
     [HideInInspector] public bool m_canMove = true;
-    [HideInInspector] public bool m_canAction = true;
     [HideInInspector] public bool m_isDashing = false;
 
     [HideInInspector] public Vector3 m_movement = Vector3.zero;

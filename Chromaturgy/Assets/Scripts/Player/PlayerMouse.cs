@@ -8,9 +8,9 @@ public class PlayerMouse : MonoBehaviourPunCallbacks
     public float m_ignoreTurnRadius = 1f;
 
     [SerializeField]
-    private float m_basicClickDamage = 5f;
+    private float m_basicClickDamage = 20f;
     [SerializeField]
-    private float m_basicClickManaConsumption = 10f;
+    private float m_basicClickManaConsumption = 3f;
     
 
     private GameObject m_playerCharacter;
@@ -41,13 +41,15 @@ public class PlayerMouse : MonoBehaviourPunCallbacks
                 PlayerFacingMouse(mousePosition);
             }
             
-            if (m_data.collider.gameObject && m_data.collider.gameObject.tag != "Player")
+            if (m_data.collider.gameObject) // && m_data.collider.gameObject.tag != "Player")
             {
                 if (m_animator)
                 {
                     // Trigger attack animation 
                     photonView.RPC("TriggerPlayerAttackAnim", RpcTarget.All);
                 }
+
+                photonView.RPC("ShootPaintball", RpcTarget.All, m_playerCharacter.transform.position, m_playerCharacter.transform.forward, m_playerCharacter.transform.rotation);
 
                 //print(m_data.collider.name);
                 DebugClickDamage(m_basicClickDamage);
@@ -66,10 +68,10 @@ public class PlayerMouse : MonoBehaviourPunCallbacks
         // test: each attack consumes 10 mana
         if (hscript && m_mScript.GetEffectiveMana() >= m_basicClickManaConsumption)
         {
-            m_mScript.ConsumeMana(10);
+            m_mScript.ConsumeMana(m_basicClickManaConsumption);
             //hscript.TakeDamage(damage);
             PhotonView photonView = PhotonView.Get(m_data.transform.gameObject);
-            photonView.RPC("TakeDamage", RpcTarget.All, (float)10);
+            photonView.RPC("TakeDamage", RpcTarget.All, (float)m_basicClickDamage);
         }
     }
 
