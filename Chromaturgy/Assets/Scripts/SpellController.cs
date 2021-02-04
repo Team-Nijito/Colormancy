@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using Photon.Pun;
 
 public class SpellController : MonoBehaviour
 {
@@ -101,5 +102,11 @@ public class SpellController : MonoBehaviour
             Destroy(gameObject);
         }
 
+    }
+
+    // honest to god I have no idea how you're supposed to legitly change the color
+    public void ChangeColor(Vector3 newColor)
+    {
+        paintColor = new Color(newColor.x, newColor.z, newColor.z);
     }
 }

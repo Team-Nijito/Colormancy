@@ -352,13 +352,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a8e6785b827f82e4fb944ea40320a7b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  paintball: {fileID: 6225313193489255385, guid: 0eacf1883e1227c459d5304882b23314,
+  m_paintball: {fileID: 6225313193489255385, guid: 0eacf1883e1227c459d5304882b23314,
     type: 3}
-  paintColor: {r: 0.6501031, g: 0.8, b: 0.29019615, a: 0}
-  paintballSpawnHeight: 2
-  paintballSpawnDistanceFromPlayer: 2
-  paintballForce: 15
-  paintballDespawnTime: 3
+  m_paintColor: {r: 0.28097185, g: 0.7735849, b: 0.30798328, a: 0}
+  m_paintballSpawnHeight: 3
+  m_paintballSpawnDistanceFromPlayer: 2
+  m_paintballForce: 15
+  m_paintballDespawnTime: 3
+  m_paintballCooldown: 0.7
+  m_numBeamProjectiles: 8
+  m_beamSpread: 0.1
 --- !u!114 &8921435665619611767
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -410,7 +413,7 @@ MonoBehaviour:
     SynchronizeType: 1
     Name: Moving
   - Type: 1
-    SynchronizeType: 1
+    SynchronizeType: 0
     Name: AnimationSpeed
   - Type: 3
     SynchronizeType: 0
@@ -422,7 +425,7 @@ MonoBehaviour:
     SynchronizeType: 1
     Name: Velocity Z
   - Type: 3
-    SynchronizeType: 1
+    SynchronizeType: 0
     Name: Action
   - Type: 9
     SynchronizeType: 0
@@ -457,6 +460,7 @@ MonoBehaviour:
   ObservedComponents:
   - {fileID: 5820395927475117110}
   - {fileID: 5820395927475117115}
+  - {fileID: 8921435665619611767}
   - {fileID: -1104988167870857447}
   - {fileID: 4310232013060416496}
   viewIdField: 0

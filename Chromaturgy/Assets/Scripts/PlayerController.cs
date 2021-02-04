@@ -10,14 +10,14 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     public GameObject playerUIPrefab;
 
     public Rigidbody paintball;
-    private Rigidbody rigidbody;
+    private Rigidbody m_rigidbody;
     public Color paintColor;
 
     public float speed = 0.1f;
     private float hMovement;
     private float vMovement;
 
-    private Camera camera;
+    private Camera m_camera;
     private Vector3 lastDirection;
 
     private bool isShooting = false;
@@ -39,14 +39,14 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             _uiGo.SendMessage("SetTarget", this, SendMessageOptions.RequireReceiver);
         }
 
-        camera = Camera.main;
+        m_camera = Camera.main;
 
         hMovement = 0;
         vMovement = 0;
 
-        camera.transform.LookAt(Vector3.zero);
+        m_camera.transform.LookAt(Vector3.zero);
 
-        rigidbody = GetComponent<Rigidbody>();
+        m_rigidbody = GetComponent<Rigidbody>();
     }
 
     void Update()
@@ -67,9 +67,12 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             GameObject paintBallGo = PhotonNetwork.Instantiate(paintball.name, transform.position + lastDirection, transform.rotation, 0);
             Rigidbody paintballRigidbody = paintBallGo.GetComponent<Rigidbody>();
             paintballRigidbody.AddForce(lastDirection * 10, ForceMode.VelocityChange);
+
+            SpellController pc = paintballRigidbody.gameObject.GetComponent<SpellController>();
+            pc.SetSpellColors(SpellController.SpellColor.Orange, SpellController.SpellColor.Orange, SpellController.SpellColor.Orange);
         }
 
-        camera.transform.position = transform.position + new Vector3(-20, 20, -20);
+        m_camera.transform.position = transform.position + new Vector3(-20, 20, -20);
     }
 
     void GetMovement()
@@ -105,11 +108,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         else
         {
             isShooting = false;
-            //Rigidbody paintballRigidbody = Instantiate(paintball, transform.position + lastDirection, transform.rotation);
-            //paintballRigidbody.AddForce(lastDirection * 10, ForceMode.VelocityChange);
-
-            //SpellController pc = paintballRigidbody.gameObject.GetComponent<SpellController>();
-            //pc.SetSpellColors(SpellController.SpellColor.Orange, SpellController.SpellColor.Orange, SpellController.SpellColor.Orange);
         }
     }
 
@@ -121,7 +119,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         if (direction != Vector3.zero)
             lastDirection = direction.normalized;
 
-        rigidbody.MovePosition(rigidbody.position + direction.normalized * speed);
+        m_rigidbody.MovePosition(m_rigidbody.position + direction.normalized * speed);
     }
 
     //IPunObservable Implementation

@@ -94,7 +94,6 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
             m_username.text = owner.NickName;
         }
 
-
         if (m_effectiveHealth <= 0)
         {
             // die
