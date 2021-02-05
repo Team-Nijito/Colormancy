@@ -4,12 +4,16 @@ using Photon.Pun;
 public class PlayerMouse : MonoBehaviourPunCallbacks
 {
     // Handles the behavior of mouse reticle, and turning the player (towards the mouse)
+
+    public float m_ignoreTurnRadius = 1f;
+
     [SerializeField]
     private float m_basicClickDamage = 5f;
     [SerializeField]
     private float m_basicClickManaConsumption = 10f;
+    
 
-    private GameObject m_playerCharacter = null;
+    private GameObject m_playerCharacter;
 
     private PlayerMovement m_pmScript;
     private ManaScript m_mScript;
@@ -31,13 +35,17 @@ public class PlayerMouse : MonoBehaviourPunCallbacks
 
         if (Input.GetMouseButtonDown(0) && photonView.IsMine && PhotonNetwork.IsConnected) //  && !m_pmScript.m_isMoving
         {
-            // Cannot attack while moving
-
-            PlayerFacingMouse(mousePosition);
+            if ((new Vector3(mousePosition.x, 0, mousePosition.z) - new Vector3(transform.position.x, 0, transform.position.z)).magnitude > m_ignoreTurnRadius)
+            {
+                // only turn player if we're not clicking directly on the player or near the player
+                PlayerFacingMouse(mousePosition);
+            }
             
-            // Trigger attack animation 
-            m_animator.SetInteger("Action", 1);
-            m_animator.SetTrigger("AttackTrigger");
+            if (m_animator)
+            {
+                // Trigger attack animation 
+                photonView.RPC("TriggerPlayerAttackAnim", RpcTarget.All);
+            }
 
             if (m_data.collider.gameObject)
             {
@@ -59,7 +67,9 @@ public class PlayerMouse : MonoBehaviourPunCallbacks
         if (hscript && m_mScript.GetEffectiveMana() >= m_basicClickManaConsumption)
         {
             m_mScript.ConsumeMana(10);
-            hscript.TakeDamage(damage);
+            //hscript.TakeDamage(damage);
+            PhotonView photonView = PhotonView.Get(m_data.transform.gameObject);
+            photonView.RPC("TakeDamage", RpcTarget.All, (float)10);
         }
     }
 
@@ -96,5 +106,13 @@ public class PlayerMouse : MonoBehaviourPunCallbacks
             Vector3 targetPosition = new Vector3(mousePos.x, 0, mousePos.z);
             m_playerCharacter.transform.LookAt(targetPosition);
         }
+    }
+
+    [PunRPC]
+    public void TriggerPlayerAttackAnim()
+    {
+        // Trigger attack animation 
+        m_animator.SetInteger("Action", 1);
+        m_animator.SetTrigger("AttackTrigger");
     }
 }

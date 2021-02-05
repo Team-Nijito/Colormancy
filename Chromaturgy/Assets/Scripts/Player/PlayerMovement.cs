@@ -2,9 +2,10 @@
 using Photon.Pun;
 
 [RequireComponent(typeof(CharacterController))]
-public class PlayerMovement : MonoBehaviourPunCallbacks
+public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
 {
     // This script handles movement input and animations
+    public static GameObject LocalPlayerInstance;
 
     public enum PlayerState
     {
@@ -38,12 +39,24 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     private Vector3 m_movementNoGrav = Vector3.zero;
     private readonly float m_rotationSpeed = 40f; // from WarriorMovementControllerFREE.cs
     private float m_vSpeed = 0f; // current vertical velocity
+    private Transform m_characterTransform; 
 
     private void Awake()
     {
         m_animator = GetComponentInChildren<Animator>();
-        m_animator.updateMode = AnimatorUpdateMode.AnimatePhysics;
-        m_animator.cullingMode = AnimatorCullingMode.CullUpdateTransforms;
+        if (m_animator)
+        {
+            m_animator.updateMode = AnimatorUpdateMode.AnimatePhysics;
+            m_animator.cullingMode = AnimatorCullingMode.CullUpdateTransforms;
+        }
+        if (photonView.IsMine)
+        {
+            LocalPlayerInstance = gameObject;
+        }
+        if (m_character)
+        {
+            m_characterTransform = m_character.transform;
+        }
     }
 
 
@@ -57,13 +70,29 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     // Update is called once per frame
     void Update()
     {
-        if (photonView.IsMine && PhotonNetwork.IsConnected)
-            ProcessPlayerInput();
+        if (PhotonNetwork.IsConnected)
+        {
+            if (photonView.IsMine == false)
+            {
+                return;
+            }
+            else
+            {
+                ProcessPlayerInput();
+            }
+        }
     }
 
-    private void LateUpdate()
+    void FixedUpdate()
     {
-        MovePlayer();
+        if (photonView.IsMine == false)
+        {
+            return;
+        }
+        else
+        {
+            MovePlayer();
+        }
     }
 
     // Takes in player's iputs for movement
@@ -105,12 +134,13 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
             else
             {
                 m_controller.Move(m_movement * m_walkSpeed * Time.deltaTime);
-                m_animator.enabled = false;
-                m_animator.enabled = true;
+
+                if (m_animator)
+                {
+                    m_animator.enabled = false;
+                    m_animator.enabled = true;
+                }
             }
-            
-            // align the wizard's position to be the same as the parent GameObject position, and shift it down a bit
-            m_character.transform.position = transform.position - new Vector3(0,1,0);
 
             // check if player is moving by zeroing out the y value of m_movement (ignore gravity) and taking the magnitude
             if (m_movementNoGrav.magnitude > 0f)
@@ -119,23 +149,41 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
                 {
                     // running
                     m_isMoving = true;
-                    m_animator.SetBool("Moving", true);
-                    m_animator.SetFloat("Velocity Z", m_movementNoGrav.magnitude + 6);
+                    
+                    if (m_animator)
+                    {
+                        m_animator.SetBool("Moving", true);
+                        m_animator.SetFloat("Velocity Z", m_movementNoGrav.magnitude + 6);
+                    }
                 }
                 else
                 {
                     // walking
                     m_isMoving = true;
-                    m_animator.SetBool("Moving", true);
-                    m_animator.SetFloat("Velocity Z", m_movementNoGrav.magnitude);
+                    
+                    if (m_animator)
+                    {
+                        m_animator.SetBool("Moving", true);
+                        m_animator.SetFloat("Velocity Z", m_movementNoGrav.magnitude);
+                    }
                 }
             }
             else if (m_isMoving)
             {
                 // idle
                 m_isMoving = false;
-                m_animator.SetBool("Moving", false);
-                m_animator.SetFloat("Velocity Z", 0);
+                
+                if (m_animator)
+                {
+                    m_animator.SetBool("Moving", false);
+                    m_animator.SetFloat("Velocity Z", 0);
+                }
+            }
+
+            // align the wizard's position to be the same as the parent GameObject position, and shift it down a bit
+            if (m_character)
+            {
+                m_character.transform.position = transform.position - new Vector3(0, 1, 0);
             }
         }
     }
@@ -162,7 +210,33 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     {
         if (m_movementNoGrav != Vector3.zero)
         {
-            m_character.transform.rotation = Quaternion.Slerp(m_character.transform.rotation, Quaternion.LookRotation(m_movementNoGrav), Time.deltaTime * m_rotationSpeed);
+            if (m_character)
+            {
+                m_character.transform.rotation = Quaternion.Slerp(m_character.transform.rotation, Quaternion.LookRotation(m_movementNoGrav), Time.deltaTime * m_rotationSpeed);
+            }
+        }
+    }
+
+    // IPunObservable Implementation
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        // Use this information to sync child rotational transform
+        // instead of placing PhotonView and PhotonTransfromView on child object
+        if (stream.IsWriting)
+        {
+            if (m_character)
+            {
+                //stream.SendNext(m_characterTransform.localPosition);
+                stream.SendNext(m_characterTransform.localRotation);
+            }
+        }
+        else
+        {
+            if (m_character)
+            {
+                //m_characterTransform.localPosition = (Vector3)stream.ReceiveNext();
+                m_characterTransform.localRotation = (Quaternion)stream.ReceiveNext();
+            }
         }
     }
 }

@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using Photon.Pun;
+using Photon.Realtime;
 
 public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
 {
@@ -10,6 +11,8 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     // only works on gameobjects with a child canvas and UI slider
 
     public static GameObject LocalPlayerInstance;
+    public Slider m_healthBar;
+    public Text m_username;
 
     [SerializeField]
     private float m_baseHealth = 100f;
@@ -36,7 +39,6 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     // max health after buffs / whatever
     private float m_maxEffectiveHealth;
 
-    private Slider m_healthBar;
     private Transform m_healthBarTransform;
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
@@ -47,7 +49,7 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
         }
         else
         {
-            this.m_effectiveHealth = (float)stream.ReceiveNext();
+            m_effectiveHealth = (float)stream.ReceiveNext();
         }
     }
 
@@ -55,16 +57,24 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     {
         if (photonView.IsMine)
         {
-            HealthScript.LocalPlayerInstance = this.gameObject;
+            LocalPlayerInstance = gameObject;
         }
 
-        DontDestroyOnLoad(this.gameObject);
+        if (!m_username)
+        {
+            Debug.LogError("Public Text variable m_text not set for HealthScript.cs! (it should be the text for the player's username)");
+        }
+        else
+        {
+            Player owner = photonView.Controller;
+            m_username.text = owner.NickName;
+        }
+        DontDestroyOnLoad(gameObject);
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        m_healthBar = GetComponentInChildren<Slider>();
         m_healthBarTransform = m_healthBar.transform;
         m_effectiveHealth = m_baseHealth - m_initialHealthDeduction;
         m_maxEffectiveHealth = m_baseHealth;
@@ -73,13 +83,28 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     // Update is called once per frame
     void Update()
     {
+        if (m_username.text == "Unnamed player")
+        {
+            // display usernames from players who are already in the room to new players who had just joined the room
+            Player owner = photonView.Controller;
+            m_username.text = owner.NickName;
+        }
+
+
         if (m_effectiveHealth <= 0)
         {
             // die
             if (transform.gameObject.tag == "Player")
             {
+                // TODO: actual death + respawn system
+
                 // for player objects, just make them inactive
-                transform.gameObject.SetActive(false);
+                // for players who are killed, the scene won't be updated anymore (looks like player crashed)
+                //transform.gameObject.SetActive(false);
+
+                // bootleg respawn which doesn't work b/c we're syncing transforms and health
+                //transform.position = new Vector3(0, 5, 0);
+                photonView.RPC("RespawnPlayer", RpcTarget.All, new Vector3(0, 5, 0));
             }
             else
             {
@@ -107,6 +132,17 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
             m_effectiveHealth = tempNewHealth;
     }
 
+    public float GetMaxEffectiveHealth() { return m_maxEffectiveHealth; }
+    public float GetEffectiveHealth() { return m_effectiveHealth; }
+    public float GetArmorPercentage() { return m_armorPercentage; }
+
+    private void HealthBarFaceCamera()
+    {
+        // make the health bar orient towards the main camera
+        m_healthBarTransform.LookAt(Camera.main.transform);
+    }
+
+    [PunRPC]
     public void AlterArmorValue(float armorPercent)
     {
         // replaces the armorPercentage with new value
@@ -117,10 +153,7 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
         m_armorPercentage = armorPercent;
     }
 
-    public float GetMaxEffectiveHealth() { return m_maxEffectiveHealth; }
-    public float GetEffectiveHealth() { return m_effectiveHealth; }
-    public float GetArmorPercentage() { return m_armorPercentage; }
-
+    [PunRPC]
     public void Heal(float healValue)
     {
         // heal formula
@@ -131,12 +164,7 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
         m_effectiveHealth = m_effectiveHealth > m_maxEffectiveHealth ? m_maxEffectiveHealth : m_effectiveHealth + healValue;
     }
 
-    private void HealthBarFaceCamera()
-    {
-        // make the health bar orient towards the main camera
-        m_healthBarTransform.LookAt(Camera.main.transform);
-    }
-
+    [PunRPC]
     public void TakeDamage(float damageValue)
     {
         // damage formula
@@ -144,5 +172,13 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
         if (damageValue <= 0)
             throw new ArgumentException(string.Format("{0} should be greater than zero", damageValue), "damageValue");
         m_effectiveHealth -= (damageValue - (m_armorPercentage / 100 * damageValue));
+    }
+
+    [PunRPC]
+    public void RespawnPlayer(Vector3 position)
+    {
+        // doesn't work, transform is synced
+        transform.position = position;
+        m_effectiveHealth = m_maxEffectiveHealth;
     }
 }

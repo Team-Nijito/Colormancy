@@ -6,53 +6,70 @@ public class PlayerGUI : MonoBehaviour
     public Image m_healthBar;
     public Image m_ManaBar;
 
-    public GameObject m_player;
+    private GameObject m_playerTarget; // the player whose health and mana to track
     private HealthScript m_playerHealth;
     private ManaScript m_playerMana;
 
-    // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
-        if (m_player)
-        {
-            AssignLocalVariables();
-        }
-        else
-        {
-            print($"No player assigned for PlayerGUI. Trying to look for player with tag 'player'");
-            GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
-            for (short ind = 0; ind < players.Length; ind++)
-            {
-                // for now just take the first player and break from loop
-                // if we were to networked this, we would use "Photon.ismine" to determine that this
-                // is the player whose health/mana we want to track
-                m_player = players[ind];
-                break;
-            }
-            if (m_player)
-            {
-                print("Player assigned for PlayerGUI.");
-                AssignLocalVariables();
-            }
-            else
-                print("No player assigned for PlayerGUI.");
-        }
+        // Set this healthbar as a child of a canvas (so it will be displayed properly) 
+        transform.SetParent(GameObject.Find("Canvas").GetComponent<Transform>(), false);
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (m_player)
+        if (m_playerTarget)
         {
             m_healthBar.fillAmount = m_playerHealth.GetEffectiveHealth() / m_playerHealth.GetMaxEffectiveHealth();
             m_ManaBar.fillAmount = m_playerMana.GetEffectiveMana() / m_playerMana.GetMaxEffectiveMana();
+        }
+        else
+        {
+            // Destroy itself if the target is null, It's a fail safe when Photon is destroying Instances of a Player over the network
+            // tl;dr if the player doesn't exist, destroy the playerGUI
+            Destroy(gameObject);
+            return;
         }
     }
 
     // just call this whenever we know for sure that m_player exists
     void AssignLocalVariables()
     {
-        m_playerHealth = m_player.GetComponent<HealthScript>();
-        m_playerMana = m_player.GetComponent<ManaScript>();
+        m_playerHealth = m_playerTarget.transform.GetComponent<HealthScript>();
+        m_playerMana = m_playerTarget.GetComponent<ManaScript>();
+
+        string characterName = "Mage"; // name of character in Player prefab
+        // if the components are not located in the parent GameObject, they should be attached to the character
+        if (!m_playerHealth)
+        {
+            m_playerHealth = m_playerTarget.transform.Find(characterName).GetComponent<HealthScript>();
+        }
+        if (!m_playerMana)
+        {
+            m_playerMana = m_playerTarget.transform.Find(characterName).GetComponent<ManaScript>();
+        }
+    }
+
+    public void SetTarget(GameObject _target)
+    {
+        if (_target == null)
+        {
+            Debug.LogError("<Color=Red><a>Missing</a></Color> GameObject target for PlayerGUI.SetTarget.", this);
+            return;
+        }
+        // Cache references for efficiency
+        m_playerTarget = _target;
+        
+        // Cpde snippet for names above players ....
+        //if (playerNameText != null)
+        //{
+        //    playerNameText.text = target.photonView.Owner.NickName;
+        //}
+
+        if (_target != null)
+        {
+            AssignLocalVariables();
+        }
     }
 }

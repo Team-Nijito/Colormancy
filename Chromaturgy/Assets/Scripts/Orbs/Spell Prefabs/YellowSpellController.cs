@@ -15,7 +15,7 @@ public class YellowSpellController : MonoBehaviour
     [SerializeField]
     private float rotationSpeed;
     private float startTime;
-
+   
     private Vector3 fromPlayer;
 
     [SerializeField]

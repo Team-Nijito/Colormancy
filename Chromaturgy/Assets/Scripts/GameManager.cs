@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 
 using Photon.Pun;
@@ -11,7 +9,11 @@ public class GameManager : MonoBehaviourPunCallbacks
 {
     #region Public Fields
 
+    [Tooltip("The prefab to use for representing the player")]
     public GameObject playerPrefab;
+
+    [Tooltip("The prefab for the Health and Mana GUI")]
+    public GameObject healthManaBarPrefab;
 
     #endregion
 
@@ -48,7 +50,11 @@ public class GameManager : MonoBehaviourPunCallbacks
             {
                 if (HealthScript.LocalPlayerInstance == null)
                 {
-                    PhotonNetwork.Instantiate(this.playerPrefab.name, new Vector3(0f, 2f, 0f), Quaternion.identity, 0);
+                    GameObject player = PhotonNetwork.Instantiate(this.playerPrefab.name, new Vector3(0f, 3f, 0f), Quaternion.identity, 0);
+
+                    // Instantiate the health/mana GUI after instantiating the player
+                    GameObject playerUI = Instantiate(healthManaBarPrefab);
+                    playerUI.GetComponent<PlayerGUI>().SetTarget(player);
                 }
                 else
                 {
