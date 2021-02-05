@@ -9,29 +9,47 @@ public class YellowSpellController : MonoBehaviour
 
     [SerializeField]
     private AnimationCurve rotationScale;
+    [SerializeField]
+    private AnimationCurve positionScale;
 
     [SerializeField]
     private float rotationSpeed;
     private float startTime;
    
+    private Vector3 fromPlayer;
 
-    // Start is called before the first frame update
+    [SerializeField]
+    private float spherePaintRadius;
+
+    [SerializeField]
+    private Color paintColor;
+
+    [SerializeField]
+    private float lifetime;
+
     void OnEnable()
     {
         startTime = Time.time;
+
+        rotationScale.postWrapMode = WrapMode.Loop;
+        positionScale.postWrapMode = WrapMode.Loop;
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
-        transform.position = playerTransform.position;
-
         for (int i = 0; i < transform.childCount; i++) {
-            Vector3 fromParent = transform.GetChild(i).position - transform.position;
+            // save the new transformation
+            fromPlayer = transform.GetChild(i).position - playerTransform.position;
 
-            transform.GetChild(i).position += fromParent.normalized * 0.01f;
+            // get correct distance and vector from player first
+            transform.GetChild(i).position = playerTransform.position + fromPlayer.normalized * positionScale.Evaluate((Time.time - startTime) / lifetime);
 
-            transform.GetChild(i).RotateAround(transform.position, Vector3.up, rotationScale.Evaluate(Time.time - startTime) * rotationSpeed / fromParent.magnitude);
+            // then rotate
+            transform.GetChild(i).RotateAround(playerTransform.position, Vector3.up, rotationScale.Evaluate((Time.time - startTime) / lifetime) * rotationSpeed / fromPlayer.magnitude);
+
+            // where to store globals? eg layermask
+            PaintingManager.PaintSphere(paintColor, transform.GetChild(i).position, spherePaintRadius);
         }
     }
 }
