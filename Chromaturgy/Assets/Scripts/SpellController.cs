@@ -19,6 +19,8 @@ public class SpellController : MonoBehaviour
     public Mesh[] spellMeshes;
     public Material[] spellMaterials;
 
+    private Task spellDecay;
+
     private SpellColor greater;
     private SpellColor lesser;
     private SpellColor shape;
@@ -99,6 +101,9 @@ public class SpellController : MonoBehaviour
                 mesh.colors = colors;
             }
 
+            //spellDecay.Stop();
+            //gameObject.SetActive(false);
+            //GetComponent<Rigidbody>().velocity = Vector3.zero;
             Destroy(gameObject);
         }
 
@@ -109,4 +114,11 @@ public class SpellController : MonoBehaviour
     {
         paintColor = new Color(newColor.x, newColor.z, newColor.z);
     }
+
+    // every spell has an associated decay rate which is represented by a Task which is basically a IEnumerator but with more features
+    // (pausing, checking when Task is finished ... etc)
+    //public void SetSpellDecay(Task countDown)
+    //{
+    //    spellDecay = countDown;
+    //}
 }

@@ -18,7 +18,7 @@ GameObject:
   - component: {fileID: 4506634276466184460}
   - component: {fileID: 4506634276466184385}
   m_Layer: 8
-  m_Name: Paintball
+  m_Name: PaintballResource
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
