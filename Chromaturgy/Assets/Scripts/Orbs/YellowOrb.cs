@@ -40,6 +40,9 @@ public class YellowOrb : Orb
         //greaterEffectMethod(enemy game object, greaterEffectAmnt);
         //For any allies hit 
         //lesserEffectMethod(ally game object, lesserEffectAmnt);
+
+        GameObject orbs = GameObject.Instantiate(Resources.Load("Orbs/Yellow Orbs", typeof(GameObject))) as GameObject;
+        orbs.GetComponent<YellowSpellController>().playerTransform = t;
     }
 
 }

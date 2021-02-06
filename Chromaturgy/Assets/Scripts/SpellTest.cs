@@ -74,7 +74,7 @@ public class SpellTest : MonoBehaviour
         {
             if (manager.TryCreateSpell(out SpellManager.Spell spell))
             {
-                print("Got spell");
+                spell.Cast(transform);
             }
         }
     }

@@ -108,6 +108,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         else
         {
             isShooting = false;
+            Rigidbody paintballRigidbody = Instantiate(paintball, transform.position + lastDirection, transform.rotation);
+            paintballRigidbody.AddForce(lastDirection * 10, ForceMode.VelocityChange);
         }
     }
 
