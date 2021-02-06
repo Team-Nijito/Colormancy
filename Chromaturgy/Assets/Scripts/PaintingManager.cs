@@ -13,7 +13,6 @@ public class PaintingManager : MonoBehaviour
             // paintable layer
             if (objects[i].layer == 8)
             {
-                Debug.Log(objects[i].name);
                 Mesh mesh = objects[i].GetComponent<MeshFilter>().mesh;
 
                 // cloned to prevent multiple referencing by creating a shallow reference
@@ -55,10 +54,10 @@ public class PaintingManager : MonoBehaviour
                 if (Vector3.Distance(worldVertex, origin) < radius)
                 {
                     float l = Vector3.Distance(worldVertex, origin) / radius;
-                    if (l < radius * threshold)
+                    if (l < threshold)
                         l = 0;
                     // Perlin smoothstep 
-                    l = l * l * l * (l * (l * 6 - 15) + 10);
+                    //l = l * l * l * (l * (l * 6 - 15) + 10);
 
                     // jank smoothing calculation to create solid center
                     // use bitmask for lerp

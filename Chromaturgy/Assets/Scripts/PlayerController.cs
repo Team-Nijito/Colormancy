@@ -107,9 +107,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             isShooting = false;
             Rigidbody paintballRigidbody = Instantiate(paintball, transform.position + lastDirection, transform.rotation);
             paintballRigidbody.AddForce(lastDirection * 10, ForceMode.VelocityChange);
-
-            SpellController pc = paintballRigidbody.gameObject.GetComponent<SpellController>();
-            pc.SetSpellColors(SpellController.SpellColor.Orange, SpellController.SpellColor.Orange, SpellController.SpellColor.Orange);
         }
     }
 

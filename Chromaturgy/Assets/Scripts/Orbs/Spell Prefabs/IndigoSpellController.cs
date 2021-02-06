@@ -2,23 +2,19 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class YellowSpellController : MonoBehaviour
+public class IndigoSpellController : MonoBehaviour
 {
     [SerializeField]
-    public Transform playerTransform;
+    private Transform playerTransform;
 
-    [SerializeField]
-    private AnimationCurve rotationScale;
     [SerializeField]
     private AnimationCurve positionScale;
 
-    [SerializeField]
-    private float rotationSpeed;
+    private Vector3 fromPlayer;
+
     private float startTime;
     [SerializeField]
     private float lifetime;
-   
-    private Vector3 fromPlayer;
 
     [SerializeField]
     private float spherePaintRadius;
@@ -28,29 +24,26 @@ public class YellowSpellController : MonoBehaviour
     [SerializeField]
     private bool debug;
 
+    // Start is called before the first frame update
     void OnEnable()
     {
         startTime = Time.time;
 
-        rotationScale.postWrapMode = WrapMode.Loop;
-        positionScale.postWrapMode = WrapMode.Loop;
+        PaintingManager.PaintSphere(paintColor, transform.position, spherePaintRadius, 0.8f);
     }
 
-    // Update is called once per frame
     void FixedUpdate()
     {
         if (Time.time - startTime > lifetime && !debug)
             Destroy(gameObject);
 
-        for (int i = 0; i < transform.childCount; i++) {
+        for (int i = 0; i < transform.childCount; i++)
+        {
             // save the new transformation
             fromPlayer = transform.GetChild(i).position - playerTransform.position;
 
             // get correct distance and vector from player first
             transform.GetChild(i).position = playerTransform.position + fromPlayer.normalized * positionScale.Evaluate((Time.time - startTime) / lifetime);
-
-            // then rotate
-            transform.GetChild(i).RotateAround(playerTransform.position, Vector3.up, rotationScale.Evaluate((Time.time - startTime) / lifetime) * rotationSpeed / fromPlayer.magnitude);
 
             // where to store globals? eg layermask
             PaintingManager.PaintSphere(paintColor, transform.GetChild(i).position, spherePaintRadius);
