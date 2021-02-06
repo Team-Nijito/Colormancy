@@ -45,7 +45,7 @@ public class SpellTest : MonoBehaviour
     void Start()
     {
         manager = GetComponent<SpellManager>();
-        orbs.Add(new RedOrb());
+        orbs.Add(new IndigoOrb());
         orbs.Add(new YellowOrb());
     }
 

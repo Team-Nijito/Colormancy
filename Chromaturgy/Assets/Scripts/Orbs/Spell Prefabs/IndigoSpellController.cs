@@ -5,7 +5,7 @@ using UnityEngine;
 public class IndigoSpellController : MonoBehaviour
 {
     [SerializeField]
-    private Transform playerTransform;
+    public Transform playerTransform;
 
     [SerializeField]
     private AnimationCurve positionScale;
