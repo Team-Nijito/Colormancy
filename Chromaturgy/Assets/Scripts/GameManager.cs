@@ -17,11 +17,13 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     #endregion
 
+    #region Private Fields
+    #endregion
+
     #region Photon Methods
 
     public override void OnLeftRoom()
     {
-        //Load launcher when they leave
         SceneManager.LoadScene(0);
     }
 

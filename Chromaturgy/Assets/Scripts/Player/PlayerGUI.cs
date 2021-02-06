@@ -19,7 +19,7 @@ public class PlayerGUI : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (m_playerTarget)
+        if (m_playerTarget && m_playerHealth && m_playerMana)
         {
             m_healthBar.fillAmount = m_playerHealth.GetEffectiveHealth() / m_playerHealth.GetMaxEffectiveHealth();
             m_ManaBar.fillAmount = m_playerMana.GetEffectiveMana() / m_playerMana.GetMaxEffectiveMana();
@@ -41,13 +41,22 @@ public class PlayerGUI : MonoBehaviour
 
         string characterName = "Mage"; // name of character in Player prefab
         // if the components are not located in the parent GameObject, they should be attached to the character
+        Transform temp;
         if (!m_playerHealth)
         {
-            m_playerHealth = m_playerTarget.transform.Find(characterName).GetComponent<HealthScript>();
+            temp = m_playerTarget.transform.Find(characterName);
+            if (temp)
+            {
+                m_playerHealth = temp.GetComponent<HealthScript>();
+            }
         }
         if (!m_playerMana)
         {
-            m_playerMana = m_playerTarget.transform.Find(characterName).GetComponent<ManaScript>();
+            temp = m_playerTarget.transform.Find(characterName);
+            if (temp)
+            {
+                m_playerMana = temp.GetComponent<ManaScript>();
+            }
         }
     }
 

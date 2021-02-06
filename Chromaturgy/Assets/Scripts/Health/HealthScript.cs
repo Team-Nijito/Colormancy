@@ -39,6 +39,8 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     // max health after buffs / whatever
     private float m_maxEffectiveHealth;
 
+    private ManaScript m_mScript;
+
     private Transform m_healthBarTransform;
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
@@ -55,6 +57,8 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
 
     private void Awake()
     {
+        m_mScript = GetComponent<ManaScript>();
+
         if (photonView.IsMine)
         {
             LocalPlayerInstance = gameObject;
@@ -90,20 +94,12 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
             m_username.text = owner.NickName;
         }
 
-
         if (m_effectiveHealth <= 0)
         {
             // die
             if (transform.gameObject.tag == "Player")
             {
-                // TODO: actual death + respawn system
-
-                // for player objects, just make them inactive
-                // for players who are killed, the scene won't be updated anymore (looks like player crashed)
-                //transform.gameObject.SetActive(false);
-
-                // bootleg respawn which doesn't work b/c we're syncing transforms and health
-                //transform.position = new Vector3(0, 5, 0);
+                // player respawns in the middle
                 photonView.RPC("RespawnPlayer", RpcTarget.All, new Vector3(0, 5, 0));
             }
             else
@@ -177,8 +173,19 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     [PunRPC]
     public void RespawnPlayer(Vector3 position)
     {
-        // doesn't work, transform is synced
+        // if you want to teleport the player, just deactivate and reactivate the gameObject
+        gameObject.SetActive(false);
         transform.position = position;
+        gameObject.SetActive(true);
+        ResetHealth();
+        m_mScript.ResetMana();
+    }
+
+    /// <summary>
+    /// This should only be called when the player dies and respawns (caller should be a PunRPC function)
+    /// </summary>
+    public void ResetHealth()
+    {
         m_effectiveHealth = m_maxEffectiveHealth;
     }
 }
