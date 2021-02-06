@@ -68,8 +68,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             Rigidbody paintballRigidbody = paintBallGo.GetComponent<Rigidbody>();
             paintballRigidbody.AddForce(lastDirection * 10, ForceMode.VelocityChange);
 
-            SpellController pc = paintballRigidbody.gameObject.GetComponent<SpellController>();
-            pc.SetSpellColors(SpellController.SpellColor.Orange, SpellController.SpellColor.Orange, SpellController.SpellColor.Orange);
+            //SpellController pc = paintballRigidbody.gameObject.GetComponent<SpellController>();
+            //pc.SetSpellColors(SpellController.SpellColor.Orange, SpellController.SpellColor.Orange, SpellController.SpellColor.Orange);
         }
 
         m_camera.transform.position = transform.position + new Vector3(-20, 20, -20);

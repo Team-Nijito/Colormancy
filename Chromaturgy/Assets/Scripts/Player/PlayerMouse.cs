@@ -45,7 +45,7 @@ public class PlayerMouse : MonoBehaviourPunCallbacks
                     PlayerFacingMouse(mousePosition);
                 }
 
-                if (m_data.collider.gameObject) // && m_data.collider.gameObject.tag != "Player")
+                if (m_data.collider.gameObject) // && m_data.collider.gameObject.tag != "Player") // prevent friendly fire
                 {
                     if (m_animator && m_paScript.isAttackReady())
                     {
@@ -53,30 +53,8 @@ public class PlayerMouse : MonoBehaviourPunCallbacks
                         photonView.RPC("TriggerPlayerAttackAnim", RpcTarget.All);
                     }
 
-                    photonView.RPC("ShootPaintball", RpcTarget.All, false, mousePosition);
-
-                    //print(m_data.collider.name);
-                    DebugClickDamage(m_basicClickDamage);
-                }
-            }
-            else if (Input.GetMouseButtonDown(1))
-            {
-                // paintball beam attack
-                if ((new Vector3(mousePosition.x, 0, mousePosition.z) - new Vector3(transform.position.x, 0, transform.position.z)).magnitude > m_ignoreTurnRadius)
-                {
-                    // only turn player if we're not clicking directly on the player or near the player
-                    PlayerFacingMouse(mousePosition);
-                }
-
-                if (m_data.collider.gameObject) // && m_data.collider.gameObject.tag != "Player")
-                {
-                    if (m_animator && m_paScript.isAttackReady())
-                    {
-                        // Trigger attack animation 
-                        photonView.RPC("TriggerPlayerAttackAnim", RpcTarget.All);
-                    }
-
-                    photonView.RPC("ShootPaintball", RpcTarget.All, true, mousePosition);
+                    // currently unimplemented
+                    //photonView.RPC("ShootPaintball", RpcTarget.All, false, mousePosition);
 
                     //print(m_data.collider.name);
                     DebugClickDamage(m_basicClickDamage);

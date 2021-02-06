@@ -76,6 +76,7 @@ public class PlayerAttack : MonoBehaviourPun
     [PunRPC]
     public void ShootPaintball(bool beam, Vector3 mousePos)
     {
+        // handle cool down stuff
         if (!isAttackReady())
         {
             return;
@@ -95,95 +96,13 @@ public class PlayerAttack : MonoBehaviourPun
         // on the floor
 
         // tl;dr don't use PhotonNetwork.Instantiate for paint projectiles if you intend for players to join in during a game session
+        // or do, if you want to ignore me or whatever.
 
         m_pmouseScript.PlayerFacingMouse(mousePos); // sometimes the player won't turn quick enough
         Vector3 characterPosition = m_playerCharacter.transform.position;
         Vector3 characterForward = m_playerCharacter.transform.forward;
         Quaternion characterRotation = m_playerCharacter.transform.rotation;
 
-        if (!beam)
-        {
-            m_paintColor = Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
-
-            Rigidbody paintballRigidbody = Instantiate(m_paintball, characterPosition + new Vector3(0, m_paintballSpawnHeight, 0) +
-                                       characterForward * m_paintballSpawnDistanceFromPlayer, characterRotation);
-
-            //GameObject tmpPaintball = ObjectPool.m_SharedInstance.GetPooledObject(ObjectPool.ObjectType.Paintball);
-            //if (tmpPaintball != null)
-            //{
-            //    tmpPaintball.transform.position = characterPosition + new Vector3(0, m_paintballSpawnHeight, 0) +
-            //                                        characterForward * m_paintballSpawnDistanceFromPlayer;
-            //    tmpPaintball.transform.rotation = characterRotation;
-            //    tmpPaintball.SetActive(true);
-            //}
-            //else
-            //{
-            //    Debug.LogError("No inactive objects from object pool to reference! (PlayerAttack.cs)");
-            //}
-            
-            //GameObject pb = PhotonNetwork.InstantiateRoomObject(m_paintball.name, characterPosition + new Vector3(0, m_paintballSpawnHeight, 0) +
-            //                characterForward * m_paintballSpawnDistanceFromPlayer, characterRotation);
-            //Rigidbody paintballRigidbody = pb.GetComponent<Rigidbody>();
-
-            //Rigidbody paintballRigidbody = tmpPaintball.GetComponent<Rigidbody>();
-
-            paintballRigidbody.AddForce(characterForward * m_paintballForce, ForceMode.VelocityChange);
-
-            SpellController pc = paintballRigidbody.gameObject.GetComponent<SpellController>();
-            pc.SetSpellColors(SpellController.SpellColor.Orange, SpellController.SpellColor.Orange, SpellController.SpellColor.Orange);
-
-            // bootleg change color
-            pc.ChangeColor(new Vector3(m_paintColor.r, m_paintColor.g, m_paintColor.b));
-
-            Destroy(paintballRigidbody.gameObject, m_paintballDespawnTime);
-
-            //Task countDown = new Task(ObjectPool.m_SharedInstance.Deactivate(tmpPaintball, m_paintballDespawnTime));
-            //pc.SetSpellDecay(countDown);
-        }
-        else
-        {
-            // shoot pellets in a line with varying forces
-            for (short ind = 1; ind < m_numBeamProjectiles + 1; ind++)
-            {
-                m_paintColor = Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
-
-                Rigidbody paintballRigidbody = Instantiate(m_paintball, characterPosition + new Vector3(0, m_paintballSpawnHeight, 0) +
-                                       characterForward * m_paintballSpawnDistanceFromPlayer, characterRotation);
-                
-                //GameObject tmpPaintball = ObjectPool.m_SharedInstance.GetPooledObject(ObjectPool.ObjectType.Paintball);
-                //if (tmpPaintball != null)
-                //{
-                //    tmpPaintball.transform.position = characterPosition + new Vector3(0, m_paintballSpawnHeight, 0) +
-                //                                        characterForward * m_paintballSpawnDistanceFromPlayer;
-                //    tmpPaintball.transform.rotation = characterRotation;
-                //    tmpPaintball.SetActive(true);
-                //}
-                //else
-                //{
-                //    Debug.LogError("No inactive objects from object pool to reference! (PlayerAttack.cs)");
-                //}
-
-                //GameObject pb = PhotonNetwork.InstantiateRoomObject(m_paintball.name, characterPosition + new Vector3(0, m_paintballSpawnHeight, 0) +
-                //            characterForward * m_paintballSpawnDistanceFromPlayer, characterRotation);
-                //Rigidbody paintballRigidbody = pb.GetComponent<Rigidbody>();
-                
-                //Rigidbody paintballRigidbody = tmpPaintball.GetComponent<Rigidbody>();
-
-                paintballRigidbody.AddForce(characterForward *
-                                            Random.Range(m_paintballForce * m_beamSpread * ind, m_paintballForce + m_beamSpread * m_paintballForce * ind),
-                                            ForceMode.VelocityChange);
-
-                SpellController pc = paintballRigidbody.gameObject.GetComponent<SpellController>();
-                pc.SetSpellColors(SpellController.SpellColor.Orange, SpellController.SpellColor.Orange, SpellController.SpellColor.Orange);
-
-                // bootleg change color
-                pc.ChangeColor(new Vector3(m_paintColor.r, m_paintColor.g, m_paintColor.b));
-
-                Destroy(paintballRigidbody.gameObject, m_paintballDespawnTime);
-                
-                //Task countDown = new Task(ObjectPool.m_SharedInstance.Deactivate(tmpPaintball, m_paintballDespawnTime));
-                //pc.SetSpellDecay(countDown);
-            }
-        }
+        // do attack here (instantiate, add velocity, etc...)
     }
 }
