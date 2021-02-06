@@ -42,6 +42,7 @@ public class IndigoOrb : Orb
         //lesserEffectMethod(ally game object, lesserEffectAmnt);
 
         GameObject orbs = GameObject.Instantiate(Resources.Load("Orbs/Indigo Orbs", typeof(GameObject))) as GameObject;
+        orbs.transform.position = t.position;
         orbs.GetComponent<IndigoSpellController>().playerTransform = t;
     }
 

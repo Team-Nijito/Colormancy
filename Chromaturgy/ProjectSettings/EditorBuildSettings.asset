@@ -9,6 +9,12 @@ EditorBuildSettings:
     path: Assets/Scenes/Launcher.unity
     guid: 5970344aa787c914b84b86d19e663653
   - enabled: 1
+    path: Assets/Scenes/WizardSpellTest.unity
+    guid: 6e5c7e8a67e824441aa650788630051e
+  - enabled: 1
+    path: Assets/Scenes/22.unity
+    guid: 2bad7b61a05b52b4cba6dfe0e6c982ab
+  - enabled: 1
     path: Assets/Scenes/TestMoveChamber.unity
     guid: 224914af2d40b0c4eb28f5f816aae16b
   - enabled: 1
