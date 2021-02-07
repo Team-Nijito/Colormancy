@@ -11,7 +11,7 @@ public class PaintingManager : MonoBehaviour
         for (int i = 0; i < objects.Length; i++)
         {
             // paintable layer
-            if (objects[i].layer == 8)
+            if (objects[i].layer == 9)
             {
                 // sharedmesh because unity automatically draws instanced
                 Mesh mesh = objects[i].GetComponent<MeshFilter>().sharedMesh;
@@ -35,7 +35,7 @@ public class PaintingManager : MonoBehaviour
 
     public static void PaintSphere(Color paintColor, Vector3 origin, float radius, float threshold = 0.5f)
     {
-        Collider[] hitColliders = Physics.OverlapSphere(origin, radius, 1 << 8);
+        Collider[] hitColliders = Physics.OverlapSphere(origin, radius, 1 << 9);
         float l = 0;
         float colorLerp = 0;
         float originToVertex = 0;
