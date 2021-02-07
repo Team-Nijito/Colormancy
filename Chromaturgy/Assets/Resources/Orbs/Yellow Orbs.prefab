@@ -270,7 +270,7 @@ MonoBehaviour:
     m_RotationOrder: 4
   rotationSpeed: 10
   lifetime: 3
-  spherePaintRadius: 1.5
+  spherePaintRadius: 2.5
   paintColor: {r: 0.98700476, g: 1, b: 0.3443396, a: 0}
   debug: 0
 --- !u!1 &852709483024857157

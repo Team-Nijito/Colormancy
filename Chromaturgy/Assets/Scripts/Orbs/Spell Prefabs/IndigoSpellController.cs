@@ -24,6 +24,8 @@ public class IndigoSpellController : MonoBehaviour
     [SerializeField]
     private bool debug;
 
+    private int tick;
+
     // Start is called before the first frame update
     void OnEnable()
     {
@@ -34,6 +36,8 @@ public class IndigoSpellController : MonoBehaviour
 
     void FixedUpdate()
     {
+        tick++;
+
         if (Time.time - startTime > lifetime && !debug)
             Destroy(gameObject);
 
@@ -45,8 +49,12 @@ public class IndigoSpellController : MonoBehaviour
             // get correct distance and vector from player first
             transform.GetChild(i).position = playerTransform.position + fromPlayer.normalized * positionScale.Evaluate((Time.time - startTime) / lifetime);
 
-            // where to store globals? eg layermask
-            PaintingManager.PaintSphere(paintColor, transform.GetChild(i).position, spherePaintRadius);
+            // paint calls on separate ticks to prevent overloading of physics engine
+            if (tick == (PaintingManager.paintingTickFrequency - i) % PaintingManager.paintingTickFrequency + 1)
+                PaintingManager.PaintSphere(paintColor, transform.GetChild(i).position, spherePaintRadius);
         }
+
+        if (tick == PaintingManager.paintingTickFrequency)
+            tick = 0;
     }
 }

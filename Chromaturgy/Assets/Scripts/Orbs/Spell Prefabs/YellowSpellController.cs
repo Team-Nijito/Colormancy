@@ -28,6 +28,8 @@ public class YellowSpellController : MonoBehaviour
     [SerializeField]
     private bool debug;
 
+    private int tick;
+
     void OnEnable()
     {
         startTime = Time.time;
@@ -39,6 +41,8 @@ public class YellowSpellController : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
+        tick++;
+
         if (Time.time - startTime > lifetime && !debug)
             Destroy(gameObject);
 
@@ -52,8 +56,11 @@ public class YellowSpellController : MonoBehaviour
             // then rotate
             transform.GetChild(i).RotateAround(playerTransform.position, Vector3.up, rotationScale.Evaluate((Time.time - startTime) / lifetime) * rotationSpeed / fromPlayer.magnitude);
 
-            // where to store globals? eg layermask
-            PaintingManager.PaintSphere(paintColor, transform.GetChild(i).position, spherePaintRadius);
+            if (tick == (PaintingManager.paintingTickFrequency - i) % PaintingManager.paintingTickFrequency + 1)
+                PaintingManager.PaintSphere(paintColor, transform.GetChild(i).position, spherePaintRadius);
         }
+
+        if (tick == PaintingManager.paintingTickFrequency)
+            tick = 0;
     }
 }
