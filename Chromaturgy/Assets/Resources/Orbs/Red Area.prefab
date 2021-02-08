@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 2289333853478670742}
   - component: {fileID: 1751865619799750208}
   - component: {fileID: 1751865619799750271}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Red Area
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -78,7 +78,7 @@ GameObject:
   - component: {fileID: 2245510852417664120}
   - component: {fileID: 6744001728315962424}
   - component: {fileID: 4619997612531694836}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Base
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -157,7 +157,7 @@ GameObject:
   - component: {fileID: 8189152888145961313}
   - component: {fileID: 7247030357717593485}
   - component: {fileID: 628116738535878436}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Edge
   m_TagString: Untagged
   m_Icon: {fileID: 0}

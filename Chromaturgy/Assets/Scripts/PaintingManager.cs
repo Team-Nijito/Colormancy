@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class PaintingManager : MonoBehaviour
 {
+    public static int paintingMask = 9;
+
     void Start()
     {
         // find all paintable gameobjects and set their initial colors
@@ -11,10 +13,17 @@ public class PaintingManager : MonoBehaviour
         for (int i = 0; i < objects.Length; i++)
         {
             // paintable layer
-            if (objects[i].layer == 9)
+            if (objects[i].layer == paintingMask)
             {
                 // sharedmesh because unity automatically draws instanced
-                Mesh mesh = objects[i].GetComponent<MeshFilter>().sharedMesh;
+                Mesh mesh;
+                try
+                {
+                    mesh = objects[i].GetComponent<MeshFilter>().sharedMesh;
+                } catch
+                {
+                    mesh = objects[i].GetComponent<MeshFilter>().mesh;
+                }
 
                 List<Vector3> vertices = new List<Vector3>();
                 mesh.GetVertices(vertices);
@@ -26,16 +35,17 @@ public class PaintingManager : MonoBehaviour
                 {
                     for (int k = 0; k < vertices.Count; k++)
                         colors.Add(new Color(1, 1, 1, 0));
+
+                    mesh.SetColors(colors);
                 }
 
-                mesh.SetColors(colors);
             }
         }
     }
 
     public static void PaintSphere(Color paintColor, Vector3 origin, float radius, float threshold = 0.5f)
     {
-        Collider[] hitColliders = Physics.OverlapSphere(origin, radius, 1 << 9);
+        Collider[] hitColliders = Physics.OverlapSphere(origin, radius, 1 << paintingMask);
         float l = 0;
         float colorLerp = 0;
         float originToVertex = 0;

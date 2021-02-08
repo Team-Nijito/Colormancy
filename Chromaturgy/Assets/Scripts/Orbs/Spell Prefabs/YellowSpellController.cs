@@ -48,13 +48,13 @@ public class YellowSpellController : MonoBehaviour
 
         for (int i = 0; i < transform.childCount; i++) {
             // save the new transformation
-            fromPlayer = transform.GetChild(i).position - playerTransform.position;
+            fromPlayer = transform.GetChild(i).position - transform.position;
 
             // get correct distance and vector from player first
-            transform.GetChild(i).position = playerTransform.position + fromPlayer.normalized * positionScale.Evaluate((Time.time - startTime) / lifetime);
+            transform.GetChild(i).position = transform.position + fromPlayer.normalized * positionScale.Evaluate((Time.time - startTime) / lifetime);
 
             // then rotate
-            transform.GetChild(i).RotateAround(playerTransform.position, Vector3.up, rotationScale.Evaluate((Time.time - startTime) / lifetime) * rotationSpeed / fromPlayer.magnitude);
+            transform.GetChild(i).RotateAround(transform.position, Vector3.up, rotationScale.Evaluate((Time.time - startTime) / lifetime) * rotationSpeed / fromPlayer.magnitude);
 
             if (tick == (PaintingManager.paintingTickFrequency - i) % PaintingManager.paintingTickFrequency + 1)
                 PaintingManager.PaintSphere(paintColor, transform.GetChild(i).position, spherePaintRadius);

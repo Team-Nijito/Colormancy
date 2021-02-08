@@ -30,8 +30,6 @@ public class IndigoSpellController : MonoBehaviour
     void OnEnable()
     {
         startTime = Time.time;
-
-        PaintingManager.PaintSphere(paintColor, transform.position, spherePaintRadius, 0.8f);
     }
 
     void FixedUpdate()
@@ -44,10 +42,10 @@ public class IndigoSpellController : MonoBehaviour
         for (int i = 0; i < transform.childCount; i++)
         {
             // save the new transformation
-            fromPlayer = transform.GetChild(i).position - playerTransform.position;
+            fromPlayer = transform.GetChild(i).position - transform.position;
 
             // get correct distance and vector from player first
-            transform.GetChild(i).position = playerTransform.position + fromPlayer.normalized * positionScale.Evaluate((Time.time - startTime) / lifetime);
+            transform.GetChild(i).position = transform.position + fromPlayer.normalized * positionScale.Evaluate((Time.time - startTime) / lifetime);
 
             // paint calls on separate ticks to prevent overloading of physics engine
             if (tick == (PaintingManager.paintingTickFrequency - i) % PaintingManager.paintingTickFrequency + 1)
