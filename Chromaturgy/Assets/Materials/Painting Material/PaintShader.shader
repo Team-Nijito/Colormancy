@@ -187,7 +187,6 @@
                     }
 
                     col *= attenuation * (nl + s) * _LightColor0 * shadow;
-                    col.rgb += ShadeSH9(float4(i.normal, 1));
 
                     return col;
                 }
@@ -372,7 +371,6 @@
                     }
 
                     col *= attenuation * (nl + s) * _LightColor0 * shadow;
-                    col.rgb += ShadeSH9(float4(i.normal, 1));
 
                     return col;
                 }

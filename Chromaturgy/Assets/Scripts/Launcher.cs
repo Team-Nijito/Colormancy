@@ -97,7 +97,7 @@ public class Launcher : MonoBehaviourPunCallbacks
         Debug.Log("OnJoinedRoom(). Client is in a room");
         if (PhotonNetwork.CurrentRoom.PlayerCount == 1)
         {
-            PhotonNetwork.LoadLevel("TestMoveChamber");
+            PhotonNetwork.LoadLevel("TestMoveChamber"); // FIXME
         }
     }
 

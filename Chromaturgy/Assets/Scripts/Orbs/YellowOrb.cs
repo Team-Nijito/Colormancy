@@ -42,6 +42,7 @@ public class YellowOrb : Orb
         //lesserEffectMethod(ally game object, lesserEffectAmnt);
 
         GameObject orbs = GameObject.Instantiate(Resources.Load("Orbs/Yellow Orbs", typeof(GameObject))) as GameObject;
+        orbs.transform.position = t.position;
         orbs.GetComponent<YellowSpellController>().playerTransform = t;
     }
 

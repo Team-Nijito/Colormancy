@@ -17,6 +17,9 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     public Slider m_healthBar;
     public Text m_username;
 
+    [HideInInspector]
+    public GameManager m_gameManager;
+
     [SerializeField]
     private float m_baseHealth = 100f;
 
@@ -43,7 +46,6 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     private float m_maxEffectiveHealth;
 
     private ManaScript m_mScript;
-
     private Transform m_healthBarTransform;
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
@@ -60,6 +62,8 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
 
     private void Awake()
     {
+        // Try to find the GameManager script in the GameManager object in the current scene
+        m_gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
         if (IsPlayer)
         {
             m_mScript = GetComponent<ManaScript>();
@@ -77,8 +81,13 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
             {
                 Player owner = photonView.Controller;
                 m_username.text = owner.NickName;
+
+                // Set the username as the object's name
+                transform.name = m_username.text;
+
+                m_gameManager.AddPlayerToGameObjectList(transform.gameObject);
             }
-            DontDestroyOnLoad(gameObject);
+            DontDestroyOnLoad(transform.root.gameObject); // made the warning go away with transform.root.gameObject
         }
         else
         {
@@ -147,7 +156,10 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     private void HealthBarFaceCamera()
     {
         // make the health bar orient towards the main camera
-        m_healthBarTransform.LookAt(Camera.main.transform);
+        if (m_healthBarTransform && Camera.main)
+        {
+            m_healthBarTransform.LookAt(Camera.main.transform);
+        }
     }
 
     [PunRPC]
