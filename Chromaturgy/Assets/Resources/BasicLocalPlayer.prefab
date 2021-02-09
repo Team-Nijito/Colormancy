@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 1180500943100195449}
   - component: {fileID: 4390937036659053632}
   - component: {fileID: 7102118974069354054}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -108,7 +108,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4146986456698834581}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: Fill Area
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -147,7 +147,7 @@ GameObject:
   - component: {fileID: 3789378594062269400}
   - component: {fileID: 725772618364055437}
   - component: {fileID: 7008692829269300533}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -238,7 +238,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3496824951300363211}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: Handle Slide Area
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -275,7 +275,7 @@ GameObject:
   - component: {fileID: 4323141309226286230}
   - component: {fileID: 8171476410869345322}
   - component: {fileID: 1511805631609017971}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: Visor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -352,7 +352,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3964983904604125477}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: CharacterModel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -385,7 +385,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8347197487691507393}
   - component: {fileID: 4123368691968340828}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: Healthbar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -482,7 +482,7 @@ GameObject:
   - component: {fileID: 3908766625470638216}
   - component: {fileID: 5573487695666375195}
   - component: {fileID: 6313308794560643765}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: BasicLocalPlayer
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -542,7 +542,6 @@ MonoBehaviour:
   m_runSpeed: 10
   m_isMoving: 0
   m_canMove: 1
-  m_canAction: 1
   m_isDashing: 0
   m_movement: {x: 0, y: 0, z: 0}
   m_gravity: 9.81
@@ -651,6 +650,7 @@ MonoBehaviour:
   ObservedComponents:
   - {fileID: 2960449182456995223}
   - {fileID: 657857051694980833}
+  - {fileID: 3908766625470638216}
   - {fileID: 5573487695666375195}
   viewIdField: 0
   InstantiationId: 0
@@ -666,7 +666,7 @@ GameObject:
   - component: {fileID: 9141042131006470775}
   - component: {fileID: 2813634169799284287}
   - component: {fileID: 6970384322436210558}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -741,7 +741,7 @@ GameObject:
   - component: {fileID: 796299021973835319}
   - component: {fileID: 4045635247124610601}
   - component: {fileID: 8136492753151001936}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: PlayerName
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -834,7 +834,7 @@ GameObject:
   - component: {fileID: 17344799977467636}
   - component: {fileID: 2968139501094456550}
   - component: {fileID: 1342945326329620934}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: Fill
   m_TagString: Untagged
   m_Icon: {fileID: 0}

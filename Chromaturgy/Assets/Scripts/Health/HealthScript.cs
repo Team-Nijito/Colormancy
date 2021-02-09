@@ -11,6 +11,9 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     // only works on gameobjects with a child canvas and UI slider
 
     public static GameObject LocalPlayerInstance;
+
+    public bool IsPlayer = false;
+
     public Slider m_healthBar;
     public Text m_username;
 
@@ -57,23 +60,30 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
 
     private void Awake()
     {
-        m_mScript = GetComponent<ManaScript>();
-
-        if (photonView.IsMine)
+        if (IsPlayer)
         {
-            LocalPlayerInstance = gameObject;
-        }
+            m_mScript = GetComponent<ManaScript>();
 
-        if (!m_username)
-        {
-            Debug.LogError("Public Text variable m_text not set for HealthScript.cs! (it should be the text for the player's username)");
+            if (photonView.IsMine)
+            {
+                LocalPlayerInstance = gameObject;
+            }
+
+            if (!m_username)
+            {
+                Debug.LogError("Public Text variable m_text not set for HealthScript.cs! (it should be the text for the player's username)");
+            }
+            else
+            {
+                Player owner = photonView.Controller;
+                m_username.text = owner.NickName;
+            }
+            DontDestroyOnLoad(gameObject);
         }
         else
         {
-            Player owner = photonView.Controller;
-            m_username.text = owner.NickName;
+            ;
         }
-        DontDestroyOnLoad(gameObject);
     }
 
     // Start is called before the first frame update
@@ -111,8 +121,10 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
         // slider goes from 0 to 100
         m_healthBar.value = (m_effectiveHealth / m_maxEffectiveHealth) * 100;
         HealthBarFaceCamera();
-        if (m_isRegenHealth) 
+        if (m_isRegenHealth)
+        {
             HealthRegeneration(m_regenHealthPercentage * Time.deltaTime);
+        }
     }
 
     private void HealthRegeneration(float percentage)

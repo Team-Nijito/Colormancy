@@ -3,23 +3,23 @@ using Photon.Pun;
 
 public class PlayerAttack : MonoBehaviourPun
 {
-    public Rigidbody m_paintball;
+    //public Rigidbody m_paintball;
     public Color m_paintColor;
 
-    [SerializeField]
-    private float m_paintballSpawnHeight = 3f;
-    [SerializeField]
-    private float m_paintballSpawnDistanceFromPlayer = 2f;
-    [SerializeField]
-    private float m_paintballForce = 10f;
-    [SerializeField]
-    private float m_paintballDespawnTime = 3f;
-    [SerializeField]
-    private float m_paintballCooldown = .7f;
-    [SerializeField]
-    private float m_numBeamProjectiles = 4;
-    [SerializeField]
-    private float m_beamSpread = .5f;
+    //[SerializeField]
+    //private float m_paintballSpawnHeight = 3f;
+    //[SerializeField]
+    //private float m_paintballSpawnDistanceFromPlayer = 2f;
+    //[SerializeField]
+    //private float m_paintballForce = 10f;
+    //[SerializeField]
+    //private float m_paintballDespawnTime = 3f;
+    //[SerializeField]
+    //private float m_paintballCooldown = .7f;
+    //[SerializeField]
+    //private float m_numBeamProjectiles = 4;
+    //[SerializeField]
+    //private float m_beamSpread = .5f;
 
     private float m_currentCooldown;
     private GameObject m_playerCharacter;
@@ -81,7 +81,7 @@ public class PlayerAttack : MonoBehaviourPun
         {
             return;
         }
-        m_currentCooldown = m_paintballCooldown;
+        //m_currentCooldown = m_paintballCooldown;
 
         // If you use PhotonNetwork.Instantiate, any player who joins will witness a lot of projectiles being spawned in
         // so that the newly joined player's scene will be updated as the other player's scene (lookup photon object pooling)
