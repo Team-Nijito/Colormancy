@@ -22,8 +22,8 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
     private CharacterController m_controller;
 
     // Movement
-    public float m_walkSpeed = 0f;
-    public float m_runSpeed = 0f;
+    [SerializeField] private float m_walkSpeed = 18f;
+    [SerializeField] private float m_runSpeed = 20f;
 
     [HideInInspector] public bool m_isMoving = false;
     [HideInInspector] public bool m_canMove = true;
@@ -40,10 +40,9 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
 
     private void Awake()
     {
-        m_animator = GetComponentInChildren<Animator>();
+        m_animator = GetComponent<Animator>();
         if (m_animator)
         {
-            m_animator.updateMode = AnimatorUpdateMode.AnimatePhysics;
             m_animator.cullingMode = AnimatorCullingMode.CullUpdateTransforms;
         }
         if (photonView.IsMine)

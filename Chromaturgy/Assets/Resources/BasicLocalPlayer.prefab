@@ -590,14 +590,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ca848426ea85fa48879e6f5999220fa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsPlayer: 1
+  m_isPlayer: 1
   m_healthBar: {fileID: 4123368691968340828}
   m_username: {fileID: 4045635247124610601}
+  m_gameManager: {fileID: 0}
   m_baseHealth: 100
   m_initialHealthDeduction: 0
   m_armorPercentage: 0
   m_isRegenHealth: 1
   m_regenHealthPercentage: 1
+  m_timeUntilDestroy: 3
 --- !u!114 &3908766625470638216
 MonoBehaviour:
   m_ObjectHideFlags: 0

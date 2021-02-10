@@ -12,7 +12,7 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
 
     public static GameObject LocalPlayerInstance;
 
-    public bool IsPlayer = false;
+    public bool m_isPlayer = false;
 
     public Slider m_healthBar;
     public Text m_username;
@@ -46,7 +46,12 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     private float m_maxEffectiveHealth;
 
     private ManaScript m_mScript;
+    private AnimationManager m_animManager;
     private Transform m_healthBarTransform;
+
+    [SerializeField]
+    [Tooltip("Used for destroying dead enemies")]
+    private float m_timeUntilDestroy = 3.0f;
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
@@ -64,7 +69,7 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     {
         // Try to find the GameManager script in the GameManager object in the current scene
         m_gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
-        if (IsPlayer)
+        if (m_isPlayer)
         {
             m_mScript = GetComponent<ManaScript>();
 
@@ -101,38 +106,58 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
         m_healthBarTransform = m_healthBar.transform;
         m_effectiveHealth = m_baseHealth - m_initialHealthDeduction;
         m_maxEffectiveHealth = m_baseHealth;
+
+        m_animManager = GetComponent<AnimationManager>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (m_username.text == "Unnamed player")
+        if (m_isPlayer)
         {
-            // display usernames from players who are already in the room to new players who had just joined the room
-            Player owner = photonView.Controller;
-            m_username.text = owner.NickName;
-        }
-
-        if (m_effectiveHealth <= 0)
-        {
+            if (m_username.text == "Unnamed player")
+            {
+                // display usernames from players who are already in the room to new players who had just joined the room
+                Player owner = photonView.Controller;
+                m_username.text = owner.NickName;
+            }
             // die
-            if (transform.gameObject.tag == "Player")
+            if (m_effectiveHealth <= 0 && transform.gameObject.tag == "Player")
             {
                 // player respawns in the middle
                 photonView.RPC("RespawnPlayer", RpcTarget.All, new Vector3(0, 5, 0));
             }
-            else
+        }
+        else
+        {
+            if (m_effectiveHealth <= 0)
             {
-                // for other objects, we may want to destroy them
-                Destroy(transform.gameObject);
+                {
+                    // disable movement, collider, and rigidbody
+                    GetComponent<EnemyChase>().enabled = false;
+                    GetComponent<Rigidbody>().isKinematic = true;
+                    GetComponent<Collider>().enabled = false;
+
+                    // disable health bar and name
+                    m_healthBar.gameObject.SetActive(false);
+
+                    // play dying animation
+                    m_animManager.ChangeState(AnimationManager.EnemyState.Death);
+                    // for other objects, we may want to destroy them
+                    Destroy(transform.gameObject, m_timeUntilDestroy);
+                }
             }
         }
-        // slider goes from 0 to 100
-        m_healthBar.value = (m_effectiveHealth / m_maxEffectiveHealth) * 100;
-        HealthBarFaceCamera();
-        if (m_isRegenHealth)
+
+        if (m_healthBar)
         {
-            HealthRegeneration(m_regenHealthPercentage * Time.deltaTime);
+            // slider goes from 0 to 100
+            m_healthBar.value = (m_effectiveHealth / m_maxEffectiveHealth) * 100;
+            HealthBarFaceCamera();
+            if (m_isRegenHealth)
+            {
+                HealthRegeneration(m_regenHealthPercentage * Time.deltaTime);
+            }
         }
     }
 
@@ -166,6 +191,13 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     public void AlterArmorValue(float armorPercent)
     {
         // replaces the armorPercentage with new value
+
+        // ignore RPCs for dead enemies
+        if (!m_isPlayer && m_animManager.GetCurrentState() == AnimationManager.EnemyState.Death)
+        {
+            return;
+        }
+
         if (armorPercent < 0)
             throw new ArgumentException(string.Format("{0} shouldn't be a negative number", armorPercent), "armorPercent");
         if (armorPercent > 100)
@@ -179,6 +211,13 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
         // heal formula
         // health = health + healValue
         // if health is larger than maxHealth, set health to maxHealth
+
+        // ignore RPCs for dead enemies
+        if (!m_isPlayer && m_animManager.GetCurrentState() == AnimationManager.EnemyState.Death)
+        {
+            return;
+        }
+
         if (healValue <= 0)
             throw new ArgumentException(string.Format("{0} should be greater than zero", healValue), "healValue");
         m_effectiveHealth = m_effectiveHealth > m_maxEffectiveHealth ? m_maxEffectiveHealth : m_effectiveHealth + healValue;
@@ -189,6 +228,13 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     {
         // damage formula
         // health = health - (damage - (damage * armorPercentage))
+        
+        // ignore RPCs for dead enemies
+        if (!m_isPlayer && m_animManager.GetCurrentState() == AnimationManager.EnemyState.Death)
+        {
+            return;
+        }
+
         if (damageValue <= 0)
             throw new ArgumentException(string.Format("{0} should be greater than zero", damageValue), "damageValue");
         m_effectiveHealth -= (damageValue - (m_armorPercentage / 100 * damageValue));

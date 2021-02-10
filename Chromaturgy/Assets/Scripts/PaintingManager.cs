@@ -94,7 +94,7 @@ public class PaintingManager : MonoBehaviour
     }
 
     public static void UnpaintSphere(Vector3 origin, float radius, float threshold = 0.5f) {
-        Collider[] hitColliders = Physics.OverlapSphere(origin, radius, 1 << 8);
+        Collider[] hitColliders = Physics.OverlapSphere(origin, radius, 1 << paintingMask);
         float l = 0;
         float colorLerp = 0;
         float originToVertex = 0;
