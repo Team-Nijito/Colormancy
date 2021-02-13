@@ -1,53 +1,69 @@
 ﻿using UnityEngine;
 using Photon.Pun;
+using Photon.Realtime;
 
 public class EnemyChase : MonoBehaviourPun, IPunObservable
 {
     // Handles the logic, and movement of the enemy chaser.
     // If there is a hitbox, the damage is done by the hitbox, and the hitbox is a child of a part of the character object.
 
+    #region Variables
+
+    [System.Serializable]
+    protected struct HitBox
+    {
+        public GameObject m_hitBoxObject;
+        public DetectHit m_hitBoxScript;
+    }
+
     // Targetting
-    private Transform m_targetPlayer;
+    protected Transform m_targetPlayer;
 
-    [SerializeField] private float m_detectionRadius = 30f;
+    [SerializeField] protected float m_detectionRadius = 30f;
 
-    [SerializeField] private float m_attackRange = 3f;
+    [SerializeField] protected float m_attackRange = 3f;
 
     // Movement
-    [SerializeField] private float m_speed = 18f;
+    [SerializeField] protected float m_speed = 18f;
 
     [Tooltip("The speed at which the Run animation is triggered")]
-    [SerializeField] 
-    private float m_speedTriggerRun = 15f;
+    [SerializeField]
+    protected float m_speedTriggerRun = 15f;
 
-    private AnimationManager.EnemyState m_currentState = AnimationManager.EnemyState.Idle;
+    protected AnimationManager.EnemyState m_currentState = AnimationManager.EnemyState.Idle;
 
-    private Vector3 m_directionToPlayer = Vector3.zero;
-    private float m_distanceFromPlayer = -1;
+    protected Vector3 m_directionToPlayer = Vector3.zero;
+    protected float m_distanceFromPlayer = -1;
 
     // Attack attributes
+
     [Tooltip("Include all references to hitboxes here")]
     [SerializeField]
-    private GameObject[] m_hitBoxesArray;
-
-    private float m_attackAnimLength;
+    protected HitBox[] m_hitBoxesArray;
 
     [SerializeField]
-    private float m_attackActiveStart; // 2.767 // 0.29
+    private int m_numPlayersCanHit = 4; // number of players hitbox can damage in one attack animation
 
-    [SerializeField]
-    private float m_attackActiveEnd; // 0.31
+    private int[] m_hurtVictimArray; // keep track of PhotonID of players who hitbox has damaged so we don't damage them
+                                     // again during same attack animation
+
+    private int m_hurtVictimArrayIndex = 0; // keep track of first available spot to insert in array
 
     // Components
     public GameObject m_character = null;
-    private Transform m_characterTransform;
+    protected Transform m_characterTransform;
 
-    private Rigidbody m_rbody;
-    private HealthScript m_hscript;
-    private AnimationManager m_animManager;
+    protected Rigidbody m_rbody;
+    protected HealthScript m_hscript;
+    protected AnimationManager m_animManager;
+
+    protected bool m_isAttacking = false; // don't interrupt attacking animation
+
+    #endregion
+    #region MonoBehaviour callbacks
 
     // Start is called before the first frame update
-    void Start()
+    protected virtual void Start()
     {
         m_rbody = GetComponent<Rigidbody>();
         m_hscript = GetComponent<HealthScript>();
@@ -57,14 +73,12 @@ public class EnemyChase : MonoBehaviourPun, IPunObservable
         {
             m_characterTransform = m_character.transform;
         }
-        if (m_animManager)
-        {
-            m_attackAnimLength = m_animManager.attackTime;
-        }
+
+        m_hurtVictimArray = new int[m_numPlayersCanHit];
     }
 
     // Update is called once per frame
-    void Update()
+    protected virtual void Update()
     {
         Transform target = DetermineTargetPlayer(ref m_distanceFromPlayer);
         if (target && (!m_targetPlayer || m_targetPlayer.gameObject.GetPhotonView().ViewID != target.gameObject.GetPhotonView().ViewID))
@@ -75,15 +89,18 @@ public class EnemyChase : MonoBehaviourPun, IPunObservable
         ProcessAIIntent();
     }
 
-    private void FixedUpdate()
+    protected virtual void FixedUpdate()
     {
         HandleAIIntent();
     }
 
+    #endregion
+    #region Private Methods
+
     // Determine which player to seek out (if omnipotent), or just check
     // if there are any players around the enemy (if not omnipotent)
     // right now just omnipotent b/c we're in an arena of course they know we're here
-    private Transform DetermineTargetPlayer(ref float distanceFromPlayer)
+    protected virtual Transform DetermineTargetPlayer(ref float distanceFromPlayer)
     {
         Transform targetTransform = null;
         float targetDistance = -1;
@@ -114,30 +131,41 @@ public class EnemyChase : MonoBehaviourPun, IPunObservable
     }
 
     // Consider what the AI will do at any point, and handles AI animation
-    private void ProcessAIIntent()
+    protected virtual void ProcessAIIntent()
     {
-        if (m_targetPlayer)
+        // don't interrupt enemy attack animation, so that players have a chance to dodge attacks
+        if (!m_isAttacking)
         {
-            m_directionToPlayer = m_targetPlayer.position - transform.position;
-
-            if (m_distanceFromPlayer < m_detectionRadius)
+            if (m_targetPlayer)
             {
-                m_directionToPlayer.y = 0;
 
-                if (m_directionToPlayer.magnitude > m_attackRange)
+                m_directionToPlayer = m_targetPlayer.position - transform.position;
+
+                if (m_distanceFromPlayer < m_detectionRadius)
                 {
-                    if (m_speed > m_speedTriggerRun)
+                    m_directionToPlayer.y = 0;
+
+                    if (m_directionToPlayer.magnitude > m_attackRange)
                     {
-                        m_animManager.ChangeState(AnimationManager.EnemyState.Run);
+                        if (m_speed > m_speedTriggerRun)
+                        {
+                            m_animManager.ChangeState(AnimationManager.EnemyState.Run);
+                        }
+                        else
+                        {
+                            m_animManager.ChangeState(AnimationManager.EnemyState.Walk);
+                        }
                     }
                     else
                     {
-                        m_animManager.ChangeState(AnimationManager.EnemyState.Walk);
+                        m_animManager.ChangeState(AnimationManager.EnemyState.Attack);
+                        m_isAttacking = true;
                     }
+
                 }
                 else
                 {
-                    m_animManager.ChangeState(AnimationManager.EnemyState.Attack);
+                    m_animManager.ChangeState(AnimationManager.EnemyState.Idle);
                 }
             }
             else
@@ -145,14 +173,10 @@ public class EnemyChase : MonoBehaviourPun, IPunObservable
                 m_animManager.ChangeState(AnimationManager.EnemyState.Idle);
             }
         }
-        else
-        {
-            m_animManager.ChangeState(AnimationManager.EnemyState.Idle);
-        }
     }
 
     // Primarily used for moving and attacking
-    private void HandleAIIntent()
+    protected virtual void HandleAIIntent()
     {
         if (m_targetPlayer)
         {
@@ -176,30 +200,85 @@ public class EnemyChase : MonoBehaviourPun, IPunObservable
     /// </summary>
     /// <param name="playerPhotonViewID"></param>
     [PunRPC]
-    public void DeclareTargetPlayer(int playerPhotonViewID) 
+    public void DeclareTargetPlayer(int playerPhotonViewID)
     {
         Transform playerTransform = PhotonView.Find(playerPhotonViewID).transform;
         m_targetPlayer = playerTransform;
     }
 
+    // see wrapper functions in public methods
     [PunRPC]
-    public void EnableHitBoxes()
+    private void EnableHitBoxes()
     {
-        foreach (GameObject hitBox in m_hitBoxesArray)
+        foreach (HitBox hitBox in m_hitBoxesArray)
         {
-            hitBox.SetActive(true);
+            hitBox.m_hitBoxObject.SetActive(true);
         }
     }
 
+    // see wrapper functions in public methods
     [PunRPC]
-    public void DisableHitBoxes()
+    private void DisableHitBoxes()
     {
-        foreach (GameObject hitBox in m_hitBoxesArray)
+        foreach (HitBox hitBox in m_hitBoxesArray)
         {
-            hitBox.SetActive(false);
+            hitBox.m_hitBoxObject.SetActive(false);
         }
+        ResetHurtVictimArray();
+        m_isAttacking = false;
     }
 
+    // Clears the hurt victim array, so that we can damage the victims again in the next attack
+    private void ResetHurtVictimArray()
+    {
+        if (m_hurtVictimArray != null)
+        {
+            System.Array.Clear(m_hurtVictimArray, 0, m_hurtVictimArray.Length);
+        }
+        m_hurtVictimArrayIndex = 0;
+    }
+
+    // for hitbox usage, keep track of players (via array) we've attacked during same animation
+    // then we would reset the array and check again during the next animation
+    [PunRPC]
+    private void InsertHurtVictim(int playerViewID)
+    {
+        m_hurtVictimArray[m_hurtVictimArrayIndex] = playerViewID;
+        m_hurtVictimArrayIndex += 1;
+    }
+
+    #endregion
+
+    #region Public methods
+    
+    // Wrapper function for enabling hitbox
+    public void RPCEnableHitBoxes()
+    {
+        photonView.RPC("EnableHitBoxes", RpcTarget.All);
+    }
+
+    // Wrapper function for disabling hitbox
+    public void RPCDisablehitBoxes()
+    {
+        photonView.RPC("DisableHitBoxes", RpcTarget.All);
+    }
+
+    // Wrapper function for inserting players who've the enemy attacked during one animation
+    public void RPCInsertHurtVictim(int playerViewID)
+    {
+        photonView.RPC("InsertHurtVictim", RpcTarget.All, playerViewID);
+    }
+
+
+    /// <summary>
+    /// Check if player can be attacked again during attack animation. Prevents a player from being attacked multiple times during 1 anim.
+    /// </summary>
+    /// <param name="PhotonID"></param>
+    /// <returns>Whether a player is a valid target</returns>
+    public bool IsPlayerValidTarget(int PhotonID)
+    {
+        return !m_hurtVictimArray.Contains(PhotonID) && m_hurtVictimArrayIndex < m_numPlayersCanHit;
+    }
 
     // IPunObservable Implementation
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
@@ -223,4 +302,6 @@ public class EnemyChase : MonoBehaviourPun, IPunObservable
             }
         }
     }
+
+    #endregion
 }

@@ -23,12 +23,17 @@ public class AnimationManager : MonoBehaviour
     const string ENEMY_ATTACK = "Attack";
     const string ENEMY_DEATH = "Death";
 
-    // Animation times (try not to alter these values outside of the script)
-    public float idleTime;
-    public float walkTime;
-    public float runTime;
-    public float attackTime;
-    public float deathTime;
+    // Enable any of these animations to be played / or not
+    [SerializeField]
+    private bool m_EnemyIdleExist = true;
+    [SerializeField]
+    private bool m_EnemyWalkExist = true;
+    [SerializeField]
+    private bool m_EnemyRunExist = true;
+    [SerializeField]
+    private bool m_EnemyAttackExist = true;
+    [SerializeField]
+    private bool m_EnemyDeathExist = true;
 
     private void Start()
     {
@@ -51,19 +56,34 @@ public class AnimationManager : MonoBehaviour
         switch (newState)
         {
             case EnemyState.Idle:
-                m_animator.Play(ENEMY_IDLE);
+                if (m_EnemyIdleExist)
+                {
+                    m_animator.Play(ENEMY_IDLE);
+                }
                 break;
             case EnemyState.Walk:
-                m_animator.Play(ENEMY_WALK);
+                if (m_EnemyWalkExist)
+                {
+                    m_animator.Play(ENEMY_WALK);
+                }
                 break;
             case EnemyState.Run:
-                m_animator.Play(ENEMY_RUN);
+                if (m_EnemyRunExist)
+                {
+                    m_animator.Play(ENEMY_RUN);
+                }
                 break;
             case EnemyState.Attack:
-                m_animator.Play(ENEMY_ATTACK);
+                if (m_EnemyAttackExist)
+                {
+                    m_animator.Play(ENEMY_ATTACK);
+                }
                 break;
             case EnemyState.Death:
-                m_animator.Play(ENEMY_DEATH);
+                if (m_EnemyDeathExist)
+                {
+                    m_animator.Play(ENEMY_DEATH);
+                }
                 break;
         }
         m_currentState = newState;
@@ -72,32 +92,5 @@ public class AnimationManager : MonoBehaviour
     public EnemyState GetCurrentState()
     {
         return m_currentState;
-    }
-
-    // Function by johnnieZombie https://forum.unity.com/threads/how-to-find-animation-clip-length.465751/
-    public void UpdateAnimClipTimes()
-    {
-        AnimationClip[] clips = m_animator.runtimeAnimatorController.animationClips;
-        foreach (AnimationClip clip in clips)
-        {
-            switch (clip.name)
-            {
-                case "Attack":
-                    attackTime = clip.length;
-                    break;
-                case "Death":
-                    deathTime = clip.length;
-                    break;
-                case "Idle":
-                    idleTime = clip.length;
-                    break;
-                case "Walk":
-                    walkTime = clip.length;
-                    break;
-                case "Run":
-                    runTime = clip.length;
-                    break;
-            }
-        }
     }
 }

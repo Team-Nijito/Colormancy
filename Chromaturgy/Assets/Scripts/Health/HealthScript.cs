@@ -237,7 +237,10 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
 
         if (damageValue <= 0)
             throw new ArgumentException(string.Format("{0} should be greater than zero", damageValue), "damageValue");
-        m_effectiveHealth -= (damageValue - (m_armorPercentage / 100 * damageValue));
+        if (photonView.IsMine)
+        {
+            m_effectiveHealth -= (damageValue - (m_armorPercentage / 100 * damageValue));
+        }
     }
 
     [PunRPC]

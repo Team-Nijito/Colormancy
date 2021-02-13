@@ -1,28 +1,44 @@
 ﻿using Photon.Pun;
 using UnityEngine;
+using System.Linq;
 
 public class DetectHit : MonoBehaviour
 {
     // This script is used with projectiles and hitboxes to do damage
-
-    public EnemyChase m_enemyChaseScript;
+    private enum TriggerType{
+        Enter,
+        Stay,
+        Exit
+    }
 
     [SerializeField]
-    private float m_damage = 12f;
+    private GameObject m_parentGameObject; // the parent gameobject with the PhotonView
+    private EnemyChase m_parentECScript;
 
     [SerializeField]
     private bool m_isProjectile = false;
 
-    private GameObject m_currentVictim = null; // who we're currently damaging
-    private HealthScript m_currentVictimHealthScript = null;
+    [SerializeField]
+    private float m_damage = 12f;
+
+    private void Start()
+    {
+        if (!m_isProjectile)
+        {
+            m_parentECScript = m_parentGameObject.GetComponent<EnemyChase>();
+        }
+    }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player") && (m_isProjectile))
+        if (other.CompareTag("Player"))
         {
-            DetermineVictim(other.gameObject);
-            PhotonView photonView = PhotonView.Get(m_currentVictim);
-            photonView.RPC("TakeDamage", RpcTarget.All, m_damage);
+            CheckApplyDamage(other, TriggerType.Enter);
+
+            if (m_isProjectile)
+            {
+                Destroy(gameObject);
+            }
         }
     }
 
@@ -30,19 +46,45 @@ public class DetectHit : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            DetermineVictim(other.gameObject);
-            PhotonView photonView = PhotonView.Get(m_currentVictim);
-            photonView.RPC("TakeDamage", RpcTarget.All, m_damage * Time.deltaTime);
+            CheckApplyDamage(other, TriggerType.Exit);
+
+            if (m_isProjectile)
+            {
+                Destroy(gameObject);
+            }
         }
     }
 
-    // If this is a new victim, focus on the victim and then GetComponent<HealthScript> it
-    private void DetermineVictim(GameObject entity)
+    private void CheckApplyDamage(Collider player, TriggerType trigType)
     {
-        if (entity != m_currentVictim)
+        PhotonView playerPhotonView = PhotonView.Get(player.gameObject);
+        if (m_isProjectile)
         {
-            m_currentVictim = entity;
-            m_currentVictimHealthScript = m_currentVictim.GetComponent<HealthScript>();
+            if (trigType == TriggerType.Enter)
+            {
+                playerPhotonView.RPC("TakeDamage", RpcTarget.All, m_damage);
+            }
+            else
+            {
+                playerPhotonView.RPC("TakeDamage", RpcTarget.All, m_damage * Time.deltaTime);
+            }
         }
+        else if (m_parentECScript.IsPlayerValidTarget(playerPhotonView.ViewID))
+        {
+            m_parentECScript.RPCInsertHurtVictim(playerPhotonView.ViewID);
+            if (trigType == TriggerType.Enter)
+            {
+                playerPhotonView.RPC("TakeDamage", RpcTarget.All, m_damage);
+            }
+            else
+            {
+                playerPhotonView.RPC("TakeDamage", RpcTarget.All, m_damage * Time.deltaTime);
+            }
+        }
+    }
+
+    public void SetParentGameObject(GameObject parent)
+    {
+        m_parentGameObject = parent;
     }
 }

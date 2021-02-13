@@ -367,7 +367,7 @@ MonoBehaviour:
   m_initialHealthDeduction: 0
   m_armorPercentage: 0
   m_isRegenHealth: 1
-  m_regenHealthPercentage: 4
+  m_regenHealthPercentage: 0.5
   m_timeUntilDestroy: 3
 --- !u!114 &6914068583315090777
 MonoBehaviour:
