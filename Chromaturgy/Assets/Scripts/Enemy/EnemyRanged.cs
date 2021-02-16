@@ -75,6 +75,9 @@ public class EnemyRanged : EnemyChase
     // Wrapper function for spawning projectile
     public void RPCSpawnProjectile()
     {
-        photonView.RPC("SpawnProjectile", RpcTarget.All);
+        if (photonView.IsMine)
+        {
+            photonView.RPC("SpawnProjectile", RpcTarget.All);
+        }
     }
 }

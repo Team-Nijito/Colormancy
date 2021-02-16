@@ -157,20 +157,24 @@ public class EnemyPainter : EnemyChase
         while (true)
         {
             yield return new WaitForSecondsRealtime(m_paintCooldown);
-            Debug.DrawRay(transform.position, Vector3.down * m_raycastFloor, Color.green);
-            if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.down), out m_raycastHit, m_raycastFloor, m_paintableMask))
-            {
-                //the ray collided with something, you can interact
-                // with the hit object now by using hit.collider.gameObject
-                Vector3 paintPosition = new Vector3(transform.position.x, m_raycastHit.collider.gameObject.transform.position.y, transform.position.z);
 
-                if (!m_isUnpainter)
+            if (transform)
+            {
+                //Debug.DrawRay(transform.position, Vector3.down * m_raycastFloor, Color.green);
+                if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.down), out m_raycastHit, m_raycastFloor, m_paintableMask))
                 {
-                    PaintingManager.PaintSphere(m_colorToPaint, paintPosition, m_paintRadius);
-                }
-                else
-                {
-                    PaintingManager.UnpaintSphere(paintPosition, m_paintRadius);
+                    //the ray collided with something, you can interact
+                    // with the hit object now by using hit.collider.gameObject
+                    Vector3 paintPosition = new Vector3(transform.position.x, m_raycastHit.collider.gameObject.transform.position.y, transform.position.z);
+
+                    if (!m_isUnpainter)
+                    {
+                        PaintingManager.PaintSphere(m_colorToPaint, paintPosition, m_paintRadius);
+                    }
+                    else
+                    {
+                        PaintingManager.UnpaintSphere(paintPosition, m_paintRadius);
+                    }
                 }
             }
         }

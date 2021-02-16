@@ -58,27 +58,30 @@ public class DetectHit : MonoBehaviour
     private void CheckApplyDamage(Collider player, TriggerType trigType)
     {
         PhotonView playerPhotonView = PhotonView.Get(player.gameObject);
-        if (m_isProjectile)
+        if (playerPhotonView.IsMine)
         {
-            if (trigType == TriggerType.Enter)
+            if (m_isProjectile)
             {
-                playerPhotonView.RPC("TakeDamage", RpcTarget.All, m_damage);
+                if (trigType == TriggerType.Enter)
+                {
+                    playerPhotonView.RPC("TakeDamage", RpcTarget.All, m_damage);
+                }
+                else
+                {
+                    playerPhotonView.RPC("TakeDamage", RpcTarget.All, m_damage * Time.deltaTime);
+                }
             }
-            else
+            else if (m_parentECScript.IsPlayerValidTarget(playerPhotonView.ViewID))
             {
-                playerPhotonView.RPC("TakeDamage", RpcTarget.All, m_damage * Time.deltaTime);
-            }
-        }
-        else if (m_parentECScript.IsPlayerValidTarget(playerPhotonView.ViewID))
-        {
-            m_parentECScript.RPCInsertHurtVictim(playerPhotonView.ViewID);
-            if (trigType == TriggerType.Enter)
-            {
-                playerPhotonView.RPC("TakeDamage", RpcTarget.All, m_damage);
-            }
-            else
-            {
-                playerPhotonView.RPC("TakeDamage", RpcTarget.All, m_damage * Time.deltaTime);
+                m_parentECScript.RPCInsertHurtVictim(playerPhotonView.ViewID);
+                if (trigType == TriggerType.Enter)
+                {
+                    playerPhotonView.RPC("TakeDamage", RpcTarget.All, m_damage);
+                }
+                else
+                {
+                    playerPhotonView.RPC("TakeDamage", RpcTarget.All, m_damage * Time.deltaTime);
+                }
             }
         }
     }
