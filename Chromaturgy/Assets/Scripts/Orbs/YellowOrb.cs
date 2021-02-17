@@ -9,6 +9,7 @@ public class YellowOrb : Orb
         OrbColor = Color.yellow;
         OrbShape = SpellShape.OrbitingOrbs;
         CooldownMod = 1.3f;
+        ShapeManaMod = .9f;
         OrbElement = Element.Light;
         ModAmount = .1f;
     }
@@ -46,4 +47,19 @@ public class YellowOrb : Orb
         orbs.GetComponent<YellowSpellController>().playerTransform = t;
     }
 
+    public static object Deserialize(byte[] data)
+    {
+        YellowOrb result = new YellowOrb();
+        result.OrbColor = new Color(data[0], data[1], data[2]);
+        result.CooldownMod = data[3];
+        result.ShapeManaMod = data[4];
+        result.ModAmount = data[5];
+        return result;
+    }
+
+    public static byte[] Serialize(object customType)
+    {
+        YellowOrb c = (YellowOrb)customType;
+        return new byte[] { (byte)c.OrbColor.r, (byte)c.OrbColor.g, (byte)c.OrbColor.b, (byte)c.CooldownMod, (byte)c.ShapeManaMod, (byte)c.ModAmount };
+    }
 }

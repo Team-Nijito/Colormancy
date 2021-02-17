@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using ExitGames.Client.Photon;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,12 +7,17 @@ public class SpellManager : MonoBehaviour
 {
     public struct Spell
     {
+        static float BASE_SPELL_MANA = 33f;
         static float BASE_COOLDOWN = 10f;
 
-        Orb[] orbs;
+        float SpellCooldown;
+        float SpellManaCost;
+        (Orb, Orb, Orb) OrbTuple;
+
         Dictionary<Orb.Element, int> orbDict;
-        
-        public float SpellCooldown { get; private set; }
+
+        Orb[] orbs;
+
 
         public Spell(Orb[] _orbs)
         {
@@ -27,11 +33,28 @@ public class SpellManager : MonoBehaviour
             orbs = _orbs;
             
             SpellCooldown = BASE_COOLDOWN * orbs[2].CooldownMod;
+            SpellManaCost = BASE_SPELL_MANA * orbs[2].ShapeManaMod;
+            OrbTuple = (orbs[0], orbs[1], orbs[2]);
         }
 
         public void Cast(Transform t)
         {
             orbs[2].CastShape(orbs[0].CastGreaterEffect, orbs[1].CastLesserEffect, (orbDict[orbs[0].OrbElement], orbDict[orbs[1].OrbElement], orbDict[orbs[2].OrbElement]), t);
+        }
+
+        public float GetSpellCooldown()
+        {
+            return SpellCooldown;
+        }
+
+        public float GetManaCost()
+        {
+            return SpellManaCost;
+        }
+
+        public (Orb, Orb, Orb) GetOrbTuple()
+        {
+            return OrbTuple;
         }
     }
 
@@ -40,7 +63,7 @@ public class SpellManager : MonoBehaviour
 
     public Orb FirstOrb { get; private set; }
 
-    public void AddOrb(Orb orb)
+    public Spell AddOrb(Orb orb)
     {
         if (FirstOrb != null)
         {
@@ -51,7 +74,15 @@ public class SpellManager : MonoBehaviour
         currentSpellOrbs.Push(orb);
 
         FirstOrb.AddHeldEffect(test);
-        print("First orb now " + orb);
+
+        if (TestCreateSpell(out Spell spell))
+        {
+            return spell;
+        }
+        else
+        {
+            return new Spell();
+        }
     }
 
     private void Start()
@@ -59,22 +90,46 @@ public class SpellManager : MonoBehaviour
         test = GetComponent<SpellTest>();
     }
 
-    public bool TryCreateSpell(out Spell spell)
+    public bool TestCreateSpell(out Spell spell)
     {
         if (currentSpellOrbs.Count >= 3)
         {
             Orb[] spellOrbs = new Orb[] { currentSpellOrbs.Pop(), currentSpellOrbs.Pop(), currentSpellOrbs.Pop() };
-            
+            currentSpellOrbs.Push(spellOrbs[2]);
+            currentSpellOrbs.Push(spellOrbs[1]);
+            currentSpellOrbs.Push(spellOrbs[0]);
+
             //Create and return new spell from orbs
-            Debug.Log(string.Format("Creating spell with orbs: {0}, {1}, {2}", spellOrbs[0], spellOrbs[1], spellOrbs[2]));
             spell = new Spell(spellOrbs);
-            currentSpellOrbs.Clear();
             return true;
-        } else
+        }
+        else
         {
             spell = new Spell();
             return false;
         }
+    }
+
+    //public bool TryCreateSpell(out Spell spell)
+    //{
+    //    if (currentSpellOrbs.Count >= 3)
+    //    {
+    //        Orb[] spellOrbs = new Orb[] { currentSpellOrbs.Pop(), currentSpellOrbs.Pop(), currentSpellOrbs.Pop() };
+            
+    //        //Create and return new spell from orbs
+    //        spell = new Spell(spellOrbs);
+    //        currentSpellOrbs.Clear();
+    //        return true;
+    //    } else
+    //    {
+    //        spell = new Spell();
+    //        return false;
+    //    }
+    //}
+
+    public void ClearOrbs()
+    {
+        currentSpellOrbs.Clear();
     }
 }
 

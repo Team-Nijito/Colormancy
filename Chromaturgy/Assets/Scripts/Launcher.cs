@@ -1,4 +1,5 @@
-﻿using Photon.Pun;
+﻿using ExitGames.Client.Photon;
+using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
 
@@ -33,6 +34,8 @@ public class Launcher : MonoBehaviourPunCallbacks
     private void Awake()
     {
         PhotonNetwork.AutomaticallySyncScene = true;
+        PhotonPeer.RegisterType(typeof(IndigoOrb), (byte)'A', IndigoOrb.Serialize, IndigoOrb.Deserialize);
+        PhotonPeer.RegisterType(typeof(YellowOrb), (byte)'B', YellowOrb.Serialize, YellowOrb.Deserialize);
     }
 
     // Start is called before the first frame update
