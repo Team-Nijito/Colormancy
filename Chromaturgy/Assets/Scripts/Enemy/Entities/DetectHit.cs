@@ -40,6 +40,16 @@ public class DetectHit : MonoBehaviour
                 Destroy(gameObject);
             }
         }
+        // Uncomment this once you've implemented a simple ray check for checking if an enemy can see the player
+        //else if (!other.CompareTag("Enemy"))
+        //{
+            
+            // Destroy a projectile if it collides with an environmental object
+            //if (m_isProjectile)
+            //{
+            //    Destroy(gameObject);
+            //}
+        //}
     }
 
     private void OnTriggerStay(Collider other)
@@ -53,6 +63,15 @@ public class DetectHit : MonoBehaviour
                 Destroy(gameObject);
             }
         }
+        // Uncomment this once you've implemented a simple ray check for checking if an enemy can see the player
+        //else if (!other.CompareTag("Enemy"))
+        //{
+            // Destroy a projectile if it collides with an environmental object
+            //if (m_isProjectile)
+            //{
+            //    Destroy(gameObject);
+            //}
+        //}
     }
 
     private void CheckApplyDamage(Collider player, TriggerType trigType)

@@ -47,9 +47,9 @@ public class EnemyRanged : EnemyChase
                 }
                 else
                 {
+                    //TODO:  Attack if we can see the player, otherwise move closer
                     m_animManager.ChangeState(AnimationManager.EnemyState.Attack);
                 }
-
             }
             else
             {

@@ -837,7 +837,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4908208701604714504}
   - component: {fileID: 8702466685735060493}
-  - component: {fileID: 949987643190913358}
+  - component: {fileID: 1836321641692789840}
   - component: {fileID: 4908208701597792166}
   - component: {fileID: 3757489281828187951}
   - component: {fileID: 4908208701605102283}
@@ -881,22 +881,28 @@ CapsuleCollider:
   m_Height: 0.18
   m_Direction: 1
   m_Center: {x: 0, y: 0.089, z: 0}
---- !u!54 &949987643190913358
-Rigidbody:
+--- !u!195 &1836321641692789840
+NavMeshAgent:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4908208701605069864}
-  serializedVersion: 2
-  m_Mass: 1
-  m_Drag: 1
-  m_AngularDrag: 0.5
-  m_UseGravity: 1
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 80
-  m_CollisionDetection: 0
+  m_Enabled: 1
+  m_AgentTypeID: 0
+  m_Radius: 0.05
+  m_Speed: 5
+  m_Acceleration: 30
+  avoidancePriority: 50
+  m_AngularSpeed: 120
+  m_StoppingDistance: 3
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 0.18
+  m_BaseOffset: 0
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 3
 --- !u!95 &4908208701597792166
 Animator:
   serializedVersion: 3
@@ -969,7 +975,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_detectionRadius: 15
   m_attackRange: 3
-  m_speed: 12
+  m_speed: 5
   m_speedTriggerRun: 15
   m_hitBoxesArray: []
   m_numPlayersCanHit: 4
@@ -981,10 +987,12 @@ MonoBehaviour:
   m_raycastFloor: 1.5
   m_wanderTime:
     minTime: 3
-    maxTime: 5
+    maxTime: 7
   m_idleTime:
     minTime: 1
     maxTime: 2
+  m_rangeXMove: 30
+  m_rangeZMove: 30
 --- !u!114 &1233567071775370880
 MonoBehaviour:
   m_ObjectHideFlags: 0

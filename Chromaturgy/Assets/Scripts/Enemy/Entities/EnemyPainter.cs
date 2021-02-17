@@ -2,6 +2,7 @@
 using Photon.Pun;
 using Photon.Realtime;
 using System.Collections;
+using UnityEngine.AI;
 
 public class EnemyPainter : EnemyChase
 {
@@ -21,6 +22,7 @@ public class EnemyPainter : EnemyChase
         Wander
     }
 
+    // Painting settings
     [SerializeField]
     private Color m_colorToPaint = Color.red;
 
@@ -34,17 +36,22 @@ public class EnemyPainter : EnemyChase
     private float m_paintRadius = 3f;
 
     [SerializeField]
-    private float m_raycastFloor = 1.5f;
+    private float m_raycastFloor = 1.5f; // how large is the laser we shoot downwards to check for a ground
 
     private RaycastHit m_raycastHit;
-
     private int m_paintableMask = 1 << 8; // only focus on the paintable mask
 
+    // Wandering and idle settings
     [SerializeField]
     private RangeTime m_wanderTime;
 
     [SerializeField]
     private RangeTime m_idleTime;
+
+    [SerializeField]
+    private float m_rangeXMove = 10f;
+    [SerializeField]
+    private float m_rangeZMove = 10f;
 
     private Task m_paintFloor;
     private Task m_wanderRandomDirection;
@@ -54,9 +61,13 @@ public class EnemyPainter : EnemyChase
 
     protected override void Start()
     {
-        m_rbody = GetComponent<Rigidbody>();
         m_hscript = GetComponent<HealthScript>();
         m_animManager = GetComponent<AnimationManager>();
+        m_navMeshAgent = GetComponent<NavMeshAgent>();
+
+        // Override the variables in m_navMeshAgent if they're not set already.
+        m_navMeshAgent.speed = m_speed;
+        m_navMeshAgent.stoppingDistance = m_attackRange;
 
         if (m_character)
         {
@@ -64,7 +75,7 @@ public class EnemyPainter : EnemyChase
         }
 
         m_paintFloor = new Task(PaintOnFloorLoop());
-        m_wanderRandomDirection = new Task(WanderRandomDirection());
+        m_wanderRandomDirection = new Task(ShuffleRandomDirection());
         m_wanderRandomDirection.Pause();
     }
 
@@ -127,6 +138,7 @@ public class EnemyPainter : EnemyChase
                 transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(m_directionToPlayer) * Quaternion.Euler(0, 180f, 0), 0.1f);
                 if (m_wState == WanderState.Wander || m_wState == WanderState.Idle)
                 {
+                    m_navMeshAgent.isStopped = true;
                     m_wanderRandomDirection.Pause();
                     m_lastWState = m_wState;
                     m_wState = WanderState.NotWandering;
@@ -141,13 +153,14 @@ public class EnemyPainter : EnemyChase
                     {
                         m_wState = m_lastWState;
                     }
+                    m_navMeshAgent.isStopped = false;
                     m_wanderRandomDirection.Unpause();
                 }
             }
 
-            if (m_currentState == AnimationManager.EnemyState.Walk || m_currentState == AnimationManager.EnemyState.Run)
+            if (IsMoving() && m_navMeshAgent.isStopped)
             {
-                m_rbody.AddForce(transform.forward * m_speed);
+                m_navMeshAgent.Move(transform.forward * m_speed * Time.deltaTime);
             }
         }
     }
@@ -158,10 +171,10 @@ public class EnemyPainter : EnemyChase
         {
             yield return new WaitForSecondsRealtime(m_paintCooldown);
 
-            if (transform)
+            if (this && IsMoving())
             {
                 //Debug.DrawRay(transform.position, Vector3.down * m_raycastFloor, Color.green);
-                if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.down), out m_raycastHit, m_raycastFloor, m_paintableMask))
+                if (Physics.Raycast(transform.position, -transform.up, out m_raycastHit, m_raycastFloor, m_paintableMask))
                 {
                     //the ray collided with something, you can interact
                     // with the hit object now by using hit.collider.gameObject
@@ -180,18 +193,49 @@ public class EnemyPainter : EnemyChase
         }
     }
 
-    private IEnumerator WanderRandomDirection()
+    private IEnumerator ShuffleRandomDirection()
     {
         while (true)
         {
             yield return new WaitForSecondsRealtime(Random.Range(m_wanderTime.minTime, m_wanderTime.maxTime));
 
-            // choose random direction
-            transform.eulerAngles = new Vector3(0, Random.Range(0, 360), 0);
+            m_navMeshAgent.SetDestination(GetRandomPosition()); // choose random direction
 
             m_wState = WanderState.Wander;
             yield return new WaitForSecondsRealtime(Random.Range(m_idleTime.minTime, m_idleTime.maxTime));
+
             m_wState = WanderState.Idle;
+            m_navMeshAgent.SetDestination(transform.position); // set destination to current destionation so it wont keep moving
         }
+    }
+
+    // Find a random position on the map that the NavMeshAgent can travel to
+    private Vector3 GetRandomPosition()
+    {
+        float randomZ;
+        float randomX;
+        Vector3 newPosition;
+
+        while (true)
+        {
+            randomZ = Random.Range(-m_rangeZMove, m_rangeZMove);
+            randomX = Random.Range(-m_rangeXMove, m_rangeXMove);
+
+            newPosition = new Vector3(transform.position.x + randomX,
+                                      transform.position.y,
+                                      transform.position.z + randomZ);
+
+            if (Physics.Raycast(newPosition, -transform.up, out m_raycastHit, m_raycastFloor, m_paintableMask))
+            {
+                break;
+            }
+        }
+
+        return newPosition;
+    }
+
+    private bool IsMoving()
+    {
+        return m_currentState == AnimationManager.EnemyState.Walk || m_currentState == AnimationManager.EnemyState.Run;
     }
 }

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
+using UnityEngine.AI;
 
 public class EnemyChase : MonoBehaviourPun, IPunObservable
 {
@@ -53,7 +54,7 @@ public class EnemyChase : MonoBehaviourPun, IPunObservable
     public GameObject m_character = null;
     protected Transform m_characterTransform;
 
-    protected Rigidbody m_rbody;
+    protected NavMeshAgent m_navMeshAgent;
     protected HealthScript m_hscript;
     protected AnimationManager m_animManager;
 
@@ -65,10 +66,14 @@ public class EnemyChase : MonoBehaviourPun, IPunObservable
     // Start is called before the first frame update
     protected virtual void Start()
     {
-        m_rbody = GetComponent<Rigidbody>();
         m_hscript = GetComponent<HealthScript>();
         m_animManager = GetComponent<AnimationManager>();
-        
+        m_navMeshAgent = GetComponent<NavMeshAgent>();
+
+        // Override the variables in m_navMeshAgent if they're not set already.
+        m_navMeshAgent.speed = m_speed;
+        m_navMeshAgent.stoppingDistance = m_attackRange;
+
         if (m_character)
         {
             m_characterTransform = m_character.transform;
@@ -138,7 +143,6 @@ public class EnemyChase : MonoBehaviourPun, IPunObservable
         {
             if (m_targetPlayer)
             {
-
                 m_directionToPlayer = m_targetPlayer.position - transform.position;
 
                 if (m_distanceFromPlayer < m_detectionRadius)
@@ -161,7 +165,6 @@ public class EnemyChase : MonoBehaviourPun, IPunObservable
                         m_animManager.ChangeState(AnimationManager.EnemyState.Attack);
                         m_isAttacking = true;
                     }
-
                 }
                 else
                 {
@@ -184,11 +187,18 @@ public class EnemyChase : MonoBehaviourPun, IPunObservable
 
             if (Vector3.Distance(m_targetPlayer.position, transform.position) < m_detectionRadius)
             {
-                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(m_directionToPlayer), 0.1f);
-
                 if (m_currentState == AnimationManager.EnemyState.Walk || m_currentState == AnimationManager.EnemyState.Run)
                 {
-                    m_rbody.AddForce(transform.forward * m_speed);
+                    m_navMeshAgent.SetDestination(m_targetPlayer.position);
+                }
+                else if (m_currentState == AnimationManager.EnemyState.Attack)
+                {
+                    // Stop the agent from moving
+                    m_navMeshAgent.SetDestination(transform.position);
+                    m_navMeshAgent.velocity = Vector3.zero;
+                    
+                    // turn towards player when attacking
+                    transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(m_directionToPlayer), 0.1f);
                 }
             }
         }
@@ -289,7 +299,6 @@ public class EnemyChase : MonoBehaviourPun, IPunObservable
         {
             if (m_character)
             {
-                //stream.SendNext(m_characterTransform.localPosition);
                 stream.SendNext(m_characterTransform.localRotation);
             }
         }
@@ -297,7 +306,6 @@ public class EnemyChase : MonoBehaviourPun, IPunObservable
         {
             if (m_character)
             {
-                //m_characterTransform.localPosition = (Vector3)stream.ReceiveNext();
                 m_characterTransform.localRotation = (Quaternion)stream.ReceiveNext();
             }
         }

@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using Photon.Pun;
 using Photon.Realtime;
+using UnityEngine.AI;
 
 public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
 {
@@ -133,9 +135,10 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
             if (m_effectiveHealth <= 0)
             {
                 {
-                    // disable movement, collider, and rigidbody
+                    // disable movement, collider
                     GetComponent<EnemyChase>().enabled = false;
-                    GetComponent<Rigidbody>().isKinematic = true;
+                    GetComponent<NavMeshAgent>().velocity = Vector3.zero;
+                    GetComponent<NavMeshAgent>().enabled = false;
                     GetComponent<Collider>().enabled = false;
 
                     // disable health bar and name
@@ -144,7 +147,7 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
                     // play dying animation
                     m_animManager.ChangeState(AnimationManager.EnemyState.Death);
                     // for other objects, we may want to destroy them
-                    Destroy(transform.gameObject, m_timeUntilDestroy);
+                    StartCoroutine(DelayedDestruction(m_timeUntilDestroy));
                 }
             }
         }
@@ -260,5 +263,15 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     public void ResetHealth()
     {
         m_effectiveHealth = m_maxEffectiveHealth;
+    }
+
+    // Used for destroying dead enemies
+    private IEnumerator DelayedDestruction(float seconds)
+    {
+        yield return new WaitForSecondsRealtime(seconds);
+        PhotonNetwork.Destroy(transform.gameObject);
+
+        // Notify the Enemy Manager that an enemy has died
+        GameObject.Find("EnemyManager").GetComponent<EnemyManager>().EnemyHasDied();
     }
 }

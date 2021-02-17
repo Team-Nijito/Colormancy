@@ -22,7 +22,7 @@ public class Launcher : MonoBehaviourPunCallbacks
 
     #region Private Fields
 
-    string gameVersion = "1";
+    string gameVersion = "1.7"; // FIXME
 
     bool isConnecting;
 

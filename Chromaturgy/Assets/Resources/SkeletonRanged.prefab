@@ -1424,7 +1424,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7868359989327704}
   - component: {fileID: 4378588057287879517}
-  - component: {fileID: 5271895807214618142}
+  - component: {fileID: 4492902978810850956}
   - component: {fileID: 7868359999101174}
   - component: {fileID: 8080523624243871871}
   - component: {fileID: 7868359989718427}
@@ -1468,22 +1468,28 @@ CapsuleCollider:
   m_Height: 0.18
   m_Direction: 1
   m_Center: {x: 0, y: 0.089, z: 0}
---- !u!54 &5271895807214618142
-Rigidbody:
+--- !u!195 &4492902978810850956
+NavMeshAgent:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7868359989750648}
-  serializedVersion: 2
-  m_Mass: 1
-  m_Drag: 1
-  m_AngularDrag: 0.5
-  m_UseGravity: 1
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 80
-  m_CollisionDetection: 0
+  m_Enabled: 1
+  m_AgentTypeID: 0
+  m_Radius: 0.05
+  m_Speed: 18
+  m_Acceleration: 30
+  avoidancePriority: 50
+  m_AngularSpeed: 120
+  m_StoppingDistance: 15
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 0.18
+  m_BaseOffset: 0
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 3
 --- !u!95 &7868359999101174
 Animator:
   serializedVersion: 3
@@ -1515,6 +1521,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9ba24a809eb142e44bfc0f3df8a39b90, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_EnemyIdleExist: 1
+  m_EnemyWalkExist: 1
+  m_EnemyRunExist: 1
+  m_EnemyAttackExist: 1
+  m_EnemyDeathExist: 1
 --- !u!114 &7868359989718427
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1549,7 +1560,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6aaab6021a9b3564aae58e0b3e51edae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_detectionRadius: 30
+  m_detectionRadius: 100
   m_attackRange: 15
   m_speed: 18
   m_speedTriggerRun: 15
