@@ -198,6 +198,7 @@ GameObject:
   - component: {fileID: 6914068583315090777}
   - component: {fileID: 8921435665619611767}
   - component: {fileID: 802980927366244694}
+  - component: {fileID: 8887605966479162179}
   - component: {fileID: -1104988167870857447}
   - component: {fileID: 4310232013060416496}
   - component: {fileID: 537622437891460791}
@@ -421,6 +422,20 @@ MonoBehaviour:
   m_paintball: {fileID: 6225313193489255382, guid: 0eacf1883e1227c459d5304882b23314,
     type: 3}
   m_amountPaintballsToPool: 1
+--- !u!114 &8887605966479162179
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5820395927475117105}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a035a990accb804faa92f979a8edbed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  healthManaPrefab: {fileID: 5935600569168913045, guid: 9c7da00c2a164ec43a15707c1ff9cba0,
+    type: 3}
 --- !u!114 &-1104988167870857447
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -2,22 +2,26 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[System.Serializable]
 public abstract class Orb
 {
+    [System.Serializable]
     public enum SpellShape
     {
         Jump, Fireball, OrbitingOrbs, Vines, Ink, Cloud, Shockwave, Bolt, ExpandingOrbs
     }
 
+    [System.Serializable]
     public enum Element
     {
         Wrath, Fire, Light, Nature, Water, Poison, Earth, Wind, Darkness
     }
 
-    public Color OrbColor { get; protected set; }
-    public SpellShape OrbShape { get; protected set; }
-    public float CooldownMod { get; protected set; }
-    public Element OrbElement { get; protected set; }
+    public Color OrbColor;
+    public SpellShape OrbShape;
+    public Element OrbElement;
+    public float CooldownMod;
+    public float ShapeManaMod;
     protected float ModAmount;
 
     //SpellTest will just be the player controller
