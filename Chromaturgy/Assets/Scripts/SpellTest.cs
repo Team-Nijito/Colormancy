@@ -47,6 +47,7 @@ public class SpellTest : MonoBehaviour
         manager = GetComponent<SpellManager>();
         orbs.Add(new IndigoOrb());
         orbs.Add(new YellowOrb());
+        orbs.Add(new VioletOrb());
     }
 
     // Update is called once per frame

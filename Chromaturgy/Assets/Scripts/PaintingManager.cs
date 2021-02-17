@@ -6,6 +6,9 @@ public class PaintingManager : MonoBehaviour
 {
     public static int paintingMask = 9;
 
+    private static int vertexCount;
+    private static int paintedVertices;
+
     void Start()
     {
         // find all paintable gameobjects and set their initial colors
@@ -27,6 +30,7 @@ public class PaintingManager : MonoBehaviour
 
                 List<Vector3> vertices = new List<Vector3>();
                 mesh.GetVertices(vertices);
+                vertexCount += vertices.Count;
 
                 List<Color> colors = new List<Color>();
 
@@ -82,6 +86,11 @@ public class PaintingManager : MonoBehaviour
                     vertexColor.r = Mathf.Lerp(paintColor.r, colors[k].r, colorLerp);
                     vertexColor.g = Mathf.Lerp(paintColor.g, colors[k].g, colorLerp);
                     vertexColor.b = Mathf.Lerp(paintColor.b, colors[k].b, colorLerp);
+
+                    // check if painted
+                    if (vertexColor.a == 0)
+                        paintedVertices++;
+
                     // use bitmask for lerp
                     vertexColor.a = Mathf.Clamp(1 - l + colors[k].a, 0, 1);
 
@@ -94,7 +103,7 @@ public class PaintingManager : MonoBehaviour
     }
 
     public static void UnpaintSphere(Vector3 origin, float radius, float threshold = 0.5f) {
-        Collider[] hitColliders = Physics.OverlapSphere(origin, radius, 1 << 8);
+        Collider[] hitColliders = Physics.OverlapSphere(origin, radius, 1 << paintingMask);
         float l = 0;
         float colorLerp = 0;
         float originToVertex = 0;
@@ -129,8 +138,14 @@ public class PaintingManager : MonoBehaviour
                     vertexColor.r = Mathf.Lerp(paintColor.r, colors[k].r, colorLerp);
                     vertexColor.g = Mathf.Lerp(paintColor.g, colors[k].g, colorLerp);
                     vertexColor.b = Mathf.Lerp(paintColor.b, colors[k].b, colorLerp);
+
+                    // check if repainted
+                    if (vertexColor.a != 0)
+                        paintedVertices--;
+
                     // use bitmask for lerp
                     vertexColor.a = Mathf.Clamp(l - colors[k].a, 0, 1);
+
 
                     colors[k] = vertexColor;
                 }
@@ -138,6 +153,16 @@ public class PaintingManager : MonoBehaviour
 
             mesh.SetColors(colors);
         }
+    }
+
+    public static float paintingProgress()
+    {
+        return (float)paintedVertices / vertexCount;
+    }
+
+    private void Update()
+    {
+        print(paintingProgress());
     }
 
     // every x amount of fixed update ticks, do paint

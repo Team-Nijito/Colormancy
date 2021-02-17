@@ -7,7 +7,6 @@
 		_NormalComparison("Normal Comparison", float) = 0.1
 		_Color("Color", COLOR) = (1, 1, 1, 1)
 		_Lerp("Lerp", Range(0, 1)) = 1
-
 	}
 		SubShader
 		{
