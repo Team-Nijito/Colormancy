@@ -9,6 +9,7 @@ public class VioletOrb : Orb
         OrbColor = Color.yellow;
         OrbShape = SpellShape.OrbitingOrbs;
         CooldownMod = 1.3f;
+        ShapeManaMod = .9f;
         OrbElement = Element.Light;
         ModAmount = .1f;
     }
@@ -47,6 +48,20 @@ public class VioletOrb : Orb
             GameObject orbs = GameObject.Instantiate(Resources.Load("Orbs/Violet Cloud", typeof(GameObject)), hit.point + Vector3.up, t.rotation) as GameObject;
         }
 
+    }
+
+    public static object Deserialize(byte[] data) {
+        VioletOrb result = new VioletOrb();
+        result.OrbColor = new Color(data[0], data[1], data[2]);
+        result.CooldownMod = data[3];
+        result.ShapeManaMod = data[4];
+        result.ModAmount = data[5];
+        return result;
+    }
+
+    public static byte[] Serialize(object customType) {
+        VioletOrb c = (VioletOrb)customType;
+        return new byte[] { (byte)c.OrbColor.r, (byte)c.OrbColor.g, (byte)c.OrbColor.b, (byte)c.CooldownMod, (byte)c.ShapeManaMod, (byte)c.ModAmount };
     }
 
 }
