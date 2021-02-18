@@ -21,7 +21,7 @@ namespace WarriorAnimsFREE
         {
             inputHorizontal = Input.GetAxisRaw("Horizontal");
             inputVertical = Input.GetAxisRaw("Vertical");
-            //inputAttack0 = Input.GetButtonDown("Attack0");
+            inputAttack0 = Input.GetButtonDown("Attack0");
             inputJump = Input.GetButtonDown("Jump");
         }
 

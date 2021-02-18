@@ -100,7 +100,7 @@ public class PlayerMovement : MonoBehaviour
         if (m_canMove)
         {
             if (m_isDashing)
-                m_controller.Move(m_movement * m_runSpeed * Time.deltaTime);
+            m_controller.Move(m_movement * m_runSpeed * Time.deltaTime);
             else
             {
                 m_controller.Move(m_movement * m_walkSpeed * Time.deltaTime);
