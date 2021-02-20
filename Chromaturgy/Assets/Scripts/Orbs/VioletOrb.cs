@@ -8,8 +8,8 @@ public class VioletOrb : Orb
     {
         OrbColor = Color.yellow;
         OrbShape = SpellShape.OrbitingOrbs;
-        CooldownMod = 1.3f;
-        ShapeManaMod = .9f;
+        CooldownMod = 0f;
+        ShapeManaMod = 0f;
         OrbElement = Element.Light;
         ModAmount = .1f;
     }
@@ -45,7 +45,10 @@ public class VioletOrb : Orb
         RaycastHit hit;
         if (Physics.Raycast(ray, out hit, 100f, 1 << PaintingManager.paintingMask))
         {
-            GameObject orbs = GameObject.Instantiate(Resources.Load("Orbs/Violet Cloud", typeof(GameObject)), hit.point + Vector3.up, t.rotation) as GameObject;
+            Vector3 direction = hit.point - t.position;
+
+            GameObject orbs = GameObject.Instantiate(Resources.Load("Orbs/Violet Sphere", typeof(GameObject)), t.position + direction.normalized, t.rotation) as GameObject;
+            orbs.GetComponent<VioletSpellSphereController>().endPosition = hit.point;
         }
 
     }

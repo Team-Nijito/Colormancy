@@ -56,7 +56,7 @@
 				float aspectRatio = _ScreenParams.x / _ScreenParams.y;
 				textureCoordinate.x *= aspectRatio;
 				textureCoordinate.x += textureCoordinate.y;
-				textureCoordinate.y += _Time.x + frac(textureCoordinate.x / textureCoordinate.y);
+				textureCoordinate.y += _Time.x;
 				float perlin = tex2D(_NoiseTex, textureCoordinate);
 
                 return lerp(_Color, _Color2, perlin);
