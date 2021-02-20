@@ -20,7 +20,7 @@ public class VioletSpellController : MonoBehaviour
     {
         starttime = Time.time;
 
-        PaintingManager.PaintSphere(paintColor, transform.position + Vector3.down, spherePaintRadius, 0.8f);
+        PaintingManager.PaintSphere(paintColor, transform.position + Vector3.down, spherePaintRadius);
     }
 
     // Update is called once per frame

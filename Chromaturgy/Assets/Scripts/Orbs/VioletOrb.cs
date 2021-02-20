@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class YellowOrb : Orb
+public class VioletOrb : Orb
 {
-    public YellowOrb()
+    public VioletOrb()
     {
         OrbColor = Color.yellow;
         OrbShape = SpellShape.OrbitingOrbs;
-        CooldownMod = 1.3f;
-        ShapeManaMod = .9f;
+        CooldownMod = 0f;
+        ShapeManaMod = 0f;
         OrbElement = Element.Light;
         ModAmount = .1f;
     }
@@ -41,15 +41,20 @@ public class YellowOrb : Orb
         //greaterEffectMethod(enemy game object, greaterEffectAmnt);
         //For any allies hit 
         //lesserEffectMethod(ally game object, lesserEffectAmnt);
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+        if (Physics.Raycast(ray, out hit, 100f, 1 << PaintingManager.paintingMask))
+        {
+            Vector3 direction = hit.point - t.position;
 
-        GameObject orbs = GameObject.Instantiate(Resources.Load("Orbs/Yellow Orbs", typeof(GameObject))) as GameObject;
-        orbs.transform.position = t.position;
-        orbs.GetComponent<YellowSpellController>().playerTransform = t;
+            GameObject orbs = GameObject.Instantiate(Resources.Load("Orbs/Violet Sphere", typeof(GameObject)), t.position + direction.normalized, t.rotation) as GameObject;
+            orbs.GetComponent<VioletSpellSphereController>().endPosition = hit.point;
+        }
+
     }
 
-    public static object Deserialize(byte[] data)
-    {
-        YellowOrb result = new YellowOrb();
+    public static object Deserialize(byte[] data) {
+        VioletOrb result = new VioletOrb();
         result.OrbColor = new Color(data[0], data[1], data[2]);
         result.CooldownMod = data[3];
         result.ShapeManaMod = data[4];
@@ -57,9 +62,9 @@ public class YellowOrb : Orb
         return result;
     }
 
-    public static byte[] Serialize(object customType)
-    {
-        YellowOrb c = (YellowOrb)customType;
+    public static byte[] Serialize(object customType) {
+        VioletOrb c = (VioletOrb)customType;
         return new byte[] { (byte)c.OrbColor.r, (byte)c.OrbColor.g, (byte)c.OrbColor.b, (byte)c.CooldownMod, (byte)c.ShapeManaMod, (byte)c.ModAmount };
     }
+
 }

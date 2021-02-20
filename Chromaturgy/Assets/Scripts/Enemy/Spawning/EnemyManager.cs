@@ -23,7 +23,7 @@ public class EnemyManager : MonoBehaviour
     {
         if (m_numEnemiesOnField < m_desiredEnemiesOnField)
         {
-            print("Spawning");
+            //print("Spawning");
             StartCoroutine(SpawnEnemy());
         }
     }
