@@ -162,7 +162,8 @@ public class PaintingManager : MonoBehaviour
 
     private void Update()
     {
-        print(paintingProgress());
+        // uncomment this for debugging purposes
+        //print(paintingProgress());
     }
 
     // every x amount of fixed update ticks, do paint

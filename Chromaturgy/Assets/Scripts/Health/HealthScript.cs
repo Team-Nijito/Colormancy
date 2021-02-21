@@ -251,7 +251,7 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     {
         // if you want to teleport the player, just deactivate and reactivate the gameObject
         gameObject.SetActive(false);
-        transform.position = position;
+        transform.position = m_gameManager.ReturnSpawnpointPosition();
         gameObject.SetActive(true);
         ResetHealth();
         m_mScript.ResetMana();

@@ -23,7 +23,7 @@ public class Launcher : MonoBehaviourPunCallbacks
 
     #region Private Fields
 
-    string gameVersion = "1.7"; // FIXME
+    string gameVersion = "1";
 
     bool isConnecting;
 
@@ -101,7 +101,7 @@ public class Launcher : MonoBehaviourPunCallbacks
         Debug.Log("OnJoinedRoom(). Client is in a room");
         if (PhotonNetwork.CurrentRoom.PlayerCount == 1)
         {
-            PhotonNetwork.LoadLevel("TestMoveChamber"); // FIXME
+            PhotonNetwork.LoadLevel("Office Level 1");
         }
     }
 

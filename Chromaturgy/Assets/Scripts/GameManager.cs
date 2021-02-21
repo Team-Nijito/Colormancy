@@ -16,6 +16,14 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     #region Private Fields
 
+    [Tooltip("Players will spawn at this location")]
+    [SerializeField]
+    private GameObject m_playerSpawnpoint;
+
+    [Tooltip("If playerSpawnpoint is unassigned, spawn using these default coordinates")]
+    [SerializeField]
+    private Vector3 m_defaultSpawn = new Vector3(0, 3, 0);
+
     [Tooltip("The prefab to use for representing the player")]
     [SerializeField]
     private GameObject m_playerPrefab;
@@ -99,6 +107,22 @@ public class GameManager : MonoBehaviourPunCallbacks
         m_playerGameObjectList.Add(player);
     }
 
+    /// <summary>
+    /// Get the position of the spawnpoint (if it exists), otherwise return default.
+    /// </summary>
+    public Vector3 ReturnSpawnpointPosition()
+    {
+        if (m_playerSpawnpoint)
+        {
+            return m_playerSpawnpoint.transform.position;
+        }
+        else
+        {
+            return m_defaultSpawn;
+        }
+    }
+
+
     #endregion
 
     #region Private Methods
@@ -126,7 +150,15 @@ public class GameManager : MonoBehaviourPunCallbacks
             {
                 if (HealthScript.LocalPlayerInstance == null)
                 {
-                    GameObject player = PhotonNetwork.Instantiate(m_playerPrefab.name, new Vector3(0f, 3f, 0f), Quaternion.identity, 0);
+                    GameObject player;
+                    if (m_playerSpawnpoint)
+                    {
+                        player = PhotonNetwork.Instantiate(m_playerPrefab.name, m_playerSpawnpoint.transform.position, Quaternion.identity, 0);
+                    }
+                    else
+                    {
+                        player = PhotonNetwork.Instantiate(m_playerPrefab.name, m_defaultSpawn, Quaternion.identity, 0);
+                    }
 
                     // Instantiate the health/mana GUI after instantiating the player
                     //GameObject playerUI = Instantiate(healthManaBarPrefab);

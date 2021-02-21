@@ -16,7 +16,6 @@ public class EnemyManager : MonoBehaviour
     [SerializeField]
     private int m_desiredEnemiesOnField = 7; // how many enemies are on the field at the time
 
-    [SerializeField]
     private int m_numEnemiesOnField = 0;
 
     private void Update()
