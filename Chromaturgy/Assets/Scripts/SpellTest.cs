@@ -64,6 +64,8 @@ public class SpellTest : MonoBehaviourPun
         orbs.Add(new IndigoOrb());
         orbs.Add(new YellowOrb());
         orbs.Add(new VioletOrb());
+        orbs.Add(new BlueOrb());
+        orbs.Add(new OrangeOrb());
     }
 
     // Update is called once per frame

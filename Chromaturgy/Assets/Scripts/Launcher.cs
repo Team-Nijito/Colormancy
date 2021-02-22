@@ -37,6 +37,8 @@ public class Launcher : MonoBehaviourPunCallbacks
         PhotonPeer.RegisterType(typeof(IndigoOrb), (byte)'A', IndigoOrb.Serialize, IndigoOrb.Deserialize);
         PhotonPeer.RegisterType(typeof(YellowOrb), (byte)'B', YellowOrb.Serialize, YellowOrb.Deserialize);
         PhotonPeer.RegisterType(typeof(VioletOrb), (byte)'C', VioletOrb.Serialize, VioletOrb.Deserialize);
+        PhotonPeer.RegisterType(typeof(BlueOrb), (byte)'D', BlueOrb.Serialize, BlueOrb.Deserialize);
+        PhotonPeer.RegisterType(typeof(OrangeOrb), (byte)'E', OrangeOrb.Serialize, OrangeOrb.Deserialize);
     }
 
     // Start is called before the first frame update

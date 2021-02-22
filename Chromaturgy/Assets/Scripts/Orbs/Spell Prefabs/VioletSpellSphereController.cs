@@ -26,14 +26,27 @@ public class VioletSpellSphereController : MonoBehaviour
         rb.velocity = xComponent + yComponent;
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private void Update()
     {
-        ContactPoint point = collision.GetContact(0);
-        
-        if (point.normal == Vector3.up)
+        if (GetComponent<Rigidbody>().velocity == Vector3.zero)
         {
             GameObject orbs = GameObject.Instantiate(Resources.Load("Orbs/Violet Cloud", typeof(GameObject)), transform.position + Vector3.up, transform.rotation) as GameObject;
             Destroy(gameObject);
+        }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        ContactPoint[] points = new ContactPoint[8];
+        collision.GetContacts(points);
+
+        foreach (ContactPoint point in points)
+        {
+            if (point.normal == Vector3.up)
+            {
+                GameObject orbs = GameObject.Instantiate(Resources.Load("Orbs/Violet Cloud", typeof(GameObject)), transform.position + Vector3.up, transform.rotation) as GameObject;
+                Destroy(gameObject);
+            }
         }
     }
 }
