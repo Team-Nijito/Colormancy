@@ -144,7 +144,7 @@ public class PaintingManager : MonoBehaviour
                         paintedVertices--;
 
                     // use bitmask for lerp
-                    vertexColor.a = Mathf.Clamp(l - colors[k].a, 0, 1);
+                    vertexColor.a = Mathf.Clamp(colors[k].a - (1 - l), 0, 1);
 
 
                     colors[k] = vertexColor;
@@ -167,5 +167,5 @@ public class PaintingManager : MonoBehaviour
     }
 
     // every x amount of fixed update ticks, do paint
-    public static int paintingTickFrequency = 8;
+    public static int paintingTickFrequency = 4;
 }
