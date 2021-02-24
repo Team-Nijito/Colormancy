@@ -26,9 +26,9 @@ public class SpawnGUI : MonoBehaviourPunCallbacks
             foreach (PhotonView view in photonViews)
             {
                 Player player = view.Owner;
-                print("Looking to add GUI for player " + player.NickName);
                 if (player != null)
                 {
+                    print("Looking to add GUI for player " + player.NickName);
                     if (view.IsMine)
                     {
                         localPlayer = view.gameObject;

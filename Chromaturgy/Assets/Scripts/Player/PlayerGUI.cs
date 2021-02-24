@@ -69,12 +69,6 @@ public class PlayerGUI : MonoBehaviour
         }
         // Cache references for efficiency
         m_playerTarget = _target;
-        
-        // Cpde snippet for names above players ....
-        //if (playerNameText != null)
-        //{
-        //    playerNameText.text = target.photonView.Owner.NickName;
-        //}
 
         if (_target != null)
         {

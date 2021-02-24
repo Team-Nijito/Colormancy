@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PaintingManager : MonoBehaviour
 {
-    public static int paintingMask = 9;
+    public static int paintingMask = 8;
 
     private static int vertexCount;
     private static int paintedVertices;

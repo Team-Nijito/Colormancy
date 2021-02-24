@@ -43,7 +43,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cb2c5d223d05c594aa301b88e90de702, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerPrefab: {fileID: 5820395927475117105, guid: 7f1c285412074014d837633f8e97020d,
+  m_playerListFolder: {fileID: 0}
+  m_playerSpawnpoint: {fileID: 0}
+  m_defaultSpawn: {x: 0, y: 3, z: 0}
+  m_playerPrefab: {fileID: 0}
+  m_healthManaBarPrefab: {fileID: 5935600569168913045, guid: 9c7da00c2a164ec43a15707c1ff9cba0,
     type: 3}
-  healthManaBarPrefab: {fileID: 5935600569168913045, guid: 9c7da00c2a164ec43a15707c1ff9cba0,
-    type: 3}
+  m_playerListFolderName: PlayerList

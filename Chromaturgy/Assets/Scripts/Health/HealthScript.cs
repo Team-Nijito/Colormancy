@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using Photon.Pun;
 using Photon.Realtime;
+using UnityEngine.AI;
 
 public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
 {
@@ -11,8 +13,14 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     // only works on gameobjects with a child canvas and UI slider
 
     public static GameObject LocalPlayerInstance;
+
+    public bool m_isPlayer = false;
+
     public Slider m_healthBar;
     public Text m_username;
+
+    [HideInInspector]
+    public GameManager m_gameManager;
 
     [SerializeField]
     private float m_baseHealth = 100f;
@@ -40,8 +48,12 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     private float m_maxEffectiveHealth;
 
     private ManaScript m_mScript;
-
+    private AnimationManager m_animManager;
     private Transform m_healthBarTransform;
+
+    [SerializeField]
+    [Tooltip("Used for destroying dead enemies")]
+    private float m_timeUntilDestroy = 3.0f;
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
@@ -57,23 +69,37 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
 
     private void Awake()
     {
-        m_mScript = GetComponent<ManaScript>();
-
-        if (photonView.IsMine)
+        // Try to find the GameManager script in the GameManager object in the current scene
+        m_gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
+        if (m_isPlayer)
         {
-            LocalPlayerInstance = gameObject;
-        }
+            m_mScript = GetComponent<ManaScript>();
 
-        if (!m_username)
-        {
-            Debug.LogError("Public Text variable m_text not set for HealthScript.cs! (it should be the text for the player's username)");
+            if (photonView.IsMine)
+            {
+                LocalPlayerInstance = gameObject;
+            }
+
+            if (!m_username)
+            {
+                Debug.LogError("Public Text variable m_text not set for HealthScript.cs! (it should be the text for the player's username)");
+            }
+            else
+            {
+                Player owner = photonView.Controller;
+                m_username.text = owner.NickName;
+
+                // Set the username as the object's name
+                transform.name = m_username.text;
+
+                m_gameManager.AddPlayerToGameObjectList(transform.gameObject);
+            }
+            DontDestroyOnLoad(transform.root.gameObject); // made the warning go away with transform.root.gameObject
         }
         else
         {
-            Player owner = photonView.Controller;
-            m_username.text = owner.NickName;
+            ;
         }
-        DontDestroyOnLoad(gameObject);
     }
 
     // Start is called before the first frame update
@@ -82,37 +108,60 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
         m_healthBarTransform = m_healthBar.transform;
         m_effectiveHealth = m_baseHealth - m_initialHealthDeduction;
         m_maxEffectiveHealth = m_baseHealth;
+
+        m_animManager = GetComponent<AnimationManager>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (m_username.text == "Unnamed player")
+        if (m_isPlayer)
         {
-            // display usernames from players who are already in the room to new players who had just joined the room
-            Player owner = photonView.Controller;
-            m_username.text = owner.NickName;
-        }
-
-        if (m_effectiveHealth <= 0)
-        {
+            if (m_username.text == "Unnamed player")
+            {
+                // display usernames from players who are already in the room to new players who had just joined the room
+                Player owner = photonView.Controller;
+                m_username.text = owner.NickName;
+            }
             // die
-            if (transform.gameObject.tag == "Player")
+            if (m_effectiveHealth <= 0 && transform.gameObject.tag == "Player")
             {
                 // player respawns in the middle
                 photonView.RPC("RespawnPlayer", RpcTarget.All, new Vector3(0, 5, 0));
             }
-            else
+        }
+        else
+        {
+            if (m_effectiveHealth <= 0)
             {
-                // for other objects, we may want to destroy them
-                Destroy(transform.gameObject);
+                {
+                    // disable movement, collider
+                    GetComponent<EnemyChase>().enabled = false;
+                    GetComponent<NavMeshAgent>().velocity = Vector3.zero;
+                    GetComponent<NavMeshAgent>().enabled = false;
+                    GetComponent<Collider>().enabled = false;
+
+                    // disable health bar and name
+                    m_healthBar.gameObject.SetActive(false);
+
+                    // play dying animation
+                    m_animManager.ChangeState(AnimationManager.EnemyState.Death);
+                    // for other objects, we may want to destroy them
+                    StartCoroutine(DelayedDestruction(m_timeUntilDestroy));
+                }
             }
         }
-        // slider goes from 0 to 100
-        m_healthBar.value = (m_effectiveHealth / m_maxEffectiveHealth) * 100;
-        HealthBarFaceCamera();
-        if (m_isRegenHealth) 
-            HealthRegeneration(m_regenHealthPercentage * Time.deltaTime);
+
+        if (m_healthBar)
+        {
+            // slider goes from 0 to 100
+            m_healthBar.value = (m_effectiveHealth / m_maxEffectiveHealth) * 100;
+            HealthBarFaceCamera();
+            if (m_isRegenHealth)
+            {
+                HealthRegeneration(m_regenHealthPercentage * Time.deltaTime);
+            }
+        }
     }
 
     private void HealthRegeneration(float percentage)
@@ -135,13 +184,23 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     private void HealthBarFaceCamera()
     {
         // make the health bar orient towards the main camera
-        m_healthBarTransform.LookAt(Camera.main.transform);
+        if (m_healthBarTransform && Camera.main)
+        {
+            m_healthBarTransform.LookAt(Camera.main.transform);
+        }
     }
 
     [PunRPC]
     public void AlterArmorValue(float armorPercent)
     {
         // replaces the armorPercentage with new value
+
+        // ignore RPCs for dead enemies
+        if (!m_isPlayer && m_animManager.GetCurrentState() == AnimationManager.EnemyState.Death)
+        {
+            return;
+        }
+
         if (armorPercent < 0)
             throw new ArgumentException(string.Format("{0} shouldn't be a negative number", armorPercent), "armorPercent");
         if (armorPercent > 100)
@@ -155,6 +214,13 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
         // heal formula
         // health = health + healValue
         // if health is larger than maxHealth, set health to maxHealth
+
+        // ignore RPCs for dead enemies
+        if (!m_isPlayer && m_animManager.GetCurrentState() == AnimationManager.EnemyState.Death)
+        {
+            return;
+        }
+
         if (healValue <= 0)
             throw new ArgumentException(string.Format("{0} should be greater than zero", healValue), "healValue");
         m_effectiveHealth = m_effectiveHealth > m_maxEffectiveHealth ? m_maxEffectiveHealth : m_effectiveHealth + healValue;
@@ -165,9 +231,19 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     {
         // damage formula
         // health = health - (damage - (damage * armorPercentage))
+        
+        // ignore RPCs for dead enemies
+        if (!m_isPlayer && m_animManager.GetCurrentState() == AnimationManager.EnemyState.Death)
+        {
+            return;
+        }
+
         if (damageValue <= 0)
             throw new ArgumentException(string.Format("{0} should be greater than zero", damageValue), "damageValue");
-        m_effectiveHealth -= (damageValue - (m_armorPercentage / 100 * damageValue));
+        if (photonView.IsMine)
+        {
+            m_effectiveHealth -= (damageValue - (m_armorPercentage / 100 * damageValue));
+        }
     }
 
     [PunRPC]
@@ -175,7 +251,7 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     {
         // if you want to teleport the player, just deactivate and reactivate the gameObject
         gameObject.SetActive(false);
-        transform.position = position;
+        transform.position = m_gameManager.ReturnSpawnpointPosition();
         gameObject.SetActive(true);
         ResetHealth();
         m_mScript.ResetMana();
@@ -187,5 +263,15 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     public void ResetHealth()
     {
         m_effectiveHealth = m_maxEffectiveHealth;
+    }
+
+    // Used for destroying dead enemies
+    private IEnumerator DelayedDestruction(float seconds)
+    {
+        yield return new WaitForSecondsRealtime(seconds);
+        PhotonNetwork.Destroy(transform.gameObject);
+
+        // Notify the Enemy Manager that an enemy has died
+        GameObject.Find("EnemyManager").GetComponent<EnemyManager>().EnemyHasDied();
     }
 }
