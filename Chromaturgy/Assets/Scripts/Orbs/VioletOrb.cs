@@ -8,10 +8,11 @@ public class VioletOrb : Orb
     {
         OrbColor = Color.yellow;
         OrbShape = SpellShape.OrbitingOrbs;
-        CooldownMod = 0f;
-        ShapeManaMod = 0f;
+        CooldownMod = 2.2f;
+        ShapeManaMod = 1f;
         OrbElement = Element.Light;
         ModAmount = .1f;
+        UIPrefab = (GameObject)Resources.Load("Orbs/VioletOrbUI");
     }
 
     public override void AddHeldEffect(SpellTest test)

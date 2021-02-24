@@ -12,6 +12,7 @@ public class YellowOrb : Orb
         ShapeManaMod = .9f;
         OrbElement = Element.Light;
         ModAmount = .1f;
+        UIPrefab = (GameObject) Resources.Load("Orbs/YellowOrbUI");
     }
 
     public override void AddHeldEffect(SpellTest test)
@@ -45,6 +46,7 @@ public class YellowOrb : Orb
         GameObject orbs = GameObject.Instantiate(Resources.Load("Orbs/Yellow Orbs", typeof(GameObject))) as GameObject;
         orbs.transform.position = t.position;
         orbs.GetComponent<YellowSpellController>().playerTransform = t;
+        Debug.Log("Casting");
     }
 
     public static object Deserialize(byte[] data)
