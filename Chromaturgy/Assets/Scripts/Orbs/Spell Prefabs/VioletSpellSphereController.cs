@@ -31,6 +31,7 @@ public class VioletSpellSphereController : MonoBehaviour
         if (GetComponent<Rigidbody>().velocity == Vector3.zero)
         {
             GameObject orbs = GameObject.Instantiate(Resources.Load("Orbs/Violet Cloud", typeof(GameObject)), transform.position + Vector3.up, transform.rotation) as GameObject;
+            orbs.transform.Rotate(Vector3.up, Random.Range(0, 360));
             Destroy(gameObject);
         }
     }
@@ -45,6 +46,7 @@ public class VioletSpellSphereController : MonoBehaviour
             if (point.normal == Vector3.up)
             {
                 GameObject orbs = GameObject.Instantiate(Resources.Load("Orbs/Violet Cloud", typeof(GameObject)), transform.position + Vector3.up, transform.rotation) as GameObject;
+                orbs.transform.Rotate(Vector3.up, Random.Range(0, 360));
                 Destroy(gameObject);
             }
         }
