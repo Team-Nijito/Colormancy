@@ -60,11 +60,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 656f2e9ae882beb4bb7fd6c43a84d9f1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_lerp: 0
+  playerTransform: {fileID: 0}
+  endPosition: {x: 0, y: 0, z: 0}
+  jumpTime: 0.5
+  m_lerp: 1
   redBase: {fileID: 5533924623576496753}
   redEdge: {fileID: 5811497358446419998}
   lifetime: 3
-  spherePaintRadius: 2
+  spherePaintRadius: 5
   paintColor: {r: 1, g: 0, b: 0, a: 0}
   debug: 0
 --- !u!1 &5533924623576496753

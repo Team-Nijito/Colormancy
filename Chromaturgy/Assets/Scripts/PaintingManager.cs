@@ -160,11 +160,6 @@ public class PaintingManager : MonoBehaviour
         return (float)paintedVertices / vertexCount;
     }
 
-    private void Update()
-    {
-        print(paintingProgress());
-    }
-
     // every x amount of fixed update ticks, do paint
     public static int paintingTickFrequency = 4;
 }

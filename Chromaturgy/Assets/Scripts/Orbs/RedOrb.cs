@@ -8,7 +8,7 @@ public class RedOrb : Orb
     {
         OrbColor = Color.red;
         OrbShape = SpellShape.Jump;
-        CooldownMod = .7f;
+        CooldownMod = 0f;
         OrbElement = Element.Wrath;
         ModAmount = .1f;
     }
@@ -41,6 +41,34 @@ public class RedOrb : Orb
         //For any allies hit 
         //lesserEffectMethod(ally game object, lesserEffectAmnt);
 
-        GameObject g = Object.Instantiate(Resources.Load("Orb/RedOrb", typeof(GameObject)), t.position, t.rotation) as GameObject;
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+        if (Physics.Raycast(ray, out hit, 100f, 1 << PaintingManager.paintingMask))
+        {
+            if (Vector3.Dot(hit.normal,Vector3.up) > 0.5)
+            {
+                Vector3 direction = hit.point - t.position;
+
+                GameObject g = Object.Instantiate(Resources.Load("Orbs/Red Area", typeof(GameObject)), t.position + Vector3.down, t.rotation) as GameObject;
+                g.GetComponent<RedSpellController>().endPosition = hit.point + Vector3.up * 1.6f;
+                g.GetComponent<RedSpellController>().playerTransform = t;
+            }
+        }
+    }
+
+    public static object Deserialize(byte[] data)
+    {
+        RedOrb result = new RedOrb();
+        result.OrbColor = new Color(data[0], data[1], data[2]);
+        result.CooldownMod = data[3];
+        result.ShapeManaMod = data[4];
+        result.ModAmount = data[5];
+        return result;
+    }
+
+    public static byte[] Serialize(object customType)
+    {
+        RedOrb c = (RedOrb)customType;
+        return new byte[] { (byte)c.OrbColor.r, (byte)c.OrbColor.g, (byte)c.OrbColor.b, (byte)c.CooldownMod, (byte)c.ShapeManaMod, (byte)c.ModAmount };
     }
 }
