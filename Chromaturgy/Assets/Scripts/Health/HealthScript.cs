@@ -49,6 +49,7 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
 
     private ManaScript m_mScript;
     private AnimationManager m_animManager;
+    private Chromaturgy.CameraController m_camController;
     private Transform m_healthBarTransform;
 
     [SerializeField]
@@ -74,6 +75,7 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
         if (m_isPlayer)
         {
             m_mScript = GetComponent<ManaScript>();
+            m_camController = GetComponent<Chromaturgy.CameraController>();
 
             if (photonView.IsMine)
             {
@@ -278,6 +280,7 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
         Quaternion spawnRotation = Quaternion.identity;
         transform.position = m_gameManager.ReturnSpawnpointPosition(ref spawnRotation);
         transform.rotation = spawnRotation;
+        m_camController.ResetRotation(spawnRotation);
         gameObject.SetActive(true);
         ResetHealth();
         m_mScript.ResetMana();
