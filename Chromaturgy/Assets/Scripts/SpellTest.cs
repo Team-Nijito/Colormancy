@@ -61,11 +61,12 @@ public class SpellTest : MonoBehaviourPun
     {
         manager = GetComponent<SpellManager>();
         mana = GetComponent<ManaScript>();
-        orbs.Add(new IndigoOrb());
-        orbs.Add(new YellowOrb());
-        orbs.Add(new VioletOrb());
-        orbs.Add(new BlueOrb());
+        orbs.Add(new RedOrb());
         orbs.Add(new OrangeOrb());
+        orbs.Add(new YellowOrb());
+        orbs.Add(new BlueOrb());
+        orbs.Add(new VioletOrb());
+        orbs.Add(new IndigoOrb());
     }
 
     // Update is called once per frame

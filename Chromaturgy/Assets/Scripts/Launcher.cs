@@ -34,11 +34,12 @@ public class Launcher : MonoBehaviourPunCallbacks
     private void Awake()
     {
         PhotonNetwork.AutomaticallySyncScene = true;
-        PhotonPeer.RegisterType(typeof(IndigoOrb), (byte)'A', IndigoOrb.Serialize, IndigoOrb.Deserialize);
-        PhotonPeer.RegisterType(typeof(YellowOrb), (byte)'B', YellowOrb.Serialize, YellowOrb.Deserialize);
-        PhotonPeer.RegisterType(typeof(VioletOrb), (byte)'C', VioletOrb.Serialize, VioletOrb.Deserialize);
+        PhotonPeer.RegisterType(typeof(RedOrb), (byte)'A', RedOrb.Serialize, RedOrb.Deserialize);
+        PhotonPeer.RegisterType(typeof(OrangeOrb), (byte)'B', OrangeOrb.Serialize, OrangeOrb.Deserialize);
+        PhotonPeer.RegisterType(typeof(YellowOrb), (byte)'C', YellowOrb.Serialize, YellowOrb.Deserialize);
         PhotonPeer.RegisterType(typeof(BlueOrb), (byte)'D', BlueOrb.Serialize, BlueOrb.Deserialize);
-        PhotonPeer.RegisterType(typeof(OrangeOrb), (byte)'E', OrangeOrb.Serialize, OrangeOrb.Deserialize);
+        PhotonPeer.RegisterType(typeof(VioletOrb), (byte)'E', VioletOrb.Serialize, VioletOrb.Deserialize);
+        PhotonPeer.RegisterType(typeof(IndigoOrb), (byte)'F', IndigoOrb.Serialize, IndigoOrb.Deserialize);
     }
 
     // Start is called before the first frame update
