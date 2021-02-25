@@ -90,7 +90,7 @@ public class DetectHit : MonoBehaviour
                     playerPhotonView.RPC("TakeDamage", RpcTarget.All, m_damage * Time.deltaTime);
                 }
             }
-            else if (m_parentECScript.IsPlayerValidTarget(playerPhotonView.ViewID))
+            else if (m_parentECScript && m_parentECScript.IsPlayerValidTarget(playerPhotonView.ViewID))
             {
                 m_parentECScript.RPCInsertHurtVictim(playerPhotonView.ViewID);
                 if (trigType == TriggerType.Enter)

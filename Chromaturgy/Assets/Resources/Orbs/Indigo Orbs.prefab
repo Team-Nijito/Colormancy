@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1473980875905217964}
   - component: {fileID: 1473980875905217967}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: Indigo Orbs
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -88,7 +88,7 @@ GameObject:
   - component: {fileID: 1473980876237145432}
   - component: {fileID: 1473980876237145433}
   - component: {fileID: 1473980876237145430}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: Orb
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -181,7 +181,7 @@ GameObject:
   - component: {fileID: 1473980876778606385}
   - component: {fileID: 1473980876778606414}
   - component: {fileID: 1473980876778606415}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: Orb
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -274,7 +274,7 @@ GameObject:
   - component: {fileID: 1473980877241064072}
   - component: {fileID: 1473980877241064073}
   - component: {fileID: 1473980877241064070}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: Orb (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -367,7 +367,7 @@ GameObject:
   - component: {fileID: 1473980877437192339}
   - component: {fileID: 1473980877437192336}
   - component: {fileID: 1473980877437192337}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: Orb (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}

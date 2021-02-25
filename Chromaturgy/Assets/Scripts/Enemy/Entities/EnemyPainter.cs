@@ -69,11 +69,6 @@ public class EnemyPainter : EnemyChase
         m_navMeshAgent.speed = m_speed;
         m_navMeshAgent.stoppingDistance = m_attackRange;
 
-        if (m_character)
-        {
-            m_characterTransform = m_character.transform;
-        }
-
         m_paintFloor = new Task(PaintOnFloorLoop());
         m_wanderRandomDirection = new Task(ShuffleRandomDirection());
         m_wanderRandomDirection.Pause();
@@ -221,12 +216,20 @@ public class EnemyPainter : EnemyChase
             randomZ = Random.Range(-m_rangeZMove, m_rangeZMove);
             randomX = Random.Range(-m_rangeXMove, m_rangeXMove);
 
-            newPosition = new Vector3(transform.position.x + randomX,
+            if (this)
+            {
+                newPosition = new Vector3(transform.position.x + randomX,
                                       transform.position.y,
                                       transform.position.z + randomZ);
 
-            if (Physics.Raycast(newPosition, -transform.up, out m_raycastHit, m_raycastFloor, m_paintableMask))
+                if (Physics.Raycast(newPosition, -transform.up, out m_raycastHit, m_raycastFloor, m_paintableMask))
+                {
+                    break;
+                }
+            }
+            else
             {
+                newPosition = Vector3.zero;
                 break;
             }
         }

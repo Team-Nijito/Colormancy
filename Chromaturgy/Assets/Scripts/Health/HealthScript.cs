@@ -91,14 +91,8 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
 
                 // Set the username as the object's name
                 transform.name = m_username.text;
-
-                m_gameManager.AddPlayerToGameObjectList(transform.gameObject);
             }
             DontDestroyOnLoad(transform.root.gameObject); // made the warning go away with transform.root.gameObject
-        }
-        else
-        {
-            ;
         }
     }
 
@@ -110,6 +104,14 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
         m_maxEffectiveHealth = m_baseHealth;
 
         m_animManager = GetComponent<AnimationManager>();
+
+        if (m_isPlayer)
+        {
+            // Associate the GameObject that this script belongs to with the player
+            // so that if we ever invoke PhotonNetwork.PlayList
+            // we can access a player's GameObject with: player.TagObject
+            photonView.Owner.TagObject = gameObject;
+        }
     }
 
     // Update is called once per frame
@@ -127,7 +129,7 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
             if (m_effectiveHealth <= 0 && transform.gameObject.tag == "Player")
             {
                 // player respawns in the middle
-                photonView.RPC("RespawnPlayer", RpcTarget.All, new Vector3(0, 5, 0));
+                photonView.RPC("RespawnPlayer", RpcTarget.All);
             }
         }
         else
@@ -177,9 +179,27 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
             m_effectiveHealth = tempNewHealth;
     }
 
-    public float GetMaxEffectiveHealth() { return m_maxEffectiveHealth; }
-    public float GetEffectiveHealth() { return m_effectiveHealth; }
-    public float GetArmorPercentage() { return m_armorPercentage; }
+    // Used for destroying dead enemies
+    private IEnumerator DelayedDestruction(float seconds)
+    {
+        yield return new WaitForSecondsRealtime(seconds);
+        PhotonNetwork.Destroy(transform.gameObject);
+
+        // Notify the Enemy Manager that an enemy has died
+        PhotonView.Get(GameObject.Find("EnemyManager")).RPC("EnemyHasDied", RpcTarget.All);
+        //GameObject.Find("EnemyManager").GetComponent<EnemyManager>().EnemyHasDied();
+    }
+
+    private void OnPhotonInstantiate(PhotonMessageInfo info)
+    {
+        if (m_isPlayer)
+        {
+            // Associate the GameObject that this script belongs to with the player
+            // so that if we ever invoke PhotonNetwork.PlayList
+            // we can access a player's GameObject with: player.TagObject
+            info.Sender.TagObject = gameObject;
+        }
+    }
 
     private void HealthBarFaceCamera()
     {
@@ -189,6 +209,10 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
             m_healthBarTransform.LookAt(Camera.main.transform);
         }
     }
+
+    public float GetMaxEffectiveHealth() { return m_maxEffectiveHealth; }
+    public float GetEffectiveHealth() { return m_effectiveHealth; }
+    public float GetArmorPercentage() { return m_armorPercentage; }
 
     [PunRPC]
     public void AlterArmorValue(float armorPercent)
@@ -247,11 +271,13 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     }
 
     [PunRPC]
-    public void RespawnPlayer(Vector3 position)
+    public void RespawnPlayer()
     {
         // if you want to teleport the player, just deactivate and reactivate the gameObject
         gameObject.SetActive(false);
-        transform.position = m_gameManager.ReturnSpawnpointPosition();
+        Quaternion spawnRotation = Quaternion.identity;
+        transform.position = m_gameManager.ReturnSpawnpointPosition(ref spawnRotation);
+        transform.rotation = spawnRotation;
         gameObject.SetActive(true);
         ResetHealth();
         m_mScript.ResetMana();
@@ -263,15 +289,5 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     public void ResetHealth()
     {
         m_effectiveHealth = m_maxEffectiveHealth;
-    }
-
-    // Used for destroying dead enemies
-    private IEnumerator DelayedDestruction(float seconds)
-    {
-        yield return new WaitForSecondsRealtime(seconds);
-        PhotonNetwork.Destroy(transform.gameObject);
-
-        // Notify the Enemy Manager that an enemy has died
-        GameObject.Find("EnemyManager").GetComponent<EnemyManager>().EnemyHasDied();
     }
 }

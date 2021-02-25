@@ -40,7 +40,7 @@ public class SpawnpointBehaviour : MonoBehaviour
     // spawn the enemy
     public void HandleSpawning(GameObject parentFolder, string nameEntityToSpawn)
     {
-        GameObject entity = PhotonNetwork.Instantiate(nameEntityToSpawn, 
+        GameObject entity = PhotonNetwork.InstantiateRoomObject(nameEntityToSpawn, 
                                                       m_spawnPointHitbox.transform.position, 
                                                       m_spawnPointHitbox.transform.rotation * Quaternion.Euler(0, 180f, 0), 
                                                       0);

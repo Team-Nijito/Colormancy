@@ -675,12 +675,12 @@ NavMeshAgent:
   m_AgentTypeID: 0
   m_Radius: 0.05
   m_Speed: 18
-  m_Acceleration: 30
+  m_Acceleration: 15
   avoidancePriority: 50
-  m_AngularSpeed: 120
+  m_AngularSpeed: 999
   m_StoppingDistance: 3
   m_AutoTraverseOffMeshLink: 1
-  m_AutoBraking: 1
+  m_AutoBraking: 0
   m_AutoRepath: 1
   m_Height: 0.18
   m_BaseOffset: 0
@@ -756,9 +756,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be9b07ed247fd19459ff28ed86a61311, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_detectionRadius: 100
+  m_detectionRadius: 30
   m_attackRange: 3
-  m_speed: 18
+  m_speed: 12
   m_speedTriggerRun: 15
   m_hitBoxesArray:
   - m_hitBoxObject: {fileID: 6645883346320435226}
