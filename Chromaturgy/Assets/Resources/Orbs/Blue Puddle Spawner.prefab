@@ -45,6 +45,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerTransform: {fileID: 0}
   frequency: 1
-  lifeTime: 3
+  lifeTime: 1
   bMultiplier: 2
   dMultiplier: 3

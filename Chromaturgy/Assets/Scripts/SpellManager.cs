@@ -2,8 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
 
-public class SpellManager : MonoBehaviour
+public class SpellManager : MonoBehaviourPun
 {
     public struct Spell
     {
@@ -58,8 +59,10 @@ public class SpellManager : MonoBehaviour
         }
     }
 
+    OrbUIController controller;
+
     SpellTest test;
-    Stack<Orb> currentSpellOrbs = new Stack<Orb>();
+    List<Orb> currentSpellOrbs = new List<Orb>();
 
     public Orb FirstOrb { get; private set; }
 
@@ -70,8 +73,10 @@ public class SpellManager : MonoBehaviour
             FirstOrb.RevertHeldEffect(test);
         }
 
+        //print(controller.gameObject.name);
+        controller.AddOrb(orb);
         FirstOrb = orb;
-        currentSpellOrbs.Push(orb);
+        currentSpellOrbs.Add(orb);
 
         FirstOrb.AddHeldEffect(test);
 
@@ -88,16 +93,16 @@ public class SpellManager : MonoBehaviour
     private void Start()
     {
         test = GetComponent<SpellTest>();
+        if (photonView.IsMine)
+            controller = FindObjectOfType<OrbUIController>();
     }
 
     public bool TestCreateSpell(out Spell spell)
     {
+        print("Current orb count: " + currentSpellOrbs.Count);
         if (currentSpellOrbs.Count >= 3)
         {
-            Orb[] spellOrbs = new Orb[] { currentSpellOrbs.Pop(), currentSpellOrbs.Pop(), currentSpellOrbs.Pop() };
-            currentSpellOrbs.Push(spellOrbs[2]);
-            currentSpellOrbs.Push(spellOrbs[1]);
-            currentSpellOrbs.Push(spellOrbs[0]);
+            Orb[] spellOrbs = new Orb[] { currentSpellOrbs[currentSpellOrbs.Count - 1], currentSpellOrbs[currentSpellOrbs.Count - 2], currentSpellOrbs[currentSpellOrbs.Count - 3] };
 
             //Create and return new spell from orbs
             spell = new Spell(spellOrbs);
@@ -126,10 +131,5 @@ public class SpellManager : MonoBehaviour
     //        return false;
     //    }
     //}
-
-    public void ClearOrbs()
-    {
-        currentSpellOrbs.Clear();
-    }
 }
 

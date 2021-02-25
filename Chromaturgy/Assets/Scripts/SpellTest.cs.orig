@@ -62,6 +62,7 @@ public class SpellTest : MonoBehaviourPun
     {
         manager = GetComponent<SpellManager>();
         mana = GetComponent<ManaScript>();
+<<<<<<< HEAD
 
         GameObject gUIController = null;
         if (photonView.IsMine && PhotonNetwork.IsConnected)
@@ -80,6 +81,14 @@ public class SpellTest : MonoBehaviourPun
         AddSpellOrb(new BlueOrb());
         AddSpellOrb(new VioletOrb());
         AddSpellOrb(new IndigoOrb());
+=======
+        orbs.Add(new RedOrb());
+        orbs.Add(new OrangeOrb());
+        orbs.Add(new YellowOrb());
+        orbs.Add(new BlueOrb());
+        orbs.Add(new VioletOrb());
+        orbs.Add(new IndigoOrb());
+>>>>>>> 1c3a05c600758125465e7e71ea03a007551ddefd
     }
 
     // Update is called once per frame
