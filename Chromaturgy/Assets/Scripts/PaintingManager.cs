@@ -13,38 +13,65 @@ public class PaintingManager : MonoBehaviour
     {
         // find all paintable gameobjects and set their initial colors
         GameObject [] objects = FindObjectsOfType<GameObject>();
+        int count = 0;
         for (int i = 0; i < objects.Length; i++)
         {
             // paintable layer
             if (objects[i].layer == paintingMask)
             {
+                print(count);
+                count++;
                 // sharedmesh because unity automatically draws instanced
                 Mesh mesh;
                 try
                 {
                     mesh = objects[i].GetComponent<MeshFilter>().sharedMesh;
+
+                    List<Vector3> vertices = new List<Vector3>();
+                    mesh.GetVertices(vertices);
+                    vertexCount += vertices.Count;
+
+                    List<Color> colors = new List<Color>();
+
+                    // if there are no colors yet, then fill it all with a white color
+                    if (mesh.colors.Length == 0) {
+                        for (int k = 0; k < vertices.Count; k++)
+                            colors.Add(new Color(1, 1, 1, 0));
+
+                        mesh.SetColors(colors);
+                    }
                 } catch
                 {
-                    mesh = objects[i].GetComponent<MeshFilter>().mesh;
+                    try 
+                    {
+                        mesh = objects[i].GetComponent<MeshFilter>().mesh;
+
+                        List<Vector3> vertices = new List<Vector3>();
+                        mesh.GetVertices(vertices);
+                        vertexCount += vertices.Count;
+
+                        List<Color> colors = new List<Color>();
+
+                        // if there are no colors yet, then fill it all with a white color
+                        if (mesh.colors.Length == 0) {
+                            for (int k = 0; k < vertices.Count; k++)
+                                colors.Add(new Color(1, 1, 1, 0));
+
+                            mesh.SetColors(colors);
+                        }
+                    }
+                    catch 
+                    {
+
+                    }
+                    
                 }
 
-                List<Vector3> vertices = new List<Vector3>();
-                mesh.GetVertices(vertices);
-                vertexCount += vertices.Count;
-
-                List<Color> colors = new List<Color>();
-
-                // if there are no colors yet, then fill it all with a white color
-                if (mesh.colors.Length == 0)
-                {
-                    for (int k = 0; k < vertices.Count; k++)
-                        colors.Add(new Color(1, 1, 1, 0));
-
-                    mesh.SetColors(colors);
-                }
+                
 
             }
         }
+        print(count);
     }
 
     public static void PaintSphere(Color paintColor, Vector3 origin, float radius, float threshold = 0.5f)

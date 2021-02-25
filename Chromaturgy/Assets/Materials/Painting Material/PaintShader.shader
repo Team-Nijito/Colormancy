@@ -44,6 +44,7 @@
                 };
 
                 sampler2D _MainTex;
+				float4 _MainTex_ST;
 
                 v2f vert(appdata v)
                 {
@@ -126,9 +127,10 @@
                 float _Bumpiness;
                 float _NormalComparison;
 
-                float4 frag(v2f i) : SV_Target
-                {
-                    float4 col = 1;
+				float4 frag(v2f i) : SV_Target
+				{
+					//float4 col = 1;
+					float4 col = tex2D(_MainTex, i.uv);
 
                     float noiseLerp = (perlinNoise(i.worldPosition.xyz * 10) + 1) / 2;
                     noiseLerp = smoothstep(0, 1, noiseLerp);
@@ -312,7 +314,7 @@
 
                 float4 frag(v2f i) : SV_Target
                 {
-                    float4 col = 1;
+                    float4 col = tex2D(_MainTex, i.uv);
 
                     float noiseLerp = (perlinNoise(i.worldPosition.xyz * _Tiling) + 1) / 2;
                     noiseLerp = smoothstep(0, 1, noiseLerp);
