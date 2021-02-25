@@ -11,6 +11,7 @@ public class RedOrb : Orb
         CooldownMod = 0f;
         OrbElement = Element.Wrath;
         ModAmount = .1f;
+        UIPrefab = (GameObject)Resources.Load("Orbs/RedOrbUI");
     }
 
     public override void AddHeldEffect(SpellTest test)

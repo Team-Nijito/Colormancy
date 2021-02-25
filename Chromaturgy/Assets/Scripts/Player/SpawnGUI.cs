@@ -9,45 +9,25 @@ public class SpawnGUI : MonoBehaviourPunCallbacks
     [SerializeField]
     GameObject healthManaPrefab;
 
-    GameObject BarPanel;
+    GameObject BarPanel = null;
+
+    [SerializeField]
+    GameObject SpellUI;
 
     private void Start()
     {
         BarPanel = GameObject.Find("BarPanel");
-        GameObject localPlayer = null;
+
+        print(photonView.IsMine);
 
         if (BarPanel && photonView.IsMine)
         {
-            //Check if there are any characters in the room already if so add their health bars
-            PhotonView[] photonViews = UnityEngine.Object.FindObjectsOfType<PhotonView>();
-            print("There are " + PhotonNetwork.CurrentRoom.PlayerCount + " players in the room.");
-            print("Found " + photonViews.Length + " photon views on joining");
-            int remoteIndex = 1;
-            foreach (PhotonView view in photonViews)
-            {
-                Player player = view.Owner;
-                if (player != null)
-                {
-                    print("Looking to add GUI for player " + player.NickName);
-                    if (view.IsMine)
-                    {
-                        localPlayer = view.gameObject;
-                    }
-                    else
-                    {
-                        GameObject remoteBar = Instantiate(healthManaPrefab, new Vector2(0, remoteIndex * 150), Quaternion.identity);
-                        remoteBar.transform.SetParent(BarPanel.transform);
-                        remoteBar.GetComponent<PlayerGUI>().SetTarget(view.gameObject);
-                        print("Created remote health bar for player " + remoteIndex++);
-                    }
-                }
-            }
+            Transform canvas = GameObject.Find("Canvas").transform;
+            GameObject g_SpellUI = Instantiate(SpellUI, canvas.transform.position, Quaternion.identity, canvas);
+            Vector2 uiPos = g_SpellUI.GetComponent<RectTransform>().anchoredPosition;
+            g_SpellUI.GetComponent<RectTransform>().anchoredPosition = new Vector2(uiPos.x + 85, 0);
 
-            //Create local players health bar at bottom left of screen
-            GameObject bar = Instantiate(healthManaPrefab, new Vector2(0, 0), Quaternion.identity);
-            bar.transform.SetParent(BarPanel.transform);
-            bar.GetComponent<PlayerGUI>().SetTarget(localPlayer);
-            print("Created local health bar");
+            SpawnExistingPlayersHealthBars();
         }
     }
 
@@ -67,5 +47,40 @@ public class SpawnGUI : MonoBehaviourPunCallbacks
             }
         }
         print("OnPlayerEnteredRoom::created remote GUI");
+    }
+
+    void SpawnExistingPlayersHealthBars()
+    {
+        GameObject localPlayer = null;
+        //Check if there are any characters in the room already if so add their health bars
+        PhotonView[] photonViews = UnityEngine.Object.FindObjectsOfType<PhotonView>();
+        print("There are " + PhotonNetwork.CurrentRoom.PlayerCount + " players in the room.");
+        print("Found " + photonViews.Length + " photon views on joining");
+        int remoteIndex = 1;
+        foreach (PhotonView view in photonViews)
+        {
+            Player player = view.Owner;
+            if (player != null)
+            {
+                print("Looking to add GUI for player " + player.NickName);
+                if (view.IsMine)
+                {
+                    localPlayer = view.gameObject;
+                }
+                else
+                {
+                    GameObject remoteBar = Instantiate(healthManaPrefab, new Vector2(0, remoteIndex * 150), Quaternion.identity);
+                    remoteBar.transform.SetParent(BarPanel.transform);
+                    remoteBar.GetComponent<PlayerGUI>().SetTarget(view.gameObject);
+                    print("Created remote health bar for player " + remoteIndex++);
+                }
+            }
+        }
+
+        //Create local players health bar at bottom left of screen
+        GameObject bar = Instantiate(healthManaPrefab, new Vector2(0, 0), Quaternion.identity);
+        bar.transform.SetParent(BarPanel.transform);
+        bar.GetComponent<PlayerGUI>().SetTarget(localPlayer);
+        print("Created local health bar");
     }
 }

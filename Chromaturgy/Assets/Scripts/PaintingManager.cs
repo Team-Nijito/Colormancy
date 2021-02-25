@@ -19,7 +19,7 @@ public class PaintingManager : MonoBehaviour
             // paintable layer
             if (objects[i].layer == paintingMask)
             {
-                print(count);
+                //print(count);
                 count++;
                 // sharedmesh because unity automatically draws instanced
                 Mesh mesh;
@@ -71,7 +71,7 @@ public class PaintingManager : MonoBehaviour
 
             }
         }
-        print(count);
+        //print(count);
     }
 
     public static void PaintSphere(Color paintColor, Vector3 origin, float radius, float threshold = 0.5f)

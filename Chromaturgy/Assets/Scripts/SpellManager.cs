@@ -72,9 +72,12 @@ public class SpellManager : MonoBehaviourPun
         {
             FirstOrb.RevertHeldEffect(test);
         }
-
-        //print(controller.gameObject.name);
-        controller.AddOrb(orb);
+        
+        if (photonView.IsMine && PhotonNetwork.IsConnected)
+        {
+            controller.AddOrb(orb);
+        }
+        
         FirstOrb = orb;
         currentSpellOrbs.Add(orb);
 
@@ -93,8 +96,11 @@ public class SpellManager : MonoBehaviourPun
     private void Start()
     {
         test = GetComponent<SpellTest>();
-        if (photonView.IsMine)
+        //if (photonView.IsMine)
+        //{
+            print("Looking for uiCOntorller");
             controller = FindObjectOfType<OrbUIController>();
+        //}
     }
 
     public bool TestCreateSpell(out Spell spell)

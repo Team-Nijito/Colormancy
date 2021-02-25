@@ -79,8 +79,6 @@ public class Launcher : MonoBehaviourPunCallbacks
 
     public override void OnConnectedToMaster()
     {
-        Debug.Log("OnConnectedToMaster() called");
-
         if (isConnecting)
         {
             PhotonNetwork.JoinRandomRoom();
@@ -105,7 +103,6 @@ public class Launcher : MonoBehaviourPunCallbacks
 
     public override void OnJoinedRoom()
     {
-        Debug.Log("OnJoinedRoom(). Client is in a room");
         if (PhotonNetwork.CurrentRoom.PlayerCount == 1)
         {
             PhotonNetwork.LoadLevel(sceneNameToLoadIn);

@@ -12,6 +12,7 @@ public class IndigoOrb : Orb
         ShapeManaMod = 1.2f;
         OrbElement = Element.Light;
         ModAmount = .1f;
+        UIPrefab = (GameObject)Resources.Load("Orbs/IndigoOrbUI");
     }
 
     public override void AddHeldEffect(SpellTest test)
