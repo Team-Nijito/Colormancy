@@ -73,8 +73,8 @@ public class SpellManager : MonoBehaviourPun
             FirstOrb.RevertHeldEffect(test);
         }
 
-        print(controller.gameObject.name);
-        //controller.AddOrb(orb);
+        //print(controller.gameObject.name);
+        controller.AddOrb(orb);
         FirstOrb = orb;
         currentSpellOrbs.Add(orb);
 

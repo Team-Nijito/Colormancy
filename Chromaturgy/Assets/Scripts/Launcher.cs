@@ -108,11 +108,7 @@ public class Launcher : MonoBehaviourPunCallbacks
         Debug.Log("OnJoinedRoom(). Client is in a room");
         if (PhotonNetwork.CurrentRoom.PlayerCount == 1)
         {
-<<<<<<< HEAD
-            PhotonNetwork.LoadLevel("WizardSpellTest");
-=======
             PhotonNetwork.LoadLevel(sceneNameToLoadIn);
->>>>>>> 56ca801cd67286ad0d06a682ac0357c94ef210c5
         }
     }
 
