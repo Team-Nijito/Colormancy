@@ -413,6 +413,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   healthManaPrefab: {fileID: 5935600569168913045, guid: 9c7da00c2a164ec43a15707c1ff9cba0,
     type: 3}
+  SpellUI: {fileID: 7597182324010517746, guid: cab059ca28b4bdf45858414acff52189, type: 3}
 --- !u!114 &-1104988167870857447
 MonoBehaviour:
   m_ObjectHideFlags: 0

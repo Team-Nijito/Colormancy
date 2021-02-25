@@ -1,8 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using Photon.Pun;
 
-public class OrbUIController : MonoBehaviour
+public class OrbUIController : MonoBehaviourPun
 {
     GameObject[] orbs = new GameObject[3];
 
