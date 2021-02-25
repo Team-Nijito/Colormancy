@@ -19,13 +19,17 @@ public class Launcher : MonoBehaviourPunCallbacks
     [SerializeField]
     private GameObject progressLabel;
 
+    [Tooltip("Name of the scene to load after player joins a room")]
+    [SerializeField]
+    private string sceneNameToLoadIn = "Office Level 1";
+
     #endregion
 
     #region Private Fields
 
-    string gameVersion = "1";
+    private string gameVersion = "1";
 
-    bool isConnecting;
+    private bool isConnecting;
 
     #endregion
 
@@ -104,7 +108,7 @@ public class Launcher : MonoBehaviourPunCallbacks
         Debug.Log("OnJoinedRoom(). Client is in a room");
         if (PhotonNetwork.CurrentRoom.PlayerCount == 1)
         {
-            PhotonNetwork.LoadLevel("Office Level 1");
+            PhotonNetwork.LoadLevel(sceneNameToLoadIn);
         }
     }
 

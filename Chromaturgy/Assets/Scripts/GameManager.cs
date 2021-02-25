@@ -1,8 +1,7 @@
-﻿using UnityEngine;
-using UnityEngine.SceneManagement;
-
-using Photon.Pun;
+﻿using Photon.Pun;
 using Photon.Realtime;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 using System.Collections.Generic;
 
 public class GameManager : MonoBehaviourPunCallbacks
@@ -16,9 +15,9 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     #region Private Fields
 
-    [Tooltip("Players will spawn at this location")]
+    [Tooltip("Players will spawn on these location(s)")]
     [SerializeField]
-    private GameObject m_playerSpawnpoint;
+    private GameObject[] m_playerSpawnpoints;
 
     [Tooltip("If playerSpawnpoint is unassigned, spawn using these default coordinates")]
     [SerializeField]
@@ -36,7 +35,7 @@ public class GameManager : MonoBehaviourPunCallbacks
     [SerializeField]
     private string m_playerListFolderName = "PlayerList";
 
-    private List<GameObject> m_playerGameObjectList; // list of player game object
+    private int m_currentSpawnIndex = 0; // index of the current spawn to spawn the player, used if m_playerSpawnpoints exists
 
     #endregion
 
@@ -57,71 +56,23 @@ public class GameManager : MonoBehaviourPunCallbacks
     }
 
     /// <summary>
-    /// Returns a list of all the gameobjects associated with a player in the server.
-    /// FetchPlayerGameObjects can be called with a string (username) to fetch the GameObject of a player
-    /// If that player exists, returns that GameObject in a List, otherwise returns null
+    /// Get the position of the spawnpoint (if it exists), otherwise return default
     /// </summary>
-    /// <param name="specificPlayer"></param>
-    /// <returns></returns>
-    public List<GameObject> FetchPlayerGameObjects(string specificPlayer = "")
+    /// <param name="spawnRotation">The rotation of the spawn, pass a quaternion by reference and it will be updated with this variable.</param>
+    /// <returns>The position of the spawnpoint</returns>
+    public Vector3 ReturnSpawnpointPosition(ref Quaternion spawnRotation)
     {
-        if (specificPlayer == "")
+        if (m_playerSpawnpoints.Length > 0)
         {
-            // O(n) search, remove all null GameObjects from list
-            int ind = 0;
-            while (ind < m_playerGameObjectList.Count)
-            {
-                GameObject tmp = m_playerGameObjectList[ind];
-                if (!tmp)
-                {
-                    m_playerGameObjectList.Remove(tmp);
-                }
-                else
-                {
-                    ind += 1;
-                }
-            }
-            return m_playerGameObjectList;
-        }
-        else
-        {
-            // search for player and return it, otherwise return null
-            foreach (GameObject player in m_playerGameObjectList)
-            {
-                if (player.name == specificPlayer)
-                {
-                    return new List<GameObject> { player };
-                }
-            }
-            return null;
-        }
-    }
-
-    /// <summary>
-    /// Adds the player GameObject to the player GameObject list and also sets the player GameObject as a child of the playerlist folder
-    /// </summary>
-    /// <param name="name"></param>
-    public void AddPlayerToGameObjectList(GameObject player)
-    {
-        player.transform.parent = m_playerListFolder.transform;
-        m_playerGameObjectList.Add(player);
-    }
-
-    /// <summary>
-    /// Get the position of the spawnpoint (if it exists), otherwise return default.
-    /// </summary>
-    public Vector3 ReturnSpawnpointPosition()
-    {
-        if (m_playerSpawnpoint)
-        {
-            return m_playerSpawnpoint.transform.position;
+            Vector3 spawnPosition = m_playerSpawnpoints[m_currentSpawnIndex].transform.position;
+            spawnRotation = m_playerSpawnpoints[m_currentSpawnIndex].transform.rotation;
+            return spawnPosition;
         }
         else
         {
             return m_defaultSpawn;
         }
     }
-
 
     #endregion
 
@@ -134,8 +85,6 @@ public class GameManager : MonoBehaviourPunCallbacks
         {
             m_playerListFolder = new GameObject(m_playerListFolderName);
         }
-
-        m_playerGameObjectList = new List<GameObject>();
     }
 
     private void Start()
@@ -150,19 +99,11 @@ public class GameManager : MonoBehaviourPunCallbacks
             {
                 if (HealthScript.LocalPlayerInstance == null)
                 {
-                    GameObject player;
-                    if (m_playerSpawnpoint)
-                    {
-                        player = PhotonNetwork.Instantiate(m_playerPrefab.name, m_playerSpawnpoint.transform.position, Quaternion.identity, 0);
-                    }
-                    else
-                    {
-                        player = PhotonNetwork.Instantiate(m_playerPrefab.name, m_defaultSpawn, Quaternion.identity, 0);
-                    }
-
-                    // Instantiate the health/mana GUI after instantiating the player
-                    //GameObject playerUI = Instantiate(healthManaBarPrefab);
-                    //playerUI.GetComponent<PlayerGUI>().SetTarget(player);
+                    // Determine the spawnpoint to spawn the player on
+                    m_currentSpawnIndex = m_playerSpawnpoints.Length > 0 ? (PhotonNetwork.LocalPlayer.ActorNumber % m_playerSpawnpoints.Length) - 1 : 0;
+                    Quaternion spawnRotation = Quaternion.identity;
+                    Vector3 spawnPosition = ReturnSpawnpointPosition(ref spawnRotation);
+                    photonView.RPC("SpawnPlayer", PhotonNetwork.LocalPlayer, spawnPosition, spawnRotation);
                 }
                 else
                 {
@@ -184,5 +125,12 @@ public class GameManager : MonoBehaviourPunCallbacks
         }
         PhotonNetwork.LoadLevel("SampleScene");
     }
+    
+    [PunRPC]
+    private void SpawnPlayer(Vector3 spawnPos, Quaternion spawnRot)
+    {
+        PhotonNetwork.Instantiate(m_playerPrefab.name, spawnPos, spawnRot);
+    }
+
     #endregion
 }

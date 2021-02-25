@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 387652664625819234}
   - component: {fileID: 3315601828756203687}
   - component: {fileID: 3258891433430490837}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: Blue Sphere
   m_TagString: Untagged
   m_Icon: {fileID: 0}

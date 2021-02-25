@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 6217126765523390350}
   - component: {fileID: 6217126765523390337}
   - component: {fileID: 6659849736160256123}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: Violet Sphere
   m_TagString: Untagged
   m_Icon: {fileID: 0}
