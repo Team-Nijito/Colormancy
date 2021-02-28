@@ -52,7 +52,6 @@ public class EnemyChase : MonoBehaviourPun, IPunObservable
 
     // Components
     public GameObject m_character = null;
-    protected Transform m_characterTransform;
 
     protected NavMeshAgent m_navMeshAgent;
     protected HealthScript m_hscript;
@@ -74,11 +73,6 @@ public class EnemyChase : MonoBehaviourPun, IPunObservable
         m_navMeshAgent.speed = m_speed;
         m_navMeshAgent.stoppingDistance = m_attackRange;
 
-        if (m_character)
-        {
-            m_characterTransform = m_character.transform;
-        }
-
         m_hurtVictimArray = new int[m_numPlayersCanHit];
     }
 
@@ -86,10 +80,15 @@ public class EnemyChase : MonoBehaviourPun, IPunObservable
     protected virtual void Update()
     {
         Transform target = DetermineTargetPlayer(ref m_distanceFromPlayer);
-        if (target && (!m_targetPlayer || m_targetPlayer.gameObject.GetPhotonView().ViewID != target.gameObject.GetPhotonView().ViewID))
+        PhotonView targetPhotonView = target.gameObject.GetPhotonView();
+        if (target && (!m_targetPlayer || m_targetPlayer.gameObject.GetPhotonView().ViewID != targetPhotonView.ViewID))
         {
             // Only send another RPC, if the target this time is different.
-            photonView.RPC("DeclareTargetPlayer", RpcTarget.All, target.gameObject.GetPhotonView().ViewID);
+            // Also check if player is still here
+            if (targetPhotonView.Owner != null && targetPhotonView.Owner.TagObject != null)
+            {
+                photonView.RPC("DeclareTargetPlayer", RpcTarget.All, target.gameObject.GetPhotonView().ViewID);
+            }
         }
         ProcessAIIntent();
     }
@@ -111,22 +110,23 @@ public class EnemyChase : MonoBehaviourPun, IPunObservable
         float targetDistance = -1;
 
         // Focus on the closest players from all players
-        foreach (GameObject player in m_hscript.m_gameManager.FetchPlayerGameObjects())
+        foreach (Player play in PhotonNetwork.PlayerList)
         {
-            if (player)
+            GameObject playObj = play.TagObject as GameObject;
+            if (playObj)
             {
-                float tmpDistance = Vector3.Distance(player.transform.position, transform.position);
+                float tmpDistance = Vector3.Distance(playObj.transform.position, transform.position);
                 if (targetTransform)
                 {
                     if (tmpDistance < Vector3.Distance(targetTransform.position, transform.position))
                     {
-                        targetTransform = player.transform;
+                        targetTransform = playObj.transform;
                         targetDistance = tmpDistance;
                     }
                 }
                 else
                 {
-                    targetTransform = player.transform;
+                    targetTransform = playObj.transform;
                     targetDistance = tmpDistance;
                 }
             }
@@ -299,14 +299,14 @@ public class EnemyChase : MonoBehaviourPun, IPunObservable
         {
             if (m_character)
             {
-                stream.SendNext(m_characterTransform.localRotation);
+                stream.SendNext(m_character.transform.localRotation);
             }
         }
         else
         {
             if (m_character)
             {
-                m_characterTransform.localRotation = (Quaternion)stream.ReceiveNext();
+                m_character.transform.localRotation = (Quaternion)stream.ReceiveNext();
             }
         }
     }

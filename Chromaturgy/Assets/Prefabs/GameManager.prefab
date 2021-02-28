@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6713501385978202045}
   - component: {fileID: 7917960859537667781}
+  - component: {fileID: -4774289116210966217}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -44,9 +45,31 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_playerListFolder: {fileID: 0}
-  m_playerSpawnpoint: {fileID: 0}
+  m_playerSpawnpoints: []
   m_defaultSpawn: {x: 0, y: 3, z: 0}
   m_playerPrefab: {fileID: 0}
   m_healthManaBarPrefab: {fileID: 5935600569168913045, guid: 9c7da00c2a164ec43a15707c1ff9cba0,
     type: 3}
   m_playerListFolderName: PlayerList
+--- !u!114 &-4774289116210966217
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1514547462070139307}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  observableSearch: 2
+  Synchronization: 3
+  OwnershipTransfer: 0
+  ObservedComponents: []
+  viewIdField: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0

@@ -22,6 +22,7 @@ public abstract class Orb
     public Element OrbElement;
     public float CooldownMod;
     public float ShapeManaMod;
+    public GameObject UIPrefab;
     protected float ModAmount;
 
     //SpellTest will just be the player controller

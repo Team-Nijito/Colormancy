@@ -17,6 +17,7 @@ public class SpellTest : MonoBehaviourPun
     List<Orb> orbs = new List<Orb>();
     SpellManager manager;
     ManaScript mana;
+    OrbTrayUIController uIController;
 
     Dictionary<(Orb, Orb, Orb), float> spellCooldowns = new Dictionary<(Orb, Orb, Orb), float>();
 
@@ -61,11 +62,24 @@ public class SpellTest : MonoBehaviourPun
     {
         manager = GetComponent<SpellManager>();
         mana = GetComponent<ManaScript>();
-        orbs.Add(new IndigoOrb());
-        orbs.Add(new YellowOrb());
-        orbs.Add(new VioletOrb());
-        orbs.Add(new BlueOrb());
-        orbs.Add(new OrangeOrb());
+
+        GameObject gUIController = null;
+        if (photonView.IsMine && PhotonNetwork.IsConnected)
+        {
+            gUIController = GameObject.Find("OrbTray");
+        }
+
+        if (gUIController)
+        {
+            uIController = gUIController.GetComponent<OrbTrayUIController>();
+        }
+
+
+        AddSpellOrb(new YellowOrb());
+        AddSpellOrb(new OrangeOrb());
+        AddSpellOrb(new BlueOrb());
+        AddSpellOrb(new VioletOrb());
+        AddSpellOrb(new IndigoOrb());
     }
 
     // Update is called once per frame
@@ -90,10 +104,17 @@ public class SpellTest : MonoBehaviourPun
             }
         }
 
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(1))
         {
-            photonView.RPC("TryCastSpell", RpcTarget.AllViaServer);
+            photonView.RPC("TryCastSpell", RpcTarget.All);
         }
+    }
+
+    void AddSpellOrb(Orb orb)
+    {
+        orbs.Add(orb);
+        if (uIController)
+            uIController.AddOrb(orb);
     }
     
     [PunRPC]
@@ -132,7 +153,6 @@ public class SpellTest : MonoBehaviourPun
         currentSpell.Cast(transform);
         spellCooldowns[currentSpell.GetOrbTuple()] = Time.time + currentSpell.GetSpellCooldown();
         mana.ConsumeMana(currentSpell.GetManaCost());
-        manager.ClearOrbs();
-        photonView.RPC("ClearSpell", RpcTarget.All);
+        //photonView.RPC("ClearSpell", RpcTarget.All);
     }
 }

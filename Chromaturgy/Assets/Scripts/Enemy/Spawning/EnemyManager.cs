@@ -1,8 +1,9 @@
-﻿using System.Collections;
+﻿using Photon.Pun;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyManager : MonoBehaviour
+public class EnemyManager : MonoBehaviourPun
 {
     [SerializeField]
     private GameObject[] m_spawnpoints;
@@ -20,11 +21,20 @@ public class EnemyManager : MonoBehaviour
 
     private void Update()
     {
-        if (m_numEnemiesOnField < m_desiredEnemiesOnField)
+        if (PhotonNetwork.IsMasterClient)
         {
-            //print("Spawning");
-            StartCoroutine(SpawnEnemy());
+            // currently have problem for spawning in more enemies for each player
+            if (m_numEnemiesOnField < m_desiredEnemiesOnField)
+            {
+                photonView.RPC("SpawnEnemyRPC", RpcTarget.MasterClient);
+            }
         }
+    }
+
+    [PunRPC]
+    private void SpawnEnemyRPC()
+    {
+        StartCoroutine(SpawnEnemy());
     }
 
     private IEnumerator SpawnEnemy(float delay = 0f)
@@ -73,6 +83,7 @@ public class EnemyManager : MonoBehaviour
         return m_enemyEntities[Random.Range(0, m_enemyEntities.Length)];
     }
 
+    [PunRPC]
     public void EnemyHasDied()
     {
         m_numEnemiesOnField--;

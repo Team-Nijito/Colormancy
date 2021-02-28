@@ -8,10 +8,11 @@ public class OrangeOrb : Orb
     {
         OrbColor = Color.yellow;
         OrbShape = SpellShape.OrbitingOrbs;
-        CooldownMod = 0f;
-        ShapeManaMod = 0f;
+        CooldownMod = 1f;
+        ShapeManaMod = 1f;
         OrbElement = Element.Light;
         ModAmount = .1f;
+        UIPrefab = (GameObject)Resources.Load("Orbs/OrangeOrbUI");
     }
 
     public override void AddHeldEffect(SpellTest test)

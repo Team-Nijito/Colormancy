@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 2289333853478670742}
   - component: {fileID: 1751865619799750208}
   - component: {fileID: 1751865619799750271}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: Red Area
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -60,11 +60,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 656f2e9ae882beb4bb7fd6c43a84d9f1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_lerp: 0
+  playerTransform: {fileID: 0}
+  endPosition: {x: 0, y: 0, z: 0}
+  jumpTime: 0.5
+  m_lerp: 1
   redBase: {fileID: 5533924623576496753}
   redEdge: {fileID: 5811497358446419998}
   lifetime: 3
-  spherePaintRadius: 2
+  spherePaintRadius: 5
   paintColor: {r: 1, g: 0, b: 0, a: 0}
   debug: 0
 --- !u!1 &5533924623576496753
@@ -78,7 +81,7 @@ GameObject:
   - component: {fileID: 2245510852417664120}
   - component: {fileID: 6744001728315962424}
   - component: {fileID: 4619997612531694836}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: Base
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -157,7 +160,7 @@ GameObject:
   - component: {fileID: 8189152888145961313}
   - component: {fileID: 7247030357717593485}
   - component: {fileID: 628116738535878436}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: Edge
   m_TagString: Untagged
   m_Icon: {fileID: 0}

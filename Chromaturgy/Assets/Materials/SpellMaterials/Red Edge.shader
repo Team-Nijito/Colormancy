@@ -11,13 +11,12 @@
     }
         SubShader
     {
-        Tags { "RenderType" = "Opaque" "Queue" = "Transparent"}
+        Tags { "RenderType" = "Transparent" "Queue" = "Transparent"}
 
         Pass
         {
             Blend SrcAlpha OneMinusSrcAlpha
-            Cull Off
-            ZWrite Off
+            Cull Front
 
             CGPROGRAM
             #pragma vertex vert
@@ -35,7 +34,7 @@
             {
                 float2 uv : TEXCOORD0;
                 float4 vertex : SV_POSITION;
-                float3 worldPos : TEXCOORD1;
+                float3 objectPos : TEXCOORD1;
             };
 
             sampler2D _NoiseTex;
@@ -47,7 +46,7 @@
                 v2f o;
                 o.vertex = UnityObjectToClipPos(v.vertex);
                 o.uv = TRANSFORM_TEX(v.uv, _NoiseTex);
-                o.worldPos = mul(unity_ObjectToWorld, v.vertex);
+                o.objectPos = v.vertex;
                 return o;
             }
 
@@ -61,12 +60,12 @@
             {
                 float4 col = _Color;
 
-                float height = tex2D(_NoiseTex, i.worldPos.xz * _Spikiness + _Time.x) * _YScale * _Lerp;
+                float height = tex2D(_NoiseTex, i.objectPos.xz * _Spikiness + _Time.x) * _YScale * _Lerp;
 
-                if (i.worldPos.y > height)
+                if (i.objectPos.y > height * 0.5)
                     col.w = 0;
                 else {
-                    col = lerp(float4(0, 0, 0, 1), _Color, pow(i.worldPos.y / height, _Darkness));
+                    col = lerp(float4(0, 0, 0, 1), _Color, pow(i.objectPos.y / height, _Darkness));
                     col.w *= _Lerp;
                 }
 

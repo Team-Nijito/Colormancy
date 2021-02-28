@@ -150,5 +150,13 @@ namespace Chromaturgy
                 transform.rotation = Quaternion.Lerp(transform.rotation, m_newRotation, Time.deltaTime * m_camSpeed);
             }
         }
+
+        // Used to set the rotation so that the rotation doesn't "snap" unexpectedly
+        // Example case: when respawning, the player will be rotated (to face the spawn's forward direction)
+        // but when you turn the camera afterwards, it may snap quickly
+        public void ResetRotation(Quaternion newRotation)
+        {
+            m_newRotation = newRotation;
+        }
     }
 }

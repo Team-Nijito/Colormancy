@@ -19,13 +19,17 @@ public class Launcher : MonoBehaviourPunCallbacks
     [SerializeField]
     private GameObject progressLabel;
 
+    [Tooltip("Name of the scene to load after player joins a room")]
+    [SerializeField]
+    private string sceneNameToLoadIn = "Starting Level";
+
     #endregion
 
     #region Private Fields
 
-    string gameVersion = "1";
+    private string gameVersion = "1";
 
-    bool isConnecting;
+    private bool isConnecting;
 
     #endregion
 
@@ -34,11 +38,12 @@ public class Launcher : MonoBehaviourPunCallbacks
     private void Awake()
     {
         PhotonNetwork.AutomaticallySyncScene = true;
-        PhotonPeer.RegisterType(typeof(IndigoOrb), (byte)'A', IndigoOrb.Serialize, IndigoOrb.Deserialize);
-        PhotonPeer.RegisterType(typeof(YellowOrb), (byte)'B', YellowOrb.Serialize, YellowOrb.Deserialize);
-        PhotonPeer.RegisterType(typeof(VioletOrb), (byte)'C', VioletOrb.Serialize, VioletOrb.Deserialize);
+        PhotonPeer.RegisterType(typeof(RedOrb), (byte)'A', RedOrb.Serialize, RedOrb.Deserialize);
+        PhotonPeer.RegisterType(typeof(OrangeOrb), (byte)'B', OrangeOrb.Serialize, OrangeOrb.Deserialize);
+        PhotonPeer.RegisterType(typeof(YellowOrb), (byte)'C', YellowOrb.Serialize, YellowOrb.Deserialize);
         PhotonPeer.RegisterType(typeof(BlueOrb), (byte)'D', BlueOrb.Serialize, BlueOrb.Deserialize);
-        PhotonPeer.RegisterType(typeof(OrangeOrb), (byte)'E', OrangeOrb.Serialize, OrangeOrb.Deserialize);
+        PhotonPeer.RegisterType(typeof(VioletOrb), (byte)'E', VioletOrb.Serialize, VioletOrb.Deserialize);
+        PhotonPeer.RegisterType(typeof(IndigoOrb), (byte)'F', IndigoOrb.Serialize, IndigoOrb.Deserialize);
     }
 
     // Start is called before the first frame update
@@ -74,8 +79,6 @@ public class Launcher : MonoBehaviourPunCallbacks
 
     public override void OnConnectedToMaster()
     {
-        Debug.Log("OnConnectedToMaster() called");
-
         if (isConnecting)
         {
             PhotonNetwork.JoinRandomRoom();
@@ -100,10 +103,9 @@ public class Launcher : MonoBehaviourPunCallbacks
 
     public override void OnJoinedRoom()
     {
-        Debug.Log("OnJoinedRoom(). Client is in a room");
         if (PhotonNetwork.CurrentRoom.PlayerCount == 1)
         {
-            PhotonNetwork.LoadLevel("Starting Level");
+            PhotonNetwork.LoadLevel(sceneNameToLoadIn);
         }
     }
 

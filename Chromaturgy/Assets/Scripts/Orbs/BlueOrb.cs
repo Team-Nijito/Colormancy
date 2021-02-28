@@ -8,10 +8,11 @@ public class BlueOrb : Orb
     {
         OrbColor = Color.yellow;
         OrbShape = SpellShape.OrbitingOrbs;
-        CooldownMod = 0f;
-        ShapeManaMod = 0f;
+        CooldownMod = 1.8f;
+        ShapeManaMod = .8f;
         OrbElement = Element.Light;
         ModAmount = .1f;
+        UIPrefab = (GameObject)Resources.Load("Orbs/BlueOrbUI");
     }
 
     public override void AddHeldEffect(SpellTest test)
