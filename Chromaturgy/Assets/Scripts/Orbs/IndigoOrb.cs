@@ -2,15 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+using Photon.Pun;
+
 public class IndigoOrb : Orb
 {
     public IndigoOrb()
     {
         OrbColor = Color.yellow;
-        OrbShape = SpellShape.OrbitingOrbs;
+        OrbShape = SpellShape.ExpandingOrbs;
         CooldownMod = 1.4f;
         ShapeManaMod = 1.2f;
-        OrbElement = Element.Light;
+        OrbElement = Element.Darkness;
         ModAmount = .1f;
         UIPrefab = (GameObject)Resources.Load("Orbs/IndigoOrbUI");
     }
@@ -27,7 +29,8 @@ public class IndigoOrb : Orb
 
     public override void CastGreaterEffect(GameObject hit, int orbAmount)
     {
-        throw new System.NotImplementedException();
+        PhotonView photonView = hit.GetPhotonView();
+        photonView.RPC("TakeDamage", RpcTarget.All, (float)orbAmount);
     }
 
     public override void CastLesserEffect(GameObject hit, int orbAmount)
@@ -45,7 +48,13 @@ public class IndigoOrb : Orb
 
         GameObject orbs = GameObject.Instantiate(Resources.Load("Orbs/Indigo Orbs", typeof(GameObject))) as GameObject;
         orbs.transform.position = t.position;
-        orbs.GetComponent<IndigoSpellController>().playerTransform = t;
+
+        IndigoSpellController spellController = orbs.GetComponent<IndigoSpellController>();
+        spellController.playerTransform = t;
+        spellController.greaterCast = greaterEffectMethod;
+        spellController.lesserCast = lesserEffectMethod;
+        spellController.greaterCastAmt = amounts.Item1;
+        spellController.lesserCastAmt = amounts.Item2;
     }
 
     public static object Deserialize(byte[] data)

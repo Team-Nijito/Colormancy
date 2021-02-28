@@ -26,6 +26,11 @@ public class IndigoSpellController : MonoBehaviour
 
     private int tick;
 
+    public Orb.GreaterCast greaterCast;
+    public Orb.LesserCast lesserCast;
+    public int greaterCastAmt;
+    public int lesserCastAmt;
+
     // Start is called before the first frame update
     void OnEnable()
     {
@@ -54,5 +59,13 @@ public class IndigoSpellController : MonoBehaviour
 
         if (tick == PaintingManager.paintingTickFrequency)
             tick = 0;
+    }
+
+    private void OnCollisionEnter(Collision collision) {
+        if (collision.gameObject.tag.Equals("Enemy"))
+        {
+            greaterCast(collision.gameObject, greaterCastAmt);
+        }
+
     }
 }
