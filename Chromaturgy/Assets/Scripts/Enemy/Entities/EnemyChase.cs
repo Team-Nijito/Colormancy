@@ -2,6 +2,7 @@
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine.AI;
+using System.Collections;
 
 public class EnemyChase : MonoBehaviourPun, IPunObservable
 {
@@ -20,9 +21,20 @@ public class EnemyChase : MonoBehaviourPun, IPunObservable
     // Targetting
     protected Transform m_targetPlayer;
 
-    [SerializeField] protected float m_detectionRadius = 30f;
+    [SerializeField] protected float m_closeDetectionRadius = 1.5f; // used when a player gets too close to an enemy
+    [SerializeField] protected float m_detectionRadius = 30f; // used in every other case
+
+    [Range(0, 180)]
+    [SerializeField] protected float m_fieldOfView = 30f; // degrees
 
     [SerializeField] protected float m_attackRange = 3f;
+
+    [SerializeField] protected float m_rememberTargetDuration = 7f;  // how long does an AI "remember" a target once target is out of vision
+
+    protected bool m_rememberTarget = false;
+    protected bool m_isForgettingTarget = false;
+
+    protected Coroutine m_forgettingTargetCoroutineRef = null;
 
     // Movement
     [SerializeField] protected float m_speed = 18f;
@@ -34,6 +46,7 @@ public class EnemyChase : MonoBehaviourPun, IPunObservable
     protected AnimationManager.EnemyState m_currentState = AnimationManager.EnemyState.Idle;
 
     protected Vector3 m_directionToPlayer = Vector3.zero;
+    protected float m_angleFromPlayer = 0;
     protected float m_distanceFromPlayer = -1;
 
     // Attack attributes
@@ -56,8 +69,6 @@ public class EnemyChase : MonoBehaviourPun, IPunObservable
     protected NavMeshAgent m_navMeshAgent;
     protected HealthScript m_hscript;
     protected AnimationManager m_animManager;
-
-    protected bool m_isAttacking = false; // don't interrupt attacking animation
 
     #endregion
     #region MonoBehaviour callbacks
@@ -101,9 +112,13 @@ public class EnemyChase : MonoBehaviourPun, IPunObservable
     #endregion
     #region Private Methods
 
-    // Determine which player to seek out (if omnipotent), or just check
-    // if there are any players around the enemy (if not omnipotent)
-    // right now just omnipotent b/c we're in an arena of course they know we're here
+    /// <summary>
+    /// Determine which player to seek out (if omnipotent), or just check
+    /// if there are any players around the enemy (if not omnipotent)
+    /// right now just omnipotent b/c we're in an arena of course they know we're here
+    /// </summary>
+    /// <param name="distanceFromPlayer"></param>
+    /// <returns>The transform of the closest player in the server, or null if no players characters exist</returns>
     protected virtual Transform DetermineTargetPlayer(ref float distanceFromPlayer)
     {
         Transform targetTransform = null;
@@ -135,50 +150,66 @@ public class EnemyChase : MonoBehaviourPun, IPunObservable
         return targetTransform;
     }
 
-    // Consider what the AI will do at any point, and handles AI animation
+    /// <summary>
+    /// Consider what the AI will do at any point, and handles AI animation
+    /// </summary>
     protected virtual void ProcessAIIntent()
     {
-        // don't interrupt enemy attack animation, so that players have a chance to dodge attacks
-        if (!m_isAttacking)
+        if (m_targetPlayer)
         {
-            if (m_targetPlayer)
+            m_directionToPlayer = m_targetPlayer.position - transform.position;
+            m_angleFromPlayer = Vector3.Angle(m_directionToPlayer, transform.forward);
+              
+            if (m_distanceFromPlayer < m_closeDetectionRadius)
             {
-                m_directionToPlayer = m_targetPlayer.position - transform.position;
-
-                if (m_distanceFromPlayer < m_detectionRadius)
+                // player got too close, they're detected
+                // raycast here to see if there is an object between AI and player
+                if (canSeePlayer())
                 {
-                    m_directionToPlayer.y = 0;
-
-                    if (m_directionToPlayer.magnitude > m_attackRange)
-                    {
-                        if (m_speed > m_speedTriggerRun)
-                        {
-                            m_animManager.ChangeState(AnimationManager.EnemyState.Run);
-                        }
-                        else
-                        {
-                            m_animManager.ChangeState(AnimationManager.EnemyState.Walk);
-                        }
-                    }
-                    else
-                    {
-                        m_animManager.ChangeState(AnimationManager.EnemyState.Attack);
-                        m_isAttacking = true;
-                    }
+                    photonView.RPC("PlayerIsDetected", RpcTarget.All);
                 }
-                else
+            }
+            else if (m_distanceFromPlayer < m_detectionRadius && m_angleFromPlayer < m_fieldOfView)
+            {
+                // player is in cone vision
+                // raycast here to see if there is an object between AI and player
+                if (canSeePlayer())
                 {
-                    m_animManager.ChangeState(AnimationManager.EnemyState.Idle);
+                    photonView.RPC("PlayerIsDetected", RpcTarget.All);
                 }
             }
             else
             {
-                m_animManager.ChangeState(AnimationManager.EnemyState.Idle);
+                if (m_rememberTarget)
+                {
+                    print("forgetting:");
+
+                    // still remember target, go after them
+                    photonView.RPC("StartForgettingTask", RpcTarget.All);
+                }
+
+                if (m_rememberTarget || m_isForgettingTarget)
+                {
+                    // start forgetting the target, but still target them
+                    // until AI completely forgets target
+                    photonView.RPC("PlayerIsTargetted", RpcTarget.All);
+                }
+                else
+                {
+                    // don't see player, just idle for now
+                    m_animManager.ChangeState(AnimationManager.EnemyState.Idle);
+                }
             }
+        }
+        else
+        {
+            m_animManager.ChangeState(AnimationManager.EnemyState.Idle);
         }
     }
 
-    // Primarily used for moving and attacking
+    /// <summary>
+    /// Primarily used for moving and attacking
+    /// </summary>
     protected virtual void HandleAIIntent()
     {
         if (m_targetPlayer)
@@ -204,19 +235,97 @@ public class EnemyChase : MonoBehaviourPun, IPunObservable
         }
     }
 
-    // How to pass GameObject/transform through RPC: https://forum.unity.com/threads/how-to-photon-networking-send-gameobjects-transforms-and-other-through-the-network.343973/
     /// <summary>
-    /// This is used so that the Enemy's target is synced acrossed all players
+    /// The AI raycast to see if there is any obstacle between the AI and a player target.
+    /// The ray currently originates from the chest of the AI.
     /// </summary>
-    /// <param name="playerPhotonViewID"></param>
-    [PunRPC]
-    public void DeclareTargetPlayer(int playerPhotonViewID)
+    /// <returns>Returns true if there is no obstacle between the transform and the target.</returns>
+    protected bool canSeePlayer()
     {
-        Transform playerTransform = PhotonView.Find(playerPhotonViewID).transform;
-        m_targetPlayer = playerTransform;
+        bool canSee = false;
+        Ray ray = new Ray(transform.position, m_targetPlayer.transform.position - transform.position);
+        RaycastHit hit;
+
+        if (Physics.Raycast(ray, out hit))
+        {
+            if (hit.transform == m_targetPlayer)
+            {
+                canSee = true;
+            }
+        }
+        return canSee;
     }
 
-    // see wrapper functions in public methods
+
+    /// <summary>
+    /// (PunRPC) This is invoked in ProcessAIIntent whenever a player is considered "detected"
+    /// </summary>
+    [PunRPC]
+    protected void PlayerIsDetected()
+    {
+        m_directionToPlayer.y = 0;
+
+        // Reset the m_rememberTarget task
+        m_rememberTarget = true;
+        if (m_forgettingTargetCoroutineRef != null)
+        {
+            StopCoroutine(m_forgettingTargetCoroutineRef);
+        }
+
+        PlayerIsTargetted();
+    }
+
+    /// <summary>
+    /// (PunRPC) This is invoked in ProcessAIIntent whenever a player is considered "remembered" instead of "detected"
+    /// and is also invoked by PlayerIsDetected()
+    /// </summary>
+    [PunRPC]
+    protected virtual void PlayerIsTargetted()
+    {
+        if (m_directionToPlayer.magnitude > m_attackRange)
+        {
+            if (m_speed > m_speedTriggerRun)
+            {
+                m_animManager.ChangeState(AnimationManager.EnemyState.Run);
+            }
+            else
+            {
+                m_animManager.ChangeState(AnimationManager.EnemyState.Walk);
+            }
+        }
+        else
+        {
+            m_animManager.ChangeState(AnimationManager.EnemyState.Attack);
+        }
+    }
+
+    /// <summary>
+    /// (PunRPC) Starts the forgetting task.
+    /// </summary>
+    [PunRPC]
+    protected void StartForgettingTask()
+    {
+        m_forgettingTargetCoroutineRef = StartCoroutine(ForgetTargetAfterDuration());
+    }
+
+    /// <summary>
+    /// Allows the AI to remember and target the player until the player remains out of sight for m_rememberTargetDuration seconds.
+    /// </summary>
+    protected IEnumerator ForgetTargetAfterDuration()
+    {
+        m_rememberTarget = false;
+        m_isForgettingTarget = true;
+        yield return new WaitForSeconds(m_rememberTargetDuration);
+
+        m_isForgettingTarget = false;
+
+        // stop moving towards target
+        m_navMeshAgent.SetDestination(transform.position);
+    }
+
+    /// <summary>
+    /// (PunRPC) Enables all the listed hitboxes for the AI
+    /// </summary>
     [PunRPC]
     private void EnableHitBoxes()
     {
@@ -226,7 +335,9 @@ public class EnemyChase : MonoBehaviourPun, IPunObservable
         }
     }
 
-    // see wrapper functions in public methods
+    /// <summary>
+    /// (PunRPC) Disables all the listed hitboxes for the AI
+    /// </summary>
     [PunRPC]
     private void DisableHitBoxes()
     {
@@ -235,10 +346,25 @@ public class EnemyChase : MonoBehaviourPun, IPunObservable
             hitBox.m_hitBoxObject.SetActive(false);
         }
         ResetHurtVictimArray();
-        m_isAttacking = false;
     }
 
-    // Clears the hurt victim array, so that we can damage the victims again in the next attack
+
+    /// <summary>
+    /// (PunRPC) For hitbox usage, keep track of players (via array) we've attacked during same animation
+    /// then we would reset the array and check again during the next animation
+    /// </summary>
+    /// <param name="playerViewID">Player photon view</param>
+    [PunRPC]
+    private void InsertHurtVictim(int playerViewID)
+    {
+        m_hurtVictimArray[m_hurtVictimArrayIndex] = playerViewID;
+        m_hurtVictimArrayIndex += 1;
+    }
+
+    /// <summary>
+    /// Clears the hurt victim array, so that we can damage the victims again in the next attack.
+    /// This function is used alongside InsertHurtVictim.
+    /// </summary>
     private void ResetHurtVictimArray()
     {
         if (m_hurtVictimArray != null)
@@ -248,43 +374,62 @@ public class EnemyChase : MonoBehaviourPun, IPunObservable
         m_hurtVictimArrayIndex = 0;
     }
 
-    // for hitbox usage, keep track of players (via array) we've attacked during same animation
-    // then we would reset the array and check again during the next animation
-    [PunRPC]
-    private void InsertHurtVictim(int playerViewID)
-    {
-        m_hurtVictimArray[m_hurtVictimArrayIndex] = playerViewID;
-        m_hurtVictimArrayIndex += 1;
-    }
-
     #endregion
 
     #region Public methods
-    
-    // Wrapper function for enabling hitbox
+
+    /// <summary>
+    /// RPC Wrapper function for enabling hitbox (EnableHitBoxes)
+    /// </summary>
     public void RPCEnableHitBoxes()
     {
-        photonView.RPC("EnableHitBoxes", RpcTarget.All);
+        if (photonView.IsMine)
+        {
+            photonView.RPC("EnableHitBoxes", RpcTarget.All);
+        }
     }
 
-    // Wrapper function for disabling hitbox
-    public void RPCDisablehitBoxes()
+    /// <summary>
+    /// RPC Wrapper function for disabling hitbox (DisableHitBoxes)
+    /// </summary>
+    public void RPCDisableHitBoxes()
     {
-        photonView.RPC("DisableHitBoxes", RpcTarget.All);
+        if (photonView.IsMine)
+        {
+            photonView.RPC("DisableHitBoxes", RpcTarget.All);
+        }
     }
 
-    // Wrapper function for inserting players who've the enemy attacked during one animation
+    /// <summary>
+    ///  Wrapper function for inserting players who've the enemy attacked during one animation (InsertHurtVictim)
+    /// </summary>
+    /// <param name="playerViewID"></param>
     public void RPCInsertHurtVictim(int playerViewID)
     {
-        photonView.RPC("InsertHurtVictim", RpcTarget.All, playerViewID);
+        if (photonView.IsMine)
+        {
+            photonView.RPC("InsertHurtVictim", RpcTarget.All, playerViewID);
+        }
     }
 
+    // How to pass GameObject/transform through RPC: https://forum.unity.com/threads/how-to-photon-networking-send-gameobjects-transforms-and-other-through-the-network.343973/
+    /// <summary>
+    /// (PunRPC) This is used so that the Enemy's target is synced acrossed all players
+    /// </summary>
+    /// <param name="playerPhotonViewID">Player's photon view</param>
+    [PunRPC]
+    public void DeclareTargetPlayer(int playerPhotonViewID)
+    {
+        m_rememberTarget = false; // forget old player
+        Transform playerTransform = PhotonView.Find(playerPhotonViewID).transform;
+        m_targetPlayer = playerTransform;
+    }
 
     /// <summary>
     /// Check if player can be attacked again during attack animation. Prevents a player from being attacked multiple times during 1 anim.
     /// </summary>
-    /// <param name="PhotonID"></param>
-    /// <returns>Whether a player is a valid target</returns>
+    /// <param name="PhotonID">Player's photon view</param>
+    /// <returns>Is a player is a valid target?</returns>
     public bool IsPlayerValidTarget(int PhotonID)
     {
         return !m_hurtVictimArray.Contains(PhotonID) && m_hurtVictimArrayIndex < m_numPlayersCanHit;

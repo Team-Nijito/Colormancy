@@ -756,8 +756,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be9b07ed247fd19459ff28ed86a61311, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_closeDetectionRadius: 3
   m_detectionRadius: 30
+  m_fieldOfView: 90
   m_attackRange: 3
+  m_rememberTargetDuration: 7
   m_speed: 12
   m_speedTriggerRun: 15
   m_hitBoxesArray:
@@ -2072,8 +2075,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6645883346320435226}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.0546, z: 0.1343}
-  m_LocalScale: {x: 0.18, y: 0.12, z: 0.1}
+  m_LocalPosition: {x: 0, y: 0.0546, z: 0.081}
+  m_LocalScale: {x: 0.18, y: 0.12, z: 0.2}
   m_Children: []
   m_Father: {fileID: 5161377573529824773}
   m_RootOrder: 2

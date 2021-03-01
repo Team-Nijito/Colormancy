@@ -49,9 +49,7 @@ public class EnemyPainter : EnemyChase
     private RangeTime m_idleTime;
 
     [SerializeField]
-    private float m_rangeXMove = 10f;
-    [SerializeField]
-    private float m_rangeZMove = 10f;
+    private float m_wanderRadius = 10f;
 
     private Task m_paintFloor;
     private Task m_wanderRandomDirection;
@@ -200,41 +198,41 @@ public class EnemyPainter : EnemyChase
             yield return new WaitForSecondsRealtime(Random.Range(m_idleTime.minTime, m_idleTime.maxTime));
 
             m_wState = WanderState.Idle;
-            m_navMeshAgent.SetDestination(transform.position); // set destination to current destionation so it wont keep moving
+            m_navMeshAgent.SetDestination(transform.position); // set destination to current destination so it wont keep moving
         }
     }
 
     // Find a random position on the map that the NavMeshAgent can travel to
     private Vector3 GetRandomPosition()
     {
-        float randomZ;
-        float randomX;
+        //float randomZ;
+        //float randomX;
         Vector3 newPosition;
-
         while (true)
         {
-            randomZ = Random.Range(-m_rangeZMove, m_rangeZMove);
-            randomX = Random.Range(-m_rangeXMove, m_rangeXMove);
-
-            if (this)
+            if (RandomPoint(transform.position, m_wanderRadius, out newPosition))
             {
-                newPosition = new Vector3(transform.position.x + randomX,
-                                      transform.position.y,
-                                      transform.position.z + randomZ);
-
-                if (Physics.Raycast(newPosition, -transform.up, out m_raycastHit, m_raycastFloor, m_paintableMask))
-                {
-                    break;
-                }
-            }
-            else
-            {
-                newPosition = Vector3.zero;
                 break;
             }
         }
 
         return newPosition;
+    }
+
+    bool RandomPoint(Vector3 center, float range, out Vector3 result)
+    {
+        for (int i = 0; i < 30; i++)
+        {
+            Vector3 randomPoint = center + Random.insideUnitSphere * range;
+            NavMeshHit hit;
+            if (NavMesh.SamplePosition(randomPoint, out hit, 1.0f, NavMesh.AllAreas))
+            {
+                result = hit.position;
+                return true;
+            }
+        }
+        result = Vector3.zero;
+        return false;
     }
 
     private bool IsMoving()

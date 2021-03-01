@@ -21,7 +21,7 @@ public class EnemyManager : MonoBehaviourPun
 
     private void Update()
     {
-        if (PhotonNetwork.IsMasterClient)
+        if (PhotonNetwork.LocalPlayer.IsMasterClient)
         {
             // currently have problem for spawning in more enemies for each player
             if (m_numEnemiesOnField < m_desiredEnemiesOnField)

@@ -758,10 +758,10 @@ MonoBehaviour:
   m_username: {fileID: 6031526755773922767}
   m_gameManager: {fileID: 0}
   m_baseHealth: 100
-  m_initialHealthDeduction: 0
   m_armorPercentage: 0
   m_isRegenHealth: 0
   m_regenHealthPercentage: 1
+  m_damageEveryXSecond: 0.1
   m_timeUntilDestroy: 3
 --- !u!114 &6031526756423788190
 MonoBehaviour:
@@ -775,8 +775,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc688625127bb8042b6bcfd6d84ffaf5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_closeDetectionRadius: 3
   m_detectionRadius: 15
+  m_fieldOfView: 60
   m_attackRange: 3
+  m_rememberTargetDuration: 7
   m_speed: 7
   m_speedTriggerRun: 15
   m_hitBoxesArray: []
@@ -793,8 +796,7 @@ MonoBehaviour:
   m_idleTime:
     minTime: 1
     maxTime: 2
-  m_rangeXMove: 30
-  m_rangeZMove: 30
+  m_wanderRadius: 10
 --- !u!114 &484065322178677809
 MonoBehaviour:
   m_ObjectHideFlags: 0

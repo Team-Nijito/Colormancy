@@ -31,9 +31,9 @@ public class GameManager : MonoBehaviourPunCallbacks
     [SerializeField]
     private GameObject m_healthManaBarPrefab;
 
-    [Tooltip("The name of the folder that stores the player gameobjects")]
-    [SerializeField]
-    private string m_playerListFolderName = "PlayerList";
+    //[Tooltip("The name of the folder that stores the player gameobjects")]
+    //[SerializeField]
+    //private string m_playerListFolderName = "PlayerList";
 
     private int m_currentSpawnIndex = 0; // index of the current spawn to spawn the player, used if m_playerSpawnpoints exists
 
@@ -62,7 +62,7 @@ public class GameManager : MonoBehaviourPunCallbacks
     /// <returns>The position of the spawnpoint</returns>
     public Vector3 ReturnSpawnpointPosition(ref Quaternion spawnRotation)
     {
-        if (m_playerSpawnpoints.Length > 0)
+        if (m_playerSpawnpoints.Length > 0 && m_currentSpawnIndex < PhotonNetwork.PlayerList.Length)
         {
             Vector3 spawnPosition = m_playerSpawnpoints[m_currentSpawnIndex].transform.position;
             spawnRotation = m_playerSpawnpoints[m_currentSpawnIndex].transform.rotation;
@@ -78,14 +78,14 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     #region Private Methods
 
-    private void Awake()
-    {
-        m_playerListFolder = GameObject.Find(m_playerListFolderName);
-        if (!m_playerListFolder)
-        {
-            m_playerListFolder = new GameObject(m_playerListFolderName);
-        }
-    }
+    //private void Awake()
+    //{
+    //    m_playerListFolder = GameObject.Find(m_playerListFolderName);
+    //    if (!m_playerListFolder)
+    //    {
+    //        m_playerListFolder = new GameObject(m_playerListFolderName);
+    //    }
+    //}
 
     private void Start()
     {

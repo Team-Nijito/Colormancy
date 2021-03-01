@@ -973,8 +973,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc688625127bb8042b6bcfd6d84ffaf5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_closeDetectionRadius: 3
   m_detectionRadius: 15
+  m_fieldOfView: 60
   m_attackRange: 3
+  m_rememberTargetDuration: 7
   m_speed: 7
   m_speedTriggerRun: 15
   m_hitBoxesArray: []
@@ -991,8 +994,7 @@ MonoBehaviour:
   m_idleTime:
     minTime: 1
     maxTime: 2
-  m_rangeXMove: 30
-  m_rangeZMove: 30
+  m_wanderRadius: 10
 --- !u!114 &1233567071775370880
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -13,13 +13,16 @@ public class DetectHit : MonoBehaviour
 
     [SerializeField]
     private GameObject m_parentGameObject; // the parent gameobject with the PhotonView
-    private EnemyChase m_parentECScript;
-
+    
     [SerializeField]
     private bool m_isProjectile = false;
 
     [SerializeField]
     private float m_damage = 12f;
+
+    private EnemyRanged m_parentERScript;
+    private EnemyChase m_parentECScript;
+    private PhotonView m_parentPhotonView;
 
     private void Start()
     {
@@ -27,6 +30,11 @@ public class DetectHit : MonoBehaviour
         {
             m_parentECScript = m_parentGameObject.GetComponent<EnemyChase>();
         }
+        else
+        {
+            m_parentERScript = m_parentGameObject.GetComponent<EnemyRanged>();
+        }
+        m_parentPhotonView = PhotonView.Get(m_parentGameObject);
     }
 
     private void OnTriggerEnter(Collider other)
@@ -38,18 +46,18 @@ public class DetectHit : MonoBehaviour
             if (m_isProjectile)
             {
                 Destroy(gameObject);
+                //m_parentPhotonView.RPC("RangeGetFarther", RpcTarget.All); // Tell ranged enemy to get closer
             }
         }
-        // Uncomment this once you've implemented a simple ray check for checking if an enemy can see the player
-        //else if (!other.CompareTag("Enemy"))
-        //{
-            
+        else if (!other.CompareTag("Enemy") && !other.CompareTag("Projectile"))
+        {    
             // Destroy a projectile if it collides with an environmental object
-            //if (m_isProjectile)
-            //{
-            //    Destroy(gameObject);
-            //}
-        //}
+            if (m_isProjectile && other.name != "Zone")
+            {
+                Destroy(gameObject);
+                //m_parentPhotonView.RPC("RangeGetCloser", RpcTarget.All); // Tell ranged enemy to get closer
+            }
+        }
     }
 
     private void OnTriggerStay(Collider other)
@@ -63,15 +71,14 @@ public class DetectHit : MonoBehaviour
                 Destroy(gameObject);
             }
         }
-        // Uncomment this once you've implemented a simple ray check for checking if an enemy can see the player
-        //else if (!other.CompareTag("Enemy"))
-        //{
+        else if (!other.CompareTag("Enemy") && !other.CompareTag("Projectile"))
+        {
             // Destroy a projectile if it collides with an environmental object
-            //if (m_isProjectile)
-            //{
-            //    Destroy(gameObject);
-            //}
-        //}
+            if (m_isProjectile && other.name != "Zone")
+            {
+                Destroy(gameObject);
+            }
+        }
     }
 
     private void CheckApplyDamage(Collider player, TriggerType trigType)
@@ -83,11 +90,11 @@ public class DetectHit : MonoBehaviour
             {
                 if (trigType == TriggerType.Enter)
                 {
-                    playerPhotonView.RPC("TakeDamage", RpcTarget.All, m_damage);
+                    playerPhotonView.RPC("TakeDamage", playerPhotonView.Owner, m_damage);
                 }
                 else
                 {
-                    playerPhotonView.RPC("TakeDamage", RpcTarget.All, m_damage * Time.deltaTime);
+                    playerPhotonView.RPC("TakeDamage", playerPhotonView.Owner, m_damage * Time.deltaTime);
                 }
             }
             else if (m_parentECScript && m_parentECScript.IsPlayerValidTarget(playerPhotonView.ViewID))
@@ -95,11 +102,11 @@ public class DetectHit : MonoBehaviour
                 m_parentECScript.RPCInsertHurtVictim(playerPhotonView.ViewID);
                 if (trigType == TriggerType.Enter)
                 {
-                    playerPhotonView.RPC("TakeDamage", RpcTarget.All, m_damage);
+                    playerPhotonView.RPC("TakeDamage", playerPhotonView.Owner, m_damage);
                 }
                 else
                 {
-                    playerPhotonView.RPC("TakeDamage", RpcTarget.All, m_damage * Time.deltaTime);
+                    playerPhotonView.RPC("TakeDamage", playerPhotonView.Owner, m_damage * Time.deltaTime);
                 }
             }
         }
