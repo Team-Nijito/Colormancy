@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class AnimationManager : MonoBehaviour
+public class EnemyAnimationManager : MonoBehaviour
 {
     // Manages an enemy's animation
     

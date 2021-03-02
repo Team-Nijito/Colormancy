@@ -99,11 +99,16 @@ public class GameManager : MonoBehaviourPunCallbacks
             {
                 if (HealthScript.LocalPlayerInstance == null)
                 {
-                    // Determine the spawnpoint to spawn the player on
-                    m_currentSpawnIndex = m_playerSpawnpoints.Length > 0 ? (PhotonNetwork.LocalPlayer.ActorNumber % m_playerSpawnpoints.Length) - 1 : 0;
-                    Quaternion spawnRotation = Quaternion.identity;
-                    Vector3 spawnPosition = ReturnSpawnpointPosition(ref spawnRotation);
-                    photonView.RPC("SpawnPlayer", PhotonNetwork.LocalPlayer, spawnPosition, spawnRotation);
+                    // Check if there are any clients connected to this server
+                    // This check is used to hide an error if you run a scene without opening the launcher first
+                    if (PhotonNetwork.CountOfPlayers > 0)
+                    {
+                        // Determine the spawnpoint to spawn the player on
+                        m_currentSpawnIndex = m_playerSpawnpoints.Length > 0 ? (PhotonNetwork.LocalPlayer.ActorNumber % m_playerSpawnpoints.Length) - 1 : 0;
+                        Quaternion spawnRotation = Quaternion.identity;
+                        Vector3 spawnPosition = ReturnSpawnpointPosition(ref spawnRotation);
+                        photonView.RPC("SpawnPlayer", PhotonNetwork.LocalPlayer, spawnPosition, spawnRotation);
+                    }
                 }
                 else
                 {

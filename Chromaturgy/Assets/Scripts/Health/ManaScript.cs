@@ -2,6 +2,7 @@
 using UnityEngine;
 using Photon.Pun;
 
+[DisallowMultipleComponent]
 public class ManaScript : MonoBehaviour, IPunObservable
 {
     // manages the mana for any player/object

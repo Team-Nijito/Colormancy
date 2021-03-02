@@ -1,10 +1,12 @@
 ﻿using Photon.Pun;
 using UnityEngine;
-using System.Linq;
 
 public class DetectHit : MonoBehaviour
 {
-    // This script is used with projectiles and hitboxes to do damage
+    // This script is used with enemy projectiles and hitboxes to do damage to players
+
+    #region Variables
+
     private enum TriggerType{
         Enter,
         Stay,
@@ -21,14 +23,18 @@ public class DetectHit : MonoBehaviour
     private float m_damage = 12f;
 
     private EnemyRanged m_parentERScript;
-    private EnemyChase m_parentECScript;
+    private EnemyHurtbox m_parentHurtboxScript;
     private PhotonView m_parentPhotonView;
+
+    #endregion
+
+    #region MonoBehaviour callbacks
 
     private void Start()
     {
         if (!m_isProjectile)
         {
-            m_parentECScript = m_parentGameObject.GetComponent<EnemyChase>();
+            m_parentHurtboxScript = m_parentGameObject.GetComponent<EnemyHurtbox>();
         }
         else
         {
@@ -36,6 +42,10 @@ public class DetectHit : MonoBehaviour
         }
         m_parentPhotonView = PhotonView.Get(m_parentGameObject);
     }
+
+    #endregion
+
+    #region Trigger functions
 
     private void OnTriggerEnter(Collider other)
     {
@@ -81,6 +91,10 @@ public class DetectHit : MonoBehaviour
         }
     }
 
+    #endregion
+
+    #region Private functions
+
     private void CheckApplyDamage(Collider player, TriggerType trigType)
     {
         PhotonView playerPhotonView = PhotonView.Get(player.gameObject);
@@ -97,9 +111,9 @@ public class DetectHit : MonoBehaviour
                     playerPhotonView.RPC("TakeDamage", playerPhotonView.Owner, m_damage * Time.deltaTime);
                 }
             }
-            else if (m_parentECScript && m_parentECScript.IsPlayerValidTarget(playerPhotonView.ViewID))
+            else if (m_parentHurtboxScript && m_parentHurtboxScript.IsPlayerValidTarget(playerPhotonView.ViewID))
             {
-                m_parentECScript.RPCInsertHurtVictim(playerPhotonView.ViewID);
+                m_parentHurtboxScript.RPCInsertHurtVictim(playerPhotonView.ViewID);
                 if (trigType == TriggerType.Enter)
                 {
                     playerPhotonView.RPC("TakeDamage", playerPhotonView.Owner, m_damage);
@@ -116,4 +130,6 @@ public class DetectHit : MonoBehaviour
     {
         m_parentGameObject = parent;
     }
+
+    #endregion
 }

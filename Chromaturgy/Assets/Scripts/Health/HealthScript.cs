@@ -7,6 +7,7 @@ using Photon.Realtime;
 using UnityEngine.AI;
 using System.Collections.Generic;
 
+[DisallowMultipleComponent]
 public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
 {
     // manages the "health" for any object
@@ -76,7 +77,7 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
 
     // misc components
     private ManaScript m_mScript;
-    private AnimationManager m_animManager;
+    private EnemyAnimationManager m_animManager;
     private Chromaturgy.CameraController m_camController;
     private Transform m_healthBarTransform;
 
@@ -122,7 +123,7 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
 
         m_damageDict = new Dictionary<string, DamageOverTime>();
 
-        m_animManager = GetComponent<AnimationManager>();
+        m_animManager = GetComponent<EnemyAnimationManager>();
 
         if (m_isPlayer)
         {
@@ -159,7 +160,7 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
             {
                 {
                     // disable movement, collider
-                    GetComponent<EnemyChase>().enabled = false;
+                    GetComponent<EnemyChaser>().enabled = false;
                     GetComponent<NavMeshAgent>().velocity = Vector3.zero;
                     GetComponent<NavMeshAgent>().enabled = false;
                     GetComponent<Collider>().enabled = false;
@@ -168,7 +169,7 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
                     m_healthBar.gameObject.SetActive(false);
 
                     // play dying animation
-                    m_animManager.ChangeState(AnimationManager.EnemyState.Death);
+                    m_animManager.ChangeState(EnemyAnimationManager.EnemyState.Death);
                     // for other objects, we may want to destroy them
                     StartCoroutine(DelayedDestruction(m_timeUntilDestroy));
                 }
@@ -297,7 +298,7 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
         // replaces the armorPercentage with new value
 
         // ignore RPCs for dead enemies
-        if (!m_isPlayer && m_animManager.GetCurrentState() == AnimationManager.EnemyState.Death)
+        if (!m_isPlayer && m_animManager.GetCurrentState() == EnemyAnimationManager.EnemyState.Death)
         {
             return;
         }
@@ -317,7 +318,7 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
         // if health is larger than maxHealth, set health to maxHealth
 
         // ignore RPCs for dead enemies
-        if (!m_isPlayer && m_animManager.GetCurrentState() == AnimationManager.EnemyState.Death)
+        if (!m_isPlayer && m_animManager.GetCurrentState() == EnemyAnimationManager.EnemyState.Death)
         {
             return;
         }
@@ -334,7 +335,7 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
         // health = health - (damage - (damage * armorPercentage))
         
         // ignore RPCs for dead enemies
-        if (!m_isPlayer && m_animManager.GetCurrentState() == AnimationManager.EnemyState.Death)
+        if (!m_isPlayer && m_animManager.GetCurrentState() == EnemyAnimationManager.EnemyState.Death)
         {
             return;
         }

@@ -1,12 +1,12 @@
 ﻿using UnityEngine;
-using Photon.Pun;
-using Photon.Realtime;
 using System.Collections;
 using UnityEngine.AI;
 
-public class EnemyPainter : EnemyChase
+public class EnemyPainter : EnemyChaser
 {
     // paints the floor and runs away from players, never attacks the player
+
+    #region Variables
 
     [System.Serializable]
     private class RangeTime
@@ -57,39 +57,42 @@ public class EnemyPainter : EnemyChase
     private WanderState m_wState = WanderState.NotWandering;
     private WanderState m_lastWState = WanderState.NotWandering;
 
+    #endregion
+
+    #region MonoBehaviour callbacks
+
     protected override void Start()
     {
-        m_hscript = GetComponent<HealthScript>();
-        m_animManager = GetComponent<AnimationManager>();
-        m_navMeshAgent = GetComponent<NavMeshAgent>();
-
-        // Override the variables in m_navMeshAgent if they're not set already.
-        m_navMeshAgent.speed = m_speed;
-        m_navMeshAgent.stoppingDistance = m_attackRange;
-
         m_paintFloor = new Task(PaintOnFloorLoop());
         m_wanderRandomDirection = new Task(ShuffleRandomDirection());
-        m_wanderRandomDirection.Pause();
+        m_wanderRandomDirection.Pause();   
+        
+        base.Start();
     }
+
+    #endregion
+
+    #region Protected functions
 
     // Consider what the AI will do at any point, and handles AI animation
     protected override void ProcessAIIntent()
     {
-        if (m_targetPlayer)
+        if (m_enemTargeting.TargetPlayer)
         {
-            m_directionToPlayer = m_targetPlayer.position - transform.position;
-
-            if (m_distanceFromPlayer < m_detectionRadius)
+            m_enemMovement.SetDirectionToPlayer(m_enemTargeting.TargetPlayer.position - transform.position);
+            if (m_enemMovement.DistanceFromPlayer < m_enemTargeting.DetectionRadius)
             {
-                m_directionToPlayer.y = 0;
+                Vector3 oldDirection = m_enemMovement.DirectionToPlayer;
+                oldDirection.y = 0;
+                m_enemMovement.SetDirectionToPlayer(oldDirection);
 
-                if (m_speed > m_speedTriggerRun)
+                if (m_enemMovement.Speed > m_enemMovement.SpeedTriggerRun)
                 {
-                    m_animManager.ChangeState(AnimationManager.EnemyState.Run);
+                    m_animManager.ChangeState(EnemyAnimationManager.EnemyState.Run);
                 }
                 else
                 {
-                    m_animManager.ChangeState(AnimationManager.EnemyState.Walk);
+                    m_animManager.ChangeState(EnemyAnimationManager.EnemyState.Walk);
                 }
             }
             else
@@ -97,38 +100,40 @@ public class EnemyPainter : EnemyChase
                 // wander so we can paint randomly around us
                 if (m_wState == WanderState.Wander)
                 {
-                    if (m_speed > m_speedTriggerRun)
+                    if (m_enemMovement.Speed > m_enemMovement.SpeedTriggerRun)
                     {
-                        m_animManager.ChangeState(AnimationManager.EnemyState.Run);
+                        m_animManager.ChangeState(EnemyAnimationManager.EnemyState.Run);
                     }
                     else
                     {
-                        m_animManager.ChangeState(AnimationManager.EnemyState.Walk);
+                        m_animManager.ChangeState(EnemyAnimationManager.EnemyState.Walk);
                     }
                 }
                 else
                 {
-                    m_animManager.ChangeState(AnimationManager.EnemyState.Idle);
+                    m_animManager.ChangeState(EnemyAnimationManager.EnemyState.Idle);
                 }
             }
         }
         else
         {
-            m_animManager.ChangeState(AnimationManager.EnemyState.Idle);
+            m_animManager.ChangeState(EnemyAnimationManager.EnemyState.Idle);
         }
     }
 
     // Primarily used for moving and attacking
     protected override void HandleAIIntent()
     {
-        if (m_targetPlayer)
+        if (m_enemTargeting.TargetPlayer)
         {
-            m_currentState = m_animManager.GetCurrentState();
+            m_enemMovement.SetCurrentAnimState(m_animManager.GetCurrentState());
 
-            if (Vector3.Distance(m_targetPlayer.position, transform.position) < m_detectionRadius)
+            if (Vector3.Distance(m_enemTargeting.TargetPlayer.position, transform.position) < m_enemTargeting.DetectionRadius)
             {
                 // Go the opposite direction of the player
-                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(m_directionToPlayer) * Quaternion.Euler(0, 180f, 0), 0.1f);
+                transform.rotation = Quaternion.Slerp(transform.rotation, 
+                                                      Quaternion.LookRotation(m_enemMovement.DirectionToPlayer) * 
+                                                      Quaternion.Euler(0, 180f, 0), 0.1f);
                 if (m_wState == WanderState.Wander || m_wState == WanderState.Idle)
                 {
                     m_navMeshAgent.isStopped = true;
@@ -153,10 +158,14 @@ public class EnemyPainter : EnemyChase
 
             if (IsMoving() && m_navMeshAgent.isStopped)
             {
-                m_navMeshAgent.Move(transform.forward * m_speed * Time.deltaTime);
+                m_navMeshAgent.Move(transform.forward * m_enemMovement.Speed * Time.deltaTime);
             }
         }
     }
+
+    #endregion
+
+    #region Private functions
 
     private IEnumerator PaintOnFloorLoop()
     {
@@ -219,7 +228,7 @@ public class EnemyPainter : EnemyChase
         return newPosition;
     }
 
-    bool RandomPoint(Vector3 center, float range, out Vector3 result)
+    private bool RandomPoint(Vector3 center, float range, out Vector3 result)
     {
         for (int i = 0; i < 30; i++)
         {
@@ -237,6 +246,8 @@ public class EnemyPainter : EnemyChase
 
     private bool IsMoving()
     {
-        return m_currentState == AnimationManager.EnemyState.Walk || m_currentState == AnimationManager.EnemyState.Run;
+        return m_enemMovement.CurrentAnimState == EnemyAnimationManager.EnemyState.Walk || m_enemMovement.CurrentAnimState == EnemyAnimationManager.EnemyState.Run;
     }
+
+    #endregion
 }
