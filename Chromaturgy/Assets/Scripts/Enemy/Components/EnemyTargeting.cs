@@ -67,7 +67,7 @@ public class EnemyTargeting : MonoBehaviourPun
     #region MonoBehaviour callbacks
 
     // Start is called before the first frame update
-    void Start()
+    protected void Start()
     {
         m_animManager = GetComponent<EnemyAnimationManager>();
         m_enemMovement = GetComponent<EnemyMovement>();
@@ -228,5 +228,13 @@ public class EnemyTargeting : MonoBehaviourPun
         return targetTransform;
     }
 
+    /// <summary>
+    /// Is the AI actively seeking out the position of the player at this moment?
+    /// </summary>
+    public bool IsActivelyTargetingPlayer()
+    {
+        return m_rememberTarget || m_isForgettingTarget;
+    }
+    
     #endregion
 }

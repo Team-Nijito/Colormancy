@@ -348,6 +348,9 @@ MonoBehaviour:
   m_ignoreTurnRadius: 1
   m_basicClickDamage: 5
   m_basicClickManaConsumption: 3
+  m_layersToIgnore:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!114 &5820395927475117115
 MonoBehaviour:
   m_ObjectHideFlags: 0

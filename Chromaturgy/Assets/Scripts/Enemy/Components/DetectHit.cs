@@ -22,7 +22,7 @@ public class DetectHit : MonoBehaviour
     [SerializeField]
     private float m_damage = 12f;
 
-    private EnemyRanged m_parentERScript;
+    private EnemyRangedAI m_parentERScript;
     private EnemyHurtbox m_parentHurtboxScript;
     private PhotonView m_parentPhotonView;
 
@@ -38,7 +38,7 @@ public class DetectHit : MonoBehaviour
         }
         else
         {
-            m_parentERScript = m_parentGameObject.GetComponent<EnemyRanged>();
+            m_parentERScript = m_parentGameObject.GetComponent<EnemyRangedAI>();
         }
         m_parentPhotonView = PhotonView.Get(m_parentGameObject);
     }
@@ -59,7 +59,7 @@ public class DetectHit : MonoBehaviour
                 //m_parentPhotonView.RPC("RangeGetFarther", RpcTarget.All); // Tell ranged enemy to get closer
             }
         }
-        else if (!other.CompareTag("Enemy") && !other.CompareTag("Projectile"))
+        else if (other.gameObject.layer != LayerMask.NameToLayer("Enemy") && !other.CompareTag("Projectile"))
         {    
             // Destroy a projectile if it collides with an environmental object
             if (m_isProjectile && other.name != "Zone")
@@ -81,7 +81,7 @@ public class DetectHit : MonoBehaviour
                 Destroy(gameObject);
             }
         }
-        else if (!other.CompareTag("Enemy") && !other.CompareTag("Projectile"))
+        else if (other.gameObject.layer != LayerMask.NameToLayer("Enemy") && !other.CompareTag("Projectile"))
         {
             // Destroy a projectile if it collides with an environmental object
             if (m_isProjectile && other.name != "Zone")

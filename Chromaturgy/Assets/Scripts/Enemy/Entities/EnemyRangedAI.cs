@@ -1,7 +1,7 @@
 ﻿using Photon.Pun;
 using UnityEngine;
 
-public class EnemyRanged : EnemyChaser
+public class EnemyRangedAI : EnemyChaserAI
 {
     // Similar to an EnemyChaser, but shoots projectiles at the players instead of meleeing
 
@@ -10,12 +10,11 @@ public class EnemyRanged : EnemyChaser
     // at hitting the target, but there are still bugs
     // (like the ranged enemies continuously firing... and not moving if player stay in place)
     // and the spawnpoint of the projectile being behind the skeleton
-    
+
     #region Variables
 
     protected float m_tempAttackRange;
-
-    protected EnemyProjectile m_enemProjectile;
+    protected EnemyProjectileAbility m_enemProjectile;
 
     #endregion
 
@@ -23,7 +22,7 @@ public class EnemyRanged : EnemyChaser
 
     protected override void Start()
     {
-        m_enemProjectile = GetComponent<EnemyProjectile>();
+        m_enemProjectile = GetComponent<EnemyProjectileAbility>();
         m_enemTargeting = GetComponent<EnemyTargeting>();
 
         m_tempAttackRange = m_enemTargeting.AttackRange;
@@ -44,7 +43,7 @@ public class EnemyRanged : EnemyChaser
             m_enemMovement.SetDirectionToPlayer(m_enemTargeting.TargetPlayer.position - transform.position);
             m_enemMovement.SetAngleFromPlayer(Vector3.Angle(m_enemMovement.DirectionToPlayer, transform.forward));
 
-            if (m_enemMovement.DistanceFromPlayer < m_enemTargeting.CloseDetectionRadius)
+            if (TargetIsWithinCloseDetectionRadius())
             {
                 // player got too close, they're detected
                 // raycast here to see if there is an object between AI and player
@@ -53,7 +52,7 @@ public class EnemyRanged : EnemyChaser
                     photonView.RPC("PlayerIsDetected", RpcTarget.All);
                 }
             }
-            else if (m_enemMovement.DistanceFromPlayer < m_enemTargeting.DetectionRadius && m_enemMovement.AngleFromPlayer < m_enemTargeting.FieldOfView)
+            else if (TargetIsWithinDetectionRadiusAndFieldOfView())
             {
                 // player is in cone vision
                 // raycast here to see if there is an object between AI and player
@@ -70,7 +69,7 @@ public class EnemyRanged : EnemyChaser
                     photonView.RPC("StartForgettingTask", RpcTarget.All);
                 }
 
-                if (m_enemTargeting.RememberTarget || m_enemTargeting.IsForgettingTarget)
+                if (m_enemTargeting.IsActivelyTargetingPlayer())
                 {
                     // start forgetting the target, but still target them
                     // until AI completely forgets target
@@ -99,14 +98,7 @@ public class EnemyRanged : EnemyChaser
     {
         if (m_enemMovement.DirectionToPlayer.magnitude > m_tempAttackRange)
         {
-            if (m_enemMovement.Speed > m_enemMovement.SpeedTriggerRun)
-            {
-                m_animManager.ChangeState(EnemyAnimationManager.EnemyState.Run);
-            }
-            else
-            {
-                m_animManager.ChangeState(EnemyAnimationManager.EnemyState.Walk);
-            }
+            m_enemMovement.RunOrWalkDependingOnSpeed();
         }
         else
         {

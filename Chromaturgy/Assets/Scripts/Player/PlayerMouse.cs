@@ -11,7 +11,10 @@ public class PlayerMouse : MonoBehaviourPunCallbacks
     private float m_basicClickDamage = 20f;
     [SerializeField]
     private float m_basicClickManaConsumption = 3f;
-    
+
+    [SerializeField]
+    private LayerMask m_layersToIgnore;
+
     private GameObject m_playerCharacter;
 
     private PlayerMovement m_pmScript;
@@ -90,7 +93,7 @@ public class PlayerMouse : MonoBehaviourPunCallbacks
         RaycastHit hitData;
         if (focusTag == "")
         {
-            if (Physics.Raycast(ray, out hitData, depth) && hitData.transform.tag != "Ignore Raycast")
+            if (Physics.Raycast(ray, out hitData, depth, ~m_layersToIgnore))
             {
                 m_data = hitData;
                 return hitData.point;

@@ -4,7 +4,7 @@ using UnityEngine.AI;
 
 [RequireComponent(typeof(PhotonView))]
 [DisallowMultipleComponent]
-public class EnemyChaser : MonoBehaviourPun
+public class EnemyChaserAI : MonoBehaviourPun, IEnemyDetection
 {
     // Handles the logic, and movement of the enemy chaser.
 
@@ -64,7 +64,7 @@ public class EnemyChaser : MonoBehaviourPun
 
     #endregion
     
-    #region Private Methods
+    #region Protected Methods
 
     /// <summary>
     /// Consider what the AI will do at any point, and handles AI animation
@@ -76,7 +76,7 @@ public class EnemyChaser : MonoBehaviourPun
             m_enemMovement.SetDirectionToPlayer(m_enemTargeting.TargetPlayer.position - transform.position);
             m_enemMovement.SetAngleFromPlayer(Vector3.Angle(m_enemMovement.DirectionToPlayer, transform.forward));
 
-            if (m_enemMovement.DistanceFromPlayer < m_enemTargeting.CloseDetectionRadius)
+            if (TargetIsWithinCloseDetectionRadius())
             {
                 // player got too close, they're detected
                 // raycast here to see if there is an object between AI and player
@@ -85,7 +85,7 @@ public class EnemyChaser : MonoBehaviourPun
                     photonView.RPC("PlayerIsDetected", RpcTarget.All);
                 }
             }
-            else if (m_enemMovement.DistanceFromPlayer < m_enemTargeting.DetectionRadius && m_enemMovement.AngleFromPlayer < m_enemTargeting.FieldOfView)
+            else if (TargetIsWithinDetectionRadiusAndFieldOfView())
             {
                 // player is in cone vision
                 // raycast here to see if there is an object between AI and player
@@ -98,11 +98,11 @@ public class EnemyChaser : MonoBehaviourPun
             {
                 if (m_enemTargeting.RememberTarget)
                 {
-                    // still remember target, go after them
+                    // still remember target, go after them and start forgetting the player
                     photonView.RPC("StartForgettingTask", RpcTarget.All);
                 }
 
-                if (m_enemTargeting.RememberTarget || m_enemTargeting.IsForgettingTarget)
+                if (m_enemTargeting.IsActivelyTargetingPlayer())
                 {
                     // start forgetting the target, but still target them
                     // until AI completely forgets target
@@ -110,8 +110,15 @@ public class EnemyChaser : MonoBehaviourPun
                 }
                 else
                 {
-                    // don't see player, just idle for now
-                    m_animManager.ChangeState(EnemyAnimationManager.EnemyState.Idle);
+                    // wander randomly if we don't sense nor remember player
+                    if (m_enemMovement.currentWanderState == EnemyMovement.WanderState.Wander)
+                    {
+                        m_enemMovement.RunOrWalkDependingOnSpeed();
+                    }
+                    else
+                    {
+                        m_animManager.ChangeState(EnemyAnimationManager.EnemyState.Idle);
+                    }
                 }
             }
         }
@@ -130,25 +137,53 @@ public class EnemyChaser : MonoBehaviourPun
         {
             m_enemMovement.SetCurrentAnimState(m_animManager.GetCurrentState());
 
-            if (Vector3.Distance(m_enemTargeting.TargetPlayer.position, transform.position) < m_enemTargeting.DetectionRadius)
+            if (m_enemTargeting.IsActivelyTargetingPlayer())
             {
-                EnemyAnimationManager.EnemyState state = m_enemMovement.CurrentAnimState;
+                m_enemMovement.StopWandering();
 
-                if (state == EnemyAnimationManager.EnemyState.Walk || state == EnemyAnimationManager.EnemyState.Run)
+                if (m_enemMovement.IsMoving())
                 {
-                    m_navMeshAgent.SetDestination(m_enemTargeting.TargetPlayer.position);
+                    m_enemMovement.MoveToPosition(m_enemTargeting.TargetPlayer.position);
                 }
-                else if (state == EnemyAnimationManager.EnemyState.Attack)
+                else if (m_enemMovement.CurrentAnimState == EnemyAnimationManager.EnemyState.Attack)
                 {
-                    // Stop the agent from moving
-                    m_navMeshAgent.SetDestination(transform.position);
-                    m_navMeshAgent.velocity = Vector3.zero;
-                    
-                    // turn towards player when attacking
-                    transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(m_enemMovement.DirectionToPlayer), 0.1f);
+                    m_enemMovement.StopMoving();
+                    m_enemMovement.FacePlayer();
                 }
             }
+            else
+            {
+                m_enemMovement.StartWandering();
+            }
         }
+    }
+
+    #endregion
+
+    #region Public functions
+
+    /// <summary>
+    /// Verbose detection function meant to improve readability.
+    /// </summary>
+    public virtual bool TargetIsWithinCloseDetectionRadius()
+    {
+        return m_enemMovement.DistanceFromPlayer < m_enemTargeting.CloseDetectionRadius;
+    }
+
+    /// <summary>
+    /// Verbose detection function meant to improve readability.
+    /// </summary>
+    public virtual bool TargetIsWithinDetectionRadius()
+    {
+        return m_enemMovement.DistanceFromPlayer < m_enemTargeting.DetectionRadius;
+    }
+
+    /// <summary>
+    /// Verbose detection function meant to improve readability.
+    /// </summary>
+    public virtual bool TargetIsWithinDetectionRadiusAndFieldOfView()
+    {
+        return TargetIsWithinDetectionRadius() && m_enemMovement.AngleFromPlayer < m_enemTargeting.FieldOfView;
     }
 
     #endregion

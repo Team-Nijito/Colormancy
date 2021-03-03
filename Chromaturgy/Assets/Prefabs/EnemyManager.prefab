@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1858970735588863975}
   - component: {fileID: 1858970735588863968}
-  - component: {fileID: 1285948849824267072}
+  - component: {fileID: 6304144908639013587}
   m_Layer: 0
   m_Name: EnemyManager
   m_TagString: Untagged
@@ -51,7 +51,7 @@ MonoBehaviour:
   - {fileID: 0}
   m_enemyFolder: {fileID: 0}
   m_desiredEnemiesOnField: 7
---- !u!114 &1285948849824267072
+--- !u!114 &6304144908639013587
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

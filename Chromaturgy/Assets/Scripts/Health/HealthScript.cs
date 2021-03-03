@@ -160,7 +160,7 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
             {
                 {
                     // disable movement, collider
-                    GetComponent<EnemyChaser>().enabled = false;
+                    GetComponent<EnemyChaserAI>().enabled = false; // works for all AI b/c all AI scripts derive from EnemyChaserAI
                     GetComponent<NavMeshAgent>().velocity = Vector3.zero;
                     GetComponent<NavMeshAgent>().enabled = false;
                     GetComponent<Collider>().enabled = false;

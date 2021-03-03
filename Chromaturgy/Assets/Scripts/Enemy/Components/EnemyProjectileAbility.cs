@@ -2,36 +2,36 @@
 using UnityEngine;
 
 [RequireComponent(typeof(PhotonView))]
-public class EnemyProjectile : MonoBehaviourPun
+public class EnemyProjectileAbility : MonoBehaviourPun
 {
     // Class for managing enemy shooting projectiles
 
     #region Variables
     
     [SerializeField]
-    private GameObject m_projectile;
+    protected GameObject m_projectile;
 
     [SerializeField]
-    private Transform m_projectileSpawnpoint;
+    protected Transform m_projectileSpawnpoint;
 
     //[SerializeField]
-    //private float m_spawnForward = 1f;
+    //protected float m_spawnForward = 1f;
 
     //[SerializeField]
-    //private float m_spawnHeight = 1f;
+    //protected float m_spawnHeight = 1f;
 
     [SerializeField]
-    private float m_initialXVelocity = 15f;
+    protected float m_initialXVelocity = 15f;
 
     [SerializeField]
-    private float m_initialYVelocity = 2f;
+    protected float m_initialYVelocity = 2f;
 
     [SerializeField]
-    private float m_projectileDecay = 1.5f;
+    protected float m_projectileDecay = 1.5f;
 
     #endregion
 
-    #region Private functions
+    #region Protected functions
 
     /// <summary>
     /// (PunRPC) Enemy spawns a projectile to attack a target.
@@ -39,7 +39,7 @@ public class EnemyProjectile : MonoBehaviourPun
     /// <param name="targetPosition">Position of the target.</param>
     /// <param name="targetDistance">How far away is the target.</param>
     [PunRPC]
-    private void SpawnProjectile()
+    protected void SpawnProjectile()
     {
         Vector3 spawnPosition = m_projectileSpawnpoint.position;
         GameObject projectile = Instantiate(m_projectile, spawnPosition, m_projectileSpawnpoint.rotation);
