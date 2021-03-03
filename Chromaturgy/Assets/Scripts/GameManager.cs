@@ -2,7 +2,7 @@
 using Photon.Realtime;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using System.Collections.Generic;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviourPunCallbacks
 {
@@ -36,6 +36,22 @@ public class GameManager : MonoBehaviourPunCallbacks
     private string m_playerListFolderName = "PlayerList";
 
     private int m_currentSpawnIndex = 0; // index of the current spawn to spawn the player, used if m_playerSpawnpoints exists
+    
+    public GameObject popUpBox;
+
+    Animator animator;
+    TMPro.TMP_Text popUpFullText;
+    TMPro.TMP_Text popUpImageText;
+    Image dialogueHalfImage;
+    Image dialogueFullImage;
+    GameObject nextButton;
+
+    Sprite[] dialogueImages;
+    string[] dialogueMessages;
+
+    bool WindowOpen = false;
+
+    int dialoguePage = 0;
 
     #endregion
 
@@ -72,6 +88,102 @@ public class GameManager : MonoBehaviourPunCallbacks
         {
             return m_defaultSpawn;
         }
+    }
+
+    public void PopUp(string[] messages, Sprite[] images)
+    {
+        if (!WindowOpen)
+        {
+            dialogueMessages = messages;
+            dialogueImages = images;
+            dialoguePage = 0;
+
+            SetPage();
+
+            animator.SetTrigger("pop");
+            WindowOpen = true;
+        }
+    }
+
+    public void NextPage()
+    {
+        dialoguePage++;
+        SetPage();
+
+        if (dialoguePage == (Mathf.Max(dialogueImages.Length, dialogueMessages.Length) - 1))
+        {
+            nextButton.SetActive(false);
+        }
+    }
+
+    void SetPage()
+    {
+        if (dialogueImages.Length <= dialoguePage || dialogueImages[dialoguePage] == null)
+        {
+            //No Images
+            if (dialogueMessages.Length <= dialoguePage || dialogueMessages[dialoguePage] == "")
+            {
+                //No Messages
+                Debug.LogError("Went past given messages/images");
+            } else
+            {
+                //Messages
+                SetFullText();
+            }
+        } else
+        {
+            //Images
+            if (dialogueMessages.Length <= dialoguePage || dialogueMessages[dialoguePage] == "")
+            {
+                //No Messages
+                SetFullImage();
+            }
+            else
+            {
+                //Messages
+                SetImageText();
+            }
+        }
+    }
+
+    public void CloseWindow()
+    {
+        if (WindowOpen)
+        {
+            animator.SetTrigger("close");
+            WindowOpen = false;
+        }
+    }
+
+    void SetImageText()
+    {
+        popUpFullText.gameObject.SetActive(false);
+        dialogueHalfImage.gameObject.SetActive(true);
+        popUpImageText.gameObject.SetActive(true);
+        dialogueFullImage.gameObject.SetActive(false);
+
+        dialogueHalfImage.sprite = dialogueImages[dialoguePage];
+        popUpImageText.text = dialogueMessages[dialoguePage];
+    }
+
+    void SetFullText()
+    {
+        popUpFullText.gameObject.SetActive(true);
+        dialogueHalfImage.gameObject.SetActive(false);
+        dialogueFullImage.gameObject.SetActive(false);
+        popUpImageText.gameObject.SetActive(false);
+
+        popUpFullText.text = dialogueMessages[dialoguePage];
+    }
+
+    void SetFullImage()
+    {
+        popUpFullText.gameObject.SetActive(false);
+        dialogueFullImage.gameObject.SetActive(true);
+        dialogueHalfImage.gameObject.SetActive(false);
+        popUpImageText.gameObject.SetActive(false);
+
+        dialogueFullImage.sprite = dialogueImages[dialoguePage];
     }
 
     #endregion
@@ -115,6 +227,14 @@ public class GameManager : MonoBehaviourPunCallbacks
                 Debug.LogFormat("Ignoring scene load for {0}", SceneManagerHelper.ActiveSceneName);
             }
         }
+
+
+        animator = popUpBox.GetComponent<Animator>();
+        popUpFullText = popUpBox.transform.Find("FullText").GetComponent<TMPro.TMP_Text>();
+        popUpImageText = popUpBox.transform.Find("ImageText").GetComponent<TMPro.TMP_Text>();
+        dialogueHalfImage = popUpBox.transform.Find("HalfImage").GetComponent<Image>();
+        dialogueFullImage = popUpBox.transform.Find("FullImage").GetComponent<Image>();
+        nextButton = popUpBox.transform.Find("NextButton").gameObject;
     }
 
     void LoadArena()
