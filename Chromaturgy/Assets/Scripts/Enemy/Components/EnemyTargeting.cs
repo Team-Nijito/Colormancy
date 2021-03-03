@@ -94,8 +94,11 @@ public class EnemyTargeting : MonoBehaviourPun
 
         m_isForgettingTarget = false;
 
-        // stop moving towards target
-        m_navMeshAgent.SetDestination(transform.position);
+        if (m_navMeshAgent.isOnNavMesh)
+        {
+            // stop moving towards target
+            m_navMeshAgent.SetDestination(transform.position);
+        }
     }
 
     /// <summary>

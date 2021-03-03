@@ -87,6 +87,7 @@ public class EnemyMovement : MonoBehaviourPun, IPunObservable
     #region Components
 
     protected GameObject m_character;
+    protected Rigidbody m_rigidBody;
     protected NavMeshAgent m_navMeshAgent;
     protected EnemyAnimationManager m_animManager;
 
@@ -97,6 +98,7 @@ public class EnemyMovement : MonoBehaviourPun, IPunObservable
     // Start is called before the first frame update
     protected void Start()
     {
+        m_rigidBody = GetComponent<Rigidbody>();
         m_navMeshAgent = GetComponent<NavMeshAgent>();
         m_animManager = GetComponent<EnemyAnimationManager>();
 
@@ -181,6 +183,15 @@ public class EnemyMovement : MonoBehaviourPun, IPunObservable
     #endregion
 
     #region Public functions
+
+    /// <summary>
+    /// Apply knockback on the character.
+    /// </summary>
+    /// <param name="offset">Apply a force in the direction of the offset.</param>
+    public void ApplyKnockback(Vector3 offset)
+    {
+        
+    }
 
     /// <summary>
     /// Rotates the character towards the player.

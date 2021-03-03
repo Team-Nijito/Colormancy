@@ -5,26 +5,16 @@ using UnityEngine.UI;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine.AI;
-using System.Collections.Generic;
 
 [DisallowMultipleComponent]
 public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
 {
-    // manages the "health" for any object
-    // includes: damage, healing, armor? (damage reduction)
+    // manages the "health" for any object, includes: damage, healing, armor? (damage reduction)
     // only works on gameobjects with a child canvas and UI slider
 
-    #region Public variables
+    #region Public variables and accessors (c# properties)
 
-    // DOT occurs every second
-    [System.Serializable]
-    public struct DamageOverTime 
-    {
-        public string name;
-        public float dps;
-        public float duration;
-        public bool isPercentDamage; // is it 1 damage or 1% of health damage
-    }
+    public float MaxEffectiveHealth { get { return m_maxEffectiveHealth; } private set { m_maxEffectiveHealth = value; } }
 
     public static GameObject LocalPlayerInstance;
 
@@ -37,15 +27,11 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     public GameManager m_gameManager;
 
     #endregion
+
     #region Private variables
 
     [SerializeField]
     private float m_baseHealth = 100f;
-
-    // used if you want to start off with baseHealth - initialHealthDeduction
-    // for debugging
-    //[SerializeField]
-    //private float m_initialHealthDeduction = 0f;
 
     // % of damage we're blocking
     [SerializeField]
@@ -59,9 +45,6 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     [Range(0f, 100f)]
     private float m_regenHealthPercentage = 1f;
 
-    [SerializeField]
-    private float m_damageEveryXSecond = 0.1f; // when do you want to incur DoT
-
     // health after buffs / whatever
     private float m_effectiveHealth;
 
@@ -72,16 +55,15 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     [Tooltip("Used for destroying dead enemies")]
     private float m_timeUntilDestroy = 3.0f;
 
-    // keep track of all our damage over time
-    Dictionary<string, DamageOverTime> m_damageDict;
-
     // misc components
     private ManaScript m_mScript;
+    private StatusEffectScript m_statusEffectScript;
     private EnemyAnimationManager m_animManager;
     private Chromaturgy.CameraController m_camController;
     private Transform m_healthBarTransform;
 
     #endregion
+
     #region MonoBehaviourCallback functions
 
     private void Awake()
@@ -118,11 +100,10 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     void Start()
     {
         m_healthBarTransform = m_healthBar.transform;
-        m_effectiveHealth = m_baseHealth; // - m_initialHealthDeduction;
+        m_effectiveHealth = m_baseHealth;
         m_maxEffectiveHealth = m_baseHealth;
 
-        m_damageDict = new Dictionary<string, DamageOverTime>();
-
+        m_statusEffectScript = GetComponent<StatusEffectScript>();
         m_animManager = GetComponent<EnemyAnimationManager>();
 
         if (m_isPlayer)
@@ -132,8 +113,6 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
             // we can access a player's GameObject with: player.TagObject
             photonView.Owner.TagObject = gameObject;
         }
-
-        StartCoroutine(ApplyDamageEveryXSecond(m_damageEveryXSecond)); // run the loop every 0.1f second
     }
 
     // Update is called once per frame
@@ -189,6 +168,7 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     }
 
     #endregion
+
     #region Private functions
 
     private void HealthRegeneration(float percentage)
@@ -214,68 +194,6 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
         PhotonView.Get(GameObject.Find("EnemyManager")).RPC("EnemyHasDied", RpcTarget.All);
     }
 
-    // Used for applying damage
-    private IEnumerator ApplyDamageEveryXSecond(float XSecond)
-    {
-        while (true)
-        {
-            yield return new WaitForSecondsRealtime(XSecond);
-
-            if (m_damageDict.Count > 0)
-            {
-                // apply damage
-                photonView.RPC("TakeDamage", RpcTarget.All, CalculateCumulativeDamage(XSecond));
-            }
-        }
-    }
-
-    // Go over every DamageOverTime in m_damageDict and apply the damage and decrease each
-    // struct's duration
-    // this function is semi flawed ... what if the duration of the DoT is 0.7f
-    // and we do damage every 1 second? (temp solution is to call this funct with small XSecond values (<1))
-    private float CalculateCumulativeDamage(float XSecond)
-    {
-        float returnDamage = 0;
-
-        // copying is inefficient, but is necessary in order to avoid the possibility
-        // of the dictionary being altered during the loop
-        Dictionary<string, DamageOverTime> copyDict = new Dictionary<string, DamageOverTime>(m_damageDict);
-        List<string> keysToDelete = new List<string>();
-
-        foreach (KeyValuePair<string, DamageOverTime> iter in copyDict)
-        {
-            print("Taking " + iter.Key + "damage");
-            if (iter.Value.isPercentDamage)
-            {
-                returnDamage += (iter.Value.dps / 100) * m_maxEffectiveHealth * XSecond;
-            }
-            else
-            {
-                returnDamage += iter.Value.dps * XSecond;
-            }
-            
-            DamageOverTime newStruct = iter.Value;
-            newStruct.duration -= XSecond;
-
-            if (newStruct.duration <= 0)
-            {
-                keysToDelete.Add(iter.Key);
-            }
-            else
-            {
-                m_damageDict[iter.Key] = newStruct;
-            }
-        }
-
-        // delete any marked keys in m_damageDict
-        foreach (string key in keysToDelete)
-        {
-            m_damageDict.Remove(key);
-        }
-
-        return returnDamage;
-    }
-
     private void HealthBarFaceCamera()
     {
         // make the health bar orient towards the main camera
@@ -286,6 +204,7 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     }
 
     #endregion
+
     #region Public functions
 
     public float GetMaxEffectiveHealth() { return m_maxEffectiveHealth; }
@@ -313,8 +232,7 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     [PunRPC]
     public void Heal(float healValue)
     {
-        // heal formula
-        // health = health + healValue
+        // heal formula: health = health + healValue
         // if health is larger than maxHealth, set health to maxHealth
 
         // ignore RPCs for dead enemies
@@ -331,8 +249,7 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     [PunRPC]
     public void TakeDamage(float damageValue)
     {
-        // damage formula
-        // health = health - (damage - (damage * armorPercentage))
+        // damage formula: health = health - (damage - (damage * armorPercentage))
         
         // ignore RPCs for dead enemies
         if (!m_isPlayer && m_animManager.GetCurrentState() == EnemyAnimationManager.EnemyState.Death)
@@ -359,30 +276,15 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
         m_camController.ResetRotation(spawnRotation);
         gameObject.SetActive(true);
         ResetHealth();
-        m_damageDict.Clear(); // reset all DoTs
-        StartCoroutine(ApplyDamageEveryXSecond(m_damageEveryXSecond)); // restart Coroutine
-        m_mScript.ResetMana();
-    }
-
-    /// <summary>
-    /// (PunRPC) Apply a damage over time effect if it doesn't already exist on this player, otherwise
-    /// increase the duration of the effect
-    /// </summary>
-    [PunRPC]
-    public void ApplyOrStackDoT(bool isPercentDmg, float dmg, float duration, string name)
-    {
-        DamageOverTime newDoT;
-        newDoT.name = name;
-        newDoT.dps = dmg;
-        newDoT.duration = duration;
-        newDoT.isPercentDamage = isPercentDmg;
-
-        if (m_damageDict.ContainsKey(name))
+        
+        // DEBUG
+        if (m_statusEffectScript)
         {
-            float oldDuration = m_damageDict[name].duration;
-            newDoT.duration += oldDuration;
+            m_statusEffectScript.ClearDamageDict();
+            m_statusEffectScript.RestartApplyDamage();
         }
-        m_damageDict[name] = newDoT;
+        
+        m_mScript.ResetMana();
     }
 
     /// <summary>
@@ -394,6 +296,7 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     }
 
     #endregion
+
     #region Photon functions
 
     private void OnPhotonInstantiate(PhotonMessageInfo info)

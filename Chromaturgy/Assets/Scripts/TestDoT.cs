@@ -21,6 +21,12 @@ public class TestDoT : MonoBehaviour
     [SerializeField]
     private bool m_applyDamageWhileStayOnObject = true;
 
+    [SerializeField]
+    private bool m_applyKnockback = true;
+
+    [SerializeField]
+    private bool m_push = true;
+
     private void OnTriggerEnter(Collider other)
     {
         if (m_applyDamageWhenEnterObject)
@@ -29,6 +35,33 @@ public class TestDoT : MonoBehaviour
             {
                 // apply the DoT initally
                 PhotonView.Get(other.gameObject).RPC("ApplyOrStackDoT", PhotonView.Get(other.gameObject).Owner, m_isPercentageDamage, m_damage, m_secondDuration, m_damageType);
+            }
+            else if (other.gameObject.layer == LayerMask.NameToLayer("Enemy"))
+            {
+                // for AI, address it to PhotonNetwork.MasterClient
+                PhotonView.Get(other.gameObject).RPC("ApplyOrStackDoT", PhotonNetwork.MasterClient, m_isPercentageDamage, m_damage, m_secondDuration, m_damageType);
+            }
+        }
+        if (m_applyKnockback)
+        {
+            if (other.CompareTag("Player"))
+            {
+                if (m_push)
+                {
+                    // apply funny knockback effect
+                    PhotonView.Get(other.gameObject).RPC("AddImpactForce",
+                                                         PhotonView.Get(other.gameObject).Owner,
+                                                         other.gameObject.transform.position - transform.position + Vector3.up,
+                                                         150f);
+                }
+                else
+                {
+                    // suck
+                    PhotonView.Get(other.gameObject).RPC("AddImpactForce",
+                                                         PhotonView.Get(other.gameObject).Owner,
+                                                         transform.position - other.gameObject.transform.position + Vector3.up,
+                                                         150f);
+                }
             }
         }
     }
@@ -42,6 +75,34 @@ public class TestDoT : MonoBehaviour
                 // apply the DoT per frame, multiply m_secondDuration with Time.deltaTime
                 PhotonView.Get(other.gameObject).RPC("ApplyOrStackDoT", PhotonView.Get(other.gameObject).Owner,
                 m_isPercentageDamage, m_damage, m_secondDuration * Time.deltaTime, m_damageType);
+            }
+            else if (other.gameObject.layer == LayerMask.NameToLayer("Enemy"))
+            {
+                // for AI, address it to PhotonNetwork.MasterClient
+                PhotonView.Get(other.gameObject).RPC("ApplyOrStackDoT", PhotonNetwork.MasterClient,
+                m_isPercentageDamage, m_damage, m_secondDuration * Time.deltaTime, m_damageType);
+            }
+        }
+        if (m_applyKnockback)
+        {
+            if (other.CompareTag("Player"))
+            {
+                if (m_push)
+                {
+                    // apply funny knockback effect
+                    PhotonView.Get(other.gameObject).RPC("AddImpactForce",
+                                                         PhotonView.Get(other.gameObject).Owner,
+                                                         other.gameObject.transform.position - transform.position + Vector3.up,
+                                                         Time.deltaTime * 150f);
+                }
+                else
+                {
+                    // suck
+                    PhotonView.Get(other.gameObject).RPC("AddImpactForce",
+                                                         PhotonView.Get(other.gameObject).Owner,
+                                                         transform.position - other.gameObject.transform.position + Vector3.up,
+                                                         150f);
+                }
             }
         }
     }

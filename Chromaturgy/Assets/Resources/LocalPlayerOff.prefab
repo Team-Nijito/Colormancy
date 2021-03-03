@@ -195,6 +195,7 @@ GameObject:
   - component: {fileID: 5820395927475117109}
   - component: {fileID: 5820395927475117114}
   - component: {fileID: 5820395927475117115}
+  - component: {fileID: -7263093978321082795}
   - component: {fileID: 6914068583315090777}
   - component: {fileID: 8921435665619611767}
   - component: {fileID: 8887605966479162179}
@@ -305,9 +306,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70b785f2b2d1f554b8f1d03e9c2dad07, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_character: {fileID: 8719925113848596262}
-  m_playerState: 0
-  m_animator: {fileID: 0}
   m_walkSpeed: 18
   m_runSpeed: 20
   m_isMoving: 0
@@ -315,6 +313,11 @@ MonoBehaviour:
   m_isDashing: 0
   m_movement: {x: 0, y: 0, z: 0}
   m_gravity: 9.81
+  m_characterMass: 3
+  m_impactDecay: 5
+  m_character: {fileID: 8719925113848596262}
+  m_playerState: 0
+  m_animator: {fileID: 0}
 --- !u!114 &5820395927475117109
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -348,6 +351,9 @@ MonoBehaviour:
   m_ignoreTurnRadius: 1
   m_basicClickDamage: 5
   m_basicClickManaConsumption: 3
+  m_layersToIgnore:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!114 &5820395927475117115
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -368,8 +374,20 @@ MonoBehaviour:
   m_armorPercentage: 0
   m_isRegenHealth: 1
   m_regenHealthPercentage: 0.5
-  m_damageEveryXSecond: 0.1
   m_timeUntilDestroy: 3
+--- !u!114 &-7263093978321082795
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5820395927475117105}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aea2c7aba3e4e6343a67593e4e5823ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_statusEffectTickPerXSecond: 0.1
 --- !u!114 &6914068583315090777
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -1041,10 +1041,12 @@ GameObject:
   m_Component:
   - component: {fileID: 852322663528324988}
   - component: {fileID: 3966585412307600249}
+  - component: {fileID: -1206005957394710803}
   - component: {fileID: 3861280041533867688}
   - component: {fileID: 852322663518449874}
   - component: {fileID: 8929568946903541851}
   - component: {fileID: 852322663527925183}
+  - component: {fileID: 4356796539773388678}
   - component: {fileID: 9156120208295963062}
   - component: {fileID: 3416708786810034447}
   - component: {fileID: -2214861160320240165}
@@ -1089,6 +1091,22 @@ CapsuleCollider:
   m_Height: 0.11
   m_Direction: 1
   m_Center: {x: 0, y: 0.055, z: 0}
+--- !u!54 &-1206005957394710803
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 852322663527957340}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 1
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 80
+  m_CollisionDetection: 0
 --- !u!195 &3861280041533867688
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -1167,8 +1185,20 @@ MonoBehaviour:
   m_armorPercentage: 0
   m_isRegenHealth: 0
   m_regenHealthPercentage: 1
-  m_damageEveryXSecond: 0.1
   m_timeUntilDestroy: 3
+--- !u!114 &4356796539773388678
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 852322663527957340}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aea2c7aba3e4e6343a67593e4e5823ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_statusEffectTickPerXSecond: 0.1
 --- !u!114 &9156120208295963062
 MonoBehaviour:
   m_ObjectHideFlags: 0

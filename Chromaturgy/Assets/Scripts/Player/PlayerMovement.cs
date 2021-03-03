@@ -5,6 +5,9 @@ using Photon.Pun;
 public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
 {
     // This script handles movement input and animations
+
+    #region Variables
+
     public static GameObject LocalPlayerInstance;
 
     public enum PlayerState
@@ -13,13 +16,6 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
         Move = 1,
         Fall = 2,
     }
-
-    // Components
-    public GameObject m_character = null;
-    public PlayerState m_playerState;
-
-    [HideInInspector] public Animator m_animator;
-    private CharacterController m_controller;
 
     // Movement
     [SerializeField] private float m_walkSpeed = 18f;
@@ -34,9 +30,30 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
     [SerializeField] private float m_gravity = 9.81f;
 
     private Vector3 m_movementNoGrav = Vector3.zero;
+    
     private readonly float m_rotationSpeed = 40f; // from WarriorMovementControllerFREE.cs
     private float m_vSpeed = 0f; // current vertical velocity
-    private Transform m_characterTransform; 
+
+    // Knockback
+    private Vector3 m_impact = Vector3.zero; // knockback handling
+
+    [SerializeField] private float m_characterMass = 1.0f;
+    [SerializeField] private float m_impactDecay = 5f; // how quickly impact "goes away"
+
+    #endregion
+
+    #region Components
+
+    public GameObject m_character = null;
+    public PlayerState m_playerState;
+
+    [HideInInspector] public Animator m_animator;
+    private Transform m_characterTransform;
+    private CharacterController m_controller;
+
+    #endregion
+
+    #region MonoBehaviour callbacks
 
     private void Awake()
     {
@@ -66,30 +83,24 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
     // Update is called once per frame
     void Update()
     {
-        if (PhotonNetwork.IsConnected)
+        if (photonView.IsMine)
         {
-            if (photonView.IsMine == false)
-            {
-                return;
-            }
-            else
-            {
-                ProcessPlayerInput();
-            }
+            ProcessPlayerInput();
         }
     }
 
     void FixedUpdate()
     {
-        if (photonView.IsMine == false)
-        {
-            return;
-        }
-        else
+        if (photonView.IsMine)
         {
             MovePlayer();
+            ApplyExternalForce();
         }
     }
+
+    #endregion
+
+    #region Private functions
 
     // Takes in player's iputs for movement
     private void ProcessPlayerInput()
@@ -119,8 +130,9 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
         RotateTowardsMovementDir();
     }
 
-    // Given m_movement, update the player position (aka actually move the player)
-    // also handles animations
+    /// <summary>
+    /// Given m_movement, update the player position (aka actually move the player), also handles animations
+    /// </summary>
     private void MovePlayer()
     {
         if (m_canMove)
@@ -184,10 +196,53 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
         }
     }
 
+    /// <summary>
+    /// Applies the external forces stored in m_impact to the character.
+    /// Modified script from aldonaletto: https://answers.unity.com/questions/242648/force-on-character-controller-knockback.html
+    /// </summary>
+    private void ApplyExternalForce()
+    {
+        // apply the impact force:
+        if (m_impact.magnitude > 0.2)
+        {
+            m_controller.Move(m_impact * Time.deltaTime);
+        }
+        // consumes the impact energy each cycle:
+        m_impact = Vector3.Lerp(m_impact, Vector3.zero, m_impactDecay * Time.deltaTime);
+    }
+
+    #endregion
+
+    #region Public functions
+
+    [PunRPC]
+    /// <summary>
+    /// Adds a force to m_impact.
+    /// </summary>
+    /// <param name="dir">Direction of the force</param>
+    /// <param name="force">The magnitude of the force</param>
+    public void AddImpactForce(Vector3 dir, float force)
+    {
+        dir.Normalize();
+        if (dir.y < 0)
+        {
+            dir.y = -dir.y; // reflect down force on the ground
+        }
+        m_impact += dir.normalized * force / m_characterMass;
+        print("applying impact");
+    }
+
+    #endregion
+
+    #region WarriorMovementControllerFree functions
+
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // all functions below taken from the warriormovementcontrollerFREE script
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+    /// <summary>
+    /// Print the animation states. I haven't used this much so I'm not sure if this works.
+    /// </summary>
     public void AnimatorDebug()
     {
         Debug.Log("ANIMATOR SETTINGS---------------------------");
@@ -202,6 +257,9 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
         Debug.Log("Velocity Z: " + m_animator.GetFloat("Velocity Z"));
     }
 
+    /// <summary>
+    /// Rotates the character towards the direction it's moving in
+    /// </summary>
     private void RotateTowardsMovementDir()
     {
         if (m_movementNoGrav != Vector3.zero)
@@ -213,6 +271,10 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
         }
     }
 
+    #endregion
+
+    #region Photon functions
+
     // IPunObservable Implementation
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
@@ -222,7 +284,6 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
         {
             if (m_character)
             {
-                //stream.SendNext(m_characterTransform.localPosition);
                 stream.SendNext(m_characterTransform.localRotation);
             }
         }
@@ -230,9 +291,10 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
         {
             if (m_character)
             {
-                //m_characterTransform.localPosition = (Vector3)stream.ReceiveNext();
                 m_characterTransform.localRotation = (Quaternion)stream.ReceiveNext();
             }
         }
     }
+
+    #endregion
 }
