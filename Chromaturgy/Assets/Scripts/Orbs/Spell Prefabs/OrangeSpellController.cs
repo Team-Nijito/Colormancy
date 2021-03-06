@@ -4,20 +4,28 @@ using UnityEngine;
 
 public class OrangeSpellController : MonoBehaviour
 {
-    [SerializeField]
-    private bool debug;
+    public Orb.GreaterCast greaterCast;
+    public Orb.LesserCast lesserCast;
+    public int greaterCastAmt;
+    public int lesserCastAmt;
+
+    [Space]
 
     [SerializeField]
     private float speed;
+    private float starttime;
+    [SerializeField]
+    private float lifetime;
+
+    [Space]
 
     [SerializeField]
     private float spherePaintRadius;
     [SerializeField]
     private Color paintColor;
 
-    private float starttime;
     [SerializeField]
-    private float lifetime;
+    private bool debug;
 
     // Start is called before the first frame update
     void Start()
@@ -54,9 +62,10 @@ public class OrangeSpellController : MonoBehaviour
         foreach (Collider c in sphereCollisions)
         {
             if (c.gameObject.tag.Equals("Enemy"))
-                
+                greaterCast(c.gameObject, greaterCastAmt);
+            else if (c.gameObject.tag.Equals("Player"))
+                lesserCast(c.gameObject, lesserCastAmt);
         }
-
 
         Destroy(gameObject);
     }

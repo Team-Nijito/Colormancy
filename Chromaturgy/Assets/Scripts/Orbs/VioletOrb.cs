@@ -2,15 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+using Photon.Pun;
+
 public class VioletOrb : Orb
 {
     public VioletOrb()
     {
-        OrbColor = Color.yellow;
-        OrbShape = SpellShape.OrbitingOrbs;
+        OrbColor = new Color(0.5f, 0, 0.5f, 1);
+        OrbShape = SpellShape.Cloud;
         CooldownMod = 2.2f;
         ShapeManaMod = 1f;
-        OrbElement = Element.Light;
+        OrbElement = Element.Poison;
         ModAmount = .1f;
         UIPrefab = (GameObject)Resources.Load("Orbs/VioletOrbUI");
     }
@@ -27,7 +29,8 @@ public class VioletOrb : Orb
 
     public override void CastGreaterEffect(GameObject hit, int orbAmount)
     {
-        throw new System.NotImplementedException();
+        StatusEffectScript status = hit.GetComponent<StatusEffectScript>();
+        status.RPCApplyOrStackDoT(true, 10, orbAmount, "Poison");
     }
 
     public override void CastLesserEffect(GameObject hit, int orbAmount)
@@ -35,23 +38,24 @@ public class VioletOrb : Orb
         throw new System.NotImplementedException();
     }
 
-    public override void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, (int, int, int) amounts, Transform t)
+    public override void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, (int, int, int) amounts, Transform t, Vector3 clickedPosition)
     {
         //Cast specific orb shape depending on shapeAmnt
         //For any enemies hit
         //greaterEffectMethod(enemy game object, greaterEffectAmnt);
         //For any allies hit 
         //lesserEffectMethod(ally game object, lesserEffectAmnt);
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hit;
-        if (Physics.Raycast(ray, out hit, 100f, 1 << PaintingManager.paintingMask))
-        {
-            Vector3 direction = hit.point - t.position;
+        Vector3 direction = clickedPosition - t.position;
 
-            GameObject orbs = GameObject.Instantiate(Resources.Load("Orbs/Violet Sphere", typeof(GameObject)), t.position + direction.normalized, t.rotation) as GameObject;
-            orbs.GetComponent<VioletSpellSphereController>().endPosition = hit.point;
-        }
+        GameObject g = GameObject.Instantiate(Resources.Load("Orbs/Violet Sphere"), t.position + direction.normalized, t.rotation) as GameObject;
+        VioletSpellSphereController spellController = g.GetComponent<VioletSpellSphereController>();
 
+        spellController.greaterCast = greaterEffectMethod;
+        spellController.lesserCast = lesserEffectMethod;
+        spellController.greaterCastAmt = amounts.Item1;
+        spellController.lesserCastAmt = amounts.Item2;
+
+        spellController.endPosition = clickedPosition;
     }
 
     public static object Deserialize(byte[] data) {

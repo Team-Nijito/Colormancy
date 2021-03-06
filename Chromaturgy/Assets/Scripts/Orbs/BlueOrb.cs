@@ -2,15 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+using Photon.Pun;
+
 public class BlueOrb : Orb
 {
     public BlueOrb()
     {
-        OrbColor = Color.yellow;
-        OrbShape = SpellShape.OrbitingOrbs;
+        OrbColor = Color.blue;
+        OrbShape = SpellShape.Ink;
         CooldownMod = 1.8f;
         ShapeManaMod = .8f;
-        OrbElement = Element.Light;
+        OrbElement = Element.Water;
         ModAmount = .1f;
         UIPrefab = (GameObject)Resources.Load("Orbs/BlueOrbUI");
     }
@@ -27,24 +29,32 @@ public class BlueOrb : Orb
 
     public override void CastGreaterEffect(GameObject hit, int orbAmount)
     {
-        throw new System.NotImplementedException();
+        PhotonView photonView = hit.GetPhotonView();
+        photonView.RPC("TakeDamage", RpcTarget.All, (float)orbAmount);
     }
 
     public override void CastLesserEffect(GameObject hit, int orbAmount)
     {
-        throw new System.NotImplementedException();
+        PhotonView photonView = hit.GetPhotonView();
+        photonView.RPC("ManaRegeneration", RpcTarget.All, (float)orbAmount);
     }
 
-    public override void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, (int, int, int) amounts, Transform t)
+    public override void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, (int, int, int) amounts, Transform t, Vector3 clickedPosition)
     {
         //Cast specific orb shape depending on shapeAmnt
         //For any enemies hit
         //greaterEffectMethod(enemy game object, greaterEffectAmnt);
         //For any allies hit 
         //lesserEffectMethod(ally game object, lesserEffectAmnt);
-        GameObject orbs = GameObject.Instantiate(Resources.Load("Orbs/Blue Puddle Spawner", typeof(GameObject)), t.position, t.rotation) as GameObject;
-        orbs.GetComponent<BlueSpellSpawnerController>().playerTransform = t;
-        Debug.Log("what");
+        GameObject g = GameObject.Instantiate(Resources.Load("Orbs/Blue Puddle Spawner"), t.position, t.rotation) as GameObject;
+        BlueSpellSpawnerController spellController = g.GetComponent<BlueSpellSpawnerController>();
+
+        spellController.greaterCast = greaterEffectMethod;
+        spellController.lesserCast = lesserEffectMethod;
+        spellController.greaterCastAmt = amounts.Item1;
+        spellController.lesserCastAmt = amounts.Item2;
+
+        spellController.playerTransform = t;
     }
 
     public static object Deserialize(byte[] data)

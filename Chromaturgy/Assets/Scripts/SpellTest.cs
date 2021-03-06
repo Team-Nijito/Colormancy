@@ -106,7 +106,11 @@ public class SpellTest : MonoBehaviourPun
 
         if (Input.GetMouseButtonDown(1))
         {
-            photonView.RPC("TryCastSpell", RpcTarget.All);
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
+            if (Physics.Raycast(ray, out hit, 100f, 1 << PaintingManager.paintingMask)) { }
+            
+            photonView.RPC("TryCastSpell", RpcTarget.All, hit.point);
         }
     }
 
@@ -124,7 +128,7 @@ public class SpellTest : MonoBehaviourPun
     }
 
     [PunRPC]
-    void TryCastSpell()
+    void TryCastSpell(Vector3 clickedPosition)
     {
         if (mana.GetEffectiveMana() >= currentSpell.GetManaCost() && !currentSpell.Equals(new SpellManager.Spell()))
         {
@@ -132,12 +136,12 @@ public class SpellTest : MonoBehaviourPun
             {
                 if (spellCooldowns[currentSpell.GetOrbTuple()] <= Time.time)
                 {
-                    CastSpell();
+                    CastSpell(clickedPosition);
                 }
             }
             else
             {
-                CastSpell();
+                CastSpell(clickedPosition);
             }
         }
     }
@@ -148,9 +152,9 @@ public class SpellTest : MonoBehaviourPun
         currentSpell = new SpellManager.Spell();
     }
 
-    void CastSpell()
+    void CastSpell(Vector3 clickedPosition)
     {
-        currentSpell.Cast(transform);
+        currentSpell.Cast(transform, clickedPosition);
         spellCooldowns[currentSpell.GetOrbTuple()] = Time.time + currentSpell.GetSpellCooldown();
         mana.ConsumeMana(currentSpell.GetManaCost());
         //photonView.RPC("ClearSpell", RpcTarget.All);

@@ -4,8 +4,14 @@ using UnityEngine;
 
 public class VioletSpellSphereController : MonoBehaviour
 {
-    public Vector3 endPosition;
+    public Orb.GreaterCast greaterCast;
+    public Orb.LesserCast lesserCast;
+    public int greaterCastAmt;
+    public int lesserCastAmt;
 
+    [Space]
+
+    public Vector3 endPosition;
     [SerializeField]
     private float maxHeight;
 
@@ -30,9 +36,7 @@ public class VioletSpellSphereController : MonoBehaviour
     {
         if (GetComponent<Rigidbody>().velocity == Vector3.zero)
         {
-            GameObject orbs = GameObject.Instantiate(Resources.Load("Orbs/Violet Cloud", typeof(GameObject)), transform.position + Vector3.up, transform.rotation) as GameObject;
-            orbs.transform.Rotate(Vector3.up, Random.Range(0, 360));
-            Destroy(gameObject);
+            instantiateCloud();
         }
     }
 
@@ -45,10 +49,23 @@ public class VioletSpellSphereController : MonoBehaviour
         {
             if (point.normal == Vector3.up)
             {
-                GameObject orbs = GameObject.Instantiate(Resources.Load("Orbs/Violet Cloud", typeof(GameObject)), transform.position + Vector3.up, transform.rotation) as GameObject;
-                orbs.transform.Rotate(Vector3.up, Random.Range(0, 360));
-                Destroy(gameObject);
+                instantiateCloud();
             }
         }
+    }
+
+    private void instantiateCloud()
+    {
+        GameObject g = GameObject.Instantiate(Resources.Load("Orbs/Violet Cloud", typeof(GameObject)), transform.position + Vector3.up, transform.rotation) as GameObject;
+        g.transform.Rotate(Vector3.up, Random.Range(0, 360));
+
+        VioletSpellController spellController = g.GetComponent<VioletSpellController>();
+
+        spellController.greaterCast = greaterCast;
+        spellController.lesserCast = lesserCast;
+        spellController.greaterCastAmt = greaterCastAmt;
+        spellController.lesserCastAmt = lesserCastAmt;
+
+        Destroy(gameObject);
     }
 }

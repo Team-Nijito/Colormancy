@@ -8,6 +8,8 @@ public class BlueSpellController : MonoBehaviour
     [SerializeField]
     private float lifetime;
 
+    [Space]
+
     [SerializeField]
     private float spherePaintRadius;
     [SerializeField]

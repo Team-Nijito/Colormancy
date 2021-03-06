@@ -4,12 +4,16 @@ using UnityEngine;
 
 public class BlueSpellSphereController : MonoBehaviour
 {
+    public Transform spawner;
+
     // Update is called once per frame
     void Update()
     {
         if (GetComponent<Rigidbody>().velocity == Vector3.zero)
         {
             GameObject orbs = GameObject.Instantiate(Resources.Load("Orbs/Blue Ink", typeof(GameObject)), transform.position, Quaternion.identity) as GameObject;
+            orbs.transform.RotateAround(orbs.transform.position, Vector3.up, Random.Range(0, 360));
+            orbs.transform.parent = spawner;
             Destroy(gameObject);
         }
     }
@@ -25,6 +29,7 @@ public class BlueSpellSphereController : MonoBehaviour
             {
                 GameObject orbs = GameObject.Instantiate(Resources.Load("Orbs/Blue Ink", typeof(GameObject)), point.point + Vector3.down / 10, Quaternion.identity) as GameObject;
                 orbs.transform.RotateAround(orbs.transform.position, Vector3.up, Random.Range(0, 360));
+                orbs.transform.parent = spawner;
                 Destroy(gameObject);
             }
         }

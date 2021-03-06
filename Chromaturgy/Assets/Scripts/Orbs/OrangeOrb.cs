@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+using Photon.Pun;
 public class OrangeOrb : Orb
 {
     public OrangeOrb()
@@ -27,7 +28,8 @@ public class OrangeOrb : Orb
 
     public override void CastGreaterEffect(GameObject hit, int orbAmount)
     {
-        throw new System.NotImplementedException();
+        PhotonView photonView = PhotonView.Get(hit);
+        photonView.RPC("TakeDamage", RpcTarget.All, (float)orbAmount);
     }
 
     public override void CastLesserEffect(GameObject hit, int orbAmount)
@@ -35,7 +37,7 @@ public class OrangeOrb : Orb
         throw new System.NotImplementedException();
     }
 
-    public override void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, (int, int, int) amounts, Transform t)
+    public override void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, (int, int, int) amounts, Transform t, Vector3 clickedPosition)
     {
         //Cast specific orb shape depending on shapeAmnt
         //For any enemies hit
@@ -46,7 +48,16 @@ public class OrangeOrb : Orb
         // get the wizard rotation
         Transform wizard = t.GetChild(0);
 
-        GameObject orbs = GameObject.Instantiate(Resources.Load("Orbs/Orange Fireball", typeof(GameObject)), t.position, wizard.rotation) as GameObject;
+        Vector3 direction = new Vector3(clickedPosition.x - t.position.x, 0, clickedPosition.z - t.position.z).normalized;
+        wizard.LookAt(wizard.position + direction);
+
+        GameObject g = GameObject.Instantiate(Resources.Load("Orbs/Orange Fireball"), t.position + direction, wizard.rotation) as GameObject;
+        OrangeSpellController spellController = g.GetComponent<OrangeSpellController>();
+
+        spellController.greaterCast = greaterEffectMethod;
+        spellController.lesserCast = lesserEffectMethod;
+        spellController.greaterCastAmt = amounts.Item1;
+        spellController.lesserCastAmt = amounts.Item2;
     }
 
     public static object Deserialize(byte[] data)

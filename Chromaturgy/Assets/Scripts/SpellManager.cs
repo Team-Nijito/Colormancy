@@ -38,9 +38,9 @@ public class SpellManager : MonoBehaviourPun
             OrbTuple = (orbs[0], orbs[1], orbs[2]);
         }
 
-        public void Cast(Transform t)
+        public void Cast(Transform t, Vector3 clickedPosition)
         {
-            orbs[2].CastShape(orbs[0].CastGreaterEffect, orbs[1].CastLesserEffect, (orbDict[orbs[0].OrbElement], orbDict[orbs[1].OrbElement], orbDict[orbs[2].OrbElement]), t);
+            orbs[2].CastShape(orbs[0].CastGreaterEffect, orbs[1].CastLesserEffect, (orbDict[orbs[0].OrbElement], orbDict[orbs[1].OrbElement], orbDict[orbs[2].OrbElement]), t, clickedPosition);
         }
 
         public float GetSpellCooldown()

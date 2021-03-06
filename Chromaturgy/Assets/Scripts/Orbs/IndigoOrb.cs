@@ -38,7 +38,7 @@ public class IndigoOrb : Orb
         throw new System.NotImplementedException();
     }
 
-    public override void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, (int, int, int) amounts, Transform t)
+    public override void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, (int, int, int) amounts, Transform t, Vector3 clickedPosition)
     {
         //Cast specific orb shape depending on shapeAmnt
         //For any enemies hit

@@ -6,11 +6,21 @@ public class YellowSpellController : MonoBehaviour
 {
     [SerializeField]
     public Transform playerTransform;
+    private Vector3 fromPlayer;
 
     [SerializeField]
     private AnimationCurve rotationScale;
     [SerializeField]
     private AnimationCurve positionScale;
+
+    [Space]
+
+    public Orb.GreaterCast greaterCast;
+    public Orb.LesserCast lesserCast;
+    public int greaterCastAmt;
+    public int lesserCastAmt;
+
+    [Space]
 
     [SerializeField]
     private float rotationSpeed;
@@ -18,7 +28,7 @@ public class YellowSpellController : MonoBehaviour
     [SerializeField]
     private float lifetime;
    
-    private Vector3 fromPlayer;
+    [Space]
 
     [SerializeField]
     private float spherePaintRadius;
@@ -62,5 +72,17 @@ public class YellowSpellController : MonoBehaviour
 
         if (tick == PaintingManager.paintingTickFrequency)
             tick = 0;
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.tag.Equals("Enemy"))
+        {
+            greaterCast(gameObject, greaterCastAmt);
+        }
+        else if (collision.gameObject.tag.Equals("Player"))
+        {
+            lesserCast(gameObject, lesserCastAmt);
+        }
     }
 }

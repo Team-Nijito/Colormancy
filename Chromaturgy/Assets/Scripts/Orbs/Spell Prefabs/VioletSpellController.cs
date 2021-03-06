@@ -4,9 +4,18 @@ using UnityEngine;
 
 public class VioletSpellController : MonoBehaviour
 {
+    public Orb.GreaterCast greaterCast;
+    public Orb.LesserCast lesserCast;
+    public int greaterCastAmt;
+    public int lesserCastAmt;
+
+    [Space]
+
     private float starttime;
     [SerializeField]
     private float lifetime;
+
+    [Space]
 
     [SerializeField]
     private float spherePaintRadius;
@@ -28,5 +37,13 @@ public class VioletSpellController : MonoBehaviour
     {
         if (Time.time - starttime > lifetime && !debug)
             Destroy(gameObject);
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.tag.Equals("Enemy"))
+            greaterCast(collision.gameObject, greaterCastAmt);
+        else if (collision.gameObject.tag.Equals("Player"))
+            lesserCast(collision.gameObject, lesserCastAmt);
     }
 }

@@ -37,33 +37,28 @@ public class RedOrb : Orb
         throw new System.NotImplementedException();
     }
 
-    public override void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, (int, int, int) amounts, Transform t)
+    public override void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, (int, int, int) amounts, Transform t, Vector3 clickedPosition)
     {
         //Cast specific orb shape depending on shapeAmnt
         //For any enemies hit
         //greaterEffectMethod(enemy game object, greaterEffectAmnt);
         //For any allies hit 
         //lesserEffectMethod(ally game object, lesserEffectAmnt);
+        Transform wizard = t.GetChild(0);
 
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hit;
-        if (Physics.Raycast(ray, out hit, 100f, 1 << PaintingManager.paintingMask))
-        {
-            PhotonView photonView = PhotonView.Get(t.gameObject);
+        Vector3 direction = clickedPosition - t.position;
+        wizard.LookAt(wizard.position + new Vector3(direction.x, 0, direction.y).normalized);
 
-            if (Vector3.Dot(hit.normal,Vector3.up) > 0.5)
-            {
-                Vector3 direction = hit.point - t.position;
+        GameObject g = GameObject.Instantiate(Resources.Load("Orbs/Red Area"), t.position + Vector3.down, t.rotation) as GameObject;
+        RedSpellController spellController = g.GetComponent<RedSpellController>();
 
-                GameObject g = PhotonNetwork.Instantiate("Orbs/Red Area", t.position + Vector3.down, t.rotation);
-                RedSpellController spellController = g.GetComponent<RedSpellController>();
+        spellController.greaterCast = greaterEffectMethod;
+        spellController.lesserCast = lesserEffectMethod;
+        spellController.greaterCastAmt = amounts.Item1;
+        spellController.lesserCastAmt = amounts.Item2;
 
-                spellController.greaterCast = greaterEffectMethod;
-                spellController.lesserCast = lesserEffectMethod;
-                spellController.endPosition = hit.point + Vector3.up * 1.6f;
-                spellController.playerTransform = t;
-            }
-        }
+        spellController.endPosition = clickedPosition + Vector3.up * 1.6f;
+        spellController.playerTransform = t;
     }
 
     public static object Deserialize(byte[] data)
