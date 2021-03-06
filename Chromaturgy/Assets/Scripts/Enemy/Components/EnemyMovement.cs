@@ -55,10 +55,14 @@ public class EnemyMovement : MonoBehaviourPun, IPunObservable
 
     // Movement variables
 
+    [Tooltip("Speed of character")]
     [SerializeField] protected float m_speed = 18f;
 
     [Tooltip("The speed at which the Run animation is triggered")]
     [SerializeField] protected float m_speedTriggerRun = 15f;
+
+    [Tooltip("Time that the Rigidbody controls the object whenever the NavMeshAgent is disabled (specifically for knockback)")]
+    [SerializeField] protected float m_durationRigidbody = 0.75f; 
 
     protected EnemyAnimationManager.EnemyState m_currentAnimState = EnemyAnimationManager.EnemyState.Idle;
 
@@ -163,6 +167,26 @@ public class EnemyMovement : MonoBehaviourPun, IPunObservable
     }
 
     /// <summary>
+    /// When called, the Rigidbody would control this object instead of the NavMeshAgent for a period of time.
+    /// </summary>
+    /// <param name="seconds">The time that the Rigidbody would manage this object</param>
+    protected IEnumerator RigidbodyControlsObject(Vector3 initalDir, float force, float duration)
+    {
+        // Disable the agent
+        m_navMeshAgent.enabled = false;
+        m_rigidBody.isKinematic = false;
+
+        // Apply the force
+        m_rigidBody.AddForce(initalDir * force, ForceMode.Acceleration);
+
+        yield return new WaitForSecondsRealtime(duration);
+
+        // Re-enable the agent
+        m_navMeshAgent.enabled = true;
+        m_rigidBody.isKinematic = true;
+    }
+
+    /// <summary>
     /// A function to make the enemy find a random valid position on the NavMesh and travel there, and then idle for a bit.
     /// Rinse and repeat.
     /// </summary>
@@ -180,17 +204,45 @@ public class EnemyMovement : MonoBehaviourPun, IPunObservable
         }
     }
 
+    protected IEnumerator Slowdown(float percentReductionSpeed, float duration)
+    {
+        float percent = ((100 - percentReductionSpeed) / 100);
+        // note that m_speed doesn't affect the speed of the enemy (controlled by NavMeshAgent)
+        // it's just to ensure that the value is accurate if its accessor is called during this
+        // slowdown effect
+
+        // Apply speed reduction
+        m_speed *= percent; 
+        m_navMeshAgent.speed *= percent;
+        yield return new WaitForSecondsRealtime(duration);
+        // Revert speed reduction
+        m_speed /= percent;
+        m_navMeshAgent.speed /= percent;
+    }
+
     #endregion
 
     #region Public functions
 
     /// <summary>
-    /// Apply knockback on the character.
+    /// Apply a force on the character. This is performed by disabling
+    /// the NavMeshAgent and letting the Rigidbody take over, then we wait
+    /// for a duration until we let the NavMeshAgent take over again.
     /// </summary>
     /// <param name="offset">Apply a force in the direction of the offset.</param>
-    public void ApplyKnockback(Vector3 offset)
+    public void ApplyForce(Vector3 dir, float force)
     {
-        
+        StartCoroutine(RigidbodyControlsObject(dir, force, m_durationRigidbody));
+    }
+
+    /// <summary>
+    /// Slows the player down for a period of time.
+    /// </summary>
+    /// <param name="percentReduction">The reduction in speed.</param>
+    /// <param name="duration">The duration that this slowdown will last.</param>
+    public void ApplySlowdown(float percentReduction, float duration)
+    {
+        StartCoroutine(Slowdown(percentReduction, duration));
     }
 
     /// <summary>
@@ -222,10 +274,18 @@ public class EnemyMovement : MonoBehaviourPun, IPunObservable
     }
 
     /// <summary>
+    /// Is the NavMeshAgent currently enabled?
+    /// </summary>
+    public bool IsAgentActive()
+    {
+        return m_navMeshAgent.enabled;
+    }
+
+    /// <summary>
     /// Is the player animation currently in the walk or run state?
     /// </summary>
     /// <returns>Returns true if the current animation state is walking or running</returns>
-    public bool IsMoving()
+    public bool IsAgentMoving()
     {
         return m_currentAnimState == EnemyAnimationManager.EnemyState.Walk || m_currentAnimState == EnemyAnimationManager.EnemyState.Run;
     }
@@ -237,7 +297,7 @@ public class EnemyMovement : MonoBehaviourPun, IPunObservable
     /// <returns> Is the AI in the walk or run state, and is the NavMeshAgent disabled (.isStopped is true)</returns>
     public bool IsManualMovementEnabled()
     {
-        return IsMoving() && m_navMeshAgent.isStopped;
+        return IsAgentMoving() && m_navMeshAgent.isStopped;
     }
 
     /// <summary>

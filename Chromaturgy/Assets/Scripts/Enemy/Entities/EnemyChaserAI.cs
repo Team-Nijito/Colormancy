@@ -4,7 +4,7 @@ using UnityEngine.AI;
 
 [RequireComponent(typeof(PhotonView))]
 [DisallowMultipleComponent]
-public class EnemyChaserAI : MonoBehaviourPun, IEnemyDetection
+public class EnemyChaserAI : MonoBehaviourPun, IEnemyDetection, IStatusEffects
 {
     // Handles the logic, and movement of the enemy chaser.
 
@@ -12,11 +12,12 @@ public class EnemyChaserAI : MonoBehaviourPun, IEnemyDetection
 
     // Components
     protected EnemyMovement m_enemMovement;
-    protected NavMeshAgent m_navMeshAgent;
     protected HealthScript m_hscript;
     protected EnemyAnimationManager m_animManager;
     protected EnemyTargeting m_enemTargeting;
     protected EnemyHurtbox m_enemHurtbox;
+
+    protected Rigidbody m_rigidBody;
 
     #endregion
 
@@ -27,10 +28,10 @@ public class EnemyChaserAI : MonoBehaviourPun, IEnemyDetection
     {
         m_hscript = GetComponent<HealthScript>();
         m_animManager = GetComponent<EnemyAnimationManager>();
-        m_navMeshAgent = GetComponent<NavMeshAgent>();
         m_enemMovement = GetComponent<EnemyMovement>();
         m_enemHurtbox = GetComponent<EnemyHurtbox>();
         m_enemTargeting = GetComponent<EnemyTargeting>();
+        m_rigidBody = GetComponent<Rigidbody>();
     }
 
     // Update is called once per frame
@@ -54,16 +55,22 @@ public class EnemyChaserAI : MonoBehaviourPun, IEnemyDetection
             }
         }
 
-        ProcessAIIntent();
+        if (m_enemMovement.IsAgentActive())
+        {
+            ProcessAIIntent();
+        }
     }
 
     protected virtual void FixedUpdate()
     {
-        HandleAIIntent();
+        if (m_enemMovement.IsAgentActive())
+        {
+            HandleAIIntent();
+        }
     }
 
     #endregion
-    
+
     #region Protected Methods
 
     /// <summary>
@@ -141,7 +148,7 @@ public class EnemyChaserAI : MonoBehaviourPun, IEnemyDetection
             {
                 m_enemMovement.StopWandering();
 
-                if (m_enemMovement.IsMoving())
+                if (m_enemMovement.IsAgentMoving())
                 {
                     m_enemMovement.MoveToPosition(m_enemTargeting.TargetPlayer.position);
                 }
@@ -161,6 +168,23 @@ public class EnemyChaserAI : MonoBehaviourPun, IEnemyDetection
     #endregion
 
     #region Public functions
+
+    /// <summary>
+    /// Apply a force to this character.
+    /// </summary>
+    /// <param name="dir">The direction of the force</param>
+    /// <param name="force">The magnitude of the force</param>
+    [PunRPC]
+    public void ApplyForce(Vector3 dir, float force)
+    {
+        m_enemMovement.ApplyForce(dir, force);
+    }
+
+    [PunRPC]
+    public void ApplySlowdown(float percentReduction, float duration)
+    {
+        m_enemMovement.ApplySlowdown(percentReduction, duration);
+    }
 
     /// <summary>
     /// Verbose detection function meant to improve readability.

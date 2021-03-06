@@ -179,6 +179,35 @@ public class EnemyTargeting : MonoBehaviourPun
         return canSee;
     }
 
+    /// <summary>
+    /// Change the attack and stopping range so that the AI would move closer to / farther away from the player.
+    /// </summary>
+    /// <param name="changeVal">How much to decrease the range by</param>
+    /// <param name="tempAttackRange">Your variable for attack range that you pass in by reference</param>
+    public void ChangeAttackStoppingRange(float changeVal, ref float tempAttackRange)
+    {
+        if (changeVal < 0)
+        {
+            // decrease range
+            if ((m_navMeshAgent.stoppingDistance + changeVal) >= m_closeDetectionRadius)
+            {
+                tempAttackRange += changeVal;
+                m_navMeshAgent.stoppingDistance += changeVal;
+            }
+        }
+        else
+        {
+            // increase range
+            if ((tempAttackRange + changeVal) < m_attackRange)
+            {
+                tempAttackRange += changeVal;
+                m_navMeshAgent.stoppingDistance += changeVal;
+
+                m_navMeshAgent.Move((transform.position - m_targetPlayer.position).normalized * changeVal);
+            }
+        }
+    }
+
     // How to pass GameObject/transform through RPC: https://forum.unity.com/threads/how-to-photon-networking-send-gameobjects-transforms-and-other-through-the-network.343973/
     /// <summary>
     /// (PunRPC) This is used so that the Enemy's target is synced acrossed all players

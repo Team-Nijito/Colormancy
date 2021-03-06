@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
 using Photon.Pun;
+using System.Collections;
 
 [RequireComponent(typeof(CharacterController))]
-public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
+public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable, IStatusEffects
 {
     // This script handles movement input and animations
 
@@ -211,17 +212,30 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
         m_impact = Vector3.Lerp(m_impact, Vector3.zero, m_impactDecay * Time.deltaTime);
     }
 
+    private IEnumerator ApplySlowdownForDuration(float percentReductionSpeed, float duration)
+    {
+        float percent = ((100 - percentReductionSpeed) / 100);
+        // Apply slowdown
+        m_walkSpeed *= percent;
+        m_runSpeed *= percent;
+
+        yield return new WaitForSecondsRealtime(duration);
+        // Revert slowdown
+        m_walkSpeed /= percent;
+        m_runSpeed /= percent;
+    }
+
     #endregion
 
     #region Public functions
 
-    [PunRPC]
     /// <summary>
     /// Adds a force to m_impact.
     /// </summary>
     /// <param name="dir">Direction of the force</param>
     /// <param name="force">The magnitude of the force</param>
-    public void AddImpactForce(Vector3 dir, float force)
+    [PunRPC]
+    public void ApplyForce(Vector3 dir, float force)
     {
         dir.Normalize();
         if (dir.y < 0)
@@ -229,7 +243,17 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
             dir.y = -dir.y; // reflect down force on the ground
         }
         m_impact += dir.normalized * force / m_characterMass;
-        print("applying impact");
+    }
+
+    /// <summary>
+    /// Slows the player down for a period of time.
+    /// </summary>
+    /// <param name="percentReduction">The reduction in speed.</param>
+    /// <param name="duration">The duration that this slowdown will last.</param>
+    [PunRPC]
+    public void ApplySlowdown(float percentReduction, float duration)
+    {
+        StartCoroutine(ApplySlowdownForDuration(percentReduction, duration));
     }
 
     #endregion

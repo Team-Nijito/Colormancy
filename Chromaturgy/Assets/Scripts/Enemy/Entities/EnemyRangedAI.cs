@@ -116,7 +116,7 @@ public class EnemyRangedAI : EnemyChaserAI
     [PunRPC]
     private void RangeGetCloser()
     {
-        ChangeAttackStoppingRange(-1);
+        m_enemTargeting.ChangeAttackStoppingRange(-1f, ref m_tempAttackRange);
     }
 
     /// <summary>
@@ -125,35 +125,7 @@ public class EnemyRangedAI : EnemyChaserAI
     [PunRPC]
     private void RangeGetFarther()
     {
-        ChangeAttackStoppingRange(0.1f);
-    }
-
-    /// <summary>
-    /// Change the attack and stopping range so that the AI would move closer to / farther away from the player.
-    /// </summary>
-    /// <param name="changeVal">How much to decrease the range by</param>
-    private void ChangeAttackStoppingRange(float changeVal)
-    {
-        if (changeVal < 0)
-        {
-            // decrease range
-            if ((m_navMeshAgent.stoppingDistance + changeVal) >= m_enemTargeting.CloseDetectionRadius)
-            {
-                m_tempAttackRange += changeVal;
-                m_navMeshAgent.stoppingDistance += changeVal;
-            }
-        }
-        else
-        {
-            // increase range
-            if ((m_tempAttackRange + changeVal) < m_enemTargeting.AttackRange)
-            {
-                m_tempAttackRange += changeVal;
-                m_navMeshAgent.stoppingDistance += changeVal;
-
-                m_navMeshAgent.Move((transform.position - m_enemTargeting.TargetPlayer.position).normalized * changeVal);
-            }
-        }
+        m_enemTargeting.ChangeAttackStoppingRange(0.1f, ref m_tempAttackRange);
     }
 
     #endregion

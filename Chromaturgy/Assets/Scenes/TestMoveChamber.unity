@@ -1319,7 +1319,7 @@ GameObject:
   - component: {fileID: 405044365}
   - component: {fileID: 405044364}
   m_Layer: 0
-  m_Name: GasCube
+  m_Name: BounceCube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1337,14 +1337,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e23cef57ca17e384387a78a690b3f12e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_damageType: Fire
+  m_applyDamageOverTime: 0
+  m_damageType: NotAvailable
   m_isPercentageDamage: 0
-  m_damage: 10
-  m_secondDuration: 2
-  m_applyDamageWhenEnterObject: 1
-  m_applyDamageWhileStayOnObject: 1
+  m_damage: 1
+  m_secondDuration: 0
   m_applyKnockback: 1
-  m_push: 1
+  m_force: 150
+  m_applySlowdown: 1
+  m_slowDownDuration: 3
+  m_percentReductionInSpeed: 50
 --- !u!65 &405044365
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1414,7 +1416,7 @@ Transform:
   m_GameObject: {fileID: 405044363}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -19.82, y: 0.5, z: 19.22}
-  m_LocalScale: {x: 10, y: 1, z: 10}
+  m_LocalScale: {x: 4, y: 1, z: 4}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 13
@@ -7956,120 +7958,6 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -462981019419857548, guid: b5e0232fa4240894f89f086201261332, type: 3}
---- !u!1 &1958583766
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1958583771}
-  - component: {fileID: 1958583770}
-  - component: {fileID: 1958583769}
-  - component: {fileID: 1958583768}
-  - component: {fileID: 1958583767}
-  m_Layer: 0
-  m_Name: GasCube (1)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1958583767
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1958583766}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e23cef57ca17e384387a78a690b3f12e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_damageType: Wind
-  m_isPercentageDamage: 0
-  m_damage: 1
-  m_secondDuration: 2
-  m_applyDamageWhenEnterObject: 1
-  m_applyDamageWhileStayOnObject: 1
-  m_applyKnockback: 1
-  m_push: 0
---- !u!65 &1958583768
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1958583766}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!23 &1958583769
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1958583766}
-  m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 2100000, guid: a638c97895546f645902a11cdfc13566, type: 2}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
---- !u!33 &1958583770
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1958583766}
-  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!4 &1958583771
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1958583766}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.2, y: 2.62, z: 15}
-  m_LocalScale: {x: 10, y: 1, z: 10}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 15
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1974215172
 GameObject:
   m_ObjectHideFlags: 0
@@ -8497,14 +8385,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e23cef57ca17e384387a78a690b3f12e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_applyDamageOverTime: 0
   m_damageType: Poison
   m_isPercentageDamage: 1
   m_damage: 4
   m_secondDuration: 5
-  m_applyDamageWhenEnterObject: 1
-  m_applyDamageWhileStayOnObject: 1
   m_applyKnockback: 0
-  m_push: 1
+  m_force: 150
+  m_applySlowdown: 0
+  m_slowDownDuration: 3
+  m_percentReductionInSpeed: 50
 --- !u!1 &2110463262
 GameObject:
   m_ObjectHideFlags: 0

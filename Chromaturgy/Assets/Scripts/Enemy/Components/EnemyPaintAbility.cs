@@ -67,7 +67,7 @@ public class EnemyPaintAbility : MonoBehaviour
     {
         while (true)
         {
-            if (this && m_enemMovement.IsMoving())
+            if (this && m_enemMovement.IsAgentMoving())
             {
                 Debug.DrawRay(transform.position, Vector3.down * m_raycastFloorLen, Color.green);
                 if (Physics.Raycast(transform.position, -transform.up, out m_raycastHit, m_raycastFloorLen, m_paintableMask))

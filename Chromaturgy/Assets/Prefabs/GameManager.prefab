@@ -51,8 +51,8 @@ MonoBehaviour:
     type: 3}
   m_healthManaBarPrefab: {fileID: 5935600569168913045, guid: 9c7da00c2a164ec43a15707c1ff9cba0,
     type: 3}
-  m_playerListFolderName: PlayerList
-  popUpBox: {fileID: 0}
+  popUpBox: {fileID: 3602182718859857155, guid: 3f191b7dc11e2f84dbc66f9cc04b44c0,
+    type: 3}
 --- !u!114 &-4774289116210966217
 MonoBehaviour:
   m_ObjectHideFlags: 0

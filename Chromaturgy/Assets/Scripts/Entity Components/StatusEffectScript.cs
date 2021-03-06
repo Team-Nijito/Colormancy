@@ -14,8 +14,8 @@ public class StatusEffectScript : MonoBehaviourPun
 
     // TODO:
     // Damage over time (x)
-    // Knock back (currently only for players | have to do AI next)
-    // Slow
+    // Knock back (x)
+    // Slow (x)
     // Stun
     // Fear / blind 
     // actually integrate all of these into one system
@@ -32,17 +32,20 @@ public class StatusEffectScript : MonoBehaviourPun
     }
 
     // keep track of all our damage over time
-    Dictionary<string, DamageOverTime> m_damageDict;
+    private Dictionary<string, DamageOverTime> m_damageDict;
 
     [Range(0, 10f)]
     [SerializeField]
     private float m_statusEffectTickPerXSecond = 0.1f; // how often do you want to incur a status effect
+
+    private bool m_isPlayer = false;
 
     #endregion
 
     #region Components
 
     private HealthScript m_health;
+    private IStatusEffects m_controllerScript;
 
     #endregion
 
@@ -52,6 +55,16 @@ public class StatusEffectScript : MonoBehaviourPun
     void Start()
     {
         m_health = GetComponent<HealthScript>();
+
+        if (GetComponent<CharacterController>())
+        {
+            m_controllerScript = GetComponent<PlayerMovement>(); // This is a player
+            m_isPlayer = true;
+        }
+        else
+        {
+            m_controllerScript = GetComponent<EnemyChaserAI>(); // This an AI
+        }
 
         m_damageDict = new Dictionary<string, DamageOverTime>();
 
@@ -124,16 +137,12 @@ public class StatusEffectScript : MonoBehaviourPun
         return returnDamage;
     }
 
-    #endregion
-
-    #region Public functions
-
     /// <summary>
     /// (PunRPC) Apply a damage over time effect if it doesn't already exist on this player, otherwise
     /// increase the duration of the effect
     /// </summary>
     [PunRPC]
-    public void ApplyOrStackDoT(bool isPercentDmg, float dmg, float duration, string name)
+    private void ApplyOrStackDoT(bool isPercentDmg, float dmg, float duration, string name)
     {
         DamageOverTime newDoT;
         newDoT.name = name;
@@ -149,11 +158,74 @@ public class StatusEffectScript : MonoBehaviourPun
         m_damageDict[name] = newDoT;
     }
 
+    #endregion
+
+    #region Public functions
+
+    /// <summary>
+    /// Apply force to a character.
+    /// </summary>
+    /// <param name="dir">The direction of the force.</param>
+    /// <param name="force">The magnitude of the force.</param>
+    public void RPCApplyForce(Vector3 dir, float force)
+    {
+        if (m_isPlayer)
+        {
+            photonView.RPC("ApplyForce", photonView.Owner, dir, force);
+        }
+        else
+        {
+            photonView.RPC("ApplyForce", PhotonNetwork.MasterClient, dir, force);
+        }
+    }
+
+    /// <summary>
+    /// Apply or stack damage over time to a character.
+    /// </summary>
+    /// <param name="isPercentDmg">Is a damage is percent value instead of a flat number?</param>
+    /// <param name="dmg">Damage done every second.</param>
+    /// <param name="duration">How long the damage over time lasts</param>
+    /// <param name="name">Name of this damage over time </param>
+    public void RPCApplyOrStackDoT(bool isPercentDmg, float dmg, float duration, string name)
+    {
+        if (m_isPlayer)
+        {
+            photonView.RPC("ApplyOrStackDoT", photonView.Owner, isPercentDmg, dmg, duration, name);
+        }
+        else
+        {
+            photonView.RPC("ApplyOrStackDoT", PhotonNetwork.MasterClient, isPercentDmg, dmg, duration, name);
+        }
+    }
+
+    /// <summary>
+    /// Apply slow down to a character.
+    /// </summary>
+    /// <param name="percentReduction"></param>
+    /// <param name="duration"></param>
+    public void RPCApplySlowdown(float percentReduction, float duration)
+    {
+        if (m_isPlayer)
+        {
+            photonView.RPC("ApplySlowdown", photonView.Owner, percentReduction, duration);
+        }
+        else
+        {
+            photonView.RPC("ApplySlowdown", PhotonNetwork.MasterClient, percentReduction, duration);
+        }
+    }
+
+    /// <summary>
+    /// Clear all ongoing damage over time status effects.
+    /// </summary>
     public void ClearDamageDict()
     {
         m_damageDict.Clear(); // reset all DoTs
     }
 
+    /// <summary>
+    /// Restarts the damage every x second coroutine, this is usually called after a player dies.
+    /// </summary>
     public void RestartApplyDamage()
     {
         StartCoroutine(ApplyDamageEveryXSecond());

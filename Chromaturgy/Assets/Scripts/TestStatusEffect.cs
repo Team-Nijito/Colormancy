@@ -1,0 +1,98 @@
+﻿using UnityEngine;
+
+public class TestStatusEffect : MonoBehaviour
+{
+    // This is a TestScript that utilizes the status effect system
+    // Depending on the parameters, an entity (player or AI) would collide
+    // with the GameObject that this script is parented to and will become
+    // afflicted with the status effect
+
+    #region Damage over time
+
+    [SerializeField]
+    private bool m_applyDamageOverTime = false;
+
+    [SerializeField]
+    private string m_damageType = "Poison";
+
+    [SerializeField]
+    private bool m_isPercentageDamage = true; // if true, will inflict damage dependent on victim's health
+
+    [SerializeField]
+    private float m_damage = 4f;
+
+    [SerializeField]
+    private float m_secondDuration = 5f;
+
+    #endregion
+
+    #region Knockback
+
+    [SerializeField]
+    private bool m_applyKnockback = false;
+
+    [SerializeField]
+    private float m_force = 150f;
+
+    #endregion
+
+    #region Slowdown
+
+    [SerializeField]
+    private bool m_applySlowdown = false;
+
+    [SerializeField]
+    private float m_slowDownDuration = 3f;
+
+    [Range(0,100)]
+    [SerializeField]
+    private float m_percentReductionInSpeed = 50f;
+
+    #endregion
+
+    private void OnTriggerEnter(Collider other)
+    {
+        bool isPlayer = other.CompareTag("Player");
+        bool isEnemy = other.gameObject.layer == LayerMask.NameToLayer("Enemy");
+        StatusEffectScript statEffectScript;
+
+        if (isPlayer || isEnemy)
+        {
+            statEffectScript = other.gameObject.GetComponent<StatusEffectScript>();
+
+            if (m_applyDamageOverTime)
+            {
+                statEffectScript.RPCApplyOrStackDoT(m_isPercentageDamage, m_damage, m_secondDuration, m_damageType);
+            }
+            if (m_applyKnockback)
+            {
+                statEffectScript.RPCApplyForce(other.gameObject.transform.position - transform.position + Vector3.up, m_force);
+            }
+            if (m_applySlowdown)
+            {
+                statEffectScript.RPCApplySlowdown(m_percentReductionInSpeed, m_slowDownDuration);
+            }
+        }
+    }
+    
+    private void OnTriggerStay(Collider other)
+    {
+        bool isPlayer = other.CompareTag("Player");
+        bool isEnemy = other.gameObject.layer == LayerMask.NameToLayer("Enemy");
+        StatusEffectScript statEffectScript;
+
+        if (isPlayer || isEnemy)
+        {
+            statEffectScript = other.gameObject.GetComponent<StatusEffectScript>();
+
+            if (m_applyDamageOverTime)
+            {
+                statEffectScript.RPCApplyOrStackDoT(m_isPercentageDamage, m_damage, m_secondDuration * Time.deltaTime, m_damageType);
+            }
+            if (m_applyKnockback)
+            {
+                statEffectScript.RPCApplyForce(other.gameObject.transform.position - transform.position + Vector3.up, m_force * Time.deltaTime);
+            }
+        }
+    }
+}
