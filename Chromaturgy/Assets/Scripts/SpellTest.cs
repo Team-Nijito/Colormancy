@@ -19,6 +19,8 @@ public class SpellTest : MonoBehaviourPun
     ManaScript mana;
     OrbTrayUIController uIController;
 
+    public bool TestingMode = false;
+
     Dictionary<(Orb, Orb, Orb), float> spellCooldowns = new Dictionary<(Orb, Orb, Orb), float>();
 
     SpellManager.Spell currentSpell;
@@ -74,12 +76,14 @@ public class SpellTest : MonoBehaviourPun
             uIController = gUIController.GetComponent<OrbTrayUIController>();
         }
 
-
-        AddSpellOrb(new YellowOrb());
-        AddSpellOrb(new OrangeOrb());
-        AddSpellOrb(new BlueOrb());
-        AddSpellOrb(new VioletOrb());
-        AddSpellOrb(new IndigoOrb());
+        if (TestingMode)
+        {
+            AddSpellOrb(new YellowOrb());
+            AddSpellOrb(new OrangeOrb());
+            AddSpellOrb(new BlueOrb());
+            AddSpellOrb(new VioletOrb());
+            AddSpellOrb(new IndigoOrb());
+        }
     }
 
     // Update is called once per frame
@@ -110,7 +114,7 @@ public class SpellTest : MonoBehaviourPun
         }
     }
 
-    void AddSpellOrb(Orb orb)
+    public void AddSpellOrb(Orb orb)
     {
         orbs.Add(orb);
         if (uIController)
