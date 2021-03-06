@@ -74,7 +74,7 @@ public class SpellTest : MonoBehaviourPun
             uIController = gUIController.GetComponent<OrbTrayUIController>();
         }
 
-
+        AddSpellOrb(new RedOrb());
         AddSpellOrb(new YellowOrb());
         AddSpellOrb(new OrangeOrb());
         AddSpellOrb(new BlueOrb());

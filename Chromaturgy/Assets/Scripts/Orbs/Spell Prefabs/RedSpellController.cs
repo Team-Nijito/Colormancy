@@ -2,35 +2,51 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+using Photon.Pun;
+
 public class RedSpellController : MonoBehaviour
 {
     public Transform playerTransform;
     private GameObject playerObject;
-    private Vector3 startPosition;
-    public Vector3 endPosition;
-
-    [SerializeField]
-    private float jumpTime;
-
-    [SerializeField]
-    [Range(0, 1)]
-    private float m_lerp;
-
     [SerializeField]
     private GameObject redBase;
     [SerializeField]
     private GameObject redEdge;
-    private Material baseMaterial;
-    private Material edgeMaterial;
+    private Renderer baseMaterial;
+    private Renderer edgeMaterial;
 
-    private float starttime;
+    [Space]
+
+    public Orb.GreaterCast greaterCast;
+    public Orb.LesserCast lesserCast;
+    public int greaterCastAmt;
+    public int lesserCastAmt;
+
+    [Space]
+
+    private Vector3 startPosition;
+    public Vector3 endPosition;
+    private Vector3 flatDirection;
+
+    [Space]
+
+    [SerializeField]
+    private float jumpTime;
+    [SerializeField]
+    private float jumpVelocity;
+    private float startTime;
     [SerializeField]
     private float lifetime;
+
+    [Space]
 
     [SerializeField]
     private float spherePaintRadius;
     [SerializeField]
     private Color paintColor;
+    [SerializeField]
+    [Range(0, 1)]
+    private float m_lerp;
 
     [SerializeField]
     private bool debug;
@@ -41,44 +57,76 @@ public class RedSpellController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        baseMaterial = redBase.GetComponent<Renderer>().material;
-        edgeMaterial = redEdge.GetComponent<Renderer>().material;
+        baseMaterial = redBase.GetComponent<Renderer>();
+        edgeMaterial = redEdge.GetComponent<Renderer>();
+        baseMaterial.enabled = false;
+        edgeMaterial.enabled = false;
 
         playerObject = playerTransform.gameObject;
         playerObject.GetComponent<PlayerMovement>().enabled = false;
         startPosition = playerTransform.position;
 
+        flatDirection = new Vector3(endPosition.x - startPosition.x, 0, endPosition.z - startPosition.z);
     }
 
     void OnEnable()
     {
-        starttime = Time.time;
-
-        PaintingManager.PaintSphere(paintColor, transform.position, spherePaintRadius);
+        startTime = Time.time;
     }
 
     // Update is called once per frame
     void Update()
     {
-        baseMaterial.SetFloat("_Lerp", m_lerp);
-        edgeMaterial.SetFloat("_Lerp", m_lerp);
 
         if (landed)
         {
+            // toggles
+            playerObject.GetComponent<PlayerMovement>().enabled = true;
             toggleLanding = true;
+            landed = false;
+
+
+            baseMaterial.enabled = true;
+            edgeMaterial.enabled = true;
+
+            transform.position = playerTransform.position + Vector3.down;
+
+            PaintingManager.PaintSphere(paintColor, transform.position, spherePaintRadius);
+
+            // reset time for destroying object
+            startTime = Time.time;
         }
 
-        if (Time.time - starttime < jumpTime)
+        if (Time.time - startTime < jumpTime && !toggleLanding)
         {
-            playerObject.GetComponent<CharacterController>().Move(endPosition - startPosition + Vector3.up);
+            Vector3 horizontalMovement = flatDirection.normalized * flatDirection.magnitude / jumpTime * Time.deltaTime;
+            Vector3 verticalMovement = Vector3.up * (Mathf.Lerp(jumpVelocity, -jumpVelocity, (Time.time - startTime) / jumpTime) * Time.deltaTime);
+            playerObject.GetComponent<CharacterController>().Move(horizontalMovement + verticalMovement);
         }
         else
         {
-            landed = true;
+            if (!toggleLanding)
+                landed = true;
+            else
+            {
+                baseMaterial.material.SetFloat("_Lerp", m_lerp);
+                edgeMaterial.material.SetFloat("_Lerp", m_lerp);
+            }
         }
 
+        if (Time.time - startTime > lifetime && !debug && toggleLanding)
+            Destroy(gameObject);
+    }
 
-        //if (Time.time - starttime > lifetime && !debug)
-        //Destroy(gameObject);
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.tag.Equals("Enemy"))
+        {
+            greaterCast(gameObject, greaterCastAmt);
+        }
+        else if (collision.gameObject.tag.Equals("Player"))
+        {
+            lesserCast(gameObject, lesserCastAmt);
+        }
     }
 }

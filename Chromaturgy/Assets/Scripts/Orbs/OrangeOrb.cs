@@ -6,11 +6,11 @@ public class OrangeOrb : Orb
 {
     public OrangeOrb()
     {
-        OrbColor = Color.yellow;
-        OrbShape = SpellShape.OrbitingOrbs;
+        OrbColor = new Color(1, 0.6445f, 0.016f, 1);
+        OrbShape = SpellShape.Fireball;
         CooldownMod = 1f;
         ShapeManaMod = 1f;
-        OrbElement = Element.Light;
+        OrbElement = Element.Fire;
         ModAmount = .1f;
         UIPrefab = (GameObject)Resources.Load("Orbs/OrangeOrbUI");
     }

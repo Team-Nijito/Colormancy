@@ -2,13 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+using Photon.Pun;
+
 public class RedOrb : Orb
 {
     public RedOrb()
     {
         OrbColor = Color.red;
         OrbShape = SpellShape.Jump;
-        CooldownMod = 0f;
+        CooldownMod = 0.7f;
         OrbElement = Element.Wrath;
         ModAmount = .1f;
         UIPrefab = (GameObject)Resources.Load("Orbs/RedOrbUI");
@@ -26,7 +28,8 @@ public class RedOrb : Orb
 
     public override void CastGreaterEffect(GameObject hit, int orbAmount)
     {
-        throw new System.NotImplementedException();
+        PhotonView photonView = hit.GetPhotonView();
+        photonView.RPC("TakeDamage", RpcTarget.All, (float)orbAmount);
     }
 
     public override void CastLesserEffect(GameObject hit, int orbAmount)
@@ -46,13 +49,19 @@ public class RedOrb : Orb
         RaycastHit hit;
         if (Physics.Raycast(ray, out hit, 100f, 1 << PaintingManager.paintingMask))
         {
+            PhotonView photonView = PhotonView.Get(t.gameObject);
+
             if (Vector3.Dot(hit.normal,Vector3.up) > 0.5)
             {
                 Vector3 direction = hit.point - t.position;
 
-                GameObject g = Object.Instantiate(Resources.Load("Orbs/Red Area", typeof(GameObject)), t.position + Vector3.down, t.rotation) as GameObject;
-                g.GetComponent<RedSpellController>().endPosition = hit.point + Vector3.up * 1.6f;
-                g.GetComponent<RedSpellController>().playerTransform = t;
+                GameObject g = PhotonNetwork.Instantiate("Orbs/Red Area", t.position + Vector3.down, t.rotation);
+                RedSpellController spellController = g.GetComponent<RedSpellController>();
+
+                spellController.greaterCast = greaterEffectMethod;
+                spellController.lesserCast = lesserEffectMethod;
+                spellController.endPosition = hit.point + Vector3.up * 1.6f;
+                spellController.playerTransform = t;
             }
         }
     }
