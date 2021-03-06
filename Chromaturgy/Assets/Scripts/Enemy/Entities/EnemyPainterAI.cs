@@ -5,6 +5,23 @@ public class EnemyPainterAI : EnemyChaserAI
 {
     // paints the floor and runs away from players, never attacks the player
 
+    #region Variables
+
+    EnemyPaintAbility m_enemPaintAbility;
+
+    #endregion
+
+    #region MonoBehaviourCallbacks
+
+    protected override void Start()
+    {
+        m_enemPaintAbility = GetComponent<EnemyPaintAbility>();
+        base.Start();
+    }
+
+
+    #endregion
+
     #region Protected functions
 
     // Consider what the AI will do at any point, and handles AI animation
@@ -66,6 +83,19 @@ public class EnemyPainterAI : EnemyChaserAI
                 m_enemMovement.ManuallyMove(transform.forward * m_enemMovement.Speed * Time.deltaTime);
             }
         }
+    }
+
+    #endregion
+
+    #region Public functions
+
+    /// <summary>
+    /// Stop all ongoing Tasks or coroutines.
+    /// </summary>
+    public override void StopAllTasks()
+    {
+        m_enemPaintAbility.StopAllTasks();
+        base.StopAllTasks();
     }
 
     #endregion

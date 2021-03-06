@@ -11,13 +11,10 @@ using UnityEngine;
 public class StatusEffectScript : MonoBehaviourPun
 {
     // Is responsible for handling side effects on entities with a HealthScript
-
-    // TODO:
-    // Damage over time (x)
-    // Knock back (x)
-    // Slow (x)
-    // Stun (x)
-    // Fear / blind
+    // Features: Damage over Time, Knock back, Slow, Stun, and Blind
+    // Damage over Time is implemented in this script, while
+    // all other status effects are implemented in the controller script that implements
+    // IStatusEffect
 
     #region Variables
 

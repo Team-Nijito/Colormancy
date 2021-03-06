@@ -12,4 +12,6 @@ public interface IStatusEffects
     void ApplySlowdown(float percentReduction, float duration);
     void ApplyStun(float duration);
     void ApplyBlind(float duration);
+
+    void StopAllTasks();
 }

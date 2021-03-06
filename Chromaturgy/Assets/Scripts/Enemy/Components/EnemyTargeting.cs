@@ -52,11 +52,9 @@ public class EnemyTargeting : MonoBehaviourPun
 
     protected Coroutine m_forgettingTargetCoroutineRef = null;
 
-    protected delegate void FunctionInvokeOnPlayerTargetted();
-
     protected bool m_canTargetPlayers = true; // stun variable
 
-    protected Task m_blindTask;
+    protected Task m_blindTask; // bind variable
 
     #endregion
 
@@ -306,6 +304,21 @@ public class EnemyTargeting : MonoBehaviourPun
     public bool IsBlind()
     {
         return !m_canTargetPlayers;
+    }
+
+    /// <summary>
+    /// Stop all ongoing Tasks or coroutines.
+    /// </summary>
+    public void StopAllTasks()
+    {
+        if (m_blindTask != null)
+        {
+            m_blindTask.Stop();
+        }
+        if (m_forgettingTargetCoroutineRef != null)
+        {
+            StopCoroutine(m_forgettingTargetCoroutineRef);
+        }
     }
 
     #endregion

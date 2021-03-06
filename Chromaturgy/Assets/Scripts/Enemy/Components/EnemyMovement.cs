@@ -421,6 +421,22 @@ public class EnemyMovement : MonoBehaviourPun, IPunObservable
     }
 
     /// <summary>
+    /// Stop all ongoing Tasks or coroutines.
+    /// </summary>
+    public void StopAllTasks()
+    {
+        if (m_wanderRandomDirectionTask != null)
+        {
+            m_wanderRandomDirectionTask.Stop();
+        }
+        if (m_moveErraticallyTask != null)
+        {
+            m_moveErraticallyTask.Stop();
+        }
+        StopAllCoroutines();
+    }
+
+    /// <summary>
     /// If the NavMeshAgent is currently traveling to a destination ... stop it.
     /// </summary>
     public void StopMoving()

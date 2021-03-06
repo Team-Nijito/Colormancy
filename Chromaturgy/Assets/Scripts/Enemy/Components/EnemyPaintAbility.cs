@@ -111,6 +111,17 @@ public class EnemyPaintAbility : MonoBehaviour
     }
 
     /// <summary>
+    /// Stop all ongoing Tasks or coroutines.
+    /// </summary>
+    public void StopAllTasks()
+    {
+        if (m_paintFloor != null)
+        {
+            m_paintFloor.Stop();
+        }
+    }
+
+    /// <summary>
     /// Unpause the painting process.
     /// </summary>
     public void UnpausePainting()

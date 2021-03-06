@@ -15,9 +15,9 @@ public class EnemyManager : MonoBehaviourPun
     private GameObject m_enemyFolder; // the folder the enemies will be organized under
 
     [SerializeField]
-    private int m_desiredEnemiesOnField = 7; // how many enemies are on the field at the time
+    private uint m_desiredEnemiesOnField = 7; // how many enemies are on the field at the time
 
-    private int m_numEnemiesOnField = 0;
+    private uint m_numEnemiesOnField = 0;
 
     private void Update()
     {
@@ -86,6 +86,9 @@ public class EnemyManager : MonoBehaviourPun
     [PunRPC]
     public void EnemyHasDied()
     {
-        m_numEnemiesOnField--;
+        if (m_numEnemiesOnField > 0)
+        {
+            m_numEnemiesOnField--;
+        }
     }
 }

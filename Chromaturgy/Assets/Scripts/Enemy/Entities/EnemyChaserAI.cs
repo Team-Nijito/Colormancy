@@ -233,5 +233,14 @@ public class EnemyChaserAI : MonoBehaviourPun, IEnemyDetection, IStatusEffects
         return TargetIsWithinDetectionRadius() && m_enemMovement.AngleFromPlayer < m_enemTargeting.FieldOfView;
     }
 
+    /// <summary>
+    /// Stop all ongoing Tasks or coroutines.
+    /// </summary>
+    public virtual void StopAllTasks()
+    {
+        m_enemTargeting.StopAllTasks();
+        m_enemMovement.StopAllTasks();
+    }
+
     #endregion
 }

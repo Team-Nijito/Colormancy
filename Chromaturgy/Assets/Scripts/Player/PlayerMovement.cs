@@ -43,9 +43,15 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable, IStatus
     [SerializeField] private float m_characterMass = 1.0f;
     [SerializeField] private float m_impactDecay = 5f; // how quickly impact "goes away"
 
+    // Slowdown
+    private float m_originalWalkSpeed;
+    private float m_originalRunSpeed;
+
     // Stun / blind
     private Task m_stunTask = null; // only permit one stun coroutine at a time
     private Task m_blindTask = null;
+
+    private GameObject m_blindPanel;
 
     #endregion
 
@@ -85,6 +91,10 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable, IStatus
     {
         m_controller = GetComponent<CharacterController>();
         m_playerState = PlayerState.Idle;
+        m_blindPanel = GameObject.Find("Canvas").transform.Find("BlindPanel").gameObject;
+
+        m_originalRunSpeed = m_runSpeed;
+        m_originalWalkSpeed = m_walkSpeed;
     }
 
     // Update is called once per frame
@@ -115,12 +125,11 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable, IStatus
     /// <param name="duration">Duration of blind.</param>
     private IEnumerator BlindForDuration(float duration)
     {
-        GameObject blindPanel = GameObject.Find("Canvas").transform.Find("BlindPanel").gameObject;
         // apply blind
-        blindPanel.SetActive(true);
+        m_blindPanel.SetActive(true);
         yield return new WaitForSecondsRealtime(duration);
         // disable blind
-        blindPanel.SetActive(false);
+        m_blindPanel.SetActive(false);
     }
 
     // Takes in player's iputs for movement
@@ -284,14 +293,14 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable, IStatus
     [PunRPC]
     public void ApplyBlind(float duration)
     {
-        if (m_stunTask == null)
+        if (m_blindTask == null)
         {
-            m_stunTask = new Task(BlindForDuration(duration));
+            m_blindTask = new Task(BlindForDuration(duration));
         }
         else
         {
-            m_stunTask.Stop();
-            m_stunTask = new Task(BlindForDuration(duration));
+            m_blindTask.Stop();
+            m_blindTask = new Task(BlindForDuration(duration));
         }
     }
 
@@ -338,6 +347,26 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable, IStatus
             m_stunTask.Stop();
             m_stunTask = new Task(StunForDuration(duration));
         }
+    }
+
+    /// <summary>
+    /// Stop all ongoing Tasks or coroutines, and reset all variables before status effects.
+    /// </summary>
+    public void StopAllTasks()
+    {
+        if (m_stunTask != null)
+        {
+            m_stunTask.Stop();
+            m_canMove = true;
+        }
+        if (m_blindTask != null)
+        {
+            m_blindTask.Stop();
+            m_blindPanel.SetActive(false);
+        }
+        StopAllCoroutines();
+        m_walkSpeed = m_walkSpeed < m_originalWalkSpeed ? m_originalWalkSpeed : m_walkSpeed;
+        m_runSpeed = m_runSpeed < m_originalRunSpeed ? m_originalRunSpeed : m_runSpeed;
     }
 
     #endregion

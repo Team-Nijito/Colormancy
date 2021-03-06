@@ -55,12 +55,18 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     [Tooltip("Used for destroying dead enemies")]
     private float m_timeUntilDestroy = 3.0f;
 
+    #endregion
+
+    #region Components
+
     // misc components
     private ManaScript m_mScript;
     private StatusEffectScript m_statusEffectScript;
     private EnemyAnimationManager m_animManager;
     private Chromaturgy.CameraController m_camController;
     private Transform m_healthBarTransform;
+
+    private PlayerMovement m_playerMovement;
 
     #endregion
 
@@ -70,10 +76,12 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     {
         // Try to find the GameManager script in the GameManager object in the current scene
         m_gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
+        m_isPlayer = GetComponent<CharacterController>() != null;
         if (m_isPlayer)
         {
             m_mScript = GetComponent<ManaScript>();
             m_camController = GetComponent<Chromaturgy.CameraController>();
+            m_playerMovement = GetComponent<PlayerMovement>();
 
             if (photonView.IsMine)
             {
@@ -138,8 +146,11 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
             if (m_effectiveHealth <= 0)
             {
                 {
+                    EnemyChaserAI controllerScript = GetComponent<EnemyChaserAI>();
+                    controllerScript.StopAllTasks(); // stop all ongoing status effects
+                    controllerScript.enabled = false; // works for all AI b/c all AI scripts derive from EnemyChaserAI
+
                     // disable movement, collider
-                    GetComponent<EnemyChaserAI>().enabled = false; // works for all AI b/c all AI scripts derive from EnemyChaserAI
                     GetComponent<NavMeshAgent>().velocity = Vector3.zero;
                     GetComponent<NavMeshAgent>().enabled = false;
                     GetComponent<Collider>().enabled = false;
@@ -270,21 +281,28 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     {
         // if you want to teleport the player, just deactivate and reactivate the gameObject
         gameObject.SetActive(false);
+
+        // if we have a status effect component, then stop any onging status effects
+        if (m_statusEffectScript)
+        {
+            m_statusEffectScript.ClearDamageDict();
+            m_playerMovement.StopAllTasks();
+        }
+
         Quaternion spawnRotation = Quaternion.identity;
         transform.position = m_gameManager.ReturnSpawnpointPosition(ref spawnRotation);
         transform.rotation = spawnRotation;
         m_camController.ResetRotation(spawnRotation);
-        gameObject.SetActive(true);
         ResetHealth();
-        
-        // DEBUG
+        m_mScript.ResetMana();
+
+        gameObject.SetActive(true);
+
+        // restart the damage over time system
         if (m_statusEffectScript)
         {
-            m_statusEffectScript.ClearDamageDict();
             m_statusEffectScript.RestartApplyDamage();
         }
-        
-        m_mScript.ResetMana();
     }
 
     /// <summary>
