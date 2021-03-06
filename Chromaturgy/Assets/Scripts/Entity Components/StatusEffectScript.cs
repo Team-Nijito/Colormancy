@@ -16,9 +16,8 @@ public class StatusEffectScript : MonoBehaviourPun
     // Damage over time (x)
     // Knock back (x)
     // Slow (x)
-    // Stun
-    // Fear / blind 
-    // actually integrate all of these into one system
+    // Stun (x)
+    // Fear / blind
 
     #region Variables
 
@@ -105,7 +104,7 @@ public class StatusEffectScript : MonoBehaviourPun
 
         foreach (KeyValuePair<string, DamageOverTime> iter in copyDict)
         {
-            print("Taking " + iter.Key + "damage");
+            //print("Taking " + iter.Key + "damage");
             if (iter.Value.isPercentDamage)
             {
                 returnDamage += (iter.Value.dps / 100) * m_health.MaxEffectiveHealth * XSecond;
@@ -161,6 +160,22 @@ public class StatusEffectScript : MonoBehaviourPun
     #endregion
 
     #region Public functions
+    
+    /// <summary>
+    /// Blind a characters. If it's an AI, they will panic and will not be able to target players.
+    /// </summary>
+    /// <param name="duration">How long the stun will last.</param>
+    public void RPCApplyBlind(float duration)
+    {
+        if (m_isPlayer)
+        {
+            photonView.RPC("ApplyBlind", photonView.Owner, duration);
+        }
+        else
+        {
+            photonView.RPC("ApplyBlind", PhotonNetwork.MasterClient, duration);
+        }
+    }
 
     /// <summary>
     /// Apply force to a character.
@@ -199,10 +214,10 @@ public class StatusEffectScript : MonoBehaviourPun
     }
 
     /// <summary>
-    /// Apply slow down to a character.
+    /// Apply a slowdown to this character for a duration, then changes the character's speed to its speed before the slowdown. Stackable.
     /// </summary>
-    /// <param name="percentReduction"></param>
-    /// <param name="duration"></param>
+    /// <param name="percentReduction">Range(0,100f). What percentage will we reduce the character's speed by? 50%?</param>
+    /// <param name="duration">How long the slowdown will last.</param>
     public void RPCApplySlowdown(float percentReduction, float duration)
     {
         if (m_isPlayer)
@@ -212,6 +227,22 @@ public class StatusEffectScript : MonoBehaviourPun
         else
         {
             photonView.RPC("ApplySlowdown", PhotonNetwork.MasterClient, percentReduction, duration);
+        }
+    }
+
+    /// <summary>
+    /// Stuns a character and prevent them from moving.
+    /// </summary>
+    /// <param name="duration">How long the stun will last.</param>
+    public void RPCApplyStun(float duration)
+    {
+        if (m_isPlayer)
+        {
+            photonView.RPC("ApplyStun", photonView.Owner, duration);
+        }
+        else
+        {
+            photonView.RPC("ApplyStun", PhotonNetwork.MasterClient, duration);
         }
     }
 

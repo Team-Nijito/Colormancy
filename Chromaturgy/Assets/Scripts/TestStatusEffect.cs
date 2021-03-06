@@ -50,6 +50,26 @@ public class TestStatusEffect : MonoBehaviour
 
     #endregion
 
+    #region Stun
+
+    [SerializeField]
+    private bool m_applyStun = false;
+
+    [SerializeField]
+    private float m_stunDuration = 1.5f;
+
+    #endregion
+
+    #region Blind
+
+    [SerializeField]
+    private bool m_applyBlind = false;
+
+    [SerializeField]
+    private float m_blindDuration = 5f;
+
+    #endregion
+
     private void OnTriggerEnter(Collider other)
     {
         bool isPlayer = other.CompareTag("Player");
@@ -71,6 +91,16 @@ public class TestStatusEffect : MonoBehaviour
             if (m_applySlowdown)
             {
                 statEffectScript.RPCApplySlowdown(m_percentReductionInSpeed, m_slowDownDuration);
+            }
+            if (m_applyStun)
+            {
+                statEffectScript.RPCApplyStun(m_stunDuration);
+                Destroy(gameObject); // destroy the gameobject to prevent consecutive stuns on collision
+            }
+            if (m_applyBlind)
+            {
+                statEffectScript.RPCApplyBlind(m_blindDuration);
+                Destroy(gameObject); // destroy the gameobject to prevent consecutive blinds on collision
             }
         }
     }

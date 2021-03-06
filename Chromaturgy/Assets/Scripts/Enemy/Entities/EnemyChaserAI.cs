@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using Photon.Pun;
-using UnityEngine.AI;
+using System;
 
 [RequireComponent(typeof(PhotonView))]
 [DisallowMultipleComponent]
@@ -17,8 +17,6 @@ public class EnemyChaserAI : MonoBehaviourPun, IEnemyDetection, IStatusEffects
     protected EnemyTargeting m_enemTargeting;
     protected EnemyHurtbox m_enemHurtbox;
 
-    protected Rigidbody m_rigidBody;
-
     #endregion
 
     #region MonoBehaviour callbacks
@@ -31,7 +29,6 @@ public class EnemyChaserAI : MonoBehaviourPun, IEnemyDetection, IStatusEffects
         m_enemMovement = GetComponent<EnemyMovement>();
         m_enemHurtbox = GetComponent<EnemyHurtbox>();
         m_enemTargeting = GetComponent<EnemyTargeting>();
-        m_rigidBody = GetComponent<Rigidbody>();
     }
 
     // Update is called once per frame
@@ -55,7 +52,7 @@ public class EnemyChaserAI : MonoBehaviourPun, IEnemyDetection, IStatusEffects
             }
         }
 
-        if (m_enemMovement.IsAgentActive())
+        if (m_enemMovement.IsAgentActive() && !m_enemTargeting.IsBlind())
         {
             ProcessAIIntent();
         }
@@ -63,7 +60,7 @@ public class EnemyChaserAI : MonoBehaviourPun, IEnemyDetection, IStatusEffects
 
     protected virtual void FixedUpdate()
     {
-        if (m_enemMovement.IsAgentActive())
+        if (m_enemMovement.IsAgentActive() && !m_enemTargeting.IsBlind())
         {
             HandleAIIntent();
         }
@@ -170,7 +167,18 @@ public class EnemyChaserAI : MonoBehaviourPun, IEnemyDetection, IStatusEffects
     #region Public functions
 
     /// <summary>
-    /// Apply a force to this character.
+    /// Character is blind, meaning that it will shuffle around aggressively and cannot target player.
+    /// </summary>
+    /// <param name="duration">Duration of blind</param>
+    [PunRPC]
+    public void ApplyBlind(float duration)
+    {
+        m_enemMovement.BlindPanic(duration);
+        m_enemTargeting.Blind(duration);
+    }
+
+    /// <summary>
+    /// (PunRPC) Apply a force to this character.
     /// </summary>
     /// <param name="dir">The direction of the force</param>
     /// <param name="force">The magnitude of the force</param>
@@ -180,10 +188,25 @@ public class EnemyChaserAI : MonoBehaviourPun, IEnemyDetection, IStatusEffects
         m_enemMovement.ApplyForce(dir, force);
     }
 
+    /// <summary>
+    /// (PunRPC) Apply a slowdown to this character for a duration, then changes the character's speed to its speed before the slowdown. Stackable.
+    /// </summary>
+    /// <param name="percentReduction">Range(0,100f). What percentage will we reduce the character's speed by? 50%?</param>
+    /// <param name="duration">How long the slowdown will last.</param>
     [PunRPC]
     public void ApplySlowdown(float percentReduction, float duration)
     {
         m_enemMovement.ApplySlowdown(percentReduction, duration);
+    }
+
+    /// <summary>
+    /// (PunRPC) Stuns a character and prevent them from moving.
+    /// </summary>
+    /// <param name="duration">How long the stun will last.</param>
+    [PunRPC]
+    public void ApplyStun(float duration)
+    {
+        m_enemMovement.ApplyStun(duration);
     }
 
     /// <summary>

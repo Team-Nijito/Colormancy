@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using Photon.Pun;
 using System.Collections;
+using System;
+using UnityEngine.UI;
 
 [RequireComponent(typeof(CharacterController))]
 public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable, IStatusEffects
@@ -40,6 +42,10 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable, IStatus
 
     [SerializeField] private float m_characterMass = 1.0f;
     [SerializeField] private float m_impactDecay = 5f; // how quickly impact "goes away"
+
+    // Stun / blind
+    private Task m_stunTask = null; // only permit one stun coroutine at a time
+    private Task m_blindTask = null;
 
     #endregion
 
@@ -103,32 +109,49 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable, IStatus
 
     #region Private functions
 
+    /// <summary>
+    /// Blinds the player by putting up a black screen.
+    /// </summary>
+    /// <param name="duration">Duration of blind.</param>
+    private IEnumerator BlindForDuration(float duration)
+    {
+        GameObject blindPanel = GameObject.Find("Canvas").transform.Find("BlindPanel").gameObject;
+        // apply blind
+        blindPanel.SetActive(true);
+        yield return new WaitForSecondsRealtime(duration);
+        // disable blind
+        blindPanel.SetActive(false);
+    }
+
     // Takes in player's iputs for movement
     private void ProcessPlayerInput()
     {
-        // Normalize movement vector, so that we don't move faster when
-        // we move diagonally
-        m_movement = new Vector3
+        if (m_canMove)
         {
-            x = Input.GetAxisRaw("Horizontal"),
-            y = 0,
-            z = Input.GetAxisRaw("Vertical")
-        }.normalized;
+            // Normalize movement vector, so that we don't move faster when
+            // we move diagonally
+            m_movement = new Vector3
+            {
+                x = Input.GetAxisRaw("Horizontal"),
+                y = 0,
+                z = Input.GetAxisRaw("Vertical")
+            }.normalized;
 
-        //CONVERT direction from local to world relative to camera
-        m_movement = Camera.main.transform.TransformDirection(m_movement);
+            //CONVERT direction from local to world relative to camera
+            m_movement = Camera.main.transform.TransformDirection(m_movement);
 
-        // Calculate gravity + update m_vSpeed and movement.y
-        m_vSpeed -= m_gravity * Time.deltaTime;
-        if (m_controller.isGrounded) m_vSpeed = 0;
-        m_movement.y = m_vSpeed;
+            // Calculate gravity + update m_vSpeed and movement.y
+            m_vSpeed -= m_gravity * Time.deltaTime;
+            if (m_controller.isGrounded) m_vSpeed = 0;
+            m_movement.y = m_vSpeed;
 
-        // Determine whether the player is currently dashing
-        if (Input.GetKey(KeyCode.LeftShift)) m_isDashing = true;
-        else m_isDashing = false;
+            // Determine whether the player is currently dashing
+            if (Input.GetKey(KeyCode.LeftShift)) m_isDashing = true;
+            else m_isDashing = false;
 
-        m_movementNoGrav = new Vector3(m_movement.x, 0f, m_movement.z); // for animation purposes
-        RotateTowardsMovementDir();
+            m_movementNoGrav = new Vector3(m_movement.x, 0f, m_movement.z); // for animation purposes
+            RotateTowardsMovementDir();
+        }
     }
 
     /// <summary>
@@ -194,12 +217,15 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable, IStatus
             {
                 m_character.transform.position = transform.position - new Vector3(0, 1, 0);
             }
+
+            m_movement = Vector3.zero; // reset movement after finished moving
         }
     }
 
     /// <summary>
     /// Applies the external forces stored in m_impact to the character.
-    /// Modified script from aldonaletto: https://answers.unity.com/questions/242648/force-on-character-controller-knockback.html
+    /// Modified script from aldonaletto: https://answers.unity.com/questions/242648/force-on-character-controller-knockback.html.
+    /// This IEnumerator works well with StartCoroutine.
     /// </summary>
     private void ApplyExternalForce()
     {
@@ -212,6 +238,12 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable, IStatus
         m_impact = Vector3.Lerp(m_impact, Vector3.zero, m_impactDecay * Time.deltaTime);
     }
 
+    /// <summary>
+    /// Applies slowdown, waits for duration, then reverts slowdown.
+    /// This IEnumerator works well with StartCoroutine.
+    /// </summary>
+    /// <param name="percentReductionSpeed">Range(0,100f). What percentage will we reduce the character's speed by? 50%?</param>
+    /// <param name="duration">How long the slowdown will last.</param>
     private IEnumerator ApplySlowdownForDuration(float percentReductionSpeed, float duration)
     {
         float percent = ((100 - percentReductionSpeed) / 100);
@@ -225,14 +257,48 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable, IStatus
         m_runSpeed /= percent;
     }
 
+    /// <summary>
+    /// Stuns the character, waits for duration, then character can move again.
+    /// This IEnumerator doesn't work well with StartCoroutine, go with Task instead.
+    /// (having multiple coroutines may mean that player may escape stun early if stunned repeatedly)
+    /// </summary>
+    /// <param name="duration">Duration of stun.</param>
+    private IEnumerator StunForDuration(float duration)
+    {
+        // apply stun
+        m_canMove = false;
+        m_animator.SetBool("Moving", false);
+        yield return new WaitForSecondsRealtime(duration);
+        // revert stun
+        m_canMove = true;
+    }
+
     #endregion
 
     #region Public functions
 
     /// <summary>
-    /// Adds a force to m_impact.
+    /// Is like the CS:GO flashbang, but in black.
     /// </summary>
-    /// <param name="dir">Direction of the force</param>
+    /// <param name="duration">Duration of blind</param>
+    [PunRPC]
+    public void ApplyBlind(float duration)
+    {
+        if (m_stunTask == null)
+        {
+            m_stunTask = new Task(BlindForDuration(duration));
+        }
+        else
+        {
+            m_stunTask.Stop();
+            m_stunTask = new Task(BlindForDuration(duration));
+        }
+    }
+
+    /// <summary>
+    /// (PunRPC) Apply a force to this character.
+    /// </summary>
+    /// <param name="dir">The direction of the force</param>
     /// <param name="force">The magnitude of the force</param>
     [PunRPC]
     public void ApplyForce(Vector3 dir, float force)
@@ -246,14 +312,32 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable, IStatus
     }
 
     /// <summary>
-    /// Slows the player down for a period of time.
+    /// (PunRPC) Apply a slowdown to this character for a duration, then changes the character's speed to its speed before the slowdown. Stackable.
     /// </summary>
-    /// <param name="percentReduction">The reduction in speed.</param>
-    /// <param name="duration">The duration that this slowdown will last.</param>
+    /// <param name="percentReduction">Range(0,100f). What percentage will we reduce the character's speed by? 50%?</param>
+    /// <param name="duration">How long the slowdown will last.</param>
     [PunRPC]
     public void ApplySlowdown(float percentReduction, float duration)
     {
         StartCoroutine(ApplySlowdownForDuration(percentReduction, duration));
+    }
+
+    /// <summary>
+    /// (PunRPC) Stuns a character and prevent them from moving.
+    /// </summary>
+    /// <param name="duration">How long the stun will last.</param>
+    [PunRPC]
+    public void ApplyStun(float duration)
+    {
+        if (m_stunTask == null)
+        {
+            m_stunTask = new Task(StunForDuration(duration));
+        }
+        else
+        {
+            m_stunTask.Stop();
+            m_stunTask = new Task(StunForDuration(duration));
+        }
     }
 
     #endregion

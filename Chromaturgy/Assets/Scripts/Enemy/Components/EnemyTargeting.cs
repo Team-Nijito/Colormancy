@@ -54,6 +54,10 @@ public class EnemyTargeting : MonoBehaviourPun
 
     protected delegate void FunctionInvokeOnPlayerTargetted();
 
+    protected bool m_canTargetPlayers = true; // stun variable
+
+    protected Task m_blindTask;
+
     #endregion
 
     #region Components
@@ -82,6 +86,17 @@ public class EnemyTargeting : MonoBehaviourPun
     #endregion
 
     #region Protected functions
+
+    /// <summary>
+    /// Character is blinded and now cannot target players.
+    /// </summary>
+    /// <param name="duration">Duration of blind (Min val = 1f)</param>
+    protected IEnumerator Blinded(float duration)
+    {
+        m_canTargetPlayers = false;
+        yield return new WaitForSecondsRealtime(duration);
+        m_canTargetPlayers = true;
+    }
 
     /// <summary>
     /// Allows the AI to remember and target the player until the player remains out of sight for m_rememberTargetDuration seconds.
@@ -157,6 +172,23 @@ public class EnemyTargeting : MonoBehaviourPun
     #endregion
 
     #region Public functions
+    
+    /// <summary>
+    /// Blind the character, preventing them from targetting the player for a duration.
+    /// </summary>
+    /// <param name="duration">Duration of blind</param>
+    public void Blind(float duration)
+    {
+        if (m_blindTask == null)
+        {
+            m_blindTask = new Task(Blinded(duration));
+        }
+        else
+        {
+            m_blindTask.Stop();
+            m_blindTask = new Task(Blinded(duration));
+        }
+    }
 
     /// <summary>
     /// The AI raycast to see if there is any obstacle between the AI and a player target.
@@ -268,5 +300,13 @@ public class EnemyTargeting : MonoBehaviourPun
         return m_rememberTarget || m_isForgettingTarget;
     }
     
+    /// <summary>
+    /// Is the character blind (cannot target players)?
+    /// </summary>
+    public bool IsBlind()
+    {
+        return !m_canTargetPlayers;
+    }
+
     #endregion
 }

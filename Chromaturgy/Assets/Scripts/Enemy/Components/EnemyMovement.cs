@@ -73,18 +73,19 @@ public class EnemyMovement : MonoBehaviourPun, IPunObservable
     // Wander variables
 
     [SerializeField]
-    private RangeTime m_wanderTime;
+    protected RangeTime m_wanderTime;
 
     [SerializeField]
-    private RangeTime m_idleTime;
+    protected RangeTime m_idleTime;
 
     [SerializeField]
-    private float m_wanderRadius = 10f;
+    protected float m_wanderRadius = 10f;
 
-    private Task m_wanderRandomDirectionTask;
+    protected Task m_wanderRandomDirectionTask;
+    protected Task m_moveErraticallyTask;
 
-    private WanderState m_wState = WanderState.NotWandering;
-    private WanderState m_lastWState = WanderState.NotWandering;
+    protected WanderState m_wState = WanderState.NotWandering;
+    protected WanderState m_lastWState = WanderState.NotWandering;
 
     #endregion
 
@@ -144,6 +145,33 @@ public class EnemyMovement : MonoBehaviourPun, IPunObservable
     #region Protected functions
 
     /// <summary>
+    /// A variant of ShuffleRandomDirection where the AI would "panic" (move around randomly at frequent intervals).
+    /// </summary>
+    /// <param name="duration">Duration of panic (Min val = 1f)</param>
+    protected IEnumerator PanicRandomDirection(float duration)
+    {
+        float cumulativeTime = 0f;
+
+        while (cumulativeTime < duration)
+        {
+            if (m_navMeshAgent.isOnNavMesh)
+            {
+                m_navMeshAgent.SetDestination(GetRandomPosition()); // choose random direction
+            }
+            m_wState = WanderState.Wander;
+            yield return new WaitForSecondsRealtime(0.75f);
+            if (m_navMeshAgent.isOnNavMesh)
+            {
+                m_navMeshAgent.SetDestination(transform.position); // set destination to current destination so it wont keep moving
+            }
+            m_wState = WanderState.Idle;
+            yield return new WaitForSecondsRealtime(0.25f);
+
+            cumulativeTime += 1f;
+        }
+    }
+
+    /// <summary>
     /// Returns a random valid position on the NavMesh. 
     /// </summary>
     /// <param name="center">The center of the place we start looking.</param>
@@ -170,14 +198,21 @@ public class EnemyMovement : MonoBehaviourPun, IPunObservable
     /// When called, the Rigidbody would control this object instead of the NavMeshAgent for a period of time.
     /// </summary>
     /// <param name="seconds">The time that the Rigidbody would manage this object</param>
-    protected IEnumerator RigidbodyControlsObject(Vector3 initalDir, float force, float duration)
+    protected IEnumerator RigidbodyControlsObject(Vector3 initalDir, float force, float duration, bool stun)
     {
         // Disable the agent
         m_navMeshAgent.enabled = false;
         m_rigidBody.isKinematic = false;
 
-        // Apply the force
-        m_rigidBody.AddForce(initalDir * force, ForceMode.Acceleration);
+        if (stun)
+        {
+            m_rigidBody.velocity = Vector3.zero;
+        }
+        else
+        {
+            // Apply the force
+            m_rigidBody.AddForce(initalDir * force, ForceMode.Acceleration);
+        }
 
         yield return new WaitForSecondsRealtime(duration);
 
@@ -232,7 +267,7 @@ public class EnemyMovement : MonoBehaviourPun, IPunObservable
     /// <param name="offset">Apply a force in the direction of the offset.</param>
     public void ApplyForce(Vector3 dir, float force)
     {
-        StartCoroutine(RigidbodyControlsObject(dir, force, m_durationRigidbody));
+        StartCoroutine(RigidbodyControlsObject(dir, force, m_durationRigidbody, false));
     }
 
     /// <summary>
@@ -243,6 +278,32 @@ public class EnemyMovement : MonoBehaviourPun, IPunObservable
     public void ApplySlowdown(float percentReduction, float duration)
     {
         StartCoroutine(Slowdown(percentReduction, duration));
+    }
+
+    /// <summary>
+    /// Stuns a character and prevent them from moving.
+    /// </summary>
+    /// <param name="duration">How long the stun will last.</param>
+    public void ApplyStun(float duration)
+    {
+        StartCoroutine(RigidbodyControlsObject(Vector3.zero, 0, duration, true));
+    }
+
+    /// <summary>
+    /// The character will now shuffle around aggressively.
+    /// </summary>
+    /// <param name="duration">Duration of blind panic.</param>
+    public void BlindPanic(float duration)
+    {
+        if (m_moveErraticallyTask == null)
+        {
+            m_moveErraticallyTask = new Task(PanicRandomDirection(duration));
+        }
+        else
+        {
+            m_moveErraticallyTask.Stop();
+            m_moveErraticallyTask = new Task(PanicRandomDirection(duration));
+        }
     }
 
     /// <summary>

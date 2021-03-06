@@ -10,4 +10,6 @@ public interface IStatusEffects
     
     void ApplyForce(Vector3 dir, float force);
     void ApplySlowdown(float percentReduction, float duration);
+    void ApplyStun(float duration);
+    void ApplyBlind(float duration);
 }
