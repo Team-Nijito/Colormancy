@@ -43709,6 +43709,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7917960859537667781, guid: a2874b7c33b663f47add06323276b963,
         type: 3}
+      propertyPath: popUpBox
+      value: 
+      objectReference: {fileID: 5660576723356485295}
+    - target: {fileID: 7917960859537667781, guid: a2874b7c33b663f47add06323276b963,
+        type: 3}
       propertyPath: m_playerPrefab
       value: 
       objectReference: {fileID: 5820395927475117105, guid: 0581afa7c6d1af948a396e0436033cfa,
@@ -91011,11 +91016,31 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 724465142215285671, guid: 42f0d0e1b8c1eb64d9532980b31a2cf2,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1002506116}
+    - target: {fileID: 724465142215285671, guid: 42f0d0e1b8c1eb64d9532980b31a2cf2,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: CloseWindow
+      objectReference: {fileID: 0}
     - target: {fileID: 4306213637502330649, guid: 42f0d0e1b8c1eb64d9532980b31a2cf2,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 1002506116}
+    - target: {fileID: 4319047897179212660, guid: 42f0d0e1b8c1eb64d9532980b31a2cf2,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1002506116}
+    - target: {fileID: 4319047897179212660, guid: 42f0d0e1b8c1eb64d9532980b31a2cf2,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: NextPage
+      objectReference: {fileID: 0}
     - target: {fileID: 5660576722297093904, guid: 42f0d0e1b8c1eb64d9532980b31a2cf2,
         type: 3}
       propertyPath: m_Pivot.x
@@ -91128,6 +91153,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 42f0d0e1b8c1eb64d9532980b31a2cf2, type: 3}
+--- !u!1 &5660576723356485295 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 724465141416255112, guid: 42f0d0e1b8c1eb64d9532980b31a2cf2,
+    type: 3}
+  m_PrefabInstance: {fileID: 5660576723356485294}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &6256116256656319332
 PrefabInstance:
   m_ObjectHideFlags: 0
