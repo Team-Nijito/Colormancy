@@ -43,6 +43,9 @@ namespace Chromaturgy
         private CameraZoom m_currentZoom = CameraZoom.Stationary;
         private CameraSpin m_currentSpin = CameraSpin.Stationary;
 
+        [SerializeField]
+        private string m_sceneToDeactivateCharacter = "YouWinScene";
+
         private void Start()
         {
             if (photonView.IsMine)
@@ -59,6 +62,8 @@ namespace Chromaturgy
             m_TCameraTransform.parent = transform;
             m_newRotation = transform.rotation;
 
+            m_TCamera.name = "PlayerCamera"; // change name so that we won't destroy this camera on scene load
+
             InitialCameraTrackPlayer();
             m_newZoom = m_TCameraTransform.localPosition;
 
@@ -67,10 +72,17 @@ namespace Chromaturgy
 
         private void Update()
         {
-            if (m_TCamera && m_isFollowing)
+            if (SceneManagerHelper.ActiveSceneName == m_sceneToDeactivateCharacter)
             {
-                HandleCameraZoomInputs();
-                HandleCameraRotationInputs();
+                gameObject.SetActive(false);
+            }
+            else
+            {
+                if (m_TCamera && m_isFollowing)
+                {
+                    HandleCameraZoomInputs();
+                    HandleCameraRotationInputs();
+                }
             }
         }
 

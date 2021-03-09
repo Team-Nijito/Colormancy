@@ -138,7 +138,7 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
             if (m_effectiveHealth <= 0 && transform.gameObject.tag == "Player")
             {
                 // player respawns in the middle
-                photonView.RPC("RespawnPlayer", RpcTarget.All);
+                photonView.RPC("RespawnPlayer", RpcTarget.All, false);
             }
         }
         else
@@ -277,7 +277,7 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     }
 
     [PunRPC]
-    public void RespawnPlayer()
+    public void RespawnPlayer(bool newSceneLoad)
     {
         // if you want to teleport the player, just deactivate and reactivate the gameObject
         gameObject.SetActive(false);
@@ -289,13 +289,19 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
             m_playerMovement.StopAllTasks();
         }
 
+        if (newSceneLoad)
+        {
+            // Must find the gameManager because we loaded into the new scene
+            m_gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
+        }
+
         Quaternion spawnRotation = Quaternion.identity;
         transform.position = m_gameManager.ReturnSpawnpointPosition(ref spawnRotation);
         transform.rotation = spawnRotation;
         m_camController.ResetRotation(spawnRotation);
+
         ResetHealth();
         m_mScript.ResetMana();
-
         gameObject.SetActive(true);
 
         // restart the damage over time system

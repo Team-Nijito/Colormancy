@@ -1050,8 +1050,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_colorToPaint: {r: 1, g: 0, b: 0, a: 1}
   m_isUnpainter: 1
-  m_paintCooldown: 0.5
-  m_paintRadius: 3
+  m_paintCooldown: 0.25
+  m_paintRadius: 1
   m_raycastFloorLen: 2
   m_paintableMask:
     serializedVersion: 2

@@ -2670,6 +2670,11 @@ PrefabInstance:
         type: 3}
     - target: {fileID: 7917960859537667781, guid: a2874b7c33b663f47add06323276b963,
         type: 3}
+      propertyPath: m_paintPercentageToWin
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7917960859537667781, guid: a2874b7c33b663f47add06323276b963,
+        type: 3}
       propertyPath: m_playerSpawnpoints.Array.size
       value: 4
       objectReference: {fileID: 0}
@@ -4593,7 +4598,7 @@ GameObject:
   - component: {fileID: 951749133}
   - component: {fileID: 951749132}
   m_Layer: 0
-  m_Name: MainCamera
+  m_Name: Main Camera
   m_TagString: MainCamera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

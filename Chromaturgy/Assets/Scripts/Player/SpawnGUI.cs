@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 
@@ -16,19 +14,7 @@ public class SpawnGUI : MonoBehaviourPunCallbacks
 
     private void Start()
     {
-        BarPanel = GameObject.Find("BarPanel");
-
-        print(photonView.IsMine);
-
-        if (BarPanel && photonView.IsMine)
-        {
-            Transform canvas = GameObject.Find("Canvas").transform;
-            GameObject g_SpellUI = Instantiate(SpellUI, canvas.transform.position, Quaternion.identity, canvas);
-            Vector2 uiPos = g_SpellUI.GetComponent<RectTransform>().anchoredPosition;
-            g_SpellUI.GetComponent<RectTransform>().anchoredPosition = new Vector2(uiPos.x + 85, 0);
-
-            SpawnExistingPlayersHealthBars();
-        }
+        ResetUIAfterSceneLoad();
     }
 
     public override void OnPlayerEnteredRoom(Player newPlayer)
@@ -37,7 +23,7 @@ public class SpawnGUI : MonoBehaviourPunCallbacks
         int GUIPosNumber = PhotonNetwork.CurrentRoom.PlayerCount - 1;
         GameObject newBar = Instantiate(healthManaPrefab, new Vector2(0, GUIPosNumber * 150), Quaternion.identity);
         newBar.transform.SetParent(BarPanel.transform);
-        PhotonView[] photonViews = UnityEngine.Object.FindObjectsOfType<PhotonView>();
+        PhotonView[] photonViews = FindObjectsOfType<PhotonView>();
         foreach (PhotonView view in photonViews)
         {
             Player player = view.Owner;
@@ -53,7 +39,7 @@ public class SpawnGUI : MonoBehaviourPunCallbacks
     {
         GameObject localPlayer = null;
         //Check if there are any characters in the room already if so add their health bars
-        PhotonView[] photonViews = UnityEngine.Object.FindObjectsOfType<PhotonView>();
+        PhotonView[] photonViews = FindObjectsOfType<PhotonView>();
         print("There are " + PhotonNetwork.CurrentRoom.PlayerCount + " players in the room.");
         print("Found " + photonViews.Length + " photon views on joining");
         int remoteIndex = 1;
@@ -82,5 +68,20 @@ public class SpawnGUI : MonoBehaviourPunCallbacks
         bar.transform.SetParent(BarPanel.transform);
         bar.GetComponent<PlayerGUI>().SetTarget(localPlayer);
         print("Created local health bar");
+    }
+
+    public void ResetUIAfterSceneLoad()
+    {
+        BarPanel = GameObject.Find("BarPanel");
+
+        if (BarPanel && photonView.IsMine)
+        {
+            Transform canvas = GameObject.Find("Canvas").transform;
+            GameObject g_SpellUI = Instantiate(SpellUI, canvas.transform.position, Quaternion.identity, canvas);
+            Vector2 uiPos = g_SpellUI.GetComponent<RectTransform>().anchoredPosition;
+            g_SpellUI.GetComponent<RectTransform>().anchoredPosition = new Vector2(uiPos.x + 85, 0);
+
+            SpawnExistingPlayersHealthBars();
+        }
     }
 }

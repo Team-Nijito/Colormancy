@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Photon.Pun;
+using UnityEngine;
 
 [RequireComponent(typeof(EnemyPaintAbility))]
 public class EnemyPainterAI : EnemyChaserAI
@@ -27,7 +28,7 @@ public class EnemyPainterAI : EnemyChaserAI
     // Consider what the AI will do at any point, and handles AI animation
     protected override void ProcessAIIntent()
     {
-        if (m_enemTargeting.TargetPlayer)
+        if (PhotonNetwork.InRoom && m_enemTargeting.TargetPlayer)
         {
             m_enemMovement.SetDirectionToPlayer(m_enemTargeting.TargetPlayer.position - transform.position);
             m_enemMovement.SetAngleFromPlayer(Vector3.Angle(m_enemMovement.DirectionToPlayer, transform.forward));
@@ -55,14 +56,22 @@ public class EnemyPainterAI : EnemyChaserAI
         }
         else
         {
-            m_animManager.ChangeState(EnemyAnimationManager.EnemyState.Idle);
+            // wander around in offline mode
+            if (m_enemMovement.currentWanderState == EnemyMovement.WanderState.Wander)
+            {
+                m_enemMovement.RunOrWalkDependingOnSpeed();
+            }
+            else
+            {
+                m_animManager.ChangeState(EnemyAnimationManager.EnemyState.Idle);
+            }
         }
     }
 
     // Primarily used for moving and attacking
     protected override void HandleAIIntent()
     {
-        if (m_enemTargeting.TargetPlayer)
+        if (PhotonNetwork.InRoom && m_enemTargeting.TargetPlayer)
         {
             m_enemMovement.SetCurrentAnimState(m_animManager.GetCurrentState());
             //Vector3.Distance(m_enemTargeting.TargetPlayer.position, transform.position) < m_enemTargeting.DetectionRadius
@@ -82,6 +91,10 @@ public class EnemyPainterAI : EnemyChaserAI
             {
                 m_enemMovement.ManuallyMove(transform.forward * m_enemMovement.Speed * Time.deltaTime);
             }
+        }
+        else
+        {
+            m_enemMovement.StartWandering();
         }
     }
 

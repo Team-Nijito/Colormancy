@@ -38,7 +38,7 @@ public class EnemyRangedAI : EnemyChaserAI
     /// </summary>
     protected override void ProcessAIIntent()
     {
-        if (m_enemTargeting.TargetPlayer)
+        if (PhotonNetwork.InRoom && m_enemTargeting.TargetPlayer)
         {
             m_enemMovement.SetDirectionToPlayer(m_enemTargeting.TargetPlayer.position - transform.position);
             m_enemMovement.SetAngleFromPlayer(Vector3.Angle(m_enemMovement.DirectionToPlayer, transform.forward));
@@ -84,7 +84,15 @@ public class EnemyRangedAI : EnemyChaserAI
         }
         else
         {
-            m_animManager.ChangeState(EnemyAnimationManager.EnemyState.Idle);
+            // wander around in offline mode
+            if (m_enemMovement.currentWanderState == EnemyMovement.WanderState.Wander)
+            {
+                m_enemMovement.RunOrWalkDependingOnSpeed();
+            }
+            else
+            {
+                m_animManager.ChangeState(EnemyAnimationManager.EnemyState.Idle);
+            }
         }
     }
 

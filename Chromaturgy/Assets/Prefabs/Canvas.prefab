@@ -79,9 +79,9 @@ MonoBehaviour:
   m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 1920, y: 1080}
+  m_ReferenceResolution: {x: 1280, y: 720}
   m_ScreenMatchMode: 0
-  m_MatchWidthOrHeight: 0
+  m_MatchWidthOrHeight: 1
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
@@ -522,7 +522,7 @@ PrefabInstance:
     - target: {fileID: 3385855604305957520, guid: 8bda28dae310bb9439cbffdeb2d52dba,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 2.6307373
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3385855604305957520, guid: 8bda28dae310bb9439cbffdeb2d52dba,
         type: 3}
@@ -559,6 +559,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 5660576723088563779}
     m_Modifications:
+    - target: {fileID: 3090542349220195649, guid: 835adfb05f0d04a46a5df0adb9e16867,
+        type: 3}
+      propertyPath: m_FontData.m_BestFit
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5772028471521054216, guid: 835adfb05f0d04a46a5df0adb9e16867,
         type: 3}
       propertyPath: m_Name
@@ -608,6 +613,21 @@ PrefabInstance:
         type: 3}
       propertyPath: m_SizeDelta.y
       value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 7884836957760796374, guid: 835adfb05f0d04a46a5df0adb9e16867,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7884836957760796374, guid: 835adfb05f0d04a46a5df0adb9e16867,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7884836957760796374, guid: 835adfb05f0d04a46a5df0adb9e16867,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7884836957760796374, guid: 835adfb05f0d04a46a5df0adb9e16867,
         type: 3}

@@ -4,16 +4,11 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class GameManager : MonoBehaviourPunCallbacks
+public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 {
-    #region Public Fields
-
-    [HideInInspector]
-    public GameObject m_playerListFolder;
-
-    #endregion
-
     #region Private Fields
+
+    // General variables
 
     [Tooltip("Players will spawn on these location(s)")]
     [SerializeField]
@@ -27,16 +22,46 @@ public class GameManager : MonoBehaviourPunCallbacks
     [SerializeField]
     private GameObject m_playerPrefab;
 
-    [Tooltip("The prefab for the Health and Mana GUI")]
+    public bool DoSpawnPlayer { get { return m_doSpawnPlayer; } private set { m_doSpawnPlayer = value; } }
+
+    [Tooltip("Do we spawn players in this scene?")]
     [SerializeField]
-    private GameObject m_healthManaBarPrefab;
+    private bool m_doSpawnPlayer = true;
 
-    //[Tooltip("The name of the folder that stores the player gameobjects")]
-    //[SerializeField]
-    //private string m_playerListFolderName = "PlayerList";
+    private uint m_currentSpawnIndex = 0; // index of the current spawn to spawn the player, used if m_playerSpawnpoints exists
 
-    private int m_currentSpawnIndex = 0; // index of the current spawn to spawn the player, used if m_playerSpawnpoints exists
-    
+    // Ready up variables
+
+    [SerializeField]
+    private bool m_isLobby = false;
+
+    public int PlayersReady { get { return m_playersReady; } private set { m_playersReady = value; } }
+    public uint PlayersNeededToReady { get { return m_playersNeededToStartGame; } private set { m_playersNeededToStartGame = value; } }
+
+    private int m_playersReady = 0;
+
+    [SerializeField]
+    private uint m_playersNeededToStartGame = 5;
+
+    [SerializeField]
+    private string m_levelAfterLobbyLevel = "Office Level 1";
+
+    // Painting variables
+
+    // Accessor ... you can fetch m_paintPecentageToWin with PaintPercentToWin if you're outside this script
+    public float PaintPercentToWin { get { return m_paintPercentageToWin; } private set { m_paintPercentageToWin = value; } }
+
+    [Range(0,1)]
+    [SerializeField]
+    private float m_paintPercentageToWin = 0.75f;
+
+    [SerializeField]
+    private string m_levelAfterBeatingStage = "YouWinScene";
+
+    #endregion
+
+    #region Dialogue system fields
+
     public GameObject popUpBox;
 
     Animator animator;
@@ -188,19 +213,16 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     #endregion
 
-    #region Private Methods
-
-    //private void Awake()
-    //{
-    //    m_playerListFolder = GameObject.Find(m_playerListFolderName);
-    //    if (!m_playerListFolder)
-    //    {
-    //        m_playerListFolder = new GameObject(m_playerListFolderName);
-    //    }
-    //}
+    #region MonoBehaviour callbacks
 
     private void Start()
     {
+        if (!m_doSpawnPlayer || !PhotonNetwork.InRoom)
+        {
+            // don't do anything
+            return;
+        }
+
         if (m_playerPrefab == null)
         {
             Debug.LogError("<Color=Red>Missing player prefab");
@@ -212,7 +234,7 @@ public class GameManager : MonoBehaviourPunCallbacks
                 if (HealthScript.LocalPlayerInstance == null)
                 {
                     // Determine the spawnpoint to spawn the player on
-                    m_currentSpawnIndex = m_playerSpawnpoints.Length > 0 ? (PhotonNetwork.LocalPlayer.ActorNumber % m_playerSpawnpoints.Length) - 1 : 0;
+                    m_currentSpawnIndex = (uint)(m_playerSpawnpoints.Length > 0 ? (PhotonNetwork.LocalPlayer.ActorNumber % m_playerSpawnpoints.Length) - 1 : 0);
                     Quaternion spawnRotation = Quaternion.identity;
                     Vector3 spawnPosition = ReturnSpawnpointPosition(ref spawnRotation);
                     photonView.RPC("SpawnPlayer", PhotonNetwork.LocalPlayer, spawnPosition, spawnRotation);
@@ -220,6 +242,28 @@ public class GameManager : MonoBehaviourPunCallbacks
                 else
                 {
                     Debug.LogFormat("Ignoring scene load for {0}", SceneManagerHelper.ActiveSceneName);
+
+                    // This portion of the code is reached whenever HealthScript.LocalPlayerInstance exists
+                    // meaning we're loading a new scene (player is Don't Destroy on load)
+
+                    PhotonView playerView = PhotonView.Get(HealthScript.LocalPlayerInstance);
+                    
+                    // Fetch the current scene's GameManager
+                    GameManager m_currentGm = GameObject.Find("GameManager").GetComponent<GameManager>();
+
+                    if (m_currentGm.DoSpawnPlayer && playerView.IsMine)
+                    {
+                        // Destroy the current camera because the player already has one
+                        Destroy(GameObject.Find("Main Camera"));
+
+                        // Teleport only all players to the first spawn? (bug)
+                        playerView.RPC("RespawnPlayer", PhotonNetwork.LocalPlayer, true);
+
+                        // Reset their GUI
+                        playerView.gameObject.GetComponent<SpawnGUI>().ResetUIAfterSceneLoad();
+                    }
+
+                    // how do I spawn players at their spawnpoints? hmm..
                 }
             }
             else
@@ -237,6 +281,22 @@ public class GameManager : MonoBehaviourPunCallbacks
         nextButton = popUpBox.transform.Find("NextButton").gameObject;
     }
 
+    private void Update()
+    {
+        if (m_isLobby && PhotonNetwork.IsMasterClient)
+        {
+            // check if all players are ready
+            if (m_playersReady >= m_playersNeededToStartGame)
+            {
+                LoadNewSceneAfterLobby();
+            }
+        }
+    }
+
+    #endregion
+
+    #region Private Methods
+
     void LoadArena()
     {
         if (!PhotonNetwork.IsMasterClient)
@@ -250,6 +310,76 @@ public class GameManager : MonoBehaviourPunCallbacks
     private void SpawnPlayer(Vector3 spawnPos, Quaternion spawnRot)
     {
         PhotonNetwork.Instantiate(m_playerPrefab.name, spawnPos, spawnRot);
+    }
+
+    private void LoadFirstLevel()
+    {
+        // do it instantly for now
+        SceneManager.LoadScene(m_levelAfterLobbyLevel);
+    }
+    
+    [PunRPC]
+    private void ReadyUp()
+    {
+        m_playersReady++;
+    }
+
+    [PunRPC]
+    private void UnReady()
+    {
+        m_playersReady--;
+    }
+
+    private void LoadNewSceneAfterLobby()
+    {
+        // do it instantly for now
+        SceneManager.LoadScene(m_levelAfterLobbyLevel);
+    }
+
+    #endregion
+
+    #region Public Methods
+
+    public void LoadNewSceneAfterFinishedPainting()
+    {
+        // do it instantly for now
+        SceneManager.LoadScene(m_levelAfterBeatingStage);
+    }
+
+    /// <summary>
+    /// Player readies up. Used for the lobby.
+    /// </summary>
+    public void RPCReadyUp()
+    {
+        photonView.RPC("ReadyUp", RpcTarget.All);
+    }
+
+    /// <summary>
+    /// Player unreadies. Used for the lobby.
+    /// </summary>
+    public void RPCUnready()
+    {
+        photonView.RPC("UnReady", RpcTarget.All);
+    }
+
+    #endregion
+
+    #region Photon functions
+
+    // Synchronize the number of players ready across all clients
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (m_isLobby)
+        {
+            if (stream.IsWriting)
+            {
+                stream.SendNext(m_playersReady);
+            }
+            else
+            {
+                m_playersReady = (int)stream.ReceiveNext();
+            }
+        }
     }
 
     #endregion

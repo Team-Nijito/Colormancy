@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Photon.Pun;
+using UnityEngine;
 
 public class TestStatusEffect : MonoBehaviour
 {
@@ -80,27 +81,35 @@ public class TestStatusEffect : MonoBehaviour
         {
             statEffectScript = other.gameObject.GetComponent<StatusEffectScript>();
 
-            if (m_applyDamageOverTime)
+            if (PhotonNetwork.InRoom)
             {
-                statEffectScript.RPCApplyOrStackDoT(m_isPercentageDamage, m_damage, m_secondDuration, m_damageType);
+                // online - we launched from the launcher and then joined the room
+                if (m_applyDamageOverTime)
+                {
+                    statEffectScript.RPCApplyOrStackDoT(m_isPercentageDamage, m_damage, m_secondDuration, m_damageType);
+                }
+                if (m_applyKnockback)
+                {
+                    statEffectScript.RPCApplyForce(other.gameObject.transform.position - transform.position + Vector3.up, m_force);
+                }
+                if (m_applySlowdown)
+                {
+                    statEffectScript.RPCApplySlowdown(m_percentReductionInSpeed, m_slowDownDuration);
+                }
+                if (m_applyStun)
+                {
+                    statEffectScript.RPCApplyStun(m_stunDuration);
+                    Destroy(gameObject); // destroy the gameobject to prevent consecutive stuns on collision
+                }
+                if (m_applyBlind)
+                {
+                    statEffectScript.RPCApplyBlind(m_blindDuration);
+                    Destroy(gameObject); // destroy the gameobject to prevent consecutive blinds on collision
+                }
             }
-            if (m_applyKnockback)
+            else
             {
-                statEffectScript.RPCApplyForce(other.gameObject.transform.position - transform.position + Vector3.up, m_force);
-            }
-            if (m_applySlowdown)
-            {
-                statEffectScript.RPCApplySlowdown(m_percentReductionInSpeed, m_slowDownDuration);
-            }
-            if (m_applyStun)
-            {
-                statEffectScript.RPCApplyStun(m_stunDuration);
-                Destroy(gameObject); // destroy the gameobject to prevent consecutive stuns on collision
-            }
-            if (m_applyBlind)
-            {
-                statEffectScript.RPCApplyBlind(m_blindDuration);
-                Destroy(gameObject); // destroy the gameobject to prevent consecutive blinds on collision
+                // offline testing (you've clicked play on the current scene that's not the launcher) is currently not supported
             }
         }
     }
@@ -115,13 +124,20 @@ public class TestStatusEffect : MonoBehaviour
         {
             statEffectScript = other.gameObject.GetComponent<StatusEffectScript>();
 
-            if (m_applyDamageOverTime)
+            if (PhotonNetwork.InRoom)
             {
-                statEffectScript.RPCApplyOrStackDoT(m_isPercentageDamage, m_damage, m_secondDuration * Time.deltaTime, m_damageType);
+                if (m_applyDamageOverTime)
+                {
+                    statEffectScript.RPCApplyOrStackDoT(m_isPercentageDamage, m_damage, m_secondDuration * Time.deltaTime, m_damageType);
+                }
+                if (m_applyKnockback)
+                {
+                    statEffectScript.RPCApplyForce(other.gameObject.transform.position - transform.position + Vector3.up, m_force * Time.deltaTime);
+                }
             }
-            if (m_applyKnockback)
+            else
             {
-                statEffectScript.RPCApplyForce(other.gameObject.transform.position - transform.position + Vector3.up, m_force * Time.deltaTime);
+                // offline testing (you've clicked play on the current scene that's not the launcher) is currently not supported
             }
         }
     }
