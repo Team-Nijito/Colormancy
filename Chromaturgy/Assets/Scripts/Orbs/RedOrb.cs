@@ -28,7 +28,7 @@ public class RedOrb : Orb
 
     public override void CastGreaterEffect(GameObject hit, int orbAmount)
     {
-        PhotonView photonView = hit.GetPhotonView();
+        PhotonView photonView = PhotonView.Get(hit);
         photonView.RPC("TakeDamage", RpcTarget.All, (float)orbAmount);
     }
 
