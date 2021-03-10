@@ -10,6 +10,15 @@ public class PaintProgressUI : MonoBehaviour
     [SerializeField]
     private Image m_paintFillBar;
 
+    [SerializeField]
+    private RectTransform m_brush;
+
+    [SerializeField]
+    private float m_brushInitialX = 60f;
+
+    [SerializeField]
+    private float m_brushTravelLengthX = 146f; // end position is 206, trust me I did the math
+
     private GameManager m_gmScript;
 
     #endregion
@@ -31,6 +40,8 @@ public class PaintProgressUI : MonoBehaviour
     private void Update()
     {
         m_paintFillBar.fillAmount = PaintingManager.paintingProgress() / m_gmScript.PaintPercentageNeededToWin;
+        print(m_paintFillBar.fillAmount);
+        m_brush.position = new Vector2(m_brushInitialX + m_brushTravelLengthX * m_paintFillBar.fillAmount, m_brush.position.y);
     }
 
     #endregion
