@@ -151,5 +151,6 @@ public class SpellTest : MonoBehaviourPun
     {
         currentSpell.Cast(transform);
         spellCooldowns[currentSpell.GetOrbTuple()] = Time.time + currentSpell.GetSpellCooldown();
+        mana.ConsumeMana(currentSpell.GetManaCost());
     }
 }

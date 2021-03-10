@@ -103,11 +103,11 @@ public class GameManager : MonoBehaviourPunCallbacks
             dialogueImages = images;
             dialoguePage = 0;
 
-            SetPage();
-
             animator.SetTrigger("pop");
             PodiumMessage = false;
             WindowOpen = true;
+
+            SetPage();
         }
     }
 
@@ -192,6 +192,8 @@ public class GameManager : MonoBehaviourPunCallbacks
             WindowOpen = false;
             playerSpellTest = null;
             currentOrbType = null;
+            acceptButton.SetActive(false);
+            nextButton.SetActive(true);
         }
     }
 
