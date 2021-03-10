@@ -17,7 +17,7 @@ public class PaintProgressUI : MonoBehaviour
     private float m_brushInitialX = 60f;
 
     [SerializeField]
-    private float m_brushTravelLengthX = 146f; // end position is 206, trust me I did the math
+    private float m_brushTravelLengthX = 146f; // end position is 206? idk UI scales and stuff
 
     private GameManager m_gmScript;
 
@@ -30,8 +30,8 @@ public class PaintProgressUI : MonoBehaviour
         m_gmScript = GameObject.Find("GameManager").GetComponent<GameManager>();
         if (!m_gmScript.IsLevel)
         {
-            // disable this gameObject for nonlevel scenes
-            gameObject.SetActive(false);
+            // destroy this gameObject for nonlevel scenes
+            Destroy(gameObject);
         }
     }
 
@@ -40,7 +40,6 @@ public class PaintProgressUI : MonoBehaviour
     private void Update()
     {
         m_paintFillBar.fillAmount = PaintingManager.paintingProgress() / m_gmScript.PaintPercentageNeededToWin;
-        print(m_paintFillBar.fillAmount);
         m_brush.position = new Vector2(m_brushInitialX + m_brushTravelLengthX * m_paintFillBar.fillAmount, m_brush.position.y);
     }
 

@@ -151,7 +151,7 @@ public class SpellTest : MonoBehaviourPun
         }
     }
     
-    void CastSpell()
+    void CastSpell(Vector3 clickedPosition)
     {
         currentSpell.Cast(transform, clickedPosition);
         spellCooldowns[currentSpell.GetOrbTuple()] = Time.time + currentSpell.GetSpellCooldown();

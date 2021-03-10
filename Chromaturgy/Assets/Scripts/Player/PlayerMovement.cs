@@ -91,7 +91,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable, IStatus
     {
         m_controller = GetComponent<CharacterController>();
         m_playerState = PlayerState.Idle;
-        m_blindPanel = GameObject.Find("Canvas").transform.Find("BlindPanel").gameObject;
+        m_blindPanel = GameObject.Find("Canvas").transform.Find("LevelUI").transform.Find("BlindPanel").gameObject;
 
         m_originalRunSpeed = m_runSpeed;
         m_originalWalkSpeed = m_walkSpeed;

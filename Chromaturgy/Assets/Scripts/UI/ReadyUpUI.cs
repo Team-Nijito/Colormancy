@@ -28,6 +28,11 @@ public class ReadyUpUI : MonoBehaviour
     private void Start()
     {
         m_gmScript = GameObject.Find("GameManager").GetComponent<GameManager>();
+
+        if (m_gmScript.IsLevel)
+        {
+            Destroy(gameObject);
+        }
     }
 
     private void Update()

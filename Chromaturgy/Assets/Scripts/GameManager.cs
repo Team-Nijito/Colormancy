@@ -294,11 +294,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
                     // Fetch the current scene's GameManager
                     GameManager m_currentGm = GameObject.Find("GameManager").GetComponent<GameManager>();
 
-                    if (m_currentGm.DoSpawnPlayer && playerView.IsMine)
-                    {
-                        // Destroy the current camera because the player already has one
-                        Destroy(GameObject.Find("Main Camera"));
+                    // Destroy the current camera because the player already has one
+                    Destroy(GameObject.Find("Main Camera"));
 
+                    if (m_currentGm.DoSpawnPlayer && playerView.IsMine)
+                    {    
                         // Teleport only all players to the first spawn? (bug)
                         playerView.RPC("RespawnPlayer", PhotonNetwork.LocalPlayer, true);
 
