@@ -21,7 +21,8 @@ public class SpellTest : MonoBehaviourPun
 
     public bool TestingMode = false;
 
-    Dictionary<(Orb, Orb, Orb), float> spellCooldowns = new Dictionary<(Orb, Orb, Orb), float>();
+    [SerializeField]
+    Dictionary<(System.Type, System.Type, System.Type), float> spellCooldowns = new Dictionary<(System.Type, System.Type, System.Type), float>();
 
     SpellManager.Spell currentSpell;
 
@@ -145,18 +146,10 @@ public class SpellTest : MonoBehaviourPun
             }
         }
     }
-
-    [PunRPC]
-    void ClearSpell()
-    {
-        currentSpell = new SpellManager.Spell();
-    }
-
+    
     void CastSpell()
     {
         currentSpell.Cast(transform);
         spellCooldowns[currentSpell.GetOrbTuple()] = Time.time + currentSpell.GetSpellCooldown();
-        mana.ConsumeMana(currentSpell.GetManaCost());
-        //photonView.RPC("ClearSpell", RpcTarget.All);
     }
 }

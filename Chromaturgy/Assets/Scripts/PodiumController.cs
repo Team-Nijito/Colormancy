@@ -5,9 +5,20 @@ using Photon.Pun;
 
 public class PodiumController : MonoBehaviour
 {
+    public GameObject interactIndicator;
+    SpriteRenderer indicatorSprite;
+
+    [SerializeField]
+    string[] messages = new string[] { "Test Message 1" };
+
+    [SerializeField]
+    Sprite[] images;
+
     SpellTest playerSpellTest = null;
 
     bool InRange = false;
+
+    GameManager manager;
 
     public enum OrbTypes { BlueOrb, BrownOrb, GreenOrb, IndigoOrb, OrangeOrb, RedOrb, VioletOrb, YellowOrb, QuicksilverOrb}
 
@@ -16,7 +27,8 @@ public class PodiumController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-
+        manager = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>();
+        indicatorSprite = interactIndicator.GetComponent<SpriteRenderer>();
     }
 
     // Update is called once per frame
@@ -24,11 +36,12 @@ public class PodiumController : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0) && InRange)
         {
-            AddCurrentSpellOrb();
+            Orb orb = GetCurrentOrb();
+            manager.PodiumPopUp(messages, images, orb, playerSpellTest);
         }
     }
 
-    void AddCurrentSpellOrb()
+    Orb GetCurrentOrb()
     {
         Orb orbType = null;
         switch(podiumType)
@@ -59,8 +72,7 @@ public class PodiumController : MonoBehaviour
                 break;
         }
 
-        if (orbType != null)
-            playerSpellTest.AddSpellOrb(orbType);
+        return orbType;
     }
 
     private void OnTriggerEnter(Collider other)
@@ -70,6 +82,7 @@ public class PodiumController : MonoBehaviour
             if (other.gameObject.GetComponent<PhotonView>().IsMine)
             {
                 InRange = true;
+                indicatorSprite.enabled = true;
                 playerSpellTest = other.gameObject.GetComponent<SpellTest>();
             }
         }
@@ -82,6 +95,7 @@ public class PodiumController : MonoBehaviour
             if (other.gameObject.GetComponent<PhotonView>().IsMine)
             {
                 InRange = false;
+                indicatorSprite.enabled = false;
                 playerSpellTest = null;
             }
         }
