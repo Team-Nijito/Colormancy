@@ -8,12 +8,8 @@ public class PaintingManager : MonoBehaviour
     private static int vertexCount;
     private static int paintedVertices;
 
-    private GameManager gameManagerScript;
-
     private void Start()
     {
-        gameManagerScript = GameObject.Find("GameManager").GetComponent<GameManager>();
-
         // find all paintable gameobjects and set their initial colors
         GameObject [] objects = FindObjectsOfType<GameObject>();
         int count = 0;
@@ -75,15 +71,6 @@ public class PaintingManager : MonoBehaviour
             }
         }
         //print(count);
-    }
-
-    private void Update()
-    {
-        //print("Paint progress: " + paintingProgress());
-        if (paintingProgress() > gameManagerScript.PaintPercentToWin)
-        {
-            gameManagerScript.LoadNewSceneAfterFinishedPainting();
-        }
     }
 
     public static void PaintSphere(Color paintColor, Vector3 origin, float radius, float threshold = 0.5f)

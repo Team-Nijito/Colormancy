@@ -111,6 +111,10 @@ public class Launcher : MonoBehaviourPunCallbacks
     {
         if (PhotonNetwork.CurrentRoom.PlayerCount == 1)
         {
+            if (sceneNameToLoadIn == "Launcher")
+            {
+                Debug.LogError("You shouldn't load the Launcher scene because we're already in Launcher.unity");
+            }
             PhotonNetwork.LoadLevel(sceneNameToLoadIn);
         }
     }

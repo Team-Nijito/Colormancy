@@ -32,8 +32,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
     // Ready up variables
 
+    public bool IsLevel { get { return m_isLevel; } private set { m_isLevel = value; } }
     [SerializeField]
-    private bool m_isLobby = false;
+    private bool m_isLevel = true;
 
     public int PlayersReady { get { return m_playersReady; } private set { m_playersReady = value; } }
     public uint PlayersNeededToReady { get { return m_playersNeededToStartGame; } private set { m_playersNeededToStartGame = value; } }
@@ -46,14 +47,14 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     [SerializeField]
     private string m_levelAfterLobbyLevel = "Office Level 1";
 
+    private bool m_isLoadingNewScene = false;
+
     // Painting variables
 
-    // Accessor ... you can fetch m_paintPecentageToWin with PaintPercentToWin if you're outside this script
-    public float PaintPercentToWin { get { return m_paintPercentageToWin; } private set { m_paintPercentageToWin = value; } }
-
+    public float PaintPercentageNeededToWin { get { return m_paintPercentageNeededToWin; } private set { m_paintPercentageNeededToWin = value; } }
     [Range(0,1)]
     [SerializeField]
-    private float m_paintPercentageToWin = 0.75f;
+    private float m_paintPercentageNeededToWin = 0.75f;
 
     [SerializeField]
     private string m_levelAfterBeatingStage = "YouWinScene";
@@ -283,12 +284,22 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
     private void Update()
     {
-        if (m_isLobby && PhotonNetwork.IsMasterClient)
+        if (PhotonNetwork.IsMasterClient)
         {
-            // check if all players are ready
-            if (m_playersReady >= m_playersNeededToStartGame)
+            if (!m_isLevel)
             {
-                LoadNewSceneAfterLobby();
+                // check if all players are ready
+                if (m_playersReady >= m_playersNeededToStartGame)
+                {
+                    LoadFirstLevel();
+                }
+            }
+            else
+            {
+                if (PaintingManager.paintingProgress() > m_paintPercentageNeededToWin)
+                {
+                    LoadNewSceneAfterFinishedPainting();
+                }
             }
         }
     }
@@ -314,8 +325,13 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
     private void LoadFirstLevel()
     {
-        // do it instantly for now
-        SceneManager.LoadScene(m_levelAfterLobbyLevel);
+        if (!m_isLoadingNewScene)
+        {
+            m_isLoadingNewScene = true;
+
+            // do it instantly for now
+            PhotonNetwork.LoadLevel(m_levelAfterLobbyLevel);
+        }
     }
     
     [PunRPC]
@@ -330,20 +346,19 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         m_playersReady--;
     }
 
-    private void LoadNewSceneAfterLobby()
-    {
-        // do it instantly for now
-        SceneManager.LoadScene(m_levelAfterLobbyLevel);
-    }
-
     #endregion
 
     #region Public Methods
 
     public void LoadNewSceneAfterFinishedPainting()
     {
-        // do it instantly for now
-        SceneManager.LoadScene(m_levelAfterBeatingStage);
+        if (!m_isLoadingNewScene)
+        {
+            m_isLoadingNewScene = true;
+
+            // do it instantly for now
+            PhotonNetwork.LoadLevel(m_levelAfterBeatingStage);
+        }
     }
 
     /// <summary>
@@ -369,7 +384,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     // Synchronize the number of players ready across all clients
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
-        if (m_isLobby)
+        if (!m_isLevel)
         {
             if (stream.IsWriting)
             {
