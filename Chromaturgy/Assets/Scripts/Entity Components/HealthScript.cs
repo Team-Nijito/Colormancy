@@ -138,7 +138,7 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
             if (m_effectiveHealth <= 0 && transform.gameObject.tag == "Player")
             {
                 // player respawns in the middle
-                photonView.RPC("RespawnPlayer", RpcTarget.All, false);
+                photonView.RPC("RespawnPlayer", RpcTarget.All);
             }
         }
         else
@@ -277,7 +277,7 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     }
 
     [PunRPC]
-    public void RespawnPlayer(bool newSceneLoad)
+    public void RespawnPlayer()
     {
         // if you want to teleport the player, just deactivate and reactivate the gameObject
         gameObject.SetActive(false);
@@ -289,7 +289,7 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
             m_playerMovement.StopAllTasks();
         }
 
-        if (newSceneLoad)
+        if (!m_gameManager)
         {
             // Must find the gameManager because we loaded into the new scene
             m_gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();

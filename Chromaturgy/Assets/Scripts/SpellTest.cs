@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
+using System;
 
 public class OrbInfo
 {
@@ -14,7 +15,10 @@ public class OrbInfo
 
 public class SpellTest : MonoBehaviourPun
 {
+    public static List<Orb> orbHistory = new List<Orb>(); // static variable that keep tracks of orbs in between scenes
+
     List<Orb> orbs = new List<Orb>();
+
     SpellManager manager;
     ManaScript mana;
     OrbTrayUIController uIController;
@@ -66,25 +70,7 @@ public class SpellTest : MonoBehaviourPun
         manager = GetComponent<SpellManager>();
         mana = GetComponent<ManaScript>();
 
-        GameObject gUIController = null;
-        if (photonView.IsMine && PhotonNetwork.IsConnected)
-        {
-            gUIController = GameObject.Find("OrbTray");
-        }
-
-        if (gUIController)
-        {
-            uIController = gUIController.GetComponent<OrbTrayUIController>();
-        }
-
-        if (TestingMode)
-        {
-            AddSpellOrb(new YellowOrb());
-            AddSpellOrb(new OrangeOrb());
-            AddSpellOrb(new BlueOrb());
-            AddSpellOrb(new VioletOrb());
-            AddSpellOrb(new IndigoOrb());
-        }
+        Initialization();
     }
 
     // Update is called once per frame
@@ -119,9 +105,13 @@ public class SpellTest : MonoBehaviourPun
         }
     }
 
-    public void AddSpellOrb(Orb orb)
+    public void AddSpellOrb(Orb orb, bool addToOrbHistory = false)
     {
         orbs.Add(orb);
+        if (addToOrbHistory)
+        {
+            orbHistory.Add(orb); // sync across scenes
+        }
         if (uIController)
             uIController.AddOrb(orb);
     }
@@ -156,5 +146,86 @@ public class SpellTest : MonoBehaviourPun
         currentSpell.Cast(transform, clickedPosition);
         spellCooldowns[currentSpell.GetOrbTuple()] = Time.time + currentSpell.GetSpellCooldown();
         mana.ConsumeMana(currentSpell.GetManaCost());
+    }
+
+    private void UpdateOrbsFromPreviousScene()
+    {
+        // update the player's orbs from the previous scene
+        foreach (Orb o in orbHistory.ToArray())
+        {
+            switch (o.OrbElement)
+            {
+                case Orb.Element.Wrath:
+                    AddSpellOrb(new RedOrb());
+                    break;
+                case Orb.Element.Fire:
+                    AddSpellOrb(new OrangeOrb());
+                    break;
+                case Orb.Element.Light:
+                    AddSpellOrb(new YellowOrb());
+                    break;
+                case Orb.Element.Nature:
+                    //AddSpellOrb(new GreenOrb());
+                    throw new NotImplementedException("Didn't implement adding " + o.OrbElement + " yet");
+                case Orb.Element.Water:
+                    AddSpellOrb(new BlueOrb());
+                    break;
+                case Orb.Element.Poison:
+                    AddSpellOrb(new VioletOrb());
+                    break;
+                case Orb.Element.Earth:
+                    //AddSpellOrb(new BrownOrb());
+                    throw new NotImplementedException("Didn't implement adding " + o.OrbElement + " yet");
+                case Orb.Element.Wind:
+                    //AddSpellOrb(new QuickSilverOrb());
+                    throw new NotImplementedException("Didn't implement adding " + o.OrbElement + " yet");
+                case Orb.Element.Darkness:
+                    AddSpellOrb(new IndigoOrb());
+                    break;
+                default:
+                    throw new NotImplementedException("Didn't implement adding " + o.OrbElement + " yet");
+            }
+        }
+    }
+
+    /// <summary>
+    /// Call this function upon loading a new scene from an existing scene
+    /// To reassign the references.
+    /// </summary>
+    public void Initialization()
+    {
+        GameObject gUIController = null;
+        if (photonView.IsMine && PhotonNetwork.IsConnected)
+        {
+            gUIController = GameObject.Find("OrbTray");
+        }
+
+        if (gUIController)
+        {
+            uIController = gUIController.GetComponent<OrbTrayUIController>();
+        }
+
+        if (TestingMode)
+        {
+            AddSpellOrb(new YellowOrb());
+            AddSpellOrb(new OrangeOrb());
+            AddSpellOrb(new BlueOrb());
+            AddSpellOrb(new VioletOrb());
+            AddSpellOrb(new IndigoOrb());
+        }
+        else
+        {
+            UpdateOrbsFromPreviousScene();
+        }
+    }
+
+    /// <summary>
+    /// Clear out all current spells.
+    /// (although this will not update the UI).
+    /// </summary>
+    public void ResetSpells()
+    {
+        orbHistory.Clear();
+        orbs.Clear();
     }
 }

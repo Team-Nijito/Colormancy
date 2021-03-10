@@ -97,11 +97,8 @@ public class SpellManager : MonoBehaviourPun
     private void Start()
     {
         test = GetComponent<SpellTest>();
-        //if (photonView.IsMine)
-        //{
-            print("Looking for uiCOntorller");
-            uiController = FindObjectOfType<OrbUIController>();
-        //}
+
+        Initialization();
     }
 
     public bool TestCreateSpell(out Spell spell)
@@ -119,6 +116,15 @@ public class SpellManager : MonoBehaviourPun
             spell = new Spell();
             return false;
         }
+    }
+
+    /// <summary>
+    /// Call this whenever we load into any new scene.
+    /// </summary>
+    public void Initialization()
+    {
+        //print("Looking for uiController");
+        uiController = FindObjectOfType<OrbUIController>();
     }
 }
 
