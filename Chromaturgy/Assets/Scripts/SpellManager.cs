@@ -13,7 +13,7 @@ public class SpellManager : MonoBehaviourPun
 
         float SpellCooldown;
         float SpellManaCost;
-        (Orb, Orb, Orb) OrbTuple;
+        (System.Type, System.Type, System.Type) OrbTuple;
 
         Dictionary<Orb.Element, int> orbDict;
 
@@ -35,7 +35,8 @@ public class SpellManager : MonoBehaviourPun
             
             SpellCooldown = BASE_COOLDOWN * orbs[2].CooldownMod;
             SpellManaCost = BASE_SPELL_MANA * orbs[2].ShapeManaMod;
-            OrbTuple = (orbs[0], orbs[1], orbs[2]);
+            print(orbs[1].GetType());
+            OrbTuple = (orbs[0].GetType(), orbs[1].GetType(), orbs[2].GetType());
         }
 
         public void Cast(Transform t, Vector3 clickedPosition)
@@ -53,13 +54,13 @@ public class SpellManager : MonoBehaviourPun
             return SpellManaCost;
         }
 
-        public (Orb, Orb, Orb) GetOrbTuple()
+        public (System.Type, System.Type, System.Type) GetOrbTuple()
         {
             return OrbTuple;
         }
     }
 
-    OrbUIController controller;
+    OrbUIController uiController;
 
     SpellTest test;
     List<Orb> currentSpellOrbs = new List<Orb>();
@@ -68,20 +69,20 @@ public class SpellManager : MonoBehaviourPun
 
     public Spell AddOrb(Orb orb)
     {
-        if (FirstOrb != null)
-        {
-            FirstOrb.RevertHeldEffect(test);
-        }
-        
         if (photonView.IsMine && PhotonNetwork.IsConnected)
         {
-            controller.AddOrb(orb);
+            if (FirstOrb != null)
+            {
+                FirstOrb.RevertHeldEffect(test);
+            }
+            FirstOrb = orb;
+            FirstOrb.AddHeldEffect(test);
+
+            uiController.AddOrb(orb);
         }
         
-        FirstOrb = orb;
         currentSpellOrbs.Add(orb);
 
-        FirstOrb.AddHeldEffect(test);
 
         if (TestCreateSpell(out Spell spell))
         {
@@ -99,13 +100,12 @@ public class SpellManager : MonoBehaviourPun
         //if (photonView.IsMine)
         //{
             print("Looking for uiCOntorller");
-            controller = FindObjectOfType<OrbUIController>();
+            uiController = FindObjectOfType<OrbUIController>();
         //}
     }
 
     public bool TestCreateSpell(out Spell spell)
     {
-        print("Current orb count: " + currentSpellOrbs.Count);
         if (currentSpellOrbs.Count >= 3)
         {
             Orb[] spellOrbs = new Orb[] { currentSpellOrbs[currentSpellOrbs.Count - 1], currentSpellOrbs[currentSpellOrbs.Count - 2], currentSpellOrbs[currentSpellOrbs.Count - 3] };
@@ -120,22 +120,5 @@ public class SpellManager : MonoBehaviourPun
             return false;
         }
     }
-
-    //public bool TryCreateSpell(out Spell spell)
-    //{
-    //    if (currentSpellOrbs.Count >= 3)
-    //    {
-    //        Orb[] spellOrbs = new Orb[] { currentSpellOrbs.Pop(), currentSpellOrbs.Pop(), currentSpellOrbs.Pop() };
-            
-    //        //Create and return new spell from orbs
-    //        spell = new Spell(spellOrbs);
-    //        currentSpellOrbs.Clear();
-    //        return true;
-    //    } else
-    //    {
-    //        spell = new Spell();
-    //        return false;
-    //    }
-    //}
 }
 
