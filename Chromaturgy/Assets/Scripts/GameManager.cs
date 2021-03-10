@@ -45,11 +45,16 @@ public class GameManager : MonoBehaviourPunCallbacks
     Image dialogueHalfImage;
     Image dialogueFullImage;
     GameObject nextButton;
+    GameObject acceptButton;
 
     Sprite[] dialogueImages;
     string[] dialogueMessages;
 
     bool WindowOpen = false;
+    bool PodiumMessage = false;
+
+    Orb currentOrbType;
+    SpellTest playerSpellTest;
 
     int dialoguePage = 0;
 
@@ -101,7 +106,27 @@ public class GameManager : MonoBehaviourPunCallbacks
             SetPage();
 
             animator.SetTrigger("pop");
+            PodiumMessage = false;
             WindowOpen = true;
+        }
+    }
+
+    public void PodiumPopUp(string[] messages, Sprite[] images, Orb orbType, SpellTest spellTest)
+    {
+        if (!WindowOpen)
+        {
+            currentOrbType = orbType;
+            playerSpellTest = spellTest;
+
+            dialogueMessages = messages;
+            dialogueImages = images;
+            dialoguePage = 0;
+
+            animator.SetTrigger("pop");
+            PodiumMessage = true;
+            WindowOpen = true;
+
+            SetPage();
         }
     }
 
@@ -109,11 +134,6 @@ public class GameManager : MonoBehaviourPunCallbacks
     {
         dialoguePage++;
         SetPage();
-
-        if (dialoguePage == (Mathf.Max(dialogueImages.Length, dialogueMessages.Length) - 1))
-        {
-            nextButton.SetActive(false);
-        }
     }
 
     void SetPage()
@@ -144,6 +164,24 @@ public class GameManager : MonoBehaviourPunCallbacks
                 SetImageText();
             }
         }
+
+        if (dialoguePage == (Mathf.Max(dialogueImages.Length, dialogueMessages.Length) - 1))
+        {
+            nextButton.SetActive(false);
+            if (PodiumMessage)
+            {
+                acceptButton.SetActive(true);
+            }
+        }
+    }
+
+    public void AddCurrentOrb()
+    {
+        if (currentOrbType != null)
+        {
+            playerSpellTest.AddSpellOrb(currentOrbType);
+            CloseWindow();
+        }
     }
 
     public void CloseWindow()
@@ -152,6 +190,8 @@ public class GameManager : MonoBehaviourPunCallbacks
         {
             animator.SetTrigger("close");
             WindowOpen = false;
+            playerSpellTest = null;
+            currentOrbType = null;
         }
     }
 
@@ -235,6 +275,8 @@ public class GameManager : MonoBehaviourPunCallbacks
         dialogueHalfImage = popUpBox.transform.Find("HalfImage").GetComponent<Image>();
         dialogueFullImage = popUpBox.transform.Find("FullImage").GetComponent<Image>();
         nextButton = popUpBox.transform.Find("NextButton").gameObject;
+        acceptButton = popUpBox.transform.Find("AcceptButton").gameObject;
+        acceptButton.SetActive(false);
     }
 
     void LoadArena()

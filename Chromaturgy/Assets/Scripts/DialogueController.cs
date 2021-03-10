@@ -6,6 +6,8 @@ using Photon.Pun;
 
 public class DialogueController : MonoBehaviour
 {
+    SpriteRenderer spriteRenderer;
+
     [SerializeField]
     string[] messages = new string[] { "Test Message 1" };
 
@@ -19,6 +21,7 @@ public class DialogueController : MonoBehaviour
     private void Start()
     {
         manager = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>();
+        spriteRenderer = GetComponentInChildren<SpriteRenderer>();
     }
 
     private void Update()
@@ -36,6 +39,7 @@ public class DialogueController : MonoBehaviour
             if (other.gameObject.GetComponent<PhotonView>().IsMine)
             {
                 InRange = true;
+                spriteRenderer.enabled = true;
             }
         }
     }
@@ -47,6 +51,7 @@ public class DialogueController : MonoBehaviour
             if (other.gameObject.GetComponent<PhotonView>().IsMine)
             {
                 InRange = false;
+                spriteRenderer.enabled = false;
                 manager.CloseWindow();
             }
         }
