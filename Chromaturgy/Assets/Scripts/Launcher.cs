@@ -21,7 +21,7 @@ public class Launcher : MonoBehaviourPunCallbacks
 
     [Tooltip("Name of the scene to load after player joins a room")]
     [SerializeField]
-    private string sceneNameToLoadIn = "Starting Level";
+    private string sceneNameToLoadIn = "Dungeon Level 2";
 
     #endregion
 
