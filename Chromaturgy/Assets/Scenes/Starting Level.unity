@@ -25585,7 +25585,7 @@ PrefabInstance:
     - target: {fileID: 7917960859537667781, guid: a2874b7c33b663f47add06323276b963,
         type: 3}
       propertyPath: m_playersNeededToStartGame
-      value: 1
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 7917960859537667781, guid: a2874b7c33b663f47add06323276b963,
         type: 3}
