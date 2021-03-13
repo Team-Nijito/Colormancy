@@ -14,6 +14,7 @@ public class BlueSpellSpawnerController : MonoBehaviour
     public Orb.LesserCast lesserCast;
     public int greaterCastAmt;
     public int lesserCastAmt;
+    public float spellEffectMod;
 
     [Space]
 
@@ -30,12 +31,15 @@ public class BlueSpellSpawnerController : MonoBehaviour
     [SerializeField]
     private int frequency;
     private int tick;
+    private List<GameObject> entitiesEntered;
 
     // Start is called before the first frame update
     void Start()
     {
         // use mage rotation
         modelTransform = playerTransform.GetChild(0);
+
+        entitiesEntered = new List<GameObject>();
     }
 
     // Update is called once per frame
@@ -62,11 +66,28 @@ public class BlueSpellSpawnerController : MonoBehaviour
     {
         if (collision.gameObject.tag.Equals("Enemy"))
         {
-            greaterCast(gameObject, greaterCastAmt);
+            if (!entitiesEntered.Contains(collision.gameObject))
+            {
+                entitiesEntered.Add(collision.gameObject);
+                greaterCast(collision.gameObject, greaterCastAmt, spellEffectMod);
+            }
         }
         else if (collision.gameObject.tag.Equals("Player"))
         {
-            lesserCast(gameObject, lesserCastAmt);
+            lesserCast(collision.gameObject, lesserCastAmt, spellEffectMod);
+        }
+    }
+
+    private void OnCollisionExit(Collision collision)
+    {
+        if (collision.gameObject.tag.Equals("Enemy"))
+        {
+            if (!entitiesEntered.Contains(collision.gameObject))
+                entitiesEntered.Remove(collision.gameObject);
+        }
+        else if (collision.gameObject.tag.Equals("Player"))
+        {
+            
         }
     }
 }

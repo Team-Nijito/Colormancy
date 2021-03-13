@@ -195,9 +195,9 @@ public class EnemyChaserAI : MonoBehaviourPun, IEnemyDetection, IStatusEffects
     /// <param name="dir">The direction of the force</param>
     /// <param name="force">The magnitude of the force</param>
     [PunRPC]
-    public void ApplyForce(Vector3 dir, float force)
+    public void ApplyForce(Vector3 dir, float force, float stunDuration)
     {
-        m_enemMovement.ApplyForce(dir, force);
+        m_enemMovement.ApplyForce(dir, force, stunDuration);
     }
 
     /// <summary>

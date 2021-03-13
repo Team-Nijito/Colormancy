@@ -21,6 +21,7 @@ public class RedSpellController : MonoBehaviour
     public Orb.LesserCast lesserCast;
     public int greaterCastAmt;
     public int lesserCastAmt;
+    public float spellEffectMod;
 
     [Space]
 
@@ -77,6 +78,9 @@ public class RedSpellController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (toggleLanding && TryGetComponent(out CapsuleCollider capsuleCollider))
+            capsuleCollider.enabled = false;
+
 
         if (landed)
         {
@@ -92,6 +96,35 @@ public class RedSpellController : MonoBehaviour
             transform.position = playerTransform.position + Vector3.down;
 
             PaintingManager.PaintSphere(paintColor, transform.position, spherePaintRadius);
+
+            // search in enemy layermask
+            Collider[] hitColliders = Physics.OverlapSphere(transform.position, spherePaintRadius, 1 << 10);
+
+            foreach (var hitCollider in hitColliders)
+            {
+                if (hitCollider.tag.Equals("Enemy"))
+                {
+                    Vector3 PlayerToEnemy = (hitCollider.gameObject.transform.position - transform.position).normalized;
+                    PlayerToEnemy *= 127;
+
+                    int vectorCastData = (int)Mathf.Abs(PlayerToEnemy.x) + (PlayerToEnemy.x > 0 ? 0 : 128);
+                    vectorCastData = vectorCastData << 8;
+
+                    vectorCastData = vectorCastData | ((int)Mathf.Abs(PlayerToEnemy.y) + (PlayerToEnemy.y > 0 ? 0 : 128));
+                    vectorCastData = vectorCastData << 8;
+
+                    vectorCastData = vectorCastData | ((int)Mathf.Abs(PlayerToEnemy.z) + (PlayerToEnemy.z > 0 ? 0 : 128));
+                    vectorCastData = vectorCastData << 8;
+
+                    vectorCastData = vectorCastData | greaterCastAmt;
+
+                    greaterCast(hitCollider.gameObject, vectorCastData, spellEffectMod);
+                }
+                else if (hitCollider.tag.Equals("Player"))
+                {
+                    lesserCast(hitCollider.gameObject, lesserCastAmt, spellEffectMod);
+                }
+            }
 
             // reset time for destroying object
             startTime = Time.time;
@@ -118,15 +151,9 @@ public class RedSpellController : MonoBehaviour
             Destroy(gameObject);
     }
 
-    private void OnCollisionEnter(Collision collision)
+    void OnDrawGizmos()
     {
-        if (collision.gameObject.tag.Equals("Enemy"))
-        {
-            greaterCast(gameObject, greaterCastAmt);
-        }
-        else if (collision.gameObject.tag.Equals("Player"))
-        {
-            lesserCast(gameObject, lesserCastAmt);
-        }
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawSphere(transform.position, spherePaintRadius);
     }
 }

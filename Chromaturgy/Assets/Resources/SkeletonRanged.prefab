@@ -1596,7 +1596,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_speed: 14
   m_speedTriggerRun: 15
-  m_durationRigidbody: 0.75
+  m_durationRigidbody: 2
   m_wanderTime:
     minTime: 2
     maxTime: 5

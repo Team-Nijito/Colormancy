@@ -8,6 +8,7 @@ public class VioletSpellController : MonoBehaviour
     public Orb.LesserCast lesserCast;
     public int greaterCastAmt;
     public int lesserCastAmt;
+    public float spellEffectMod;
 
     [Space]
 
@@ -42,8 +43,10 @@ public class VioletSpellController : MonoBehaviour
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.tag.Equals("Enemy"))
-            greaterCast(collision.gameObject, greaterCastAmt);
+        {
+            greaterCast(collision.gameObject, greaterCastAmt, spellEffectMod);
+        }
         else if (collision.gameObject.tag.Equals("Player"))
-            lesserCast(collision.gameObject, lesserCastAmt);
+            lesserCast(collision.gameObject, lesserCastAmt, spellEffectMod);
     }
 }

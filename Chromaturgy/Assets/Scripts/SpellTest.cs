@@ -79,6 +79,7 @@ public class SpellTest : MonoBehaviourPun
 
         if (TestingMode)
         {
+            AddSpellOrb(new RedOrb());
             AddSpellOrb(new YellowOrb());
             AddSpellOrb(new OrangeOrb());
             AddSpellOrb(new BlueOrb());

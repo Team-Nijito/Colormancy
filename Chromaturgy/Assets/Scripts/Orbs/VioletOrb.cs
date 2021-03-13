@@ -14,6 +14,7 @@ public class VioletOrb : Orb
         ShapeManaMod = 1f;
         OrbElement = Element.Poison;
         ModAmount = .1f;
+        SpellEffectMod = 0.18f;
         UIPrefab = (GameObject)Resources.Load("Orbs/VioletOrbUI");
     }
 
@@ -27,13 +28,15 @@ public class VioletOrb : Orb
         test.HealthRegenMod -= ModAmount;
     }
 
-    public override void CastGreaterEffect(GameObject hit, int orbAmount)
+    public override void CastGreaterEffect(GameObject hit, int orbAmount, float spellEffectMod)
     {
         StatusEffectScript status = hit.GetComponent<StatusEffectScript>();
-        status.RPCApplyOrStackDoT(true, 10, orbAmount, "Poison");
+        // currently stacks, should not
+        status.RPCApplyOrStackDoT(true, 50 * spellEffectMod, orbAmount * 2 + 3, "Poison");
+        status.RPCApplySlowdown(10, orbAmount * 2 + 3);
     }
 
-    public override void CastLesserEffect(GameObject hit, int orbAmount)
+    public override void CastLesserEffect(GameObject hit, int orbAmount, float spellEffectMod)
     {
         throw new System.NotImplementedException();
     }
@@ -54,6 +57,7 @@ public class VioletOrb : Orb
         spellController.lesserCast = lesserEffectMethod;
         spellController.greaterCastAmt = amounts.Item1;
         spellController.lesserCastAmt = amounts.Item2;
+        spellController.spellEffectMod = SpellEffectMod;
 
         spellController.endPosition = clickedPosition;
     }

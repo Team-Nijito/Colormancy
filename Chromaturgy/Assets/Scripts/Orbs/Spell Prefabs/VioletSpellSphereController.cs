@@ -8,6 +8,7 @@ public class VioletSpellSphereController : MonoBehaviour
     public Orb.LesserCast lesserCast;
     public int greaterCastAmt;
     public int lesserCastAmt;
+    public float spellEffectMod;
 
     [Space]
 
@@ -56,7 +57,7 @@ public class VioletSpellSphereController : MonoBehaviour
 
     private void instantiateCloud()
     {
-        GameObject g = GameObject.Instantiate(Resources.Load("Orbs/Violet Cloud", typeof(GameObject)), transform.position + Vector3.up, transform.rotation) as GameObject;
+        GameObject g = GameObject.Instantiate(Resources.Load("Orbs/Violet Cloud"), transform.position + Vector3.up, transform.rotation) as GameObject;
         g.transform.Rotate(Vector3.up, Random.Range(0, 360));
 
         VioletSpellController spellController = g.GetComponent<VioletSpellController>();
@@ -65,6 +66,7 @@ public class VioletSpellSphereController : MonoBehaviour
         spellController.lesserCast = lesserCast;
         spellController.greaterCastAmt = greaterCastAmt;
         spellController.lesserCastAmt = lesserCastAmt;
+        spellController.spellEffectMod = spellEffectMod;
 
         Destroy(gameObject);
     }

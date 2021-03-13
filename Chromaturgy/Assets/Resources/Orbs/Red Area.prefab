@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 5805420566613578499}
   m_Layer: 9
   m_Name: Red Area
-  m_TagString: Untagged
+  m_TagString: Projectile
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -28,7 +28,7 @@ Transform:
   m_GameObject: {fileID: 1481272708916251436}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0.022, z: 0}
-  m_LocalScale: {x: 2, y: 2, z: 2}
+  m_LocalScale: {x: 3, y: 2, z: 3}
   m_Children:
   - {fileID: 2245510852417664120}
   - {fileID: 8189152888145961313}
@@ -44,7 +44,7 @@ CapsuleCollider:
   m_GameObject: {fileID: 1481272708916251436}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   m_Radius: 1
   m_Height: 3
   m_Direction: 1

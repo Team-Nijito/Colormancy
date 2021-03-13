@@ -14,6 +14,7 @@ public class IndigoOrb : Orb
         ShapeManaMod = 1.2f;
         OrbElement = Element.Darkness;
         ModAmount = .1f;
+        SpellEffectMod = 1f;
         UIPrefab = (GameObject)Resources.Load("Orbs/IndigoOrbUI");
     }
 
@@ -27,13 +28,17 @@ public class IndigoOrb : Orb
         test.HealthRegenMod -= ModAmount;
     }
 
-    public override void CastGreaterEffect(GameObject hit, int orbAmount)
+    public override void CastGreaterEffect(GameObject hit, int orbAmount, float spellEffectMod)
     {
         PhotonView photonView = hit.GetPhotonView();
-        photonView.RPC("TakeDamage", RpcTarget.All, (float)orbAmount);
+        photonView.RPC("TakeDamage", RpcTarget.All, orbAmount * 20f * spellEffectMod);
+
+        StatusEffectScript status = hit.GetComponent<StatusEffectScript>();
+        status.RPCApplyBlind(orbAmount);
+        // feared not implemented yet
     }
 
-    public override void CastLesserEffect(GameObject hit, int orbAmount)
+    public override void CastLesserEffect(GameObject hit, int orbAmount, float spellEffectMod)
     {
         throw new System.NotImplementedException();
     }
@@ -46,15 +51,24 @@ public class IndigoOrb : Orb
         //For any allies hit 
         //lesserEffectMethod(ally game object, lesserEffectAmnt);
 
-        GameObject orbs = GameObject.Instantiate(Resources.Load("Orbs/Indigo Orbs", typeof(GameObject))) as GameObject;
-        orbs.transform.position = t.position;
+        GameObject g = GameObject.Instantiate(Resources.Load("Orbs/Indigo Orbs", typeof(GameObject))) as GameObject;
+        g.transform.position = t.position;
 
-        IndigoSpellController spellController = orbs.GetComponent<IndigoSpellController>();
+        for (int i = 0; i < 16; i++)
+        {
+            IndigoSpellSphereController sphereController = g.transform.GetChild(i).GetComponent<IndigoSpellSphereController>();
+            sphereController.greaterCast = greaterEffectMethod;
+            sphereController.lesserCast = lesserEffectMethod;
+            sphereController.greaterCastAmt = amounts.Item1;
+            sphereController.lesserCastAmt = amounts.Item2;
+            sphereController.spellEffectMod = SpellEffectMod;
+
+            if ((i % 2 == 1 && amounts.Item3 == 2) || (i % 4 != 0 && amounts.Item3 == 1))
+                GameObject.Destroy(g.transform.GetChild(i).gameObject);
+        }
+
+        IndigoSpellController spellController = g.GetComponent<IndigoSpellController>();
         spellController.playerTransform = t;
-        spellController.greaterCast = greaterEffectMethod;
-        spellController.lesserCast = lesserEffectMethod;
-        spellController.greaterCastAmt = amounts.Item1;
-        spellController.lesserCastAmt = amounts.Item2;
     }
 
     public static object Deserialize(byte[] data)

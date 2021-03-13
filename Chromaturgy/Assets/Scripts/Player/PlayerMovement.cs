@@ -310,7 +310,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable, IStatus
     /// <param name="dir">The direction of the force</param>
     /// <param name="force">The magnitude of the force</param>
     [PunRPC]
-    public void ApplyForce(Vector3 dir, float force)
+    public void ApplyForce(Vector3 dir, float force, float stunDuration)
     {
         dir.Normalize();
         if (dir.y < 0)

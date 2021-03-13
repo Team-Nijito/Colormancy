@@ -123,5 +123,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec08cb2a0bc151c4992a45bd3fcebcf9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  greaterCastAmt: 0
+  lesserCastAmt: 0
+  spellEffectMod: 0
   endPosition: {x: 0, y: 0, z: 0}
   maxHeight: 3

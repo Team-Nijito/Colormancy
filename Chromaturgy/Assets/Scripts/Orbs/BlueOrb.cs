@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using Photon.Pun;
-
 public class BlueOrb : Orb
 {
     public BlueOrb()
@@ -14,6 +13,7 @@ public class BlueOrb : Orb
         ShapeManaMod = .8f;
         OrbElement = Element.Water;
         ModAmount = .1f;
+        SpellEffectMod = 1.1f;
         UIPrefab = (GameObject)Resources.Load("Orbs/BlueOrbUI");
     }
 
@@ -27,13 +27,13 @@ public class BlueOrb : Orb
         test.HealthRegenMod -= ModAmount;
     }
 
-    public override void CastGreaterEffect(GameObject hit, int orbAmount)
+    public override void CastGreaterEffect(GameObject hit, int orbAmount, float spellEffectMod)
     {
         PhotonView photonView = hit.GetPhotonView();
-        photonView.RPC("TakeDamage", RpcTarget.All, (float)orbAmount);
+        photonView.RPC("TakeDamage", RpcTarget.All, orbAmount * 20f * spellEffectMod);
     }
 
-    public override void CastLesserEffect(GameObject hit, int orbAmount)
+    public override void CastLesserEffect(GameObject hit, int orbAmount, float spellEffectMod)
     {
         PhotonView photonView = hit.GetPhotonView();
         photonView.RPC("ManaRegeneration", RpcTarget.All, (float)orbAmount);
@@ -53,6 +53,7 @@ public class BlueOrb : Orb
         spellController.lesserCast = lesserEffectMethod;
         spellController.greaterCastAmt = amounts.Item1;
         spellController.lesserCastAmt = amounts.Item2;
+        spellController.spellEffectMod = SpellEffectMod;
 
         spellController.playerTransform = t;
     }

@@ -13,6 +13,7 @@ public class OrangeOrb : Orb
         ShapeManaMod = 1f;
         OrbElement = Element.Fire;
         ModAmount = .1f;
+        SpellEffectMod = 1f;
         UIPrefab = (GameObject)Resources.Load("Orbs/OrangeOrbUI");
     }
 
@@ -26,13 +27,15 @@ public class OrangeOrb : Orb
         test.HealthRegenMod -= ModAmount;
     }
 
-    public override void CastGreaterEffect(GameObject hit, int orbAmount)
+    public override void CastGreaterEffect(GameObject hit, int orbAmount, float spellEffectMod)
     {
         PhotonView photonView = PhotonView.Get(hit);
-        photonView.RPC("TakeDamage", RpcTarget.All, (float)orbAmount);
+        photonView.RPC("TakeDamage", RpcTarget.All, orbAmount * 20f * spellEffectMod);
+        // temporary until autoattack increase is implemented
+        photonView.RPC("AlterArmorValueAdditive", RpcTarget.All, -20f * spellEffectMod, 3f);
     }
 
-    public override void CastLesserEffect(GameObject hit, int orbAmount)
+    public override void CastLesserEffect(GameObject hit, int orbAmount, float spellEffectMod)
     {
         throw new System.NotImplementedException();
     }
@@ -58,6 +61,7 @@ public class OrangeOrb : Orb
         spellController.lesserCast = lesserEffectMethod;
         spellController.greaterCastAmt = amounts.Item1;
         spellController.lesserCastAmt = amounts.Item2;
+        spellController.spellEffectMod = SpellEffectMod;
     }
 
     public static object Deserialize(byte[] data)

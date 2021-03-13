@@ -179,15 +179,15 @@ public class StatusEffectScript : MonoBehaviourPun
     /// </summary>
     /// <param name="dir">The direction of the force.</param>
     /// <param name="force">The magnitude of the force.</param>
-    public void RPCApplyForce(Vector3 dir, float force)
+    public void RPCApplyForce(Vector3 dir, float force, float stunDuration)
     {
         if (m_isPlayer)
         {
-            photonView.RPC("ApplyForce", photonView.Owner, dir, force);
+            photonView.RPC("ApplyForce", photonView.Owner, dir, force, stunDuration);
         }
         else
         {
-            photonView.RPC("ApplyForce", PhotonNetwork.MasterClient, dir, force);
+            photonView.RPC("ApplyForce", PhotonNetwork.MasterClient, dir, force, stunDuration);
         }
     }
 

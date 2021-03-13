@@ -165,6 +165,7 @@ GameObject:
   m_Component:
   - component: {fileID: 852709482318644057}
   - component: {fileID: 852709482318644056}
+  - component: {fileID: 3525512770331781792}
   m_Layer: 9
   m_Name: Yellow Orbs
   m_TagString: Untagged
@@ -268,11 +269,30 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  greaterCastAmt: 0
+  lesserCastAmt: 0
+  spellEffectMod: 0
   rotationSpeed: 10
   lifetime: 5
   spherePaintRadius: 2.5
   paintColor: {r: 0.98700476, g: 1, b: 0.3443396, a: 0}
   debug: 0
+--- !u!54 &3525512770331781792
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 852709482318644054}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 126
+  m_CollisionDetection: 0
 --- !u!1 &852709483024857157
 GameObject:
   m_ObjectHideFlags: 0

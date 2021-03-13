@@ -19,6 +19,7 @@ public class YellowSpellController : MonoBehaviour
     public Orb.LesserCast lesserCast;
     public int greaterCastAmt;
     public int lesserCastAmt;
+    public float spellEffectMod;
 
     [Space]
 
@@ -78,11 +79,11 @@ public class YellowSpellController : MonoBehaviour
     {
         if (collision.gameObject.tag.Equals("Enemy"))
         {
-            greaterCast(gameObject, greaterCastAmt);
+            greaterCast(collision.gameObject, greaterCastAmt, spellEffectMod);
         }
         else if (collision.gameObject.tag.Equals("Player"))
         {
-            lesserCast(gameObject, lesserCastAmt);
+            lesserCast(collision.gameObject, lesserCastAmt, spellEffectMod);
         }
     }
 }

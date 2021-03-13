@@ -35,7 +35,6 @@ public class SpellManager : MonoBehaviourPun
             
             SpellCooldown = BASE_COOLDOWN * orbs[2].CooldownMod;
             SpellManaCost = BASE_SPELL_MANA * orbs[2].ShapeManaMod;
-            print(orbs[1].GetType());
             OrbTuple = (orbs[0].GetType(), orbs[1].GetType(), orbs[2].GetType());
         }
 

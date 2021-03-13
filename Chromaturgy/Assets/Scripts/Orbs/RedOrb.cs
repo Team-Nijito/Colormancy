@@ -1,9 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 using Photon.Pun;
-
 public class RedOrb : Orb
 {
     public RedOrb()
@@ -11,8 +11,10 @@ public class RedOrb : Orb
         OrbColor = Color.red;
         OrbShape = SpellShape.Jump;
         CooldownMod = 0.7f;
+        ShapeManaMod = 0.8f;
         OrbElement = Element.Wrath;
         ModAmount = .1f;
+        SpellEffectMod = 1.5f;
         UIPrefab = (GameObject)Resources.Load("Orbs/RedOrbUI");
     }
 
@@ -26,13 +28,23 @@ public class RedOrb : Orb
         test.AttackSpeedMod -= ModAmount;
     }
 
-    public override void CastGreaterEffect(GameObject hit, int orbAmount)
+    public override void CastGreaterEffect(GameObject hit, int orbAmount, float spellEffectMod)
     {
+        int trueOrbAmount = orbAmount & 255;
+        float launchX = (float)((orbAmount >> 24) & 127) * (((orbAmount >> 31) & 1) == 1 ? -1 : 1);
+        float launchY = (float)((orbAmount >> 16) & 127) * (((orbAmount >> 23) & 1) == 1 ? -1 : 1);
+        float launchZ = (float)((orbAmount >> 8) & 127) * (((orbAmount >> 15) & 1) == 1 ? -1 : 1);
+        Vector3 launchVector = new Vector3(launchX, launchY, launchZ).normalized;
+
         PhotonView photonView = PhotonView.Get(hit);
-        photonView.RPC("TakeDamage", RpcTarget.All, (float)orbAmount);
+        photonView.RPC("TakeDamage", RpcTarget.All, trueOrbAmount * 20f * spellEffectMod);
+
+        // apply force is broken because it is using a rigidbody instead of NavMeshAgent.Warp or other methods
+        StatusEffectScript status = hit.GetComponent<StatusEffectScript>();
+        status.RPCApplyForce(launchVector + Vector3.up, 500, (trueOrbAmount == 1 ? 2f : (trueOrbAmount == 2 ? 2.5f : 3f)));
     }
 
-    public override void CastLesserEffect(GameObject hit, int orbAmount)
+    public override void CastLesserEffect(GameObject hit, int orbAmount, float spellEffectMod)
     {
         throw new System.NotImplementedException();
     }
@@ -56,6 +68,7 @@ public class RedOrb : Orb
         spellController.lesserCast = lesserEffectMethod;
         spellController.greaterCastAmt = amounts.Item1;
         spellController.lesserCastAmt = amounts.Item2;
+        spellController.spellEffectMod = SpellEffectMod;
 
         spellController.endPosition = clickedPosition + Vector3.up * 1.6f;
         spellController.playerTransform = t;

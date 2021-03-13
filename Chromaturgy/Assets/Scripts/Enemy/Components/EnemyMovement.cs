@@ -62,7 +62,7 @@ public class EnemyMovement : MonoBehaviourPun, IPunObservable
     [SerializeField] protected float m_speedTriggerRun = 15f;
 
     [Tooltip("Time that the Rigidbody controls the object whenever the NavMeshAgent is disabled (specifically for knockback)")]
-    [SerializeField] protected float m_durationRigidbody = 0.75f; 
+    [SerializeField] protected float m_durationRigidbody = 2f; 
 
     protected EnemyAnimationManager.EnemyState m_currentAnimState = EnemyAnimationManager.EnemyState.Idle;
 
@@ -265,9 +265,9 @@ public class EnemyMovement : MonoBehaviourPun, IPunObservable
     /// for a duration until we let the NavMeshAgent take over again.
     /// </summary>
     /// <param name="offset">Apply a force in the direction of the offset.</param>
-    public void ApplyForce(Vector3 dir, float force)
+    public void ApplyForce(Vector3 dir, float force, float stunDuration)
     {
-        StartCoroutine(RigidbodyControlsObject(dir, force, m_durationRigidbody, false));
+        StartCoroutine(RigidbodyControlsObject(dir, force, stunDuration, false));
     }
 
     /// <summary>

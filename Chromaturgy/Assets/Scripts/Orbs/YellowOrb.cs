@@ -14,6 +14,7 @@ public class YellowOrb : Orb
         ShapeManaMod = .9f;
         OrbElement = Element.Light;
         ModAmount = .1f;
+        SpellEffectMod = 1.25f;
         UIPrefab = (GameObject) Resources.Load("Orbs/YellowOrbUI");
     }
 
@@ -27,13 +28,15 @@ public class YellowOrb : Orb
         test.HealthRegenMod -= ModAmount;
     }
 
-    public override void CastGreaterEffect(GameObject hit, int orbAmount)
+    public override void CastGreaterEffect(GameObject hit, int orbAmount, float spellEffectMod)
     {
-        PhotonView photonView = hit.GetPhotonView();
-        photonView.RPC("TakeDamage", RpcTarget.All, (float)orbAmount);
+        PhotonView photonView = PhotonView.Get(hit);
+        photonView.RPC("TakeDamage", RpcTarget.All, orbAmount * 20f * spellEffectMod);
+
+        //missing 20% less damage
     }
 
-    public override void CastLesserEffect(GameObject hit, int orbAmount)
+    public override void CastLesserEffect(GameObject hit, int orbAmount, float spellEffectMod)
     {
         throw new System.NotImplementedException();
     }
@@ -53,6 +56,7 @@ public class YellowOrb : Orb
         spellController.lesserCast = lesserEffectMethod;
         spellController.greaterCastAmt = amounts.Item1;
         spellController.lesserCastAmt = amounts.Item2;
+        spellController.spellEffectMod = SpellEffectMod;
 
         spellController.playerTransform = t;
 

@@ -8,7 +8,7 @@ public interface IStatusEffects
     // knockback, slow, stun, fear/blind) we can cast their movement script type into
     // an IStatusEffects type and simply call these functions.
     
-    void ApplyForce(Vector3 dir, float force);
+    void ApplyForce(Vector3 dir, float force, float stunDuration);
     void ApplySlowdown(float percentReduction, float duration);
     void ApplyStun(float duration);
     void ApplyBlind(float duration);

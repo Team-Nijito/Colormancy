@@ -241,6 +241,33 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     }
 
     [PunRPC]
+    public void AlterArmorValueAdditive(float armorPercent, float resetTime = 0f)
+    {
+        // replaces the armorPercentage with new value
+
+        // ignore RPCs for dead enemies
+        if (!m_isPlayer && m_animManager.GetCurrentState() == EnemyAnimationManager.EnemyState.Death)
+        {
+            return;
+        }
+
+        m_armorPercentage += armorPercent;
+        m_armorPercentage = Mathf.Clamp(m_armorPercentage, 0f, 100f);
+
+        if (resetTime != 0f)
+        {
+            IEnumerator resetCoroutine = ResetArmor(armorPercent, resetTime);
+            StartCoroutine(resetCoroutine);
+        }
+    }
+
+    IEnumerator ResetArmor(float armorPercent, float resetTime)
+    {
+        yield return new WaitForSeconds(resetTime);
+        m_armorPercentage -= armorPercent;
+    }
+
+    [PunRPC]
     public void Heal(float healValue)
     {
         // heal formula: health = health + healValue
