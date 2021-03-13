@@ -99,6 +99,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
     public void LeaveRoom()
     {
+        SpellTest.orbHistory.Clear(); // don't retain memory of spells after leaving game
         PhotonNetwork.LeaveRoom();
     }
 
@@ -205,7 +206,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     {
         if (currentOrbType != null)
         {
-            playerSpellTest.AddSpellOrb(currentOrbType);
+            playerSpellTest.AddSpellOrb(currentOrbType, true);
             CloseWindow();
         }
     }
@@ -300,10 +301,20 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
                     if (m_currentGm.DoSpawnPlayer && playerView.IsMine)
                     {    
                         // Teleport only all players to the first spawn? (bug)
-                        playerView.RPC("RespawnPlayer", PhotonNetwork.LocalPlayer, true);
+                        playerView.RPC("RespawnPlayer", PhotonNetwork.LocalPlayer);
 
-                        // Reset their GUI
-                        playerView.gameObject.GetComponent<SpawnGUI>().ResetUIAfterSceneLoad();
+                        GameObject player = playerView.gameObject;
+
+                        // IMPORTANT: reset the references to gui b/c old references won't work after scene load
+
+                        // Reset their health GUI
+                        player.GetComponent<SpawnGUI>().ResetUIAfterSceneLoad();
+
+                        // Reset their spell manager GUI reference
+                        player.GetComponent<SpellManager>().Initialization();
+
+                        // Reset their spell GUI reference
+                        player.GetComponent<SpellTest>().Initialization();
                     }
 
                     // how do I spawn players at their spawnpoints? hmm..
