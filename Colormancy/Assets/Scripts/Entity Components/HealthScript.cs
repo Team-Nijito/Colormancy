@@ -312,8 +312,7 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
         // if we have a status effect component, then stop any onging status effects
         if (m_statusEffectScript)
         {
-            m_statusEffectScript.ClearDamageDict();
-            m_playerMovement.StopAllTasks();
+            m_statusEffectScript.ClearStatusEffects();
         }
 
         if (!m_gameManager)
@@ -330,12 +329,6 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
         ResetHealth();
         m_mScript.ResetMana();
         gameObject.SetActive(true);
-
-        // restart the damage over time system
-        if (m_statusEffectScript)
-        {
-            m_statusEffectScript.RestartApplyDamage();
-        }
     }
 
     /// <summary>

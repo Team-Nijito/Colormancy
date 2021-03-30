@@ -61,9 +61,6 @@ public class EnemyMovement : MonoBehaviourPun, IPunObservable
     [Tooltip("The speed at which the Run animation is triggered")]
     [SerializeField] protected float m_speedTriggerRun = 15f;
 
-    [Tooltip("Time that the Rigidbody controls the object whenever the NavMeshAgent is disabled (specifically for knockback)")]
-    [SerializeField] protected float m_durationRigidbody = 2f; 
-
     protected EnemyAnimationManager.EnemyState m_currentAnimState = EnemyAnimationManager.EnemyState.Idle;
 
     protected Vector3 m_directionToPlayer = Vector3.zero;
@@ -82,7 +79,6 @@ public class EnemyMovement : MonoBehaviourPun, IPunObservable
     protected float m_wanderRadius = 10f;
 
     protected Task m_wanderRandomDirectionTask;
-    protected Task m_moveErraticallyTask;
 
     protected WanderState m_wState = WanderState.NotWandering;
     protected WanderState m_lastWState = WanderState.NotWandering;
@@ -92,7 +88,6 @@ public class EnemyMovement : MonoBehaviourPun, IPunObservable
     #region Components
 
     protected GameObject m_character;
-    protected Rigidbody m_rigidBody;
     protected NavMeshAgent m_navMeshAgent;
     protected EnemyAnimationManager m_animManager;
 
@@ -103,7 +98,6 @@ public class EnemyMovement : MonoBehaviourPun, IPunObservable
     // Start is called before the first frame update
     protected void Start()
     {
-        m_rigidBody = GetComponent<Rigidbody>();
         m_navMeshAgent = GetComponent<NavMeshAgent>();
         m_animManager = GetComponent<EnemyAnimationManager>();
 
@@ -140,36 +134,16 @@ public class EnemyMovement : MonoBehaviourPun, IPunObservable
         m_directionToPlayer = newDir;
     }
 
+    /// <param name="newSpeed">New speed to override walkSpeed and NavMeshAgent speed</param>
+    public void SetSpeed(float newSpeed)
+    {
+        m_speed = newSpeed;
+        m_navMeshAgent.speed = m_speed;
+    }
+
     #endregion
 
     #region Protected functions
-
-    /// <summary>
-    /// A variant of ShuffleRandomDirection where the AI would "panic" (move around randomly at frequent intervals).
-    /// </summary>
-    /// <param name="duration">Duration of panic (Min val = 1f)</param>
-    protected IEnumerator PanicRandomDirection(float duration)
-    {
-        float cumulativeTime = 0f;
-
-        while (cumulativeTime < duration)
-        {
-            if (m_navMeshAgent.isOnNavMesh)
-            {
-                m_navMeshAgent.SetDestination(GetRandomPosition()); // choose random direction
-            }
-            m_wState = WanderState.Wander;
-            yield return new WaitForSecondsRealtime(0.75f);
-            if (m_navMeshAgent.isOnNavMesh)
-            {
-                m_navMeshAgent.SetDestination(transform.position); // set destination to current destination so it wont keep moving
-            }
-            m_wState = WanderState.Idle;
-            yield return new WaitForSecondsRealtime(0.25f);
-
-            cumulativeTime += 1f;
-        }
-    }
 
     /// <summary>
     /// Returns a random valid position on the NavMesh. 
@@ -195,33 +169,6 @@ public class EnemyMovement : MonoBehaviourPun, IPunObservable
     }
 
     /// <summary>
-    /// When called, the Rigidbody would control this object instead of the NavMeshAgent for a period of time.
-    /// </summary>
-    /// <param name="seconds">The time that the Rigidbody would manage this object</param>
-    protected IEnumerator RigidbodyControlsObject(Vector3 initalDir, float force, float duration, bool stun)
-    {
-        // Disable the agent
-        m_navMeshAgent.enabled = false;
-        m_rigidBody.isKinematic = false;
-
-        if (stun)
-        {
-            m_rigidBody.velocity = Vector3.zero;
-        }
-        else
-        {
-            // Apply the force
-            m_rigidBody.AddForce(initalDir * force, ForceMode.Acceleration);
-        }
-
-        yield return new WaitForSecondsRealtime(duration);
-
-        // Re-enable the agent
-        m_navMeshAgent.enabled = true;
-        m_rigidBody.isKinematic = true;
-    }
-
-    /// <summary>
     /// A function to make the enemy find a random valid position on the NavMesh and travel there, and then idle for a bit.
     /// Rinse and repeat.
     /// </summary>
@@ -229,30 +176,12 @@ public class EnemyMovement : MonoBehaviourPun, IPunObservable
     {
         while (true)
         {
-            m_navMeshAgent.SetDestination(GetRandomPosition()); // choose random direction
-            m_wState = WanderState.Wander;
+            WanderToRandomDirection();
             yield return new WaitForSecondsRealtime(Random.Range(m_idleTime.minTime, m_idleTime.maxTime));
 
-            m_navMeshAgent.SetDestination(transform.position); // set destination to current destination so it wont keep moving
-            m_wState = WanderState.Idle;
+            WanderIdle();
             yield return new WaitForSecondsRealtime(Random.Range(m_wanderTime.minTime, m_wanderTime.maxTime));
         }
-    }
-
-    protected IEnumerator Slowdown(float percentReductionSpeed, float duration)
-    {
-        float percent = ((100 - percentReductionSpeed) / 100);
-        // note that m_speed doesn't affect the speed of the enemy (controlled by NavMeshAgent)
-        // it's just to ensure that the value is accurate if its accessor is called during this
-        // slowdown effect
-
-        // Apply speed reduction
-        m_speed *= percent; 
-        m_navMeshAgent.speed *= percent;
-        yield return new WaitForSecondsRealtime(duration);
-        // Revert speed reduction
-        m_speed /= percent;
-        m_navMeshAgent.speed /= percent;
     }
 
     #endregion
@@ -260,49 +189,35 @@ public class EnemyMovement : MonoBehaviourPun, IPunObservable
     #region Public functions
 
     /// <summary>
-    /// Apply a force on the character. This is performed by disabling
-    /// the NavMeshAgent and letting the Rigidbody take over, then we wait
-    /// for a duration until we let the NavMeshAgent take over again.
+    /// Disable the NavMeshAgent
     /// </summary>
-    /// <param name="offset">Apply a force in the direction of the offset.</param>
-    public void ApplyForce(Vector3 dir, float force, float stunDuration)
+    public void DisableAgent()
     {
-        StartCoroutine(RigidbodyControlsObject(dir, force, stunDuration, false));
+        m_navMeshAgent.enabled = false;
     }
 
     /// <summary>
-    /// Slows the player down for a period of time.
+    /// Enable the NavMeshAgent
     /// </summary>
-    /// <param name="percentReduction">The reduction in speed.</param>
-    /// <param name="duration">The duration that this slowdown will last.</param>
-    public void ApplySlowdown(float percentReduction, float duration)
+    public void EnableAgent()
     {
-        StartCoroutine(Slowdown(percentReduction, duration));
+        m_navMeshAgent.enabled = true;
     }
 
     /// <summary>
-    /// Stuns a character and prevent them from moving.
+    /// If we're currently wandering, stop that, and make the agent exit wandering mode.
     /// </summary>
-    /// <param name="duration">How long the stun will last.</param>
-    public void ApplyStun(float duration)
+    public void ExitWanderingMode(bool disableNavMeshAgent = false)
     {
-        StartCoroutine(RigidbodyControlsObject(Vector3.zero, 0, duration, true));
-    }
-
-    /// <summary>
-    /// The character will now shuffle around aggressively.
-    /// </summary>
-    /// <param name="duration">Duration of blind panic.</param>
-    public void BlindPanic(float duration)
-    {
-        if (m_moveErraticallyTask == null)
+        if (m_wState == WanderState.Wander || m_wState == WanderState.Idle)
         {
-            m_moveErraticallyTask = new Task(PanicRandomDirection(duration));
-        }
-        else
-        {
-            m_moveErraticallyTask.Stop();
-            m_moveErraticallyTask = new Task(PanicRandomDirection(duration));
+            if (disableNavMeshAgent)
+            {
+                m_navMeshAgent.isStopped = true;
+            }
+            m_wanderRandomDirectionTask.Pause();
+            m_lastWState = m_wState;
+            m_wState = WanderState.NotWandering;
         }
     }
 
@@ -425,42 +340,43 @@ public class EnemyMovement : MonoBehaviourPun, IPunObservable
     /// </summary>
     public void StopAllTasks()
     {
-        if (m_wanderRandomDirectionTask != null)
-        {
-            m_wanderRandomDirectionTask.Stop();
-        }
-        if (m_moveErraticallyTask != null)
-        {
-            m_moveErraticallyTask.Stop();
-        }
         StopAllCoroutines();
     }
 
     /// <summary>
     /// If the NavMeshAgent is currently traveling to a destination ... stop it.
     /// </summary>
-    public void StopMoving()
+    public void StopMovingAndDontChangeAnimation()
     {
         // Stop the agent from moving
-        m_navMeshAgent.SetDestination(transform.position);
+        if (m_navMeshAgent.isOnNavMesh)
+        {
+            MoveToPosition(transform.position); // set destination to current destination so it wont keep moving
+        }
         m_navMeshAgent.velocity = Vector3.zero;
     }
 
     /// <summary>
-    /// If we're currently wandering, stop that. 
+    /// Stop moving, but still stay in wandering mode, we're idling for now.
     /// </summary>
-    public void StopWandering(bool disableNavMeshAgent = false)
+    public void WanderIdle()
     {
-        if (m_wState == WanderState.Wander || m_wState == WanderState.Idle)
+        StopMovingAndDontChangeAnimation();
+        m_wState = WanderState.Idle;
+        m_animManager.ChangeState(EnemyAnimationManager.EnemyState.Idle);
+    }
+
+    /// <summary>
+    /// Move the agent to a random position on the NavMesh and set the Agent to the wander state.
+    /// </summary>
+    public void WanderToRandomDirection()
+    {
+        if (m_navMeshAgent.isOnNavMesh)
         {
-            if (disableNavMeshAgent)
-            {
-                m_navMeshAgent.isStopped = true;
-            }
-            m_wanderRandomDirectionTask.Pause();
-            m_lastWState = m_wState;
-            m_wState = WanderState.NotWandering;
+            MoveToPosition(GetRandomPosition()); // choose random direction
         }
+        m_wState = WanderState.Wander;
+        RunOrWalkDependingOnSpeed();
     }
 
     #endregion

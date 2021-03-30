@@ -39,7 +39,7 @@ public class PlayerMouse : MonoBehaviourPunCallbacks
 
         if (photonView.IsMine && PhotonNetwork.IsConnected)
         {
-            if (Input.GetMouseButtonDown(0))
+            if (Input.GetMouseButtonDown(0) && m_pmScript.CanMove)
             {
                 // paintball attack
                 if ((new Vector3(mousePosition.x, 0, mousePosition.z) - new Vector3(transform.position.x, 0, transform.position.z)).magnitude > m_ignoreTurnRadius)

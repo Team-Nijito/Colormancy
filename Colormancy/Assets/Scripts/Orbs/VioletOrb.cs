@@ -33,7 +33,7 @@ public class VioletOrb : Orb
         StatusEffectScript status = hit.GetComponent<StatusEffectScript>();
         // currently stacks, should not
         status.RPCApplyOrStackDoT(true, 50 * spellEffectMod, orbAmount * 2 + 3, "Poison");
-        status.RPCApplySlowdown(10, orbAmount * 2 + 3);
+        status.RPCApplySlowdown("Slow", 10, orbAmount * 2 + 3);
     }
 
     public override void CastLesserEffect(GameObject hit, int orbAmount, float spellEffectMod)

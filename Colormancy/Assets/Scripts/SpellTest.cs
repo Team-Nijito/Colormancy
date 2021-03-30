@@ -30,6 +30,8 @@ public class SpellTest : MonoBehaviourPun
 
     SpellManager.Spell currentSpell;
 
+    PlayerMovement playerMoveScript; // need a ref to this component so we can check if we're stunned or not, so we'll prevent casting while stunned
+
     #region Dummy Player Attributes
 
     static readonly float BASE_ATTACK_SPEED = 1f;
@@ -69,6 +71,7 @@ public class SpellTest : MonoBehaviourPun
     {
         manager = GetComponent<SpellManager>();
         mana = GetComponent<ManaScript>();
+        playerMoveScript = GetComponent<PlayerMovement>();
         Initialization();
     }
 
@@ -94,7 +97,7 @@ public class SpellTest : MonoBehaviourPun
             }
         }
 
-        if (Input.GetMouseButtonDown(1))
+        if (Input.GetMouseButtonDown(1) && playerMoveScript.CanMove)
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;

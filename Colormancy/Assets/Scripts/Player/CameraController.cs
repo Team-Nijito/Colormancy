@@ -6,7 +6,10 @@ namespace Chromaturgy
     // namespace is needed otherwise Unity will say that there's already a definition for CameraController
     public class CameraController : MonoBehaviourPunCallbacks
     {
-        // This script should be a player component, and a camera should be a child of the player
+        // This script should be a player component
+
+        #region Variables
+
         public enum CameraZoom
         {
             Stationary,
@@ -46,28 +49,19 @@ namespace Chromaturgy
         [SerializeField]
         private string m_sceneToDeactivateCharacter = "YouWinScene";
 
+        private PlayerMovement m_playerMovementScript;
+
+        #endregion
+
+        #region MonoBehaviour callbacks
+
         private void Start()
         {
             if (photonView.IsMine)
             {
+                m_playerMovementScript = GetComponent<PlayerMovement>();
                 StartFollowing();
             }
-        }
-
-        public void StartFollowing()
-        {
-            // set variables
-            m_TCamera = Camera.main.transform.gameObject;
-            m_TCameraTransform = m_TCamera.transform;
-            m_TCameraTransform.parent = transform;
-            m_newRotation = transform.rotation;
-
-            m_TCamera.name = "PlayerCamera"; // change name so that we won't destroy this camera on scene load
-
-            InitialCameraTrackPlayer();
-            m_newZoom = m_TCameraTransform.localPosition;
-
-            m_isFollowing = true;
         }
 
         private void Update()
@@ -78,7 +72,7 @@ namespace Chromaturgy
             }
             else
             {
-                if (m_TCamera && m_isFollowing)
+                if (m_TCamera && m_isFollowing && m_playerMovementScript.CanMove)
                 {
                     HandleCameraZoomInputs();
                     HandleCameraRotationInputs();
@@ -94,6 +88,10 @@ namespace Chromaturgy
                 HandleCameraRotation();
             }
         }
+
+        #endregion
+
+        #region Private
 
         private void InitialCameraTrackPlayer()
         {
@@ -163,6 +161,26 @@ namespace Chromaturgy
             }
         }
 
+        #endregion
+
+        #region Public functions
+
+        public void StartFollowing()
+        {
+            // set variables
+            m_TCamera = Camera.main.transform.gameObject;
+            m_TCameraTransform = m_TCamera.transform;
+            m_TCameraTransform.parent = transform;
+            m_newRotation = transform.rotation;
+
+            m_TCamera.name = "PlayerCamera"; // change name so that we won't destroy this camera on scene load
+
+            InitialCameraTrackPlayer();
+            m_newZoom = m_TCameraTransform.localPosition;
+
+            m_isFollowing = true;
+        }
+
         // Used to set the rotation so that the rotation doesn't "snap" unexpectedly
         // Example case: when respawning, the player will be rotated (to face the spawn's forward direction)
         // but when you turn the camera afterwards, it may snap quickly
@@ -170,5 +188,7 @@ namespace Chromaturgy
         {
             m_newRotation = newRotation;
         }
+
+        #endregion
     }
 }

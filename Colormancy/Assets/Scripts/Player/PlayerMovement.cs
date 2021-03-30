@@ -1,56 +1,49 @@
 ﻿using UnityEngine;
 using Photon.Pun;
 using System.Collections;
-using System;
-using UnityEngine.UI;
 
 [RequireComponent(typeof(CharacterController))]
-public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable, IStatusEffects
+public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
 {
     // This script handles movement input and animations
+    #region Accessors (c# Properties)
+
+    public bool CanMove { get { return m_canMove; } private set { m_canMove = value; } }
+    public bool IsMoving { get { return m_isMoving; } private set { m_isMoving = value; } }
+    public bool IsDashing { get { return m_isDashing; } private set { m_isDashing = value; } }
+
+    public Vector3 CurrentMovement { get { return m_movement; } private set { m_movement = value; } }
+
+    public float WalkSpeed { get { return m_walkSpeed; } private set { m_walkSpeed = value; } }
+    public float RunSpeed { get { return m_runSpeed; } private set { m_runSpeed = value; } }
+
+    public Animator PlayerAnimator { get { return m_animator; } private set { m_animator = value; } }
+
+    public GameObject BlindPanel { get { return m_blindPanel; } private set { m_blindPanel = value; } }
+
+    #endregion
 
     #region Variables
 
     public static GameObject LocalPlayerInstance;
 
-    public enum PlayerState
-    {
-        Idle = 0,
-        Move = 1,
-        Fall = 2,
-    }
-
     // Movement
     [SerializeField] private float m_walkSpeed = 18f;
     [SerializeField] private float m_runSpeed = 20f;
 
-    [HideInInspector] public bool m_isMoving = false;
-    [HideInInspector] public bool m_canMove = true;
-    [HideInInspector] public bool m_isDashing = false;
+    private bool m_isMoving = false;
+    private bool m_canMove = true;
+    private bool m_isDashing = false;
 
-    [HideInInspector] public Vector3 m_movement = Vector3.zero;
-
-    [SerializeField] private float m_gravity = 9.81f;
+    private Vector3 m_movement = Vector3.zero;
+    [SerializeField] private readonly float m_gravity = 9.81f;
 
     private Vector3 m_movementNoGrav = Vector3.zero;
     
     private readonly float m_rotationSpeed = 40f; // from WarriorMovementControllerFREE.cs
     private float m_vSpeed = 0f; // current vertical velocity
 
-    // Knockback
-    private Vector3 m_impact = Vector3.zero; // knockback handling
-
-    [SerializeField] private float m_characterMass = 1.0f;
-    [SerializeField] private float m_impactDecay = 5f; // how quickly impact "goes away"
-
-    // Slowdown
-    private float m_originalWalkSpeed;
-    private float m_originalRunSpeed;
-
-    // Stun / blind
-    private Task m_stunTask = null; // only permit one stun coroutine at a time
-    private Task m_blindTask = null;
-
+    // Blind
     private GameObject m_blindPanel;
 
     #endregion
@@ -58,9 +51,8 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable, IStatus
     #region Components
 
     public GameObject m_character = null;
-    public PlayerState m_playerState;
 
-    [HideInInspector] public Animator m_animator;
+    private Animator m_animator;
     private Transform m_characterTransform;
     private CharacterController m_controller;
 
@@ -90,11 +82,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable, IStatus
     void Start()
     {
         m_controller = GetComponent<CharacterController>();
-        m_playerState = PlayerState.Idle;
         m_blindPanel = GameObject.Find("Canvas").transform.Find("LevelUI").transform.Find("BlindPanel").gameObject;
-
-        m_originalRunSpeed = m_runSpeed;
-        m_originalWalkSpeed = m_walkSpeed;
     }
 
     // Update is called once per frame
@@ -103,6 +91,12 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable, IStatus
         if (photonView.IsMine)
         {
             ProcessPlayerInput();
+
+            if (!m_blindPanel)
+            {
+                // ensure that blindPanel is always valid, temp fix for switching between scenes
+                m_blindPanel = GameObject.Find("Canvas").transform.Find("LevelUI").transform.Find("BlindPanel").gameObject;
+            }
         }
     }
 
@@ -111,7 +105,6 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable, IStatus
         if (photonView.IsMine)
         {
             MovePlayer();
-            ApplyExternalForce();
         }
     }
 
@@ -119,20 +112,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable, IStatus
 
     #region Private functions
 
-    /// <summary>
-    /// Blinds the player by putting up a black screen.
-    /// </summary>
-    /// <param name="duration">Duration of blind.</param>
-    private IEnumerator BlindForDuration(float duration)
-    {
-        // apply blind
-        m_blindPanel.SetActive(true);
-        yield return new WaitForSecondsRealtime(duration);
-        // disable blind
-        m_blindPanel.SetActive(false);
-    }
-
-    // Takes in player's iputs for movement
+    // Takes in player's inputs for movement
     private void ProcessPlayerInput()
     {
         if (m_canMove)
@@ -231,142 +211,43 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable, IStatus
         }
     }
 
-    /// <summary>
-    /// Applies the external forces stored in m_impact to the character.
-    /// Modified script from aldonaletto: https://answers.unity.com/questions/242648/force-on-character-controller-knockback.html.
-    /// This IEnumerator works well with StartCoroutine.
-    /// </summary>
-    private void ApplyExternalForce()
-    {
-        // apply the impact force:
-        if (m_impact.magnitude > 0.2)
-        {
-            m_controller.Move(m_impact * Time.deltaTime);
-        }
-        // consumes the impact energy each cycle:
-        m_impact = Vector3.Lerp(m_impact, Vector3.zero, m_impactDecay * Time.deltaTime);
-    }
-
-    /// <summary>
-    /// Applies slowdown, waits for duration, then reverts slowdown.
-    /// This IEnumerator works well with StartCoroutine.
-    /// </summary>
-    /// <param name="percentReductionSpeed">Range(0,100f). What percentage will we reduce the character's speed by? 50%?</param>
-    /// <param name="duration">How long the slowdown will last.</param>
-    private IEnumerator ApplySlowdownForDuration(float percentReductionSpeed, float duration)
-    {
-        float percent = ((100 - percentReductionSpeed) / 100);
-        // Apply slowdown
-        m_walkSpeed *= percent;
-        m_runSpeed *= percent;
-
-        yield return new WaitForSecondsRealtime(duration);
-        // Revert slowdown
-        m_walkSpeed /= percent;
-        m_runSpeed /= percent;
-    }
-
-    /// <summary>
-    /// Stuns the character, waits for duration, then character can move again.
-    /// This IEnumerator doesn't work well with StartCoroutine, go with Task instead.
-    /// (having multiple coroutines may mean that player may escape stun early if stunned repeatedly)
-    /// </summary>
-    /// <param name="duration">Duration of stun.</param>
-    private IEnumerator StunForDuration(float duration)
-    {
-        // apply stun
-        m_canMove = false;
-        m_animator.SetBool("Moving", false);
-        yield return new WaitForSecondsRealtime(duration);
-        // revert stun
-        m_canMove = true;
-    }
-
     #endregion
 
     #region Public functions
 
     /// <summary>
-    /// Is like the CS:GO flashbang, but in black.
+    /// Public setter for runSpeed
     /// </summary>
-    /// <param name="duration">Duration of blind</param>
-    [PunRPC]
-    public void ApplyBlind(float duration)
+    /// <param name="newSpeed">New speed to override runSpeed</param>
+    public void AlterRunSpeed(float newSpeed)
     {
-        if (m_blindTask == null)
-        {
-            m_blindTask = new Task(BlindForDuration(duration));
-        }
-        else
-        {
-            m_blindTask.Stop();
-            m_blindTask = new Task(BlindForDuration(duration));
-        }
+        m_runSpeed = newSpeed;
     }
 
     /// <summary>
-    /// (PunRPC) Apply a force to this character.
+    /// Public setter for walkSpeed
     /// </summary>
-    /// <param name="dir">The direction of the force</param>
-    /// <param name="force">The magnitude of the force</param>
-    [PunRPC]
-    public void ApplyForce(Vector3 dir, float force, float stunDuration)
+    /// <param name="newSpeed">New speed to override walkSpeed</param>
+    public void AlterWalkSpeed(float newSpeed)
     {
-        dir.Normalize();
-        if (dir.y < 0)
-        {
-            dir.y = -dir.y; // reflect down force on the ground
-        }
-        m_impact += dir.normalized * force / m_characterMass;
+        m_walkSpeed = newSpeed;
     }
 
     /// <summary>
-    /// (PunRPC) Apply a slowdown to this character for a duration, then changes the character's speed to its speed before the slowdown. Stackable.
+    /// Prevent the player from controlling their character.
     /// </summary>
-    /// <param name="percentReduction">Range(0,100f). What percentage will we reduce the character's speed by? 50%?</param>
-    /// <param name="duration">How long the slowdown will last.</param>
-    [PunRPC]
-    public void ApplySlowdown(float percentReduction, float duration)
+    public void Stun()
     {
-        StartCoroutine(ApplySlowdownForDuration(percentReduction, duration));
+        m_canMove = false;
+        m_animator.SetBool("Moving", false);
     }
 
     /// <summary>
-    /// (PunRPC) Stuns a character and prevent them from moving.
+    /// Allows the player to controll their character again.
     /// </summary>
-    /// <param name="duration">How long the stun will last.</param>
-    [PunRPC]
-    public void ApplyStun(float duration)
+    public void UnStun()
     {
-        if (m_stunTask == null)
-        {
-            m_stunTask = new Task(StunForDuration(duration));
-        }
-        else
-        {
-            m_stunTask.Stop();
-            m_stunTask = new Task(StunForDuration(duration));
-        }
-    }
-
-    /// <summary>
-    /// Stop all ongoing Tasks or coroutines, and reset all variables before status effects.
-    /// </summary>
-    public void StopAllTasks()
-    {
-        if (m_stunTask != null)
-        {
-            m_stunTask.Stop();
-            m_canMove = true;
-        }
-        if (m_blindTask != null)
-        {
-            m_blindTask.Stop();
-            m_blindPanel.SetActive(false);
-        }
-        StopAllCoroutines();
-        m_walkSpeed = m_walkSpeed < m_originalWalkSpeed ? m_originalWalkSpeed : m_walkSpeed;
-        m_runSpeed = m_runSpeed < m_originalRunSpeed ? m_originalRunSpeed : m_runSpeed;
+        m_canMove = true;
     }
 
     #endregion

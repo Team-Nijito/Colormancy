@@ -3,6 +3,10 @@ using Photon.Pun;
 
 public class PlayerAttack : MonoBehaviourPun
 {
+    /// <summary>
+    /// outdated component, will probably be replaced with an autoattack script
+    /// </summary>
+
     //public Rigidbody m_paintball;
     public Color m_paintColor;
 
