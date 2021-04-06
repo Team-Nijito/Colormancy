@@ -67,6 +67,9 @@
                 else {
                     col = lerp(float4(0, 0, 0, 1), _Color, pow(i.objectPos.y / height, _Darkness));
                     col.w *= _Lerp;
+
+                    if (height == 0)
+                        col.w = 0;
                 }
 
                 return col;

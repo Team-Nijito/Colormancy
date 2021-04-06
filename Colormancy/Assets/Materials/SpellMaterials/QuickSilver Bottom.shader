@@ -2,9 +2,11 @@
 {
     Properties
     {
-        _MainTex ("Texture", 2D) = "white" {}
+        _Color("Color", COLOR) = (1, 1, 1, 1)
 
-        _Lerp("Lerp", float) = 0.5
+        _Lerp("Lerp", Range(0, 1)) = 0.5
+        _WaveWidth("Wave Width", Range(0, 1)) = 0.5
+        _WaveOutline("Wave Outline", Range(0, 1)) = 0.1
     }
     SubShader
     {
@@ -31,10 +33,11 @@
                 float3 objPos : TEXCOORD1;
             };
 
-            sampler2D _MainTex;
-            float4 _MainTex_ST;
+            float4 _Color;
 
             float _Lerp;
+            float _WaveWidth;
+            float _WaveOutline;
 
             v2f vert (appdata v)
             {
@@ -47,16 +50,23 @@
 
             fixed4 frag(v2f i) : SV_Target
             {
+                float4 col = _Color;
+
                 float r = distance(i.uv, float2(0.5, 0.5)) * 2;
-
-                fixed4 col = tex2D(_MainTex, i.uv);
                 
-                if (r < _Lerp)
-                    r = 1;
+                float lerpCorrection = _Lerp * (1 + _WaveWidth) - (_WaveWidth / 2);
+                float upperBound = lerpCorrection + _WaveWidth / 2;
+                float lowerBound = lerpCorrection - _WaveWidth / 2;
+                if (r < upperBound && r > lowerBound)
+                    col.a = 1;
                 else
-                    r = 0;
+                    col.a = 0;
 
-                return r;
+                float upperOutline = lerpCorrection + _WaveWidth / 2 * (1 - _WaveOutline);
+                if (r > upperOutline)
+                    col.rgb = 0;
+
+                return col;
             }
             ENDCG
         }

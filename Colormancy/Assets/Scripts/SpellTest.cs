@@ -23,7 +23,7 @@ public class SpellTest : MonoBehaviourPun
     ManaScript mana;
     OrbTrayUIController uIController;
 
-    public bool TestingMode = false;
+    private bool TestingMode = true;
 
     [SerializeField]
     Dictionary<(System.Type, System.Type, System.Type), float> spellCooldowns = new Dictionary<(System.Type, System.Type, System.Type), float>();
@@ -176,8 +176,8 @@ public class SpellTest : MonoBehaviourPun
                     //AddSpellOrb(new BrownOrb());
                     throw new NotImplementedException("Didn't implement adding " + o.OrbElement + " yet");
                 case Orb.Element.Wind:
-                    //AddSpellOrb(new QuickSilverOrb());
-                    throw new NotImplementedException("Didn't implement adding " + o.OrbElement + " yet");
+                    AddSpellOrb(new QuickSilverOrb());
+                    break;
                 case Orb.Element.Darkness:
                     AddSpellOrb(new IndigoOrb());
                     break;
@@ -211,6 +211,7 @@ public class SpellTest : MonoBehaviourPun
             AddSpellOrb(new YellowOrb());
             AddSpellOrb(new BlueOrb());
             AddSpellOrb(new VioletOrb());
+            AddSpellOrb(new QuickSilverOrb());
             AddSpellOrb(new IndigoOrb());
         }
         else
