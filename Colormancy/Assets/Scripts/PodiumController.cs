@@ -39,6 +39,11 @@ public class PodiumController : MonoBehaviour
             Orb orb = GetCurrentOrb();
             manager.PodiumPopUp(messages, images, orb, playerSpellTest);
         }
+
+        if (indicatorSprite.enabled)
+        {
+            interactIndicator.transform.LookAt(Camera.main.transform.position, Vector3.up);
+        }
     }
 
     Orb GetCurrentOrb()
