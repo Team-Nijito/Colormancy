@@ -64,6 +64,9 @@ namespace Chromaturgy
 
             m_TCamera.name = "PlayerCamera"; // change name so that we won't destroy this camera on scene load
 
+            // add component to enable camera transparency behavior
+            CameraTransparency ct = m_TCamera.gameObject.AddComponent<CameraTransparency>() as CameraTransparency;
+
             InitialCameraTrackPlayer();
             m_newZoom = m_TCameraTransform.localPosition;
 
