@@ -45,12 +45,15 @@ public class CameraTransparency : MonoBehaviour
         for (int i = 0; i < hits.Length; i++)
         {
             RaycastHit hit = hits[i];
-            Renderer rend = hit.transform.GetComponent<Renderer>();
-            if (rend)
+            if (hit.transform)
             {
-                // Change the material of all hit colliders
-                // from past update back to opaque.
-                MakeOpaque(rend, i);
+                Renderer rend = hit.transform.GetComponent<Renderer>();
+                if (rend)
+                {
+                    // Change the material of all hit colliders
+                    // from past update back to opaque.
+                    MakeOpaque(rend, i);
+                }
             }
         }
     }    
@@ -64,16 +67,19 @@ public class CameraTransparency : MonoBehaviour
         for (int i = 0; i < hits.Length; i++)
         {
             RaycastHit hit = hits[i];
-            Renderer rend = hit.transform.GetComponent<Renderer>();
-            if (rend)
+            if (hit.transform)
             {
-                savedMats[i] = rend.material;
-            }
-            if (rend && hit.distance < m_currentPlayerDistance)
-            {
-                // Change the material of all hit colliders
-                // to use a transparent shader.
-                MakeTransparent(rend, i);
+                Renderer rend = hit.transform.GetComponent<Renderer>();
+                if (rend)
+                {
+                    savedMats[i] = rend.material;
+                }
+                if (rend && hit.distance < m_currentPlayerDistance)
+                {
+                    // Change the material of all hit colliders
+                    // to use a transparent shader.
+                    MakeTransparent(rend, i);
+                }
             }
         }
     }
