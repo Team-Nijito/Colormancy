@@ -6,16 +6,19 @@ using Photon.Pun;
 
 public class CameraTransparency : MonoBehaviour
 {
-
+    public float m_spherecastRadius = 0.5f;
+    private Material m_transparentMat;
     private GameObject m_player;
     private float m_currentPlayerDistance;
     private RaycastHit[] hits;
+    private Material[] savedMats;
 
     private void Start()
     {
         m_player = GameObject.FindWithTag("Player");
         // hits is initialized as an empty list to prevent runtime errors.
         hits = new RaycastHit[] { };
+        m_transparentMat = Resources.Load("Transparent", typeof(Material)) as Material;
     }
 
     private void Update()
@@ -24,7 +27,7 @@ public class CameraTransparency : MonoBehaviour
 
         UpdatePastHits();
 
-        hits = Physics.RaycastAll(transform.position, transform.forward, 100.0F);
+        hits = Physics.SphereCastAll(transform.position, m_spherecastRadius, transform.forward, m_currentPlayerDistance);
 
         UpdateCurrentHits();
     }
@@ -47,7 +50,7 @@ public class CameraTransparency : MonoBehaviour
             {
                 // Change the material of all hit colliders
                 // from past update back to opaque.
-                MakeOpaque(rend);
+                MakeOpaque(rend, i);
             }
         }
     }    
@@ -56,35 +59,34 @@ public class CameraTransparency : MonoBehaviour
     {
         // Iterate through all the hit colliders from the current update,
         // making them all transparent.
+
+        savedMats = new Material[hits.Length];
         for (int i = 0; i < hits.Length; i++)
         {
             RaycastHit hit = hits[i];
             Renderer rend = hit.transform.GetComponent<Renderer>();
-
+            if (rend)
+            {
+                savedMats[i] = rend.material;
+            }
             if (rend && hit.distance < m_currentPlayerDistance)
             {
                 // Change the material of all hit colliders
                 // to use a transparent shader.
-                MakeTransparent(rend);
+                MakeTransparent(rend, i);
             }
         }
     }
 
-    private void MakeTransparent(Renderer rend)
+    private void MakeTransparent(Renderer rend, int index)
     {
         // Make a renderer transparent.
-        rend.material.shader = Shader.Find("Transparent/Diffuse");
-        Color tempColor = rend.material.color;
-        tempColor.a = 0.3F;
-        rend.material.color = tempColor;
+        rend.material = m_transparentMat;
     }
 
-    private void MakeOpaque(Renderer rend)
+    private void MakeOpaque(Renderer rend, int index)
     {
         // Make a renderer opaque.
-        rend.material.shader = Shader.Find("Standard");
-        Color tempColor = rend.material.color;
-        tempColor.a = 1F;
-        rend.material.color = tempColor;
+        rend.material = savedMats[index];
     }
 }
