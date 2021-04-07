@@ -1424,7 +1424,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7868359989327704}
   - component: {fileID: 4378588057287879517}
-  - component: {fileID: -6028852970308107898}
+  - component: {fileID: -8570646646583680850}
   - component: {fileID: 4492902978810850956}
   - component: {fileID: 7868359999101174}
   - component: {fileID: 8080523624243871871}
@@ -1474,7 +1474,7 @@ CapsuleCollider:
   m_Height: 0.18
   m_Direction: 1
   m_Center: {x: 0, y: 0.089, z: 0}
---- !u!54 &-6028852970308107898
+--- !u!54 &-8570646646583680850
 Rigidbody:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1482,13 +1482,13 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7868359989750648}
   serializedVersion: 2
-  m_Mass: 10
-  m_Drag: 1
+  m_Mass: 1
+  m_Drag: 0
   m_AngularDrag: 0.05
   m_UseGravity: 1
   m_IsKinematic: 1
   m_Interpolate: 0
-  m_Constraints: 80
+  m_Constraints: 0
   m_CollisionDetection: 0
 --- !u!195 &4492902978810850956
 NavMeshAgent:
@@ -1581,7 +1581,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aea2c7aba3e4e6343a67593e4e5823ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_statusEffectTickPerXSecond: 0.1
 --- !u!114 &2569626399134901076
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1596,7 +1595,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_speed: 14
   m_speedTriggerRun: 15
-  m_durationRigidbody: 2
   m_wanderTime:
     minTime: 2
     maxTime: 5

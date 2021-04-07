@@ -77,7 +77,7 @@ public class EnemyPainterAI : EnemyChaserAI
             //Vector3.Distance(m_enemTargeting.TargetPlayer.position, transform.position) < m_enemTargeting.DetectionRadius
             if (TargetIsWithinDetectionRadius())
             {
-                m_enemMovement.StopWandering(true);
+                m_enemMovement.ExitWanderingMode(true);
                 
                 // Go the opposite direction of the player
                 transform.rotation = m_enemMovement.OppositePlayerDirection();

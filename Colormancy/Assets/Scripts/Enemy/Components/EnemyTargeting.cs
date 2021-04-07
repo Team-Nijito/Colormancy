@@ -54,8 +54,6 @@ public class EnemyTargeting : MonoBehaviourPun
 
     protected bool m_canTargetPlayers = true; // stun variable
 
-    protected Task m_blindTask; // bind variable
-
     #endregion
 
     #region Components
@@ -84,17 +82,6 @@ public class EnemyTargeting : MonoBehaviourPun
     #endregion
 
     #region Protected functions
-
-    /// <summary>
-    /// Character is blinded and now cannot target players.
-    /// </summary>
-    /// <param name="duration">Duration of blind (Min val = 1f)</param>
-    protected IEnumerator Blinded(float duration)
-    {
-        m_canTargetPlayers = false;
-        yield return new WaitForSecondsRealtime(duration);
-        m_canTargetPlayers = true;
-    }
 
     /// <summary>
     /// Allows the AI to remember and target the player until the player remains out of sight for m_rememberTargetDuration seconds.
@@ -172,20 +159,11 @@ public class EnemyTargeting : MonoBehaviourPun
     #region Public functions
     
     /// <summary>
-    /// Blind the character, preventing them from targetting the player for a duration.
+    /// Blind the character, preventing them from targetting the player.
     /// </summary>
-    /// <param name="duration">Duration of blind</param>
-    public void Blind(float duration)
+    public void Blind()
     {
-        if (m_blindTask == null)
-        {
-            m_blindTask = new Task(Blinded(duration));
-        }
-        else
-        {
-            m_blindTask.Stop();
-            m_blindTask = new Task(Blinded(duration));
-        }
+        m_canTargetPlayers = false;
     }
 
     /// <summary>
@@ -311,14 +289,15 @@ public class EnemyTargeting : MonoBehaviourPun
     /// </summary>
     public void StopAllTasks()
     {
-        if (m_blindTask != null)
-        {
-            m_blindTask.Stop();
-        }
-        if (m_forgettingTargetCoroutineRef != null)
-        {
-            StopCoroutine(m_forgettingTargetCoroutineRef);
-        }
+        StopAllCoroutines();
+    }
+
+    /// <summary>
+    /// Allows the AI to target players again.
+    /// </summary>
+    public void UnBlind()
+    {
+        m_canTargetPlayers = true;
     }
 
     #endregion

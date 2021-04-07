@@ -90,11 +90,15 @@ public class TestStatusEffect : MonoBehaviour
                 }
                 if (m_applyKnockback)
                 {
-                    statEffectScript.RPCApplyForce(other.gameObject.transform.position - transform.position + Vector3.up, m_force, 2f);
+                    if (other.gameObject)
+                    {
+                        statEffectScript.RPCApplyForce("Knockback", Time.deltaTime, other.gameObject.transform.position - transform.position + Vector3.up, 
+                                                       m_force, other.gameObject.transform.position);
+                    }
                 }
                 if (m_applySlowdown)
                 {
-                    statEffectScript.RPCApplySlowdown(m_percentReductionInSpeed, m_slowDownDuration);
+                    statEffectScript.RPCApplySlowdown("Slow", m_percentReductionInSpeed, m_slowDownDuration);
                 }
                 if (m_applyStun)
                 {
@@ -132,7 +136,11 @@ public class TestStatusEffect : MonoBehaviour
                 }
                 if (m_applyKnockback)
                 {
-                    statEffectScript.RPCApplyForce(other.gameObject.transform.position - transform.position + Vector3.up, m_force * Time.deltaTime, 2f);
+                    if (other.gameObject)
+                    {
+                        statEffectScript.RPCApplyForce("Knockback", Time.deltaTime, other.gameObject.transform.position - transform.position + Vector3.up, 
+                                                       m_force * Time.deltaTime, other.gameObject.transform.position);
+                    }
                 }
             }
             else

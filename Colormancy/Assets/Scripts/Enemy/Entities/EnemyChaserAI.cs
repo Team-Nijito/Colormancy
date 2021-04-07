@@ -1,10 +1,9 @@
 ﻿using UnityEngine;
 using Photon.Pun;
-using System;
 
 [RequireComponent(typeof(PhotonView))]
 [DisallowMultipleComponent]
-public class EnemyChaserAI : MonoBehaviourPun, IEnemyDetection, IStatusEffects
+public class EnemyChaserAI : MonoBehaviourPun, IEnemyDetection
 {
     // Handles the logic, and movement of the enemy chaser.
 
@@ -151,7 +150,7 @@ public class EnemyChaserAI : MonoBehaviourPun, IEnemyDetection, IStatusEffects
 
             if (m_enemTargeting.IsActivelyTargetingPlayer())
             {
-                m_enemMovement.StopWandering();
+                m_enemMovement.ExitWanderingMode();
 
                 if (m_enemMovement.IsAgentMoving())
                 {
@@ -159,7 +158,7 @@ public class EnemyChaserAI : MonoBehaviourPun, IEnemyDetection, IStatusEffects
                 }
                 else if (m_enemMovement.CurrentAnimState == EnemyAnimationManager.EnemyState.Attack)
                 {
-                    m_enemMovement.StopMoving();
+                    m_enemMovement.StopMovingAndDontChangeAnimation();
                     m_enemMovement.FacePlayer();
                 }
             }
@@ -177,49 +176,6 @@ public class EnemyChaserAI : MonoBehaviourPun, IEnemyDetection, IStatusEffects
     #endregion
 
     #region Public functions
-
-    /// <summary>
-    /// Character is blind, meaning that it will shuffle around aggressively and cannot target player.
-    /// </summary>
-    /// <param name="duration">Duration of blind</param>
-    [PunRPC]
-    public void ApplyBlind(float duration)
-    {
-        m_enemMovement.BlindPanic(duration);
-        m_enemTargeting.Blind(duration);
-    }
-
-    /// <summary>
-    /// (PunRPC) Apply a force to this character.
-    /// </summary>
-    /// <param name="dir">The direction of the force</param>
-    /// <param name="force">The magnitude of the force</param>
-    [PunRPC]
-    public void ApplyForce(Vector3 dir, float force, float stunDuration)
-    {
-        m_enemMovement.ApplyForce(dir, force, stunDuration);
-    }
-
-    /// <summary>
-    /// (PunRPC) Apply a slowdown to this character for a duration, then changes the character's speed to its speed before the slowdown. Stackable.
-    /// </summary>
-    /// <param name="percentReduction">Range(0,100f). What percentage will we reduce the character's speed by? 50%?</param>
-    /// <param name="duration">How long the slowdown will last.</param>
-    [PunRPC]
-    public void ApplySlowdown(float percentReduction, float duration)
-    {
-        m_enemMovement.ApplySlowdown(percentReduction, duration);
-    }
-
-    /// <summary>
-    /// (PunRPC) Stuns a character and prevent them from moving.
-    /// </summary>
-    /// <param name="duration">How long the stun will last.</param>
-    [PunRPC]
-    public void ApplyStun(float duration)
-    {
-        m_enemMovement.ApplyStun(duration);
-    }
 
     /// <summary>
     /// Verbose detection function meant to improve readability.

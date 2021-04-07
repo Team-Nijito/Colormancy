@@ -60,8 +60,12 @@ public class RedSpellController : MonoBehaviour
     {
         baseMaterial = redBase.GetComponent<Renderer>();
         edgeMaterial = redEdge.GetComponent<Renderer>();
-        baseMaterial.enabled = false;
-        edgeMaterial.enabled = false;
+
+        if (!debug)
+        {
+            baseMaterial.enabled = false;
+            edgeMaterial.enabled = false;
+        }
 
         playerObject = playerTransform.gameObject;
         playerObject.GetComponent<PlayerMovement>().enabled = false;
@@ -81,6 +85,11 @@ public class RedSpellController : MonoBehaviour
         if (toggleLanding && TryGetComponent(out CapsuleCollider capsuleCollider))
             capsuleCollider.enabled = false;
 
+        if (debug)
+        {
+            baseMaterial.material.SetFloat("_Lerp", m_lerp);
+            edgeMaterial.material.SetFloat("_Lerp", m_lerp);
+        }
 
         if (landed)
         {
@@ -149,11 +158,5 @@ public class RedSpellController : MonoBehaviour
 
         if (Time.time - startTime > lifetime && !debug && toggleLanding)
             Destroy(gameObject);
-    }
-
-    void OnDrawGizmos()
-    {
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawSphere(transform.position, spherePaintRadius);
     }
 }

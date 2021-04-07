@@ -40,8 +40,13 @@ public class RedOrb : Orb
         photonView.RPC("TakeDamage", RpcTarget.All, trueOrbAmount * 20f * spellEffectMod);
 
         // apply force is broken because it is using a rigidbody instead of NavMeshAgent.Warp or other methods
+        
+        // changed using apply force on rigidbody to NavMeshAgent.Warp, and tested on my own scene (which works)
+        // so you probably got to change some stuff around to make this work (apologies) -w
+
         StatusEffectScript status = hit.GetComponent<StatusEffectScript>();
-        status.RPCApplyForce(launchVector + Vector3.up, 500, (trueOrbAmount == 1 ? 2f : (trueOrbAmount == 2 ? 2.5f : 3f)));
+        status.RPCApplyForce("Knockback", Time.deltaTime, launchVector + Vector3.up, 500, hit.transform.position);
+        status.RPCApplyStun((trueOrbAmount == 1 ? 2f : (trueOrbAmount == 2 ? 2.5f : 3f))); // decoupled stun from force, now you need to call stun separately
     }
 
     public override void CastLesserEffect(GameObject hit, int orbAmount, float spellEffectMod)

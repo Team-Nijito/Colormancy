@@ -23,12 +23,14 @@ public class SpellTest : MonoBehaviourPun
     ManaScript mana;
     OrbTrayUIController uIController;
 
-    public bool TestingMode = false;
+    private bool TestingMode = true;
 
     [SerializeField]
     Dictionary<(System.Type, System.Type, System.Type), float> spellCooldowns = new Dictionary<(System.Type, System.Type, System.Type), float>();
 
     SpellManager.Spell currentSpell;
+
+    PlayerMovement playerMoveScript; // need a ref to this component so we can check if we're stunned or not, so we'll prevent casting while stunned
 
     #region Dummy Player Attributes
 
@@ -69,6 +71,7 @@ public class SpellTest : MonoBehaviourPun
     {
         manager = GetComponent<SpellManager>();
         mana = GetComponent<ManaScript>();
+        playerMoveScript = GetComponent<PlayerMovement>();
         Initialization();
     }
 
@@ -94,7 +97,7 @@ public class SpellTest : MonoBehaviourPun
             }
         }
 
-        if (Input.GetMouseButtonDown(1))
+        if (Input.GetMouseButtonDown(1) && playerMoveScript.CanMove)
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
@@ -176,8 +179,8 @@ public class SpellTest : MonoBehaviourPun
                     //AddSpellOrb(new BrownOrb());
                     throw new NotImplementedException("Didn't implement adding " + o.OrbElement + " yet");
                 case Orb.Element.Wind:
-                    //AddSpellOrb(new QuickSilverOrb());
-                    throw new NotImplementedException("Didn't implement adding " + o.OrbElement + " yet");
+                    AddSpellOrb(new QuickSilverOrb());
+                    break;
                 case Orb.Element.Darkness:
                     AddSpellOrb(new IndigoOrb());
                     break;
@@ -211,6 +214,7 @@ public class SpellTest : MonoBehaviourPun
             AddSpellOrb(new YellowOrb());
             AddSpellOrb(new BlueOrb());
             AddSpellOrb(new VioletOrb());
+            AddSpellOrb(new QuickSilverOrb());
             AddSpellOrb(new IndigoOrb());
         }
         else

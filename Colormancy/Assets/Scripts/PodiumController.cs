@@ -59,6 +59,7 @@ public class PodiumController : MonoBehaviour
             case OrbTypes.GreenOrb:
                 break;
             case OrbTypes.QuicksilverOrb:
+                orbType = new QuickSilverOrb();
                 break;
             case OrbTypes.IndigoOrb:
                 orbType = new IndigoOrb();
