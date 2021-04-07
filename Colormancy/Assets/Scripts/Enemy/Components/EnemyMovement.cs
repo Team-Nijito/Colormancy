@@ -18,6 +18,8 @@ public class EnemyMovement : MonoBehaviourPun, IPunObservable
     public float Speed { get { return m_speed; } protected set { m_speed = value; } }
     public float SpeedTriggerRun { get { return m_speedTriggerRun; } protected set { m_speedTriggerRun = value; } }
     
+    public Vector3 CurrentVelocity { get { return m_navMeshAgent.velocity; } protected set { m_navMeshAgent.velocity = value; } }
+
     public EnemyAnimationManager.EnemyState CurrentAnimState { get { return m_currentAnimState; } protected set { m_currentAnimState = value; } }
 
     public Vector3 DirectionToPlayer { get { return m_directionToPlayer; } protected set { m_directionToPlayer = value; } }
@@ -285,8 +287,9 @@ public class EnemyMovement : MonoBehaviourPun, IPunObservable
     }
 
     /// <summary>
-    /// Wrapper function for NavMeshAgent's SetDestination.
+    /// (PunRPC) Wrapper function for NavMeshAgent's SetDestination.
     /// </summary>
+    [PunRPC]
     public void MoveToPosition(Vector3 pos)
     {
         m_navMeshAgent.SetDestination(pos);
@@ -314,6 +317,11 @@ public class EnemyMovement : MonoBehaviourPun, IPunObservable
         {
             m_animManager.ChangeState(EnemyAnimationManager.EnemyState.Walk);
         }
+    }
+
+    public void SetNavMeshVelocity(Vector3 newVel)
+    {
+        m_navMeshAgent.velocity = newVel;
     }
 
     /// <summary>
@@ -373,7 +381,9 @@ public class EnemyMovement : MonoBehaviourPun, IPunObservable
     {
         if (m_navMeshAgent.isOnNavMesh)
         {
-            MoveToPosition(GetRandomPosition()); // choose random direction
+            Vector3 ranPosition = GetRandomPosition();
+            photonView.RPC("MoveToPosition", RpcTarget.All, ranPosition);
+            //MoveToPosition(GetRandomPosition()); // choose random direction
         }
         m_wState = WanderState.Wander;
         RunOrWalkDependingOnSpeed();

@@ -14,12 +14,6 @@ public class EnemyProjectileAbility : MonoBehaviourPun
     [SerializeField]
     protected Transform m_projectileSpawnpoint;
 
-    //[SerializeField]
-    //protected float m_spawnForward = 1f;
-
-    //[SerializeField]
-    //protected float m_spawnHeight = 1f;
-
     [SerializeField]
     protected float m_initialXVelocity = 15f;
 

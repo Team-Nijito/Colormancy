@@ -7699,7 +7699,7 @@ PrefabInstance:
     - target: {fileID: 1858970735588863968, guid: f3c0e5b18270531468bb1ff4a5ba57e5,
         type: 3}
       propertyPath: m_enemyEntities.Array.size
-      value: 3
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1858970735588863968, guid: f3c0e5b18270531468bb1ff4a5ba57e5,
         type: 3}
@@ -7725,7 +7725,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_enemyEntities.Array.data[0]
       value: 
-      objectReference: {fileID: 3708072817193241043, guid: db134691f7f7f1342848aeaa422600d4,
+      objectReference: {fileID: 852322663527957340, guid: 93ef9cf809333ea4fab41f7c43ce1bca,
         type: 3}
     - target: {fileID: 1858970735588863968, guid: f3c0e5b18270531468bb1ff4a5ba57e5,
         type: 3}

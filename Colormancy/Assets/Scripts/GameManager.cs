@@ -1,5 +1,4 @@
 ﻿using Photon.Pun;
-using Photon.Realtime;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -22,12 +21,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     [SerializeField]
     private GameObject m_playerPrefab;
 
-    public bool DoSpawnPlayer { get { return m_doSpawnPlayer; } private set { m_doSpawnPlayer = value; } }
-
-    [Tooltip("Do we spawn players in this scene?")]
-    [SerializeField]
-    private bool m_doSpawnPlayer = true;
-
     private uint m_currentSpawnIndex = 0; // index of the current spawn to spawn the player, used if m_playerSpawnpoints exists
 
     // Ready up variables
@@ -41,23 +34,25 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
     private int m_playersReady = 0;
 
+    [MyBox.ConditionalField("m_isLevel", true)]
     [SerializeField]
     private uint m_playersNeededToStartGame = 5;
 
+    [MyBox.ConditionalField("m_isLevel", true)]
     [SerializeField]
     private string m_levelAfterLobbyLevel = "Office Level 1";
+
+    [MyBox.ConditionalField("m_isLevel")]
+    [SerializeField]
+    private string m_levelAfterBeatingStage = "YouWinScene";
 
     private bool m_isLoadingNewScene = false;
 
     // Painting variables
-
     public float PaintPercentageNeededToWin { get { return m_paintPercentageNeededToWin; } private set { m_paintPercentageNeededToWin = value; } }
     [Range(0,1)]
     [SerializeField]
     private float m_paintPercentageNeededToWin = 0.75f;
-
-    [SerializeField]
-    private string m_levelAfterBeatingStage = "YouWinScene";
 
     #endregion
 
@@ -261,7 +256,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
     private void Start()
     {
-        if (!m_doSpawnPlayer || !PhotonNetwork.InRoom)
+        if ((SceneManager.GetActiveScene().name == "YouWinScene") || !PhotonNetwork.InRoom)
         {
             // don't do anything
             return;
@@ -298,7 +293,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
                     // Destroy the current camera because the player already has one
                     Destroy(GameObject.Find("Main Camera"));
 
-                    if (m_currentGm.DoSpawnPlayer && playerView.IsMine)
+                    if (playerView.IsMine)
                     {    
                         // Teleport only all players to the first spawn? (bug)
                         playerView.RPC("RespawnPlayer", PhotonNetwork.LocalPlayer);
@@ -326,15 +321,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
             }
         }
 
-
-        animator = popUpBox.GetComponent<Animator>();
-        popUpFullText = popUpBox.transform.Find("FullText").GetComponent<TMPro.TMP_Text>();
-        popUpImageText = popUpBox.transform.Find("ImageText").GetComponent<TMPro.TMP_Text>();
-        dialogueHalfImage = popUpBox.transform.Find("HalfImage").GetComponent<Image>();
-        dialogueFullImage = popUpBox.transform.Find("FullImage").GetComponent<Image>();
-        nextButton = popUpBox.transform.Find("NextButton").gameObject;
-        acceptButton = popUpBox.transform.Find("AcceptButton").gameObject;
-        acceptButton.SetActive(false);
+        SetPopUpVariables();
     }
 
     private void Update()
@@ -363,13 +350,16 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
     #region Private Methods
 
-    void LoadArena()
+    void SetPopUpVariables()
     {
-        if (!PhotonNetwork.IsMasterClient)
-        {
-            Debug.LogError("PhotonNetwork::Trying to load level but not master");
-        }
-        PhotonNetwork.LoadLevel("SampleScene");
+        animator = popUpBox.GetComponent<Animator>();
+        popUpFullText = popUpBox.transform.Find("FullText").GetComponent<TMPro.TMP_Text>();
+        popUpImageText = popUpBox.transform.Find("ImageText").GetComponent<TMPro.TMP_Text>();
+        dialogueHalfImage = popUpBox.transform.Find("HalfImage").GetComponent<Image>();
+        dialogueFullImage = popUpBox.transform.Find("FullImage").GetComponent<Image>();
+        nextButton = popUpBox.transform.Find("NextButton").gameObject;
+        acceptButton = popUpBox.transform.Find("AcceptButton").gameObject;
+        acceptButton.SetActive(false);
     }
     
     [PunRPC]
