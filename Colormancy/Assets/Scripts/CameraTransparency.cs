@@ -10,24 +10,40 @@ public class CameraTransparency : MonoBehaviour
     private Material m_transparentMat;
     private GameObject m_player;
     private float m_currentPlayerDistance;
-    private RaycastHit[] hits;
+    private HashSet<Transform> savedHits;
     private Material[] savedMats;
 
     private void Start()
     {
         m_player = GameObject.FindWithTag("Player");
-        // hits is initialized as an empty list to prevent runtime errors.
-        hits = new RaycastHit[] { };
+        // savedMats is initialized as an empty list to prevent runtime errors.
+        savedMats = new Material[] { };
+        savedHits = new HashSet<Transform>();
         m_transparentMat = Resources.Load("Transparent", typeof(Material)) as Material;
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         m_currentPlayerDistance = CalculateCameraPlayerDistance();
 
+        Debug.Log("Current Saved Materials: ");
+        foreach (Material mat in savedMats)
+        {
+            if (mat) { Debug.Log(mat); }
+        }
+
         UpdatePastHits();
 
-        hits = Physics.SphereCastAll(transform.position, m_spherecastRadius, transform.forward, m_currentPlayerDistance);
+        savedHits.Clear();
+
+        RaycastHit[] hits = Physics.SphereCastAll(transform.position, m_spherecastRadius, transform.forward, 
+                                     m_currentPlayerDistance);
+        Debug.Log("SpherecastAll() complete");
+
+        foreach (RaycastHit hit in hits)
+        {
+            savedHits.Add(hit.transform);
+        }
 
         UpdateCurrentHits();
     }
@@ -40,14 +56,15 @@ public class CameraTransparency : MonoBehaviour
 
     private void UpdatePastHits()
     {
+        Debug.Log("UpdatePastHits() called");
         // Iterate through all the hit colliders from the past update,
         // making them all opaque.
-        for (int i = 0; i < hits.Length; i++)
+        int i = 0;
+        foreach (Transform hit in savedHits)
         {
-            RaycastHit hit = hits[i];
-            if (hit.transform)
+            if (hit)
             {
-                Renderer rend = hit.transform.GetComponent<Renderer>();
+                Renderer rend = hit.GetComponent<Renderer>();
                 if (rend)
                 {
                     // Change the material of all hit colliders
@@ -55,32 +72,33 @@ public class CameraTransparency : MonoBehaviour
                     MakeOpaque(rend, i);
                 }
             }
+            i++;
         }
     }    
 
     private void UpdateCurrentHits()
     {
+        Debug.Log("UpdateCurrentHits() called");
         // Iterate through all the hit colliders from the current update,
         // making them all transparent.
 
-        savedMats = new Material[hits.Length];
-        for (int i = 0; i < hits.Length; i++)
+        savedMats = new Material[savedHits.Count];
+        int i = 0;
+        foreach (Transform hit in savedHits)
         {
-            RaycastHit hit = hits[i];
-            if (hit.transform)
+            if (hit)
             {
-                Renderer rend = hit.transform.GetComponent<Renderer>();
+                Debug.Log("Hit: " + hit.gameObject);
+                Renderer rend = hit.GetComponent<Renderer>();
                 if (rend)
                 {
                     savedMats[i] = rend.material;
-                }
-                if (rend && hit.distance < m_currentPlayerDistance)
-                {
                     // Change the material of all hit colliders
                     // to use a transparent shader.
                     MakeTransparent(rend, i);
                 }
             }
+            i++;
         }
     }
 
