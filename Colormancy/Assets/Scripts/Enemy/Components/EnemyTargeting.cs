@@ -285,11 +285,13 @@ public class EnemyTargeting : MonoBehaviourPun
     }
 
     /// <summary>
-    /// Stop all ongoing Tasks or coroutines.
+    /// Stop all ongoing Tasks or coroutines. Then disables the script.
     /// </summary>
     public void StopAllTasks()
     {
         StopAllCoroutines();
+        m_forgettingTargetCoroutineRef = null;
+        enabled = false;
     }
 
     /// <summary>

@@ -37,7 +37,10 @@ public class OrangeOrb : Orb
 
     public override void CastLesserEffect(GameObject hit, int orbAmount, float spellEffectMod)
     {
-        throw new System.NotImplementedException();
+        PhotonView photonView = PhotonView.Get(hit);
+
+        // right now assume that all cooldowns are reduced by base 30f * modifiers ...
+        photonView.RPC("ReduceAllCooldowns", RpcTarget.All, orbAmount * 30f * spellEffectMod);
     }
 
     public override void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, (int, int, int) amounts, Transform t, Vector3 clickedPosition)

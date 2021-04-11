@@ -280,7 +280,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
                 }
                 else
                 {
-                    Debug.LogFormat("Ignoring scene load for {0}", SceneManagerHelper.ActiveSceneName);
+                    //Debug.LogFormat("Ignoring scene load for {0}", SceneManagerHelper.ActiveSceneName);
 
                     // This portion of the code is reached whenever HealthScript.LocalPlayerInstance exists
                     // meaning we're loading a new scene (player is Don't Destroy on load)
@@ -317,7 +317,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
             }
             else
             {
-                Debug.LogFormat("Ignoring scene load for {0}", SceneManagerHelper.ActiveSceneName);
+                //Debug.LogFormat("Ignoring scene load for {0}", SceneManagerHelper.ActiveSceneName);
             }
         }
 
@@ -426,11 +426,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
     #region Photon functions
 
-    // Synchronize the number of players ready across all clients
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
         if (!m_isLevel)
         {
+            // Synchronize the number of players ready across all clients
             if (stream.IsWriting)
             {
                 stream.SendNext(m_playersReady);
@@ -439,6 +439,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
             {
                 m_playersReady = (int)stream.ReceiveNext();
             }
+        }
+        else
+        {
+            // Synchronize the paint progress between all clients
+
         }
     }
 

@@ -14,7 +14,7 @@ public class EnemyChaserAI : MonoBehaviourPun, IEnemyDetection
     protected HealthScript m_hscript;
     protected EnemyAnimationManager m_animManager;
     protected EnemyTargeting m_enemTargeting;
-    protected EnemyHurtbox m_enemHurtbox;
+    protected EnemyHitbox m_enemHurtbox;
 
     #endregion
 
@@ -26,8 +26,11 @@ public class EnemyChaserAI : MonoBehaviourPun, IEnemyDetection
         m_hscript = GetComponent<HealthScript>();
         m_animManager = GetComponent<EnemyAnimationManager>();
         m_enemMovement = GetComponent<EnemyMovement>();
-        m_enemHurtbox = GetComponent<EnemyHurtbox>();
-        m_enemTargeting = GetComponent<EnemyTargeting>();
+        m_enemHurtbox = GetComponent<EnemyHitbox>();
+        if (m_enemTargeting == null)
+        {
+            m_enemTargeting = GetComponent<EnemyTargeting>();
+        }
     }
 
     // Update is called once per frame
@@ -152,7 +155,7 @@ public class EnemyChaserAI : MonoBehaviourPun, IEnemyDetection
             {
                 m_enemMovement.ExitWanderingMode();
 
-                if (m_enemMovement.IsAgentMoving())
+                if (m_enemMovement.IsAgentMoving() && m_enemTargeting.TargetPlayer)
                 {
                     m_enemMovement.MoveToPosition(m_enemTargeting.TargetPlayer.position);
                 }
@@ -208,6 +211,8 @@ public class EnemyChaserAI : MonoBehaviourPun, IEnemyDetection
     {
         m_enemTargeting.StopAllTasks();
         m_enemMovement.StopAllTasks();
+        GetComponent<EnemySync>().enabled = false; // disable enemy sync
+        enabled = false;
     }
 
     #endregion

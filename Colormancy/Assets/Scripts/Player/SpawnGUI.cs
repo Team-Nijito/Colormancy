@@ -32,7 +32,7 @@ public class SpawnGUI : MonoBehaviourPunCallbacks
                 newBar.GetComponent<PlayerGUI>().SetTarget(view.gameObject);
             }
         }
-        print("OnPlayerEnteredRoom::created remote GUI");
+        //print("OnPlayerEnteredRoom::created remote GUI");
     }
 
     void SpawnExistingPlayersHealthBars()
@@ -40,15 +40,15 @@ public class SpawnGUI : MonoBehaviourPunCallbacks
         GameObject localPlayer = null;
         //Check if there are any characters in the room already if so add their health bars
         PhotonView[] photonViews = FindObjectsOfType<PhotonView>();
-        print("There are " + PhotonNetwork.CurrentRoom.PlayerCount + " players in the room.");
-        print("Found " + photonViews.Length + " photon views on joining");
+        //print("There are " + PhotonNetwork.CurrentRoom.PlayerCount + " players in the room."); commented this print statement -w
+        //print("Found " + photonViews.Length + " photon views on joining");
         int remoteIndex = 1;
         foreach (PhotonView view in photonViews)
         {
             Player player = view.Owner;
             if (player != null)
             {
-                print("Looking to add GUI for player " + player.NickName);
+                //print("Looking to add GUI for player " + player.NickName);
                 if (view.IsMine)
                 {
                     localPlayer = view.gameObject;
@@ -58,7 +58,7 @@ public class SpawnGUI : MonoBehaviourPunCallbacks
                     GameObject remoteBar = Instantiate(healthManaPrefab, new Vector2(0, remoteIndex * 150), Quaternion.identity);
                     remoteBar.transform.SetParent(BarPanel.transform);
                     remoteBar.GetComponent<PlayerGUI>().SetTarget(view.gameObject);
-                    print("Created remote health bar for player " + remoteIndex++);
+                    //print("Created remote health bar for player " + remoteIndex++);
                 }
             }
         }
@@ -67,7 +67,7 @@ public class SpawnGUI : MonoBehaviourPunCallbacks
         GameObject bar = Instantiate(healthManaPrefab, new Vector2(0, 0), Quaternion.identity);
         bar.transform.SetParent(BarPanel.transform);
         bar.GetComponent<PlayerGUI>().SetTarget(localPlayer);
-        print("Created local health bar");
+        //print("Created local health bar");
     }
 
     public void ResetUIAfterSceneLoad()

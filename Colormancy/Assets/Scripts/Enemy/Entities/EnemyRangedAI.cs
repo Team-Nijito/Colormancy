@@ -77,8 +77,15 @@ public class EnemyRangedAI : EnemyChaserAI
                 }
                 else
                 {
-                    // don't see player, just idle for now
-                    m_animManager.ChangeState(EnemyAnimationManager.EnemyState.Idle);
+                    // wander randomly if we don't sense nor remember player
+                    if (m_enemMovement.currentWanderState == EnemyMovement.WanderState.Wander)
+                    {
+                        m_enemMovement.RunOrWalkDependingOnSpeed();
+                    }
+                    else
+                    {
+                        m_animManager.ChangeState(EnemyAnimationManager.EnemyState.Idle);
+                    }
                 }
             }
         }
@@ -120,6 +127,7 @@ public class EnemyRangedAI : EnemyChaserAI
 
     /// <summary>
     /// (PunRPC) Move the AI closer so that the AI would have a better chance at hitting the target (hypothetically)
+    /// I'm pretty sure this breaks some things, so it's unused until further testing / fixing.
     /// </summary>
     [PunRPC]
     private void RangeGetCloser()
@@ -129,6 +137,7 @@ public class EnemyRangedAI : EnemyChaserAI
 
     /// <summary>
     /// (PunRPC) Move the AI away so that the AI would be farther away from player
+    /// /// I'm pretty sure this breaks some things, so it's unused until further testing / fixing.
     /// </summary>
     [PunRPC]
     private void RangeGetFarther()

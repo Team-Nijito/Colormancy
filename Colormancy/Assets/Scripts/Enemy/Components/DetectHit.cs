@@ -23,7 +23,7 @@ public class DetectHit : MonoBehaviour
     private float m_damage = 12f;
 
     private EnemyRangedAI m_parentERScript;
-    private EnemyHurtbox m_parentHurtboxScript;
+    private EnemyHitbox m_parentHurtboxScript;
     private PhotonView m_parentPhotonView;
 
     #endregion
@@ -34,7 +34,7 @@ public class DetectHit : MonoBehaviour
     {
         if (!m_isProjectile)
         {
-            m_parentHurtboxScript = m_parentGameObject.GetComponent<EnemyHurtbox>();
+            m_parentHurtboxScript = m_parentGameObject.GetComponent<EnemyHitbox>();
         }
         else
         {

@@ -26,11 +26,11 @@ public class CameraTransparency : MonoBehaviour
     {
         m_currentPlayerDistance = CalculateCameraPlayerDistance();
 
-        Debug.Log("Current Saved Materials: ");
-        foreach (Material mat in savedMats)
-        {
-            if (mat) { Debug.Log(mat); }
-        }
+        //Debug.Log("Current Saved Materials: "); // commented out debug statements -w
+        //foreach (Material mat in savedMats)
+        //{
+        //    if (mat) { Debug.Log(mat); }
+        //}
 
         UpdatePastHits();
 
@@ -38,7 +38,7 @@ public class CameraTransparency : MonoBehaviour
 
         RaycastHit[] hits = Physics.SphereCastAll(transform.position, m_spherecastRadius, transform.forward, 
                                      m_currentPlayerDistance);
-        Debug.Log("SpherecastAll() complete");
+        //Debug.Log("SpherecastAll() complete");
 
         foreach (RaycastHit hit in hits)
         {
@@ -56,7 +56,7 @@ public class CameraTransparency : MonoBehaviour
 
     private void UpdatePastHits()
     {
-        Debug.Log("UpdatePastHits() called");
+        //Debug.Log("UpdatePastHits() called");
         // Iterate through all the hit colliders from the past update,
         // making them all opaque.
         int i = 0;
@@ -78,7 +78,7 @@ public class CameraTransparency : MonoBehaviour
 
     private void UpdateCurrentHits()
     {
-        Debug.Log("UpdateCurrentHits() called");
+        //Debug.Log("UpdateCurrentHits() called");
         // Iterate through all the hit colliders from the current update,
         // making them all transparent.
 
@@ -88,7 +88,7 @@ public class CameraTransparency : MonoBehaviour
         {
             if (hit)
             {
-                Debug.Log("Hit: " + hit.gameObject);
+                //Debug.Log("Hit: " + hit.gameObject);
                 Renderer rend = hit.GetComponent<Renderer>();
                 if (rend)
                 {

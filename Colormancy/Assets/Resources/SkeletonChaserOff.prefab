@@ -1163,7 +1163,7 @@ MonoBehaviour:
     m_Bits: 1078
   m_closeDetectionRadius: 1.5
   m_detectionRadius: 15
-  m_fieldOfView: 90
+  m_fieldOfView: 135
   m_attackRange: 1.5
   m_rememberTargetDuration: 6
 --- !u!114 &-6367307994044888908
@@ -1201,7 +1201,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3708072817193241043}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 63520c0543a120d41a104ab6fdadd4a4, type: 3}
   m_Name: 
@@ -1243,8 +1243,8 @@ MonoBehaviour:
   ObservedComponents:
   - {fileID: 3708072817193144112}
   - {fileID: 3582504333645274679}
-  - {fileID: 7383176517900641147}
   - {fileID: -650915214295769066}
+  - {fileID: 7383176517900641147}
   viewIdField: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0

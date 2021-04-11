@@ -160,7 +160,7 @@ public class EnemyMovement : MonoBehaviourPun, IPunObservable
         {
             Vector3 randomPoint = center + Random.insideUnitSphere * range;
             NavMeshHit hit;
-            if (NavMesh.SamplePosition(randomPoint, out hit, 1.0f, NavMesh.AllAreas))
+            if (IsPositionOnNavMesh(randomPoint, out hit))
             {
                 result = hit.position;
                 return true;
@@ -279,6 +279,20 @@ public class EnemyMovement : MonoBehaviourPun, IPunObservable
     }
 
     /// <summary>
+    /// Shoots a ray at the position to check if this position is on the level's NavMesh.
+    /// </summary>
+    /// <param name="position"></param>
+    /// <returns>Whether the given position is on the level's NavMesh</returns>
+    public bool IsPositionOnNavMesh(Vector3 position, out NavMeshHit hit)
+    {
+        if (NavMesh.SamplePosition(position, out hit, 1.0f, NavMesh.AllAreas))
+        {
+            return true;
+        }
+        return false;
+    }
+
+    /// <summary>
     /// Wrapper function for NavMeshAgent's Move
     /// </summary>
     public void ManuallyMove(Vector3 offset)
@@ -287,11 +301,14 @@ public class EnemyMovement : MonoBehaviourPun, IPunObservable
     }
 
     /// <summary>
-    /// (PunRPC) Wrapper function for NavMeshAgent's SetDestination.
+    /// (PunRPC) Wrapper function for NavMeshAgent's SetDestination. This should only be called if we know for certain
+    /// that the position is on the level's NavMesh, otherwise errors may occur.
     /// </summary>
     [PunRPC]
     public void MoveToPosition(Vector3 pos)
     {
+        // don't do the "is position on NavMesh" check here, because if we were to invoke this function via PunRPC
+        // only to realize that the position isn't even valid, we wasted time sending unnecessary data thru the network
         m_navMeshAgent.SetDestination(pos);
     }
 
@@ -344,11 +361,16 @@ public class EnemyMovement : MonoBehaviourPun, IPunObservable
     }
 
     /// <summary>
-    /// Stop all ongoing Tasks or coroutines.
+    /// Stop all ongoing Tasks or coroutines. Then disables the script.
     /// </summary>
     public void StopAllTasks()
     {
+        if (m_wanderRandomDirectionTask != null)
+        {
+            m_wanderRandomDirectionTask.Stop();
+        }
         StopAllCoroutines();
+        enabled = false;
     }
 
     /// <summary>
@@ -357,7 +379,7 @@ public class EnemyMovement : MonoBehaviourPun, IPunObservable
     public void StopMovingAndDontChangeAnimation()
     {
         // Stop the agent from moving
-        if (m_navMeshAgent.isOnNavMesh)
+        if (m_navMeshAgent.isOnNavMesh && IsPositionOnNavMesh(transform.position, out _))
         {
             MoveToPosition(transform.position); // set destination to current destination so it wont keep moving
         }
@@ -379,14 +401,17 @@ public class EnemyMovement : MonoBehaviourPun, IPunObservable
     /// </summary>
     public void WanderToRandomDirection()
     {
-        if (m_navMeshAgent.isOnNavMesh)
+        if (m_navMeshAgent && m_navMeshAgent.isOnNavMesh)
         {
             Vector3 ranPosition = GetRandomPosition();
-            photonView.RPC("MoveToPosition", RpcTarget.All, ranPosition);
-            //MoveToPosition(GetRandomPosition()); // choose random direction
+            if (IsPositionOnNavMesh(ranPosition, out _))
+            {
+                photonView.RPC("MoveToPosition", RpcTarget.All, ranPosition);
+            }
+
+            m_wState = WanderState.Wander;
+            RunOrWalkDependingOnSpeed();
         }
-        m_wState = WanderState.Wander;
-        RunOrWalkDependingOnSpeed();
     }
 
     #endregion

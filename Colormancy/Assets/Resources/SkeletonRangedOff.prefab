@@ -1237,7 +1237,7 @@ MonoBehaviour:
     m_Bits: 1078
   m_closeDetectionRadius: 1.5
   m_detectionRadius: 15
-  m_fieldOfView: 90
+  m_fieldOfView: 135
   m_attackRange: 6
   m_rememberTargetDuration: 6
 --- !u!114 &-2214861160320240165
@@ -1277,7 +1277,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 852322663527957340}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 63520c0543a120d41a104ab6fdadd4a4, type: 3}
   m_Name: 

@@ -4,7 +4,7 @@ using UnityEngine;
 
 [RequireComponent(typeof(PhotonView))]
 [DisallowMultipleComponent]
-public class EnemyHurtbox : MonoBehaviourPun
+public class EnemyHitbox : MonoBehaviourPun
 {
     // This class manages the hurtboxes for the melee-type enemies
     // If there is a hitbox, the damage is done by the hitbox, and the hitbox is a child of a part of the character object.

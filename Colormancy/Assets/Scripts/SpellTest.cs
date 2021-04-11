@@ -23,10 +23,10 @@ public class SpellTest : MonoBehaviourPun
     ManaScript mana;
     OrbTrayUIController uIController;
 
-    private bool TestingMode = true;
+    private readonly bool TestingMode = true;
 
     [SerializeField]
-    Dictionary<(System.Type, System.Type, System.Type), float> spellCooldowns = new Dictionary<(System.Type, System.Type, System.Type), float>();
+    Dictionary<(Type, Type, Type), (float, float)> spellCooldowns = new Dictionary<(Type, Type, Type), (float, float)>(); // key: Orb Tuple, value: (current cooldown, Spell base cooldown)
 
     SpellManager.Spell currentSpell;
 
@@ -131,7 +131,7 @@ public class SpellTest : MonoBehaviourPun
         {
             if (spellCooldowns.ContainsKey(currentSpell.GetOrbTuple()))
             {
-                if (spellCooldowns[currentSpell.GetOrbTuple()] <= Time.time)
+                if (spellCooldowns[currentSpell.GetOrbTuple()].Item1 <= Time.time)
                 {
                     CastSpell(clickedPosition);
                 }
@@ -142,11 +142,36 @@ public class SpellTest : MonoBehaviourPun
             }
         }
     }
-    
+
+    /// <summary>
+    /// (PunRPC) Reduces all current spell cooldowns for the player this component is attached to.
+    /// The amount reduced is not a flat amount, but rather a percentage (from 0->100) that it would cooldown by.
+    /// So: cooldown = cooldown - percentReduce * BaseCooldown;
+    /// </summary>
+    /// <param name="percentReduce"></param>
+    [PunRPC]
+    void ReduceAllCooldowns(float percentReduce)
+    {
+        if (percentReduce <= 0)
+        {
+            throw new ArgumentException(string.Format("{0} is a positive percentage, and thus should be greater than zero", percentReduce), "percentReduce");
+        }
+
+        // copy list of keys so we can permute while looping (O(2n))
+        List<(Type, Type, Type)> keys = new List<(Type, Type, Type)>(spellCooldowns.Keys);
+        foreach ((Type, Type, Type) key in keys)
+        {
+            float baseCooldown = spellCooldowns[key].Item2;
+            float currentCooldown = spellCooldowns[key].Item1;
+            float newCooldown = currentCooldown - ((percentReduce / 100) * baseCooldown) > 0 ? currentCooldown - ((percentReduce / 100) * baseCooldown) : 0;
+            spellCooldowns[key] = (newCooldown, baseCooldown);
+        }
+    }
+
     void CastSpell(Vector3 clickedPosition)
     {
         currentSpell.Cast(transform, clickedPosition);
-        spellCooldowns[currentSpell.GetOrbTuple()] = Time.time + currentSpell.GetSpellCooldown();
+        spellCooldowns[currentSpell.GetOrbTuple()] = (Time.time + currentSpell.GetSpellCooldown(), currentSpell.GetSpellCooldown());
         mana.ConsumeMana(currentSpell.GetManaCost());
     }
 

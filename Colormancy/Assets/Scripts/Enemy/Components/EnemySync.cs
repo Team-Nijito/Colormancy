@@ -10,7 +10,11 @@ public class EnemySync : MonoBehaviourPun, IPunObservable
 
     // more reading on lag compensation: https://john-tucker.medium.com/synchronization-issues-unity-photon-part-4-8ca50bda2d57
 
+    // apparently this approach is really buggy
+
     #region Variables
+
+    protected readonly float MOVEMENT_THRESHOLD = 0.1f;
 
     protected Vector3 m_networkPosition;
     protected Quaternion m_networkRotation;
@@ -30,21 +34,11 @@ public class EnemySync : MonoBehaviourPun, IPunObservable
     {
         if (!photonView.IsMine)
         {
-            transform.position = Vector3.MoveTowards(transform.position, m_networkPosition, Time.fixedDeltaTime * m_enemyMovement.Speed);
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, m_networkRotation, Time.fixedDeltaTime * 100.0f);
+            transform.position = Vector3.MoveTowards(transform.position, m_networkPosition, Time.deltaTime * m_enemyMovement.CurrentVelocity.magnitude);
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, m_networkRotation, Time.deltaTime * 100.0f);
             return;
         }
     }
-
-    //public void FixedUpdate()
-    //{
-    //    if (!photonView.IsMine)
-    //    {
-    //        transform.position = Vector3.MoveTowards(transform.position, m_networkPosition, Time.fixedDeltaTime);
-    //        transform.rotation = Quaternion.RotateTowards(transform.rotation, m_networkRotation, Time.fixedDeltaTime * 100.0f);
-    //        return;
-    //    }
-    //}
 
     #endregion
 
@@ -59,30 +53,22 @@ public class EnemySync : MonoBehaviourPun, IPunObservable
         {
             stream.SendNext(transform.position);
             stream.SendNext(transform.rotation);
-            stream.SendNext(m_enemyMovement.CurrentVelocity);
-
-            //stream.SendNext(transform.localRotation);
-            //if (m_spawnProjecitlePos)
-            //{
-            //    stream.SendNext(m_spawnProjecitlePos.transform.position);
-            //}
+            if (m_enemyMovement && m_enemyMovement.CurrentVelocity.magnitude > MOVEMENT_THRESHOLD)
+            {
+                stream.SendNext(m_enemyMovement.CurrentVelocity);
+            }
         }
         else
         {
-            //transform.localRotation = (Quaternion)stream.ReceiveNext();
-            //if (m_spawnProjecitlePos)
-            //{
-            //    m_spawnProjecitlePos.transform.position = (Vector3)stream.ReceiveNext();
-            //}
-
             m_networkPosition = (Vector3)stream.ReceiveNext();
             m_networkRotation = (Quaternion)stream.ReceiveNext();
-            m_enemyMovement.SetNavMeshVelocity((Vector3)stream.ReceiveNext());
+            if (m_enemyMovement && m_enemyMovement.CurrentVelocity.magnitude > MOVEMENT_THRESHOLD)
+            {
+                m_enemyMovement.SetNavMeshVelocity((Vector3)stream.ReceiveNext());
 
-            //Vector3 newMovement = (Vector3)stream.ReceiveNext();
-
-            float lag = Mathf.Abs((float)(PhotonNetwork.Time - info.SentServerTime));
-            m_networkPosition += (m_enemyMovement.CurrentVelocity * lag);
+                float lag = Mathf.Abs((float)(PhotonNetwork.Time - info.SentServerTime));
+                m_networkPosition += (m_enemyMovement.CurrentVelocity * lag);
+            }
         }
     }
 
