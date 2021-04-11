@@ -201,8 +201,8 @@ public class SpellTest : MonoBehaviourPun
                     AddSpellOrb(new VioletOrb());
                     break;
                 case Orb.Element.Earth:
-                    //AddSpellOrb(new BrownOrb());
-                    throw new NotImplementedException("Didn't implement adding " + o.OrbElement + " yet");
+                    AddSpellOrb(new BrownOrb());
+                    break;
                 case Orb.Element.Wind:
                     AddSpellOrb(new QuickSilverOrb());
                     break;
@@ -239,6 +239,7 @@ public class SpellTest : MonoBehaviourPun
             AddSpellOrb(new YellowOrb());
             AddSpellOrb(new BlueOrb());
             AddSpellOrb(new VioletOrb());
+            AddSpellOrb(new BrownOrb());
             AddSpellOrb(new QuickSilverOrb());
             AddSpellOrb(new IndigoOrb());
         }
