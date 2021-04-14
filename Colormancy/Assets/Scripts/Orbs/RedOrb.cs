@@ -44,7 +44,7 @@ public class RedOrb : Orb
         float orbDuration = (trueOrbAmount == 1 ? 2f : (trueOrbAmount == 2 ? 2.5f : 3f));
 
         status.RPCApplyStun(orbDuration * 0.5f); // decoupled stun from force, now you need to call stun separately
-        status.RPCApplyForce("Knockback", orbDuration, launchVector + Vector3.up, 75f);
+        status.RPCApplyForce("Knockback", orbDuration, launchVector + Vector3.up, 40f);
     }
 
     public override void CastLesserEffect(GameObject hit, int orbAmount, float spellEffectMod)
