@@ -10,7 +10,7 @@ public class EnemySync : MonoBehaviourPun, IPunObservable
 
     // more reading on lag compensation: https://john-tucker.medium.com/synchronization-issues-unity-photon-part-4-8ca50bda2d57
 
-    // apparently this approach is really buggy
+    // apparently this approach is really buggy or I've implemented it wrong
 
     #region Variables
 

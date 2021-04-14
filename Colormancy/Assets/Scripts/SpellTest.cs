@@ -152,6 +152,7 @@ public class SpellTest : MonoBehaviourPun
     [PunRPC]
     void ReduceAllCooldowns(float percentReduce)
     {
+        print("Reduce cooldowns.");
         if (percentReduce <= 0)
         {
             throw new ArgumentException(string.Format("{0} is a positive percentage, and thus should be greater than zero", percentReduce), "percentReduce");
@@ -172,7 +173,12 @@ public class SpellTest : MonoBehaviourPun
     {
         currentSpell.Cast(transform, clickedPosition);
         spellCooldowns[currentSpell.GetOrbTuple()] = (Time.time + currentSpell.GetSpellCooldown(), currentSpell.GetSpellCooldown());
-        mana.ConsumeMana(currentSpell.GetManaCost());
+
+        float cost = currentSpell.GetManaCost();
+        if (cost > 0)
+        {
+            mana.ConsumeMana(currentSpell.GetManaCost());
+        }
     }
 
     private void UpdateOrbsFromPreviousScene()

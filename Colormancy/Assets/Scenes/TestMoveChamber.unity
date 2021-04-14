@@ -1334,7 +1334,7 @@ MonoBehaviour:
   m_damage: 1
   m_secondDuration: 0
   m_applyKnockback: 1
-  m_force: 150
+  m_force: 70
   m_applySlowdown: 1
   m_slowDownDuration: 3
   m_percentReductionInSpeed: 50

@@ -32,6 +32,7 @@ public class StatusEffectScript : MonoBehaviourPun
     private EnemyMovement m_enemMovement;
     private EnemyTargeting m_enemTargetting;
     private NavMeshAgent m_enemNavMeshAgent;
+    private Rigidbody m_enemRB;
 
     #endregion
 
@@ -179,7 +180,7 @@ public class StatusEffectScript : MonoBehaviourPun
     /// increase the duration of the effect.
     /// </summary>
     [PunRPC]
-    private void ApplyForceEffect(string name, float duration, Vector3 dir, float force, Vector3 enemPosition)
+    private void ApplyForceEffect(string name, float duration, Vector3 dir, float force)
     {
         if (!CheckStatusEffectExist(name, duration, dir, force))
         {
@@ -195,7 +196,7 @@ public class StatusEffectScript : MonoBehaviourPun
             {
                 // Now make a new Force class and insert to StatusEffect list
                 Force newForce = new Force(m_statusEffects, name, StatusEffect.StatusType.Force,
-                                           duration, dir, force, m_enemNavMeshAgent, enemPosition);
+                                           duration, dir, force, m_enemMovement, gameObject.transform);
 
                 m_statusEffects.Add(newForce);
             }
@@ -298,17 +299,17 @@ public class StatusEffectScript : MonoBehaviourPun
     /// </summary>
     /// <param name="dir">The direction of the force.</param>
     /// <param name="force">The magnitude of the force.</param>
-    public void RPCApplyForce(string name, float duration, Vector3 dir, float force, Vector3 originPosition)
+    public void RPCApplyForce(string name, float duration, Vector3 dir, float force)
     {
         // disable stun, leave it to other class
 
         if (m_isPlayer)
         {
-            photonView.RPC("ApplyForceEffect", photonView.Owner, name, duration, dir, force, originPosition);
+            photonView.RPC("ApplyForceEffect", photonView.Owner, name, duration, dir, force);
         }
         else
         {
-            photonView.RPC("ApplyForceEffect", PhotonNetwork.MasterClient, name, duration, dir, force, originPosition);
+            photonView.RPC("ApplyForceEffect", PhotonNetwork.MasterClient, name, duration, dir, force);
         }
     }
 
@@ -394,6 +395,7 @@ public class StatusEffectScript : MonoBehaviourPun
                 m_enemMovement = GetComponent<EnemyMovement>();
                 m_enemTargetting = GetComponent<EnemyTargeting>();
                 m_enemNavMeshAgent = GetComponent<NavMeshAgent>();
+                m_enemRB = GetComponent<Rigidbody>();
             }
 
             m_statusEffects = new List<StatusEffect>();

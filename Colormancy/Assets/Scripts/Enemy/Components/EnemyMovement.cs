@@ -7,7 +7,7 @@ using UnityEngine.AI;
 [RequireComponent(typeof(PhotonView))]
 [RequireComponent(typeof(EnemyAnimationManager))]
 [DisallowMultipleComponent]
-public class EnemyMovement : MonoBehaviourPun, IPunObservable
+public class EnemyMovement : MonoBehaviourPun
 {
     // This class is responsible for AI movement variables
     // The AI utilizes the Unity Navmesh and the Photon framework to sync its position
@@ -36,6 +36,9 @@ public class EnemyMovement : MonoBehaviourPun, IPunObservable
 
     public WanderState currentWanderState { get { return m_wState; } protected set { m_wState = value; } }
     public WanderState lastWanderState { get { return m_lastWState; } protected set { m_lastWState = value; } }
+
+    // Rigidbody accessors
+    public float Mass { get { return m_rb.mass; } protected set { m_rb.mass = value; } } // mass of character
 
     #endregion
 
@@ -92,6 +95,7 @@ public class EnemyMovement : MonoBehaviourPun, IPunObservable
     protected GameObject m_character;
     protected NavMeshAgent m_navMeshAgent;
     protected EnemyAnimationManager m_animManager;
+    protected Rigidbody m_rb;
 
     #endregion
 
@@ -102,10 +106,11 @@ public class EnemyMovement : MonoBehaviourPun, IPunObservable
     {
         m_navMeshAgent = GetComponent<NavMeshAgent>();
         m_animManager = GetComponent<EnemyAnimationManager>();
+        m_rb = GetComponent<Rigidbody>();
 
         // Override the speed variable in m_navMeshAgent if it's not set already.
         m_navMeshAgent.speed = m_speed;
-        
+
         // (important) Set up the wander Task, start it and then pause it
         // This is different than disabling autostart (because that implies you will start it later)
         m_wanderRandomDirectionTask = new Task(ShuffleRandomDirection());
@@ -191,19 +196,31 @@ public class EnemyMovement : MonoBehaviourPun, IPunObservable
     #region Public functions
 
     /// <summary>
-    /// Disable the NavMeshAgent
+    /// Disable the NavMeshAgent (and optionally enable the Rigidbody, or optionally enable the idleAnimation)
     /// </summary>
-    public void DisableAgent()
+    public void DisableAgent(bool enableRigidbody = false, bool playIdleAnimation = false)
     {
         m_navMeshAgent.enabled = false;
+        if (playIdleAnimation)
+        {
+            m_animManager.ChangeState(EnemyAnimationManager.EnemyState.Idle);
+        }
+        if (enableRigidbody && m_rb.isKinematic)
+        {
+            m_rb.isKinematic = false;
+        }
     }
 
     /// <summary>
-    /// Enable the NavMeshAgent
+    /// Enable the NavMeshAgent and disables the Rigidbody if it is enabled.
     /// </summary>
-    public void EnableAgent()
+    public void EnableAgent(bool disableRigidbody = false)
     {
         m_navMeshAgent.enabled = true;
+        if (disableRigidbody && !m_rb.isKinematic)
+        {
+            m_rb.isKinematic = true;
+        }
     }
 
     /// <summary>
@@ -322,6 +339,19 @@ public class EnemyMovement : MonoBehaviourPun, IPunObservable
     }
 
     /// <summary>
+    /// Wrapper function for Rigidbody AddForce(). This will only work if Rigidbody is in control instead of NavMeshAgent.
+    /// </summary>
+    /// <param name="force"></param>
+    /// <param name="mode"></param>
+    public void RigidbodyAddForce(Vector3 force, ForceMode mode)
+    {
+        if (!m_rb.isKinematic)
+        {
+            m_rb.AddForce(force, mode);
+        }
+    }
+
+    /// <summary>
     /// Change the AI animation depending on its speed values.
     /// </summary>
     public void RunOrWalkDependingOnSpeed()
@@ -411,31 +441,6 @@ public class EnemyMovement : MonoBehaviourPun, IPunObservable
 
             m_wState = WanderState.Wander;
             RunOrWalkDependingOnSpeed();
-        }
-    }
-
-    #endregion
-
-    #region Photon functions
-
-    // IPunObservable Implementation
-    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-    {
-        // Use this information to sync child rotational transform
-        // instead of placing PhotonView and PhotonTransfromView on child object
-        if (stream.IsWriting)
-        {
-            if (m_character)
-            {
-                stream.SendNext(m_character.transform.localRotation);
-            }
-        }
-        else
-        {
-            if (m_character)
-            {
-                m_character.transform.localRotation = (Quaternion)stream.ReceiveNext();
-            }
         }
     }
 
