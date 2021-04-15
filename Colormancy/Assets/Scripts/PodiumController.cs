@@ -83,7 +83,7 @@ public class PodiumController : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.tag == "Player")
+        if (other.gameObject.CompareTag("Player"))
         {
             if (other.gameObject.GetComponent<PhotonView>().IsMine)
             {
@@ -96,7 +96,7 @@ public class PodiumController : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.gameObject.tag == "Player")
+        if (other.gameObject.CompareTag("Player"))
         {
             if (other.gameObject.GetComponent<PhotonView>().IsMine)
             {

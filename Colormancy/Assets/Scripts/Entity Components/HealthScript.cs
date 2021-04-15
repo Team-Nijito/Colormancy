@@ -137,7 +137,7 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
                 m_username.text = owner.NickName;
             }
             // die
-            if (m_effectiveHealth <= 0 && transform.gameObject.tag == "Player" && !m_deathDebounce)
+            if (m_effectiveHealth <= 0 && transform.gameObject.CompareTag("Player") && !m_deathDebounce)
             {
                 m_deathDebounce = true;
                 // player respawns in the middle

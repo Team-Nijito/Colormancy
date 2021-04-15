@@ -111,7 +111,7 @@ public class RedSpellController : MonoBehaviour
 
             foreach (var hitCollider in hitColliders)
             {
-                if (hitCollider.tag.Equals("Enemy"))
+                if (hitCollider.CompareTag("Enemy"))
                 {
                     Vector3 PlayerToEnemy = (hitCollider.gameObject.transform.position - transform.position).normalized;
                     PlayerToEnemy *= 127;
@@ -129,7 +129,7 @@ public class RedSpellController : MonoBehaviour
 
                     greaterCast(hitCollider.gameObject, vectorCastData, spellEffectMod);
                 }
-                else if (hitCollider.tag.Equals("Player"))
+                else if (hitCollider.CompareTag("Player"))
                 {
                     lesserCast(hitCollider.gameObject, lesserCastAmt, spellEffectMod);
                 }
