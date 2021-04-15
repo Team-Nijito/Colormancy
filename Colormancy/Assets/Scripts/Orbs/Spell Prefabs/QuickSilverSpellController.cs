@@ -77,7 +77,7 @@ public class QuickSilverSpellController : MonoBehaviour
         waveMat.SetFloat("_Lerp", WaveLerp.Evaluate(currentTime));
 
         contactMat.SetFloat("_Radius", ContactRadius.Evaluate(currentTime));
-        sparkLight.intensity = (ContactRadius.Evaluate(currentTime) + 0.5f) * 10;
+        sparkLight.intensity = (ContactRadius.Evaluate(currentTime) + 0.5f) * 5;
 
         // make spell face the camera
         Vector3 lookPoint = Camera.main.transform.position;
