@@ -41,6 +41,7 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     [SerializeField]
     private bool m_isRegenHealth = false;
 
+    [MyBox.ConditionalField("m_isRegenHealth", false)]
     [SerializeField]
     [Range(0f, 100f)]
     private float m_regenHealthPercentage = 1f;

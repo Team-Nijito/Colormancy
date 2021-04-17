@@ -92,8 +92,8 @@ public class StatusEffectScript : MonoBehaviourPun
     }
     
     /// <summary>
-    /// Overloaded variant of CheckStatusEffectExist intended for appending new forces to existing forces
-    /// (given that they have the same name)
+    /// Overloaded variant of CheckStatusEffectExist intended for appending new forces to the only force status
+    /// (only one force status effect may exist in the list at one time, any new force names will essentially be ignored)
     /// </summary>
     /// <param name="name">Name of the force</param>
     /// <param name="duration">Additional duration of the force</param>
@@ -105,7 +105,7 @@ public class StatusEffectScript : MonoBehaviourPun
         // First search the list to see if status effect exists
         foreach (StatusEffect effect in m_statusEffects)
         {
-            if (effect.StatusName == name)
+            if (effect.StatusEffectType == StatusEffect.StatusType.Force)
             {
                 effect.IncreaseDuration(duration);
                 ((Force)effect).AppendForce(dir, force);
