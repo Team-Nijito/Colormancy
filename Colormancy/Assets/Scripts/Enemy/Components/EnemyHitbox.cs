@@ -66,6 +66,14 @@ public class EnemyHitbox : MonoBehaviourPun
             hitBox.m_hitBoxObject.SetActive(true);
         }
     }
+    /// <summary>
+    /// (PunRPC) Enables the listed box colider for the AI
+    /// </summary>
+    [PunRPC]
+    protected void EnableBoxCollider(int index)
+    {
+        m_hitBoxesArray[index].m_hitBoxObject.GetComponent<BoxCollider>().enabled = true;
+    }
 
     /// <summary>
     /// (PunRPC) Disables all the listed hitboxes for the AI
@@ -76,6 +84,19 @@ public class EnemyHitbox : MonoBehaviourPun
         foreach (HitBox hitBox in m_hitBoxesArray)
         {
             hitBox.m_hitBoxObject.SetActive(false);
+        }
+        ResetHurtVictimArray();
+    }
+    
+    /// <summary>
+    /// (PunRPC) Disables all the listed hitboxes for the AI
+    /// </summary>
+    [PunRPC]
+    protected void DisableBoxColliders()
+    {
+        foreach (HitBox hitBox in m_hitBoxesArray)
+        {
+            hitBox.m_hitBoxObject.GetComponent<BoxCollider>().enabled = false;
         }
         ResetHurtVictimArray();
     }
@@ -135,6 +156,28 @@ public class EnemyHitbox : MonoBehaviourPun
         if (photonView.IsMine)
         {
             photonView.RPC("DisableHitBoxes", RpcTarget.All);
+        }
+    }
+
+    /// <summary>
+    /// RPC Wrapper function for disabling mesh colliders (DisableBoxColliders). This function should be invoked by the attack animation.
+    /// </summary>
+    public void RPCDisableBoxColliders()
+    {
+        if (photonView.IsMine)
+        {
+            photonView.RPC("DisableBoxColliders", RpcTarget.All);
+        }
+    }
+
+    /// <summary>
+    /// RPC Wrapper function for enabling a mesh collider (EnableBoxCollider). This function should be invoked by the attack animation.
+    /// </summary>
+    public void RPCEnableBoxCollider(int index)
+    {
+        if (photonView.IsMine)
+        {
+            photonView.RPC("EnableBoxCollider", RpcTarget.All, index);
         }
     }
 

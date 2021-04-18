@@ -266,9 +266,18 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
         // replaces the armorPercentage with new value
 
         // ignore RPCs for dead enemies
-        if (!m_isPlayer && m_animManager.GetCurrentState() == EnemyAnimationManager.EnemyState.Death)
+        if (m_animManager != null)
         {
-            return;
+            if (!m_isPlayer && m_animManager.GetCurrentState() == EnemyAnimationManager.EnemyState.Death)
+            {
+                return;
+            }
+        } else
+        {
+            if (!m_isPlayer)
+            {
+                return;
+            }
         }
 
         m_armorPercentage += armorPercent;
@@ -308,11 +317,14 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     public void TakeDamage(float damageValue)
     {
         // damage formula: health = health - (damage - (damage * armorPercentage))
-        
+        Debug.Log(("Taking: ", damageValue, " damage"));
         // ignore RPCs for dead enemies
-        if (!m_isPlayer && m_animManager.GetCurrentState() == EnemyAnimationManager.EnemyState.Death)
+        if (m_animManager != null)
         {
-            return;
+            if (!m_isPlayer && m_animManager.GetCurrentState() == EnemyAnimationManager.EnemyState.Death)
+            {
+                return;
+            }
         }
 
         if (damageValue <= 0)
