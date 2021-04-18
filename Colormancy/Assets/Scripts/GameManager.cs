@@ -127,20 +127,22 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
                 {
                     // only initialize the Room custom properties once upon joining new scene
 
+                    int[] array2size = new int[] { -1, -1 }; // first element, ID that is browsing the orb, second element, ID that has obtained the orb
+
                     // Essentially we're keeping track of who has which orb in the lobby
                     // we don't need to store a variable and sync the variable, rather
                     // we're delegating that task to Photon via CustomProperties (basically a HashTable)
                     properties = new PhotonHashtable
                     {
-                        {RedOrbKey, -1},
-                        {OrangeOrbKey, -1},
-                        {YellowOrbKey, -1},
-                        {GreenOrbKey, -1},
-                        {BlueOrbKey, -1},
-                        {VioletOrbKey, -1},
-                        {BrownOrbKey, -1},
-                        {QuicksilverOrbKey, -1},
-                        {IndigoOrbKey, -1}
+                        {RedOrbKey, array2size},
+                        {OrangeOrbKey, array2size},
+                        {YellowOrbKey, array2size},
+                        {GreenOrbKey, array2size},
+                        {BlueOrbKey, array2size},
+                        {VioletOrbKey, array2size},
+                        {BrownOrbKey, array2size},
+                        {QuicksilverOrbKey, array2size},
+                        {IndigoOrbKey, array2size}
                     };
 
                     PhotonNetwork.CurrentRoom.SetCustomProperties(properties);
@@ -325,7 +327,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
             // fetch, alter, then set room custom properties
             PhotonHashtable roomProperties = PhotonNetwork.CurrentRoom.CustomProperties;
-            roomProperties[orbKey] = PhotonNetwork.LocalPlayer.ActorNumber;
+            int[] orbProperties = (int[])roomProperties[orbKey];
+            roomProperties[orbKey] = new int[]{orbProperties[0],PhotonNetwork.LocalPlayer.ActorNumber};
             PhotonNetwork.CurrentRoom.SetCustomProperties(roomProperties);
 
             // fetch, alter, then set player custom properties
@@ -333,9 +336,25 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
             playerProperties[OrbOwnedInLobbyKey] = PodiumController.FetchOrbType(orbKey);
             PhotonNetwork.LocalPlayer.SetCustomProperties(playerProperties);
 
-            CloseWindowVisually();
-            currentPodium.CloseWindow();
+            CloseWindow();
         }
+    }
+    
+    /// <summary>
+    /// Alters the accept button behaviour in the Popupdialogue canvas object 
+    /// </summary>
+    public void ChangeGUIMode(AcceptButtonHandler.AcceptMode newMode)
+    {
+        acceptButton.GetComponent<AcceptButtonHandler>().ChangeCurrentMode(newMode);
+    }
+
+    /// <summary>
+    /// Wrapper function to call CloseWindowVisually() and currentPodium.CloseWindow()
+    /// </summary>
+    public void CloseWindow()
+    {
+        CloseWindowVisually();
+        currentPodium.CloseWindow();
     }
 
     public void CloseWindowVisually()
@@ -366,7 +385,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
             {
                 // we must return this back to the source
                 PhotonHashtable roomProperties = PhotonNetwork.CurrentRoom.CustomProperties;
-                roomProperties[PodiumController.FetchOrbKey(orbOwned)] = -1; // nobody should own the orb anymore
+                string key = PodiumController.FetchOrbKey(orbOwned);
+                roomProperties[key] = new int[] { -1, -1 }; // nobody should own the orb anymore
+
                 PhotonNetwork.CurrentRoom.SetCustomProperties(roomProperties);
 
                 roomProperties = new PhotonHashtable();
@@ -444,7 +465,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
             // fetch, alter, then set room custom properties
             PhotonHashtable roomProperties = PhotonNetwork.CurrentRoom.CustomProperties;
-            roomProperties[orbKey] = -1;
+            int[] orbProperties = (int[])roomProperties[orbKey];
+            roomProperties[orbKey] = new int[] { orbProperties[0], -1 };
             PhotonNetwork.CurrentRoom.SetCustomProperties(roomProperties);
 
             // fetch, alter, then set player custom properties
@@ -592,12 +614,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
             }
         }
     }
-
-    public override void OnRoomPropertiesUpdate(PhotonHashtable propertiesThatChanged)
-    {
-        Debug.Log(propertiesThatChanged);
-    }
-
 
     #endregion
 }
