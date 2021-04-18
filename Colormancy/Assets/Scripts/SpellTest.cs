@@ -23,7 +23,7 @@ public class SpellTest : MonoBehaviourPun
     ManaScript mana;
     OrbTrayUIController uIController;
 
-    private readonly bool TestingMode = true;
+    private readonly bool TestingMode = false;
 
     [SerializeField]
     Dictionary<(Type, Type, Type), (float, float)> spellCooldowns = new Dictionary<(Type, Type, Type), (float, float)>(); // key: Orb Tuple, value: (current cooldown, Spell base cooldown)
@@ -117,7 +117,18 @@ public class SpellTest : MonoBehaviourPun
         if (uIController)
             uIController.AddOrb(orb);
     }
-    
+
+    public void RemoveSpellOrb(Orb orb, bool removeFromOrbHistory = false)
+    {
+        orbs.Remove(orb);
+        if (removeFromOrbHistory)
+        {
+            orbHistory.Remove(orb); // sync across scenes
+        }
+        if (uIController)
+            uIController.RemoveOrb(orb);
+    }
+
     [PunRPC]
     void AddOrb(Orb orb)
     {

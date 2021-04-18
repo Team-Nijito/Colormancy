@@ -52,7 +52,7 @@ public class DialogueController : MonoBehaviour
             {
                 InRange = false;
                 spriteRenderer.enabled = false;
-                manager.CloseWindow();
+                manager.CloseWindowVisually();
             }
         }
     }

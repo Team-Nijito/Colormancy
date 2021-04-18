@@ -9,16 +9,20 @@ public class AcceptButtonHandler : MonoBehaviour
     GameManager gameManager;
 
     // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
         button = GetComponent<Button>();
         button.onClick.AddListener(GiveOrb);
         gameManager = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>();
     }
 
-    // Update is called once per frame
-    void GiveOrb()
+    public void GiveOrb()
     {
         gameManager.AddCurrentOrb();
+    }
+
+    public void RemoveOrb()
+    {
+        gameManager.RemoveCurrentOrb();
     }
 }

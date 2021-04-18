@@ -2,13 +2,13 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using PhotonHashtable = ExitGames.Client.Photon.Hashtable; // to use with Photon's CustomProperties
 
 public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 {
     #region Private Fields
 
     // General variables
-
     [Tooltip("Players will spawn on these location(s)")]
     [SerializeField]
     private GameObject[] m_playerSpawnpoints;
@@ -40,19 +40,38 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
     [MyBox.ConditionalField("m_isLevel", true)]
     [SerializeField]
-    private string m_levelAfterLobbyLevel = "Office Level 1";
+    private string m_levelAfterLobbyLevel = OfficeLv1Name;
 
     [MyBox.ConditionalField("m_isLevel")]
     [SerializeField]
-    private string m_levelAfterBeatingStage = "YouWinScene";
+    private string m_levelAfterBeatingStage = WinSceneName;
 
     private bool m_isLoadingNewScene = false;
 
     // Painting variables
     public float PaintPercentageNeededToWin { get { return m_paintPercentageNeededToWin; } private set { m_paintPercentageNeededToWin = value; } }
-    [Range(0,1)]
+    [Range(0, 1)]
     [SerializeField]
     private float m_paintPercentageNeededToWin = 0.75f;
+
+    // Room custom properties
+    public const string RedOrbKey = "RedLoanedToPhotonID";
+    public const string OrangeOrbKey = "OrangeLoanedToPhotonID";
+    public const string YellowOrbKey = "YellowLoanedToPhotonID";
+    public const string GreenOrbKey = "GreenLoanedToPhotonID";
+    public const string BlueOrbKey = "BlueLoanedToPhotonID";
+    public const string VioletOrbKey = "VioletLoanedToPhotonID";
+    public const string BrownOrbKey = "BrownLoanedToPhotonID";
+    public const string QuicksilverOrbKey = "QuicksilverLoanedToPhotonID";
+    public const string IndigoOrbKey = "IndigoLoanedToPhotonID";
+
+    // Player custom properties
+    public const string OrbOwnedInLobbyKey = "OrbOwned";
+
+    // Name of scenes
+    public const string LobbySceneName = "Starting Level";
+    public const string WinSceneName = "YouWinScene";
+    public const string OfficeLv1Name = "Office Level 1";
 
     #endregion
 
@@ -76,179 +95,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
     Orb currentOrbType;
     SpellTest playerSpellTest;
+    PodiumController currentPodium; // keep track of current podium so we can close access to orb after player has obtained it
 
     int dialoguePage = 0;
-
-    #endregion
-
-    #region Photon Methods
-
-    public override void OnLeftRoom()
-    {
-        SceneManager.LoadScene(0);
-    }
-
-    #endregion
-
-    #region Public Methods
-
-    public void LeaveRoom()
-    {
-        SpellTest.orbHistory.Clear(); // don't retain memory of spells after leaving game
-        PhotonNetwork.LeaveRoom();
-    }
-
-    /// <summary>
-    /// Get the position of the spawnpoint (if it exists), otherwise return default
-    /// </summary>
-    /// <param name="spawnRotation">The rotation of the spawn, pass a quaternion by reference and it will be updated with this variable.</param>
-    /// <returns>The position of the spawnpoint</returns>
-    public Vector3 ReturnSpawnpointPosition(ref Quaternion spawnRotation)
-    {
-        if (m_playerSpawnpoints.Length > 0 && m_currentSpawnIndex < PhotonNetwork.PlayerList.Length)
-        {
-            Vector3 spawnPosition = m_playerSpawnpoints[m_currentSpawnIndex].transform.position;
-            spawnRotation = m_playerSpawnpoints[m_currentSpawnIndex].transform.rotation;
-            return spawnPosition;
-        }
-        else
-        {
-            return m_defaultSpawn;
-        }
-    }
-
-    public void PopUp(string[] messages, Sprite[] images)
-    {
-        if (!WindowOpen)
-        {
-            dialogueMessages = messages;
-            dialogueImages = images;
-            dialoguePage = 0;
-
-            animator.SetTrigger("pop");
-            PodiumMessage = false;
-            WindowOpen = true;
-
-            SetPage();
-        }
-    }
-
-    public void PodiumPopUp(string[] messages, Sprite[] images, Orb orbType, SpellTest spellTest)
-    {
-        if (!WindowOpen)
-        {
-            currentOrbType = orbType;
-            playerSpellTest = spellTest;
-
-            dialogueMessages = messages;
-            dialogueImages = images;
-            dialoguePage = 0;
-
-            animator.SetTrigger("pop");
-            PodiumMessage = true;
-            WindowOpen = true;
-
-            SetPage();
-        }
-    }
-
-    public void NextPage()
-    {
-        dialoguePage++;
-        SetPage();
-    }
-
-    void SetPage()
-    {
-        if (dialogueImages.Length <= dialoguePage || dialogueImages[dialoguePage] == null)
-        {
-            //No Images
-            if (dialogueMessages.Length <= dialoguePage || dialogueMessages[dialoguePage] == "")
-            {
-                //No Messages
-                Debug.LogError("Went past given messages/images");
-            } else
-            {
-                //Messages
-                SetFullText();
-            }
-        } else
-        {
-            //Images
-            if (dialogueMessages.Length <= dialoguePage || dialogueMessages[dialoguePage] == "")
-            {
-                //No Messages
-                SetFullImage();
-            }
-            else
-            {
-                //Messages
-                SetImageText();
-            }
-        }
-
-        if (dialoguePage == (Mathf.Max(dialogueImages.Length, dialogueMessages.Length) - 1))
-        {
-            nextButton.SetActive(false);
-            if (PodiumMessage)
-            {
-                acceptButton.SetActive(true);
-            }
-        }
-    }
-
-    public void AddCurrentOrb()
-    {
-        if (currentOrbType != null)
-        {
-            playerSpellTest.AddSpellOrb(currentOrbType, true);
-            CloseWindow();
-        }
-    }
-
-    public void CloseWindow()
-    {
-        if (WindowOpen)
-        {
-            animator.SetTrigger("close");
-            WindowOpen = false;
-            playerSpellTest = null;
-            currentOrbType = null;
-            acceptButton.SetActive(false);
-            nextButton.SetActive(true);
-        }
-    }
-
-    void SetImageText()
-    {
-        popUpFullText.gameObject.SetActive(false);
-        dialogueHalfImage.gameObject.SetActive(true);
-        popUpImageText.gameObject.SetActive(true);
-        dialogueFullImage.gameObject.SetActive(false);
-
-        dialogueHalfImage.sprite = dialogueImages[dialoguePage];
-        popUpImageText.text = dialogueMessages[dialoguePage];
-    }
-
-    void SetFullText()
-    {
-        popUpFullText.gameObject.SetActive(true);
-        dialogueHalfImage.gameObject.SetActive(false);
-        dialogueFullImage.gameObject.SetActive(false);
-        popUpImageText.gameObject.SetActive(false);
-
-        popUpFullText.text = dialogueMessages[dialoguePage];
-    }
-
-    void SetFullImage()
-    {
-        popUpFullText.gameObject.SetActive(false);
-        dialogueFullImage.gameObject.SetActive(true);
-        dialogueHalfImage.gameObject.SetActive(false);
-        popUpImageText.gameObject.SetActive(false);
-
-        dialogueFullImage.sprite = dialogueImages[dialoguePage];
-    }
 
     #endregion
 
@@ -256,7 +105,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
     private void Start()
     {
-        if ((SceneManager.GetActiveScene().name == "YouWinScene") || !PhotonNetwork.InRoom)
+        if ((SceneManager.GetActiveScene().name == WinSceneName) || !PhotonNetwork.InRoom)
         {
             // don't do anything
             return;
@@ -268,6 +117,45 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         }
         else
         {
+            if (SceneManager.GetActiveScene().name == LobbySceneName)
+            {
+                // Initalize the Room's custom properties once for the starting level
+                // be sure to clear these properties when moving to the first level
+
+                PhotonHashtable properties;
+                if (PhotonNetwork.PlayerList.Length == 1)
+                {
+                    // only initialize the Room custom properties once upon joining new scene
+
+                    // Essentially we're keeping track of who has which orb in the lobby
+                    // we don't need to store a variable and sync the variable, rather
+                    // we're delegating that task to Photon via CustomProperties (basically a HashTable)
+                    properties = new PhotonHashtable
+                    {
+                        {RedOrbKey, -1},
+                        {OrangeOrbKey, -1},
+                        {YellowOrbKey, -1},
+                        {GreenOrbKey, -1},
+                        {BlueOrbKey, -1},
+                        {VioletOrbKey, -1},
+                        {BrownOrbKey, -1},
+                        {QuicksilverOrbKey, -1},
+                        {IndigoOrbKey, -1}
+                    };
+
+                    PhotonNetwork.CurrentRoom.SetCustomProperties(properties);
+                }
+
+                // always setup a custom properties for all player
+                properties = new PhotonHashtable
+                {
+                    {OrbOwnedInLobbyKey, PodiumController.OrbTypes.None}
+                };
+
+                PhotonNetwork.LocalPlayer.SetCustomProperties(properties);
+                // these custom properties will be mutated whenver a player picks up a lobby orb / return a lobby orb
+            }
+
             if (PlayerController.LocalPlayerInstance == null)
             {
                 if (HealthScript.LocalPlayerInstance == null)
@@ -286,9 +174,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
                     // meaning we're loading a new scene (player is Don't Destroy on load)
 
                     PhotonView playerView = PhotonView.Get(HealthScript.LocalPlayerInstance);
-                    
-                    // Fetch the current scene's GameManager
-                    GameManager m_currentGm = GameObject.Find("GameManager").GetComponent<GameManager>();
+
+                    // Clear the custom properties as we transition to a new scene
+                    PhotonNetwork.CurrentRoom.CustomProperties.Clear(); // clear room's custom properties (will be called more than once)
+                    playerView.Controller.CustomProperties.Clear(); // clear player's custom properties
 
                     // Destroy the current camera because the player already has one
                     Destroy(GameObject.Find("Main Camera"));
@@ -311,8 +200,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
                         // Reset their spell GUI reference
                         player.GetComponent<SpellTest>().Initialization();
                     }
-
-                    // how do I spawn players at their spawnpoints? hmm..
                 }
             }
             else
@@ -350,7 +237,39 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
     #region Private Methods
 
-    void SetPopUpVariables()
+    /// <summary>
+    /// Map an Orb to a GameManager.[Orb]key string in order to utilize both room and player CustomProperties.
+    /// </summary>
+    /// <param name="type"></param>
+    /// <returns></returns>
+    private string FetchOrbKey(Orb.Element type)
+    {
+        switch (type)
+        {
+            case Orb.Element.Wrath:
+                return RedOrbKey;
+            case Orb.Element.Fire:
+                return OrangeOrbKey;
+            case Orb.Element.Light:
+                return YellowOrbKey;
+            case Orb.Element.Nature:
+                return GreenOrbKey;
+            case Orb.Element.Water:
+                return BlueOrbKey;
+            case Orb.Element.Poison:
+                return VioletOrbKey;
+            case Orb.Element.Earth:
+                return BrownOrbKey;
+            case Orb.Element.Wind:
+                return QuicksilverOrbKey;
+            case Orb.Element.Darkness:
+                return IndigoOrbKey;
+            default:
+                return "InvalidKey";
+        }
+    }
+
+    private void SetPopUpVariables()
     {
         animator = popUpBox.GetComponent<Animator>();
         popUpFullText = popUpBox.transform.Find("FullText").GetComponent<TMPro.TMP_Text>();
@@ -395,6 +314,72 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
     #region Public Methods
 
+    public void AddCurrentOrb()
+    {
+        if (currentOrbType != null)
+        {
+            playerSpellTest.AddSpellOrb(currentOrbType, true);
+
+            // Update custom properties
+            string orbKey = FetchOrbKey(currentOrbType.OrbElement);
+
+            // fetch, alter, then set room custom properties
+            PhotonHashtable roomProperties = PhotonNetwork.CurrentRoom.CustomProperties;
+            roomProperties[orbKey] = PhotonNetwork.LocalPlayer.ActorNumber;
+            PhotonNetwork.CurrentRoom.SetCustomProperties(roomProperties);
+
+            // fetch, alter, then set player custom properties
+            PhotonHashtable playerProperties = PhotonNetwork.LocalPlayer.CustomProperties;
+            playerProperties[OrbOwnedInLobbyKey] = PodiumController.FetchOrbType(orbKey);
+            PhotonNetwork.LocalPlayer.SetCustomProperties(playerProperties);
+
+            CloseWindowVisually();
+            currentPodium.CloseWindow();
+        }
+    }
+
+    public void CloseWindowVisually()
+    {
+        if (WindowOpen)
+        {
+            animator.SetTrigger("close");
+            WindowOpen = false;
+            playerSpellTest = null;
+            currentOrbType = null;
+            acceptButton.SetActive(false);
+            nextButton.SetActive(true);
+        }
+    }
+
+    /// <summary>
+    /// Invoked by the Canvas button "Leave Room"
+    /// </summary>
+    public void LeaveRoom()
+    {
+        SpellTest.orbHistory.Clear(); // don't retain memory of spells after leaving game
+
+        if (SceneManager.GetActiveScene().name == LobbySceneName)
+        {
+            // why would a bozo claim an orb and then leave, you're making me do this stupid edge case
+            PodiumController.OrbTypes orbOwned = (PodiumController.OrbTypes)PhotonNetwork.LocalPlayer.CustomProperties[OrbOwnedInLobbyKey];
+            if (orbOwned != PodiumController.OrbTypes.None)
+            {
+                // we must return this back to the source
+                PhotonHashtable roomProperties = PhotonNetwork.CurrentRoom.CustomProperties;
+                roomProperties[PodiumController.FetchOrbKey(orbOwned)] = -1; // nobody should own the orb anymore
+                PhotonNetwork.CurrentRoom.SetCustomProperties(roomProperties);
+
+                roomProperties = new PhotonHashtable();
+                PhotonNetwork.LocalPlayer.SetCustomProperties(roomProperties); // clear the character's properties
+            }
+        }
+
+        PhotonNetwork.LeaveRoom();
+    }
+
+    /// <summary>
+    /// Invoked whenever the % of the stage painted exceeds the goal, and loads a new scene according to m_levelAfterBeatingStage.
+    /// </summary>
     public void LoadNewSceneAfterFinishedPainting()
     {
         if (!m_isLoadingNewScene)
@@ -403,6 +388,91 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
             // do it instantly for now
             PhotonNetwork.LoadLevel(m_levelAfterBeatingStage);
+        }
+    }
+    
+    public void NextPage()
+    {
+        dialoguePage++;
+        SetPage();
+    }
+
+    public void PodiumPopUp(string[] messages, Sprite[] images, Orb orbType, SpellTest spellTest, PodiumController orbPodiumScript)
+    {
+        if (!WindowOpen)
+        {
+            currentPodium = orbPodiumScript;
+            currentOrbType = orbType;
+            playerSpellTest = spellTest;
+
+            dialogueMessages = messages;
+            dialogueImages = images;
+            dialoguePage = 0;
+
+            animator.SetTrigger("pop");
+            PodiumMessage = true;
+            WindowOpen = true;
+
+            SetPage();
+        }
+    }
+
+    public void PopUp(string[] messages, Sprite[] images)
+    {
+        if (!WindowOpen)
+        {
+            dialogueMessages = messages;
+            dialogueImages = images;
+            dialoguePage = 0;
+
+            animator.SetTrigger("pop");
+            PodiumMessage = false;
+            WindowOpen = true;
+
+            SetPage();
+        }
+    }
+
+    public void RemoveCurrentOrb()
+    {
+        if (currentOrbType != null)
+        {
+            playerSpellTest.RemoveSpellOrb(currentOrbType, true);
+
+            // Update custom properties
+            string orbKey = FetchOrbKey(currentOrbType.OrbElement);
+
+            // fetch, alter, then set room custom properties
+            PhotonHashtable roomProperties = PhotonNetwork.CurrentRoom.CustomProperties;
+            roomProperties[orbKey] = -1;
+            PhotonNetwork.CurrentRoom.SetCustomProperties(roomProperties);
+
+            // fetch, alter, then set player custom properties
+            PhotonHashtable playerProperties = PhotonNetwork.LocalPlayer.CustomProperties;
+            playerProperties[OrbOwnedInLobbyKey] = PodiumController.OrbTypes.None;
+            PhotonNetwork.LocalPlayer.SetCustomProperties(playerProperties);
+
+            CloseWindowVisually();
+            currentPodium.CloseWindow();
+        }
+    }
+
+    /// <summary>
+    /// Get the position of the spawnpoint (if it exists), otherwise return default
+    /// </summary>
+    /// <param name="spawnRotation">The rotation of the spawn, pass a quaternion by reference and it will be updated with this variable.</param>
+    /// <returns>The position of the spawnpoint</returns>
+    public Vector3 ReturnSpawnpointPosition(ref Quaternion spawnRotation)
+    {
+        if (m_playerSpawnpoints.Length > 0 && m_currentSpawnIndex < PhotonNetwork.PlayerList.Length)
+        {
+            Vector3 spawnPosition = m_playerSpawnpoints[m_currentSpawnIndex].transform.position;
+            spawnRotation = m_playerSpawnpoints[m_currentSpawnIndex].transform.rotation;
+            return spawnPosition;
+        }
+        else
+        {
+            return m_defaultSpawn;
         }
     }
 
@@ -420,6 +490,87 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     public void RPCUnready()
     {
         photonView.RPC("UnReady", RpcTarget.All);
+    }
+
+    public void SetFullImage()
+    {
+        popUpFullText.gameObject.SetActive(false);
+        dialogueFullImage.gameObject.SetActive(true);
+        dialogueHalfImage.gameObject.SetActive(false);
+        popUpImageText.gameObject.SetActive(false);
+
+        dialogueFullImage.sprite = dialogueImages[dialoguePage];
+    }
+
+    public void SetFullText()
+    {
+        popUpFullText.gameObject.SetActive(true);
+        dialogueHalfImage.gameObject.SetActive(false);
+        dialogueFullImage.gameObject.SetActive(false);
+        popUpImageText.gameObject.SetActive(false);
+
+        popUpFullText.text = dialogueMessages[dialoguePage];
+    }
+
+    public void SetImageText()
+    {
+        popUpFullText.gameObject.SetActive(false);
+        dialogueHalfImage.gameObject.SetActive(true);
+        popUpImageText.gameObject.SetActive(true);
+        dialogueFullImage.gameObject.SetActive(false);
+
+        dialogueHalfImage.sprite = dialogueImages[dialoguePage];
+        popUpImageText.text = dialogueMessages[dialoguePage];
+    }
+
+    public void SetPage()
+    {
+        if (dialogueImages.Length <= dialoguePage || dialogueImages[dialoguePage] == null)
+        {
+            //No Images
+            if (dialogueMessages.Length <= dialoguePage || dialogueMessages[dialoguePage] == "")
+            {
+                //No Messages
+                Debug.LogError("Went past given messages/images");
+            }
+            else
+            {
+                //Messages
+                SetFullText();
+            }
+        }
+        else
+        {
+            //Images
+            if (dialogueMessages.Length <= dialoguePage || dialogueMessages[dialoguePage] == "")
+            {
+                //No Messages
+                SetFullImage();
+            }
+            else
+            {
+                //Messages
+                SetImageText();
+            }
+        }
+
+        if (dialoguePage == (Mathf.Max(dialogueImages.Length, dialogueMessages.Length) - 1))
+        {
+            nextButton.SetActive(false);
+            if (PodiumMessage)
+            {
+                acceptButton.SetActive(true);
+            }
+        }
+    }
+
+    #endregion
+
+    #region Photon Methods
+
+    public override void OnLeftRoom()
+    {
+        SceneManager.LoadScene(0);
     }
 
     #endregion
@@ -440,12 +591,13 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
                 m_playersReady = (int)stream.ReceiveNext();
             }
         }
-        else
-        {
-            // Synchronize the paint progress between all clients
-
-        }
     }
+
+    public override void OnRoomPropertiesUpdate(PhotonHashtable propertiesThatChanged)
+    {
+        Debug.Log(propertiesThatChanged);
+    }
+
 
     #endregion
 }

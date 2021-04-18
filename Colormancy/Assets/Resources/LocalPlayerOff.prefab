@@ -327,6 +327,7 @@ MonoBehaviour:
   m_maxZoom: 25
   m_rotationAmount: 2
   m_camSpeed: 10
+  m_cameraShake: 0
   m_sceneToDeactivateCharacter: YouWinScene
 --- !u!114 &5820395927475117114
 MonoBehaviour:
