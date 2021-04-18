@@ -23,7 +23,7 @@ public class SpellTest : MonoBehaviourPun
     ManaScript mana;
     OrbTrayUIController uIController;
 
-    private readonly bool TestingMode = true;
+    private readonly bool TestingMode = false;
 
     [SerializeField]
     Dictionary<(Type, Type, Type), (float, float)> spellCooldowns = new Dictionary<(Type, Type, Type), (float, float)>(); // key: Orb Tuple, value: (current cooldown, Spell base cooldown)
@@ -117,7 +117,18 @@ public class SpellTest : MonoBehaviourPun
         if (uIController)
             uIController.AddOrb(orb);
     }
-    
+
+    public void RemoveSpellOrb(Orb orb, bool removeFromOrbHistory = false)
+    {
+        orbs.Remove(orb);
+        if (removeFromOrbHistory)
+        {
+            orbHistory.Remove(orb); // sync across scenes
+        }
+        if (uIController)
+            uIController.RemoveOrb(orb);
+    }
+
     [PunRPC]
     void AddOrb(Orb orb)
     {
@@ -152,6 +163,7 @@ public class SpellTest : MonoBehaviourPun
     [PunRPC]
     void ReduceAllCooldowns(float percentReduce)
     {
+        print("Reduce cooldowns.");
         if (percentReduce <= 0)
         {
             throw new ArgumentException(string.Format("{0} is a positive percentage, and thus should be greater than zero", percentReduce), "percentReduce");
@@ -172,7 +184,12 @@ public class SpellTest : MonoBehaviourPun
     {
         currentSpell.Cast(transform, clickedPosition);
         spellCooldowns[currentSpell.GetOrbTuple()] = (Time.time + currentSpell.GetSpellCooldown(), currentSpell.GetSpellCooldown());
-        mana.ConsumeMana(currentSpell.GetManaCost());
+
+        float cost = currentSpell.GetManaCost();
+        if (cost > 0)
+        {
+            mana.ConsumeMana(currentSpell.GetManaCost());
+        }
     }
 
     private void UpdateOrbsFromPreviousScene()
@@ -192,8 +209,8 @@ public class SpellTest : MonoBehaviourPun
                     AddSpellOrb(new YellowOrb());
                     break;
                 case Orb.Element.Nature:
-                    //AddSpellOrb(new GreenOrb());
-                    throw new NotImplementedException("Didn't implement adding " + o.OrbElement + " yet");
+                    AddSpellOrb(new GreenOrb());
+                    break;
                 case Orb.Element.Water:
                     AddSpellOrb(new BlueOrb());
                     break;
@@ -237,6 +254,7 @@ public class SpellTest : MonoBehaviourPun
             AddSpellOrb(new RedOrb());
             AddSpellOrb(new OrangeOrb());
             AddSpellOrb(new YellowOrb());
+            AddSpellOrb(new GreenOrb());
             AddSpellOrb(new BlueOrb());
             AddSpellOrb(new VioletOrb());
             AddSpellOrb(new BrownOrb());

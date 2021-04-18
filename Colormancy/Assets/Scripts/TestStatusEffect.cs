@@ -13,25 +13,43 @@ public class TestStatusEffect : MonoBehaviour
     [SerializeField]
     private bool m_applyDamageOverTime = false;
 
+    [MyBox.ConditionalField("m_applyDamageOverTime", false)]
     [SerializeField]
-    private string m_damageType = "Poison";
+    private string m_damageTypeName = "Poison";
 
+    [MyBox.ConditionalField("m_applyDamageOverTime", false)]
     [SerializeField]
     private bool m_isPercentageDamage = true; // if true, will inflict damage dependent on victim's health
 
+    [MyBox.ConditionalField("m_applyDamageOverTime", false)]
     [SerializeField]
     private float m_damage = 4f;
 
+    [MyBox.ConditionalField("m_applyDamageOverTime", false)]
     [SerializeField]
     private float m_secondDuration = 5f;
 
     #endregion
 
-    #region Knockback
+    #region Forces
+
+    [System.Serializable]
+    private enum ForceType
+    {
+        None,
+        Knockback,
+        Suck,
+        Push
+    }
 
     [SerializeField]
-    private bool m_applyKnockback = false;
+    private bool m_applyForce = false;
 
+    [MyBox.ConditionalField("m_applyForce", false)]
+    [SerializeField]
+    private ForceType m_whatForce = ForceType.None;
+
+    [MyBox.ConditionalField("m_whatForce", true, ForceType.None)]
     [SerializeField]
     private float m_force = 150f;
 
@@ -42,9 +60,11 @@ public class TestStatusEffect : MonoBehaviour
     [SerializeField]
     private bool m_applySlowdown = false;
 
+    [MyBox.ConditionalField("m_applySlowdown", false)]
     [SerializeField]
     private float m_slowDownDuration = 3f;
 
+    [MyBox.ConditionalField("m_applySlowdown", false)]
     [Range(0,100)]
     [SerializeField]
     private float m_percentReductionInSpeed = 50f;
@@ -56,6 +76,7 @@ public class TestStatusEffect : MonoBehaviour
     [SerializeField]
     private bool m_applyStun = false;
 
+    [MyBox.ConditionalField("m_applyStun", false)]
     [SerializeField]
     private float m_stunDuration = 1.5f;
 
@@ -66,6 +87,7 @@ public class TestStatusEffect : MonoBehaviour
     [SerializeField]
     private bool m_applyBlind = false;
 
+    [MyBox.ConditionalField("m_applyBlind", false)]
     [SerializeField]
     private float m_blindDuration = 5f;
 
@@ -86,14 +108,22 @@ public class TestStatusEffect : MonoBehaviour
                 // online - we launched from the launcher and then joined the room
                 if (m_applyDamageOverTime)
                 {
-                    statEffectScript.RPCApplyOrStackDoT(m_isPercentageDamage, m_damage, m_secondDuration, m_damageType);
+                    statEffectScript.RPCApplyOrStackDoT(m_isPercentageDamage, m_damage, m_secondDuration, m_damageTypeName);
                 }
-                if (m_applyKnockback)
+                if (m_applyForce)
                 {
-                    if (other.gameObject)
+                    if (m_whatForce == ForceType.Knockback && other.gameObject)
                     {
-                        statEffectScript.RPCApplyForce("Knockback", Time.deltaTime, other.gameObject.transform.position - transform.position + Vector3.up, 
-                                                       m_force, other.gameObject.transform.position);
+                        statEffectScript.RPCApplyForce("Knockback", Time.deltaTime * 1.5f, (other.gameObject.transform.position - transform.position + Vector3.up).normalized,
+                                                        m_force);
+                    }
+                    else if (m_whatForce == ForceType.Suck && other.gameObject)
+                    {
+                        statEffectScript.RPCApplyForce("Suck", Time.deltaTime * 1.5f, (transform.position - other.gameObject.transform.position).normalized, m_force);
+                    }
+                    else if (m_whatForce == ForceType.Push && other.gameObject)
+                    {
+                        statEffectScript.RPCApplyForce("Push", Time.deltaTime * 1.5f, transform.forward, m_force);
                     }
                 }
                 if (m_applySlowdown)
@@ -132,14 +162,22 @@ public class TestStatusEffect : MonoBehaviour
             {
                 if (m_applyDamageOverTime)
                 {
-                    statEffectScript.RPCApplyOrStackDoT(m_isPercentageDamage, m_damage, m_secondDuration * Time.deltaTime, m_damageType);
+                    statEffectScript.RPCApplyOrStackDoT(m_isPercentageDamage, m_damage, m_secondDuration * Time.deltaTime, m_damageTypeName);
                 }
-                if (m_applyKnockback)
+                if (m_applyForce)
                 {
-                    if (other.gameObject)
+                    if (m_whatForce == ForceType.Knockback && other.gameObject)
                     {
-                        statEffectScript.RPCApplyForce("Knockback", Time.deltaTime, other.gameObject.transform.position - transform.position + Vector3.up, 
-                                                       m_force * Time.deltaTime, other.gameObject.transform.position);
+                        statEffectScript.RPCApplyForce("Knockback", Time.deltaTime * 1.5f, (other.gameObject.transform.position - transform.position + Vector3.up).normalized,
+                                                        m_force * Time.deltaTime);
+                    }
+                    else if (m_whatForce == ForceType.Suck && other.gameObject)
+                    {
+                        statEffectScript.RPCApplyForce("Suck", Time.deltaTime * 1.5f, (transform.position - other.gameObject.transform.position).normalized, m_force * Time.deltaTime);
+                    }
+                    else if (m_whatForce == ForceType.Push && other.gameObject)
+                    {
+                        statEffectScript.RPCApplyForce("Push", Time.deltaTime * 1.5f, transform.forward, m_force * Time.deltaTime);
                     }
                 }
             }

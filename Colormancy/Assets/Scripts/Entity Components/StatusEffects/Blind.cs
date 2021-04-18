@@ -31,7 +31,7 @@ public class Blind : StatusEffect
     protected EnemyTargeting m_enemTargetting;
 
     protected readonly float m_panicIntervalSeconds = 2f;
-    protected readonly float m_idleIntervalSeconds = 1f;
+    protected readonly float m_idleIntervalSeconds = 0.5f;
 
     protected float m_panic;
     protected float m_idle;

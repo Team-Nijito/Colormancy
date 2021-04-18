@@ -20,7 +20,6 @@ public class EnemyPainterAI : EnemyChaserAI
         base.Start();
     }
 
-
     #endregion
 
     #region Protected functions

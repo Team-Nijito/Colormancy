@@ -33,7 +33,7 @@ public class Force : StatusEffect
     // For now these are static so that this force will act the same for all players
     // we could make these an actual parameter for our constructor, but we have enough
     // parameters on there.
-    [SerializeField] protected static readonly float m_characterMass = 1.0f;
+    [SerializeField] protected static readonly float m_characterMass = 1f;
     [SerializeField] protected static readonly float m_impactDecay = 5f; // how quickly impact "goes away"
 
     protected CharacterController m_controller;
@@ -42,12 +42,8 @@ public class Force : StatusEffect
 
     #region AI components
 
-    protected NavMeshAgent m_enemNavAgent;
-    protected Vector3 m_enemPosition;
-
-    // the AI entity seems to be more resilient to forces compared to the player
-    // give it a nudge
-    [SerializeField]  protected readonly float m_AIForceMultipier = 2f;
+    protected Transform m_enemTransform;
+    protected EnemyMovement m_enemMove;
 
     #endregion
 
@@ -67,13 +63,16 @@ public class Force : StatusEffect
     }
 
     public Force(List<StatusEffect> parentList, string name, StatusType type, float duration, Vector3 direction, 
-                 float forcePower, NavMeshAgent agent, Vector3 enemPos)
+                 float forcePower, EnemyMovement enemMoveScript, Transform enemTransform)
                  : base(parentList, name, type, duration)
     {
         // force upon AI entity constructor
         m_isPlayer = false;
-        m_enemNavAgent = agent;
-        m_enemPosition = enemPos;
+        m_enemTransform = enemTransform;
+        m_enemMove = enemMoveScript;
+
+        // disable NavMeshAgent (for force) and enable rigidbody (for gravity) during the force duration
+        m_enemMove.DisableAgent(true);
 
         // initialize force
         m_impact = Vector3.zero;
@@ -91,7 +90,14 @@ public class Force : StatusEffect
             direction.y = -direction.y; // reflect down force on the ground
         }
 
-        m_impact += direction * forcePower / m_characterMass;
+        if (m_isPlayer)
+        {
+            m_impact += direction * forcePower / m_characterMass;
+        }
+        else
+        {
+            m_impact += direction * forcePower / m_enemMove.Mass;
+        }
     }
 
     public override void DoStatusEffect()
@@ -103,17 +109,43 @@ public class Force : StatusEffect
             {
                 m_controller.Move(m_impact * Time.deltaTime);
             }
-            // consumes the impact energy each cycle:
-            m_impact = Vector3.Lerp(m_impact, Vector3.zero, m_impactDecay * Time.deltaTime);
         }
         else
         {
             // Using warp instead of using rigidbody to enact force
-            m_enemNavAgent.Warp(m_enemPosition + m_impact * m_AIForceMultipier * Time.deltaTime);
+            //m_enemNavAgent.Warp(m_enemTransform.position + m_impact * Time.deltaTime);
 
-            // consumes the impact energy each cycle:
-            m_impact = Vector3.Lerp(m_impact, Vector3.zero, m_impactDecay * Time.deltaTime);
+            // Found that the NavMeshAgent reacts violently (i.e. teleporting up and down) when
+            // you warp the NavMeshAgent into the air, I found that it's better to set the position
+            // manually and just enable rigidbody (for gravity) 
+            if (m_impact.magnitude > 0.2)
+            {
+                m_enemTransform.position += m_impact * Time.deltaTime;
+            }
+            else
+            {
+                // fall faster, otherwise the character would be "floaty"
+                m_enemMove.RigidbodyAddForce(Physics.gravity * 0.5f, ForceMode.Impulse);
+            }
         }
+
+        // consumes the impact energy each cycle:
+        m_impact = Vector3.Lerp(m_impact, Vector3.zero, m_impactDecay * Time.deltaTime);
+    }
+
+    /// <summary>
+    /// Remove this StatusEffect from a list of status effects, and renable the NavMeshAgent.
+    /// </summary>
+    public override void Stop()
+    {
+        if (m_parentList == null) return;
+
+        if (!m_isPlayer)
+        {
+            m_enemMove.EnableAgent(true);
+        }
+
+        m_parentList.Remove(this);
     }
 
     #endregion

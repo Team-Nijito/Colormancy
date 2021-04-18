@@ -62,9 +62,9 @@ public class OrangeSpellController : MonoBehaviour
         Collider[] sphereCollisions = Physics.OverlapSphere(collision.GetContact(0).point, spherePaintRadius * 2);
         foreach (Collider c in sphereCollisions)
         {
-            if (c.gameObject.tag.Equals("Enemy"))
+            if (c.gameObject.CompareTag("Enemy"))
                 greaterCast(c.gameObject, greaterCastAmt, spellEffectMod);
-            else if (c.gameObject.tag.Equals("Player"))
+            else if (c.gameObject.CompareTag("Player"))
                 lesserCast(c.gameObject, lesserCastAmt, spellEffectMod);
         }
 

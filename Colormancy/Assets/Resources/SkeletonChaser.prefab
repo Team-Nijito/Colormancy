@@ -894,7 +894,10 @@ MonoBehaviour:
   OwnershipTransfer: 0
   ObservedComponents:
   - {fileID: 5161377573530219718}
+<<<<<<< HEAD
   - {fileID: 3183121963216691932}
+=======
+>>>>>>> d02515e1547c096b093c8a21fa23ecfd87740a3c
   - {fileID: 5098352021510522856}
   - {fileID: 1342937965760010381}
   viewIdField: 0

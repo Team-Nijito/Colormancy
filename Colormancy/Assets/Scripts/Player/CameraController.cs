@@ -36,9 +36,12 @@ namespace Chromaturgy
         private float m_rotationAmount = 1f;
         [SerializeField]
         private float m_camSpeed = 10f;
+        [SerializeField]
+        private float m_cameraShake = 0f;
 
         private GameObject m_TCamera = null; // tracking camera
         private Transform m_TCameraTransform = null; // its transform
+        private Vector3 m_TCameraSaved; // saved reference to position
         private Vector3 m_newZoom = Vector3.zero;
         private Quaternion m_newRotation = Quaternion.identity;
 
@@ -84,8 +87,14 @@ namespace Chromaturgy
         {
             if (m_TCamera && m_isFollowing)
             {
+                // Load saved camera position at start of each update after the first shake occurs.
+                if (m_cameraShake != 0f)
+                {
+                    m_TCameraTransform.localPosition = m_TCameraSaved;
+                }
                 HandleCameraZoom();
                 HandleCameraRotation();
+                HandleCameraShake();
             }
         }
 
@@ -161,6 +170,19 @@ namespace Chromaturgy
             }
         }
 
+        private void HandleCameraShake()
+        {
+            // Save a reference of the current camera position before the shaking occurs.
+            m_TCameraSaved = m_TCameraTransform.localPosition;
+
+            // Camera stops shaking after a certain low value is reached.
+            if (m_cameraShake > 0.05f)
+            {
+                m_TCameraTransform.localPosition = m_TCameraTransform.localPosition + Random.insideUnitSphere * m_cameraShake;
+                m_cameraShake *= 0.9f;
+            }
+            
+        }
         #endregion
 
         #region Public functions
@@ -190,6 +212,13 @@ namespace Chromaturgy
             m_newZoom = m_TCameraTransform.localPosition;
 
             m_isFollowing = true;
+        }
+
+        // Sets the magnitude at which the camera will shake. Value decays over time.
+        // Should only be called with values between 0 and 1.
+        public void SetCameraShake(float shakeAmount)
+        {
+            m_cameraShake = shakeAmount;
         }
 
         #endregion

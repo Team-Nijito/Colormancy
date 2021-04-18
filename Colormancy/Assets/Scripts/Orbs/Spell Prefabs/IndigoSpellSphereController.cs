@@ -12,9 +12,9 @@ public class IndigoSpellSphereController : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.tag.Equals("Enemy"))
+        if (collision.gameObject.CompareTag("Enemy"))
             greaterCast(collision.gameObject, greaterCastAmt, spellEffectMod);
-        else if (collision.gameObject.tag.Equals("Player"))
+        else if (collision.gameObject.CompareTag("Player"))
             lesserCast(collision.gameObject, lesserCastAmt, spellEffectMod);
         
         Destroy(gameObject);

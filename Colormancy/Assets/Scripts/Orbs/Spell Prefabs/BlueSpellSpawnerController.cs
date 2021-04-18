@@ -64,7 +64,7 @@ public class BlueSpellSpawnerController : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.tag.Equals("Enemy"))
+        if (collision.gameObject.CompareTag("Enemy"))
         {
             if (!entitiesEntered.Contains(collision.gameObject))
             {
@@ -72,7 +72,7 @@ public class BlueSpellSpawnerController : MonoBehaviour
                 greaterCast(collision.gameObject, greaterCastAmt, spellEffectMod);
             }
         }
-        else if (collision.gameObject.tag.Equals("Player"))
+        else if (collision.gameObject.CompareTag("Player"))
         {
             lesserCast(collision.gameObject, lesserCastAmt, spellEffectMod);
         }
@@ -80,12 +80,12 @@ public class BlueSpellSpawnerController : MonoBehaviour
 
     private void OnCollisionExit(Collision collision)
     {
-        if (collision.gameObject.tag.Equals("Enemy"))
+        if (collision.gameObject.CompareTag("Enemy"))
         {
             if (!entitiesEntered.Contains(collision.gameObject))
                 entitiesEntered.Remove(collision.gameObject);
         }
-        else if (collision.gameObject.tag.Equals("Player"))
+        else if (collision.gameObject.CompareTag("Player"))
         {
             
         }
