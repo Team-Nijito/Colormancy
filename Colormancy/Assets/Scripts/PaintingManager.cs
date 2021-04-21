@@ -33,12 +33,10 @@ public class PaintingManager : MonoBehaviour
                     List<Color> colors = new List<Color>();
 
                     // if there are no colors yet, then fill it all with a white color
-                    if (mesh.colors.Length == 0) {
-                        for (int k = 0; k < vertices.Count; k++)
-                            colors.Add(new Color(1, 1, 1, 0));
+                    for (int k = 0; k < vertices.Count; k++)
+                        colors.Add(new Color(1, 1, 1, 0));
 
-                        mesh.SetColors(colors);
-                    }
+                    mesh.SetColors(colors);
                 } catch
                 {
                     try 
@@ -52,12 +50,10 @@ public class PaintingManager : MonoBehaviour
                         List<Color> colors = new List<Color>();
 
                         // if there are no colors yet, then fill it all with a white color
-                        if (mesh.colors.Length == 0) {
-                            for (int k = 0; k < vertices.Count; k++)
-                                colors.Add(new Color(1, 1, 1, 0));
+                        for (int k = 0; k < vertices.Count; k++)
+                            colors.Add(new Color(1, 1, 1, 0));
 
-                            mesh.SetColors(colors);
-                        }
+                        mesh.SetColors(colors);
                     }
                     catch 
                     {

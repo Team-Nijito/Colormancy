@@ -14,7 +14,7 @@ public class PodiumController : MonoBehaviour
     [SerializeField]
     Sprite[] images;
 
-    SpellTest playerSpellTest = null;
+    OrbManager playerOrbManager = null;
 
     bool InRange = false;
 
@@ -37,7 +37,7 @@ public class PodiumController : MonoBehaviour
         if (Input.GetMouseButtonDown(0) && InRange)
         {
             Orb orb = GetCurrentOrb();
-            manager.PodiumPopUp(messages, images, orb, playerSpellTest);
+            manager.PodiumPopUp(messages, images, orb, playerOrbManager);
         }
 
         if (indicatorSprite.enabled)
@@ -89,7 +89,7 @@ public class PodiumController : MonoBehaviour
             {
                 InRange = true;
                 indicatorSprite.enabled = true;
-                playerSpellTest = other.gameObject.GetComponent<SpellTest>();
+                playerOrbManager = other.gameObject.GetComponent<OrbManager>();
             }
         }
     }
@@ -102,7 +102,7 @@ public class PodiumController : MonoBehaviour
             {
                 InRange = false;
                 indicatorSprite.enabled = false;
-                playerSpellTest = null;
+                playerOrbManager = null;
             }
         }
     }

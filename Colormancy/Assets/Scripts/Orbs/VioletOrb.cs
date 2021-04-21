@@ -8,24 +8,9 @@ public class VioletOrb : Orb
 {
     public VioletOrb()
     {
-        OrbColor = new Color(0.5f, 0, 0.5f, 1);
-        OrbShape = SpellShape.Cloud;
-        CooldownMod = 2.2f;
-        ShapeManaMod = 1f;
-        OrbElement = Element.Poison;
-        ModAmount = .1f;
-        SpellEffectMod = 0.18f;
-        UIPrefab = (GameObject)Resources.Load("Orbs/VioletOrbUI");
-    }
-
-    public override void AddHeldEffect(SpellTest test)
-    {
-        test.HealthRegenMod += ModAmount;
-    }
-
-    public override void RevertHeldEffect(SpellTest test)
-    {
-        test.HealthRegenMod -= ModAmount;
+        m_OrbShape = SpellShape.Cloud;
+        m_OrbElement = Element.Poison;
+        m_UIPrefab = (GameObject)Resources.Load("Orbs/VioletOrbUI");
     }
 
     public override void CastGreaterEffect(GameObject hit, int orbAmount, float spellEffectMod)
@@ -57,23 +42,23 @@ public class VioletOrb : Orb
         spellController.lesserCast = lesserEffectMethod;
         spellController.greaterCastAmt = amounts.Item1;
         spellController.lesserCastAmt = amounts.Item2;
-        spellController.spellEffectMod = SpellEffectMod;
+        spellController.spellEffectMod = m_SpellEffectMod;
 
         spellController.endPosition = clickedPosition;
     }
 
     public static object Deserialize(byte[] data) {
         VioletOrb result = new VioletOrb();
-        result.OrbColor = new Color(data[0], data[1], data[2]);
-        result.CooldownMod = data[3];
-        result.ShapeManaMod = data[4];
-        result.ModAmount = data[5];
+        result.setColor(new Color(data[0], data[1], data[2]));
+        result.setCooldownMod(data[3]);
+        result.setShapeManaMod(data[4]);
+        result.setSpellEffectMod(data[5]);
         return result;
     }
 
     public static byte[] Serialize(object customType) {
-        VioletOrb c = (VioletOrb)customType;
-        return new byte[] { (byte)c.OrbColor.r, (byte)c.OrbColor.g, (byte)c.OrbColor.b, (byte)c.CooldownMod, (byte)c.ShapeManaMod, (byte)c.ModAmount };
+        VioletOrb o = (VioletOrb)customType;
+        return new byte[] { (byte)o.getColor().r, (byte)o.getColor().g, (byte)o.getColor().b, (byte)o.getCooldownMod(), (byte)o.getShapeManaMod(), (byte)o.getSpellEffectMod() };
     }
 
 }

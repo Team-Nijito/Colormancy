@@ -80,7 +80,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     bool PodiumMessage = false;
 
     Orb currentOrbType;
-    SpellTest playerSpellTest;
+    OrbManager playerOrbManager;
 
     int dialoguePage = 0;
 
@@ -99,7 +99,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
     public void LeaveRoom()
     {
-        SpellTest.orbHistory.Clear(); // don't retain memory of spells after leaving game
+        OrbManager.orbHistory.Clear(); // don't retain memory of spells after leaving game
         PhotonNetwork.LeaveRoom();
     }
 
@@ -138,12 +138,12 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         }
     }
 
-    public void PodiumPopUp(string[] messages, Sprite[] images, Orb orbType, SpellTest spellTest)
+    public void PodiumPopUp(string[] messages, Sprite[] images, Orb orbType, OrbManager orbManager)
     {
         if (!WindowOpen)
         {
             currentOrbType = orbType;
-            playerSpellTest = spellTest;
+            playerOrbManager = orbManager;
 
             dialogueMessages = messages;
             dialogueImages = images;
@@ -206,7 +206,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     {
         if (currentOrbType != null)
         {
-            playerSpellTest.AddSpellOrb(currentOrbType, true);
+            playerOrbManager.AddSpellOrb(currentOrbType, true);
             CloseWindow();
         }
     }
@@ -217,7 +217,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         {
             animator.SetTrigger("close");
             WindowOpen = false;
-            playerSpellTest = null;
+            playerOrbManager = null;
             currentOrbType = null;
             acceptButton.SetActive(false);
             nextButton.SetActive(true);
@@ -314,7 +314,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
                         player.GetComponent<SpellManager>().Initialization();
 
                         // Reset their spell GUI reference
-                        player.GetComponent<SpellTest>().Initialization();
+                        player.GetComponent<OrbManager>().Initialization();
                     }
 
                     // how do I spawn players at their spawnpoints? hmm..
