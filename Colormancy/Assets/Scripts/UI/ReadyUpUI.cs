@@ -80,7 +80,7 @@ public class ReadyUpUI : MonoBehaviour
     {
         if (!m_isPlayerReady)
         {
-            if (SpellTest.orbHistory.Count > 0)
+            if (OrbManager.orbHistory.Count > 0)
             {
                 m_readyButtonText.text = "Ready!";
                 m_readyButtonImg.color = Color.green;

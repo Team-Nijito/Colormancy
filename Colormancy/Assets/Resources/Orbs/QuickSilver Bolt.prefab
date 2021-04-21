@@ -91,6 +91,7 @@ GameObject:
   - component: {fileID: 7931388508879284472}
   - component: {fileID: 7931388508879284469}
   - component: {fileID: -7284652041016407744}
+  - component: {fileID: 524532843658940769}
   m_Layer: 9
   m_Name: QuickSilver Bolt
   m_TagString: Untagged
@@ -126,7 +127,7 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  m_Radius: 3
+  m_Radius: 0
   m_Height: 9
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
@@ -145,7 +146,6 @@ MonoBehaviour:
   greaterCastAmt: 0
   lesserCastAmt: 0
   spellEffectMod: 0
-  lifetime: 1
   BoltDisplacementSpeed:
     serializedVersion: 2
     m_Curve:
@@ -371,6 +371,9 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  lifetime: 1
+  spherePaintRadius: 5
+  paintColor: {r: 0.6037736, g: 0.6037736, b: 0.6037736, a: 0}
   debug: 1
   startAnimation: 0
 --- !u!108 &-7284652041016407744
@@ -434,6 +437,22 @@ Light:
   m_UseBoundingSphereOverride: 0
   m_ShadowRadius: 0
   m_ShadowAngle: 0
+--- !u!54 &524532843658940769
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7120360346188010913}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 0
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 126
+  m_CollisionDetection: 0
 --- !u!1 &7674456865577154471
 GameObject:
   m_ObjectHideFlags: 0

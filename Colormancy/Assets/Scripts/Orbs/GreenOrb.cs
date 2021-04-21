@@ -8,24 +8,16 @@ public class GreenOrb : Orb
 {
     public GreenOrb()
     {
+        /*
         OrbColor = Color.green;
-        OrbShape = SpellShape.Vines;
         CooldownMod = 2.2f;
         ShapeManaMod = 1.1f;
-        OrbElement = Element.Nature;
         ModAmount = .1f;
         SpellEffectMod = 0.18f;
-        UIPrefab = (GameObject)Resources.Load("Orbs/GreenOrbUI");
-    }
-
-    public override void AddHeldEffect(SpellTest test)
-    {
-        test.AttackSpeedMod += ModAmount;
-    }
-
-    public override void RevertHeldEffect(SpellTest test)
-    {
-        test.AttackSpeedMod -= ModAmount;
+        */
+        m_OrbShape = SpellShape.Vines;
+        m_OrbElement = Element.Nature;
+        m_UIPrefab = (GameObject)Resources.Load("Orbs/GreenOrbUI");
     }
 
     public override void CastGreaterEffect(GameObject hit, int orbAmount, float spellEffectMod)
@@ -58,22 +50,22 @@ public class GreenOrb : Orb
         spellController.lesserCast = lesserEffectMethod;
         spellController.greaterCastAmt = amounts.Item1;
         spellController.lesserCastAmt = amounts.Item2;
-        spellController.spellEffectMod = SpellEffectMod;
+        spellController.spellEffectMod = m_SpellEffectMod;
     }
 
     public static object Deserialize(byte[] data)
     {
         GreenOrb result = new GreenOrb();
-        result.OrbColor = new Color(data[0], data[1], data[2]);
-        result.CooldownMod = data[3];
-        result.ShapeManaMod = data[4];
-        result.ModAmount = data[5];
+        result.setColor(new Color(data[0], data[1], data[2]));
+        result.setCooldownMod(data[3]);
+        result.setShapeManaMod(data[4]);
+        result.setSpellEffectMod(data[5]);
         return result;
     }
 
     public static byte[] Serialize(object customType)
     {
-        GreenOrb c = (GreenOrb)customType;
-        return new byte[] { (byte)c.OrbColor.r, (byte)c.OrbColor.g, (byte)c.OrbColor.b, (byte)c.CooldownMod, (byte)c.ShapeManaMod, (byte)c.ModAmount };
+        GreenOrb o = (GreenOrb)customType;
+        return new byte[] { (byte)o.getColor().r, (byte)o.getColor().g, (byte)o.getColor().b, (byte)o.getCooldownMod(), (byte)o.getShapeManaMod(), (byte)o.getSpellEffectMod() };
     }
 }

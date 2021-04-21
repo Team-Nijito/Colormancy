@@ -8,24 +8,9 @@ public class YellowOrb : Orb
 {
     public YellowOrb()
     {
-        OrbColor = Color.yellow;
-        OrbShape = SpellShape.OrbitingOrbs;
-        CooldownMod = 1.3f;
-        ShapeManaMod = .9f;
-        OrbElement = Element.Light;
-        ModAmount = .1f;
-        SpellEffectMod = 1.25f;
-        UIPrefab = (GameObject) Resources.Load("Orbs/YellowOrbUI");
-    }
-
-    public override void AddHeldEffect(SpellTest test)
-    {
-        test.HealthRegenMod += ModAmount;
-    }
-
-    public override void RevertHeldEffect(SpellTest test)
-    {
-        test.HealthRegenMod -= ModAmount;
+        m_OrbElement = Element.Light;
+        m_OrbShape = SpellShape.OrbitingOrbs;
+        m_UIPrefab = (GameObject) Resources.Load("Orbs/YellowOrbUI");
     }
 
     public override void CastGreaterEffect(GameObject hit, int orbAmount, float spellEffectMod)
@@ -56,7 +41,7 @@ public class YellowOrb : Orb
         spellController.lesserCast = lesserEffectMethod;
         spellController.greaterCastAmt = amounts.Item1;
         spellController.lesserCastAmt = amounts.Item2;
-        spellController.spellEffectMod = SpellEffectMod;
+        spellController.spellEffectMod = m_SpellEffectMod;
 
         spellController.playerTransform = t;
 
@@ -72,16 +57,16 @@ public class YellowOrb : Orb
     public static object Deserialize(byte[] data)
     {
         YellowOrb result = new YellowOrb();
-        result.OrbColor = new Color(data[0], data[1], data[2]);
-        result.CooldownMod = data[3];
-        result.ShapeManaMod = data[4];
-        result.ModAmount = data[5];
+        result.setColor(new Color(data[0], data[1], data[2]));
+        result.setCooldownMod(data[3]);
+        result.setShapeManaMod(data[4]);
+        result.setSpellEffectMod(data[5]);
         return result;
     }
 
     public static byte[] Serialize(object customType)
     {
-        YellowOrb c = (YellowOrb)customType;
-        return new byte[] { (byte)c.OrbColor.r, (byte)c.OrbColor.g, (byte)c.OrbColor.b, (byte)c.CooldownMod, (byte)c.ShapeManaMod, (byte)c.ModAmount };
+        YellowOrb o = (YellowOrb)customType;
+        return new byte[] { (byte)o.getColor().r, (byte)o.getColor().g, (byte)o.getColor().b, (byte)o.getCooldownMod(), (byte)o.getShapeManaMod(), (byte)o.getSpellEffectMod() };
     }
 }

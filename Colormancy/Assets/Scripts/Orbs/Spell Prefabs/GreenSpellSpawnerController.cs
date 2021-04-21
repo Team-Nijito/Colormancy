@@ -29,6 +29,14 @@ public class GreenSpellSpawnerController : MonoBehaviour
     private int currentTick;
     private bool spawnVine;
 
+    [Space]
+
+    private float startTime;
+    [SerializeField]
+    private float lifetime;
+
+    [Space]
+
     [SerializeField]
     private float spherePaintRadius;
     [SerializeField]
@@ -42,6 +50,7 @@ public class GreenSpellSpawnerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        startTime = Time.time;
         currentTick = 0;
         currentIteration = 0;
         spawnVine = true;
@@ -52,6 +61,9 @@ public class GreenSpellSpawnerController : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
+        if (Time.time - startTime > lifetime && !debug)
+            Destroy(gameObject);
+
         if (spawnVine)
         {
             if (!Physics.Raycast(raycastOrigin, transform.forward, fRaycastDistance, PaintingManager.paintingMask))
@@ -123,5 +135,13 @@ public class GreenSpellSpawnerController : MonoBehaviour
             for (int i = 0; i < transform.childCount; ++i)
                 Destroy(transform.GetChild(i).gameObject);
         }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.tag.Equals("Enemy"))
+            greaterCast(collision.gameObject, greaterCastAmt, spellEffectMod);
+        else if (collision.gameObject.tag.Equals("Player"))
+            lesserCast(collision.gameObject, lesserCastAmt, spellEffectMod);
     }
 }

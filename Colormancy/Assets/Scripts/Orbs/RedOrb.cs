@@ -8,40 +8,26 @@ public class RedOrb : Orb
 {
     public RedOrb()
     {
-        OrbColor = Color.red;
-        OrbShape = SpellShape.Jump;
-        CooldownMod = 0.7f;
-        ShapeManaMod = 0.8f;
-        OrbElement = Element.Wrath;
-        ModAmount = .1f;
-        SpellEffectMod = 1.5f;
-        UIPrefab = (GameObject)Resources.Load("Orbs/RedOrbUI");
+        m_OrbShape = SpellShape.Jump;
+        m_OrbElement = Element.Wrath;
+        m_UIPrefab = (GameObject)Resources.Load("Orbs/RedOrbUI");
     }
 
-    public override void AddHeldEffect(SpellTest test)
+    public override void CastGreaterEffect(GameObject hit, int orbLevel, float spellEffectMod)
     {
-        test.AttackSpeedMod += ModAmount;
-    }
 
-    public override void RevertHeldEffect(SpellTest test)
-    {
-        test.AttackSpeedMod -= ModAmount;
-    }
-
-    public override void CastGreaterEffect(GameObject hit, int orbAmount, float spellEffectMod)
-    {
-        int trueOrbAmount = orbAmount & 255;
-        float launchX = (float)((orbAmount >> 24) & 127) * (((orbAmount >> 31) & 1) == 1 ? -1 : 1);
-        float launchY = (float)((orbAmount >> 16) & 127) * (((orbAmount >> 23) & 1) == 1 ? -1 : 1);
-        float launchZ = (float)((orbAmount >> 8) & 127) * (((orbAmount >> 15) & 1) == 1 ? -1 : 1);
+        int trueOrbLevel = orbLevel & 255;
+        float launchX = (float)((orbLevel >> 24) & 127) * (((orbLevel >> 31) & 1) == 1 ? -1 : 1);
+        float launchY = (float)((orbLevel >> 16) & 127) * (((orbLevel >> 23) & 1) == 1 ? -1 : 1);
+        float launchZ = (float)((orbLevel >> 8) & 127) * (((orbLevel >> 15) & 1) == 1 ? -1 : 1);
         Vector3 launchVector = new Vector3(launchX, launchY, launchZ).normalized;
 
         PhotonView photonView = PhotonView.Get(hit);
-        photonView.RPC("TakeDamage", RpcTarget.All, trueOrbAmount * 20f * spellEffectMod);
+        photonView.RPC("TakeDamage", RpcTarget.All, trueOrbLevel * 20f);
 
         StatusEffectScript status = hit.GetComponent<StatusEffectScript>();
 
-        float orbDuration = (trueOrbAmount == 1 ? 2f : (trueOrbAmount == 2 ? 2.5f : 3f));
+        float orbDuration = (trueOrbLevel == 1 ? 2f : (trueOrbLevel == 2 ? 2.5f : 3f));
 
         status.RPCApplyStun(orbDuration * 0.5f); // decoupled stun from force, now you need to call stun separately
         status.RPCApplyForce("Knockback", orbDuration, launchVector + Vector3.up, 40f);
@@ -52,7 +38,7 @@ public class RedOrb : Orb
         throw new System.NotImplementedException();
     }
 
-    public override void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, (int, int, int) amounts, Transform t, Vector3 clickedPosition)
+    public override void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, (int, int, int) levels, Transform t, Vector3 clickedPosition)
     {
         //Cast specific orb shape depending on shapeAmnt
         //For any enemies hit
@@ -69,9 +55,9 @@ public class RedOrb : Orb
 
         spellController.greaterCast = greaterEffectMethod;
         spellController.lesserCast = lesserEffectMethod;
-        spellController.greaterCastAmt = amounts.Item1;
-        spellController.lesserCastAmt = amounts.Item2;
-        spellController.spellEffectMod = SpellEffectMod;
+        spellController.greaterCastAmt = levels.Item1;
+        spellController.lesserCastAmt = levels.Item2;
+        spellController.spellEffectMod = m_SpellEffectMod;
 
         spellController.endPosition = clickedPosition + Vector3.up * 1.6f;
         spellController.playerTransform = t;
@@ -80,16 +66,16 @@ public class RedOrb : Orb
     public static object Deserialize(byte[] data)
     {
         RedOrb result = new RedOrb();
-        result.OrbColor = new Color(data[0], data[1], data[2]);
-        result.CooldownMod = data[3];
-        result.ShapeManaMod = data[4];
-        result.ModAmount = data[5];
+        result.setColor(new Color(data[0], data[1], data[2]));
+        result.setCooldownMod(data[3]);
+        result.setShapeManaMod(data[4]);
+        result.setSpellEffectMod(data[5]);
         return result;
     }
 
     public static byte[] Serialize(object customType)
     {
-        RedOrb c = (RedOrb)customType;
-        return new byte[] { (byte)c.OrbColor.r, (byte)c.OrbColor.g, (byte)c.OrbColor.b, (byte)c.CooldownMod, (byte)c.ShapeManaMod, (byte)c.ModAmount };
+        RedOrb o = (RedOrb)customType;
+        return new byte[] { (byte)o.getColor().r, (byte)o.getColor().g, (byte)o.getColor().b, (byte)o.getCooldownMod(), (byte)o.getShapeManaMod(), (byte)o.getSpellEffectMod() };
     }
 }
