@@ -7,6 +7,7 @@ public class YellowSpellController : MonoBehaviour
     [SerializeField]
     public Transform playerTransform;
     private Vector3 fromPlayer;
+    private const Orb.Element element = Orb.Element.Light;
 
     [SerializeField]
     private AnimationCurve rotationScale;
@@ -68,7 +69,7 @@ public class YellowSpellController : MonoBehaviour
             transform.GetChild(i).RotateAround(transform.position, Vector3.up, rotationScale.Evaluate((Time.time - startTime) / lifetime) * rotationSpeed / fromPlayer.magnitude);
 
             if (tick == (PaintingManager.paintingTickFrequency - i) % PaintingManager.paintingTickFrequency + 1)
-                PaintingManager.PaintSphere(paintColor, transform.GetChild(i).position, spherePaintRadius);
+                PaintingManager.PaintSphere(OrbValueManager.getColor(element), transform.GetChild(i).position, spherePaintRadius);
         }
 
         if (tick == PaintingManager.paintingTickFrequency)

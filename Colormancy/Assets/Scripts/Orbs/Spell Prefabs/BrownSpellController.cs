@@ -9,6 +9,7 @@ public class BrownSpellController : MonoBehaviour
     public int greaterCastLevel;
     public int lesserCastLevel;
     public float spellEffectMod;
+    private const Orb.Element element = Orb.Element.Earth;
 
     [Space]
 
@@ -56,7 +57,7 @@ public class BrownSpellController : MonoBehaviour
         rocks = transform.GetChild(2).gameObject;
         rocks.GetComponent<ParticleSystem>().Play();
 
-        PaintingManager.PaintSphere(paintColor, transform.position, spherePaintRadius);
+        PaintingManager.PaintSphere(OrbValueManager.getColor(element), transform.position, spherePaintRadius);
     }
 
     // Update is called once per frame

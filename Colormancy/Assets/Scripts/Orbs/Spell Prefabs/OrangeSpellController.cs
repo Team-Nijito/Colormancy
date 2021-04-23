@@ -9,6 +9,7 @@ public class OrangeSpellController : MonoBehaviour
     public int greaterCastLevel;
     public int lesserCastLevel;
     public float spellEffectMod;
+    private Orb.Element element = Orb.Element.Fire;
 
     [Space]
 
@@ -52,12 +53,12 @@ public class OrangeSpellController : MonoBehaviour
                 Destroy(gameObject);
         }
 
-        PaintingManager.PaintSphere(paintColor, transform.position, spherePaintRadius);
+        PaintingManager.PaintSphere(OrbValueManager.getColor(element), transform.position, spherePaintRadius);
     }
 
     private void OnCollisionEnter(Collision collision)
     {
-        PaintingManager.PaintSphere(paintColor, collision.GetContact(0).point, spherePaintRadius * 2);
+        PaintingManager.PaintSphere(OrbValueManager.getColor(element), collision.GetContact(0).point, spherePaintRadius * 2);
 
         Collider[] sphereCollisions = Physics.OverlapSphere(collision.GetContact(0).point, spherePaintRadius * 2);
         foreach (Collider c in sphereCollisions)

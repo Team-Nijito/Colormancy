@@ -9,6 +9,7 @@ public class GreenSpellSpawnerController : MonoBehaviour
     public int greaterCastLevel;
     public int lesserCastLevel;
     public float spellEffectMod;
+    private const Orb.Element element = Orb.Element.Nature;
 
     private Vector3 raycastOrigin;
 
@@ -39,8 +40,6 @@ public class GreenSpellSpawnerController : MonoBehaviour
 
     [SerializeField]
     private float spherePaintRadius;
-    [SerializeField]
-    private Color paintColor;
 
     [SerializeField]
     private bool debug;
@@ -88,7 +87,7 @@ public class GreenSpellSpawnerController : MonoBehaviour
                         vine.transform.position -= transform.right * hPlacement;
                     }
 
-                    PaintingManager.PaintSphere(paintColor, vine.transform.position, spherePaintRadius);
+                    PaintingManager.PaintSphere(OrbValueManager.getColor(element), vine.transform.position, spherePaintRadius);
 
                     vine.transform.position += transform.right * displacement * Random.Range(-1, 1);
                     vine.transform.position += transform.forward * displacement * Random.Range(-1, 1);

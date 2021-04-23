@@ -39999,7 +39999,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   orbValues:
   - element: 0
-    m_OrbColor: {r: 0, g: 0, b: 0, a: 0}
+    m_OrbColor: {r: 1, g: 0, b: 0, a: 0}
     m_GreaterEffectDamage:
       m_Level1: 0
       m_Level2: 0
@@ -40021,7 +40021,7 @@ MonoBehaviour:
     m_CooldownMod: 0
     m_ShapeManaMod: 0
   - element: 1
-    m_OrbColor: {r: 0, g: 0, b: 0, a: 0}
+    m_OrbColor: {r: 1, g: 0.57161915, b: 0, a: 0}
     m_GreaterEffectDamage:
       m_Level1: 0
       m_Level2: 0
@@ -40043,7 +40043,7 @@ MonoBehaviour:
     m_CooldownMod: 0
     m_ShapeManaMod: 0
   - element: 2
-    m_OrbColor: {r: 0, g: 0, b: 0, a: 0}
+    m_OrbColor: {r: 0.99944377, g: 1, b: 0.5613208, a: 0}
     m_GreaterEffectDamage:
       m_Level1: 0
       m_Level2: 0
@@ -40065,7 +40065,7 @@ MonoBehaviour:
     m_CooldownMod: 0
     m_ShapeManaMod: 0
   - element: 3
-    m_OrbColor: {r: 0, g: 0, b: 0, a: 0}
+    m_OrbColor: {r: 0.041749395, g: 0.4528302, b: 0, a: 0}
     m_GreaterEffectDamage:
       m_Level1: 0
       m_Level2: 0
@@ -40087,7 +40087,7 @@ MonoBehaviour:
     m_CooldownMod: 0
     m_ShapeManaMod: 0
   - element: 4
-    m_OrbColor: {r: 0, g: 0, b: 0, a: 0}
+    m_OrbColor: {r: 0.13679248, g: 0.13842863, b: 1, a: 0}
     m_GreaterEffectDamage:
       m_Level1: 0
       m_Level2: 0
@@ -40109,7 +40109,7 @@ MonoBehaviour:
     m_CooldownMod: 0
     m_ShapeManaMod: 0
   - element: 5
-    m_OrbColor: {r: 0, g: 0, b: 0, a: 0}
+    m_OrbColor: {r: 0.7830189, g: 0.24007656, b: 0.740027, a: 0}
     m_GreaterEffectDamage:
       m_Level1: 0
       m_Level2: 0
@@ -40131,7 +40131,7 @@ MonoBehaviour:
     m_CooldownMod: 0
     m_ShapeManaMod: 0
   - element: 6
-    m_OrbColor: {r: 0, g: 0, b: 0, a: 0}
+    m_OrbColor: {r: 0.6132076, g: 0.25072345, b: 0.00867745, a: 0}
     m_GreaterEffectDamage:
       m_Level1: 0
       m_Level2: 0
@@ -40153,7 +40153,7 @@ MonoBehaviour:
     m_CooldownMod: 0
     m_ShapeManaMod: 0
   - element: 7
-    m_OrbColor: {r: 0, g: 0, b: 0, a: 0}
+    m_OrbColor: {r: 0.6467604, g: 0.8113208, b: 0.80452955, a: 0}
     m_GreaterEffectDamage:
       m_Level1: 0
       m_Level2: 0
@@ -40175,7 +40175,7 @@ MonoBehaviour:
     m_CooldownMod: 0
     m_ShapeManaMod: 0
   - element: 8
-    m_OrbColor: {r: 0, g: 0, b: 0, a: 0}
+    m_OrbColor: {r: 0.2941672, g: 0.038892835, b: 0.4339623, a: 0}
     m_GreaterEffectDamage:
       m_Level1: 0
       m_Level2: 0

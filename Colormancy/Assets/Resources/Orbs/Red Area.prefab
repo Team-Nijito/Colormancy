@@ -64,13 +64,14 @@ MonoBehaviour:
   playerTransform: {fileID: 0}
   redBase: {fileID: 5533924623576496753}
   redEdge: {fileID: 5811497358446419998}
-  greaterCastAmt: 0
-  lesserCastAmt: 0
+  greaterCastLevel: 0
+  lesserCastLevel: 0
+  spellEffectMod: 0
   endPosition: {x: 0, y: 0, z: 0}
   jumpTime: 0.5
   jumpVelocity: 20
   lifetime: 3
-  spherePaintRadius: 5
+  spherePaintRadius: 7
   paintColor: {r: 1, g: 0, b: 0, a: 0}
   m_lerp: 1
   debug: 0

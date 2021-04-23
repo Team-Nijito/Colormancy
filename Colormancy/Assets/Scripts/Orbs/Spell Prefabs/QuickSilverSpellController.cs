@@ -9,6 +9,7 @@ public class QuickSilverSpellController : MonoBehaviour
     public int greaterCastLevel;
     public int lesserCastLevel;
     public float spellEffectMod;
+    private const Orb.Element element = Orb.Element.Wind;
 
     [Space]
 
@@ -47,8 +48,6 @@ public class QuickSilverSpellController : MonoBehaviour
 
     [SerializeField]
     private float spherePaintRadius;
-    [SerializeField]
-    private Color paintColor;
 
     [SerializeField]
     private bool debug;
@@ -73,7 +72,7 @@ public class QuickSilverSpellController : MonoBehaviour
 
         sparkLight = GetComponent<Light>();
 
-        PaintingManager.PaintSphere(paintColor, transform.position, spherePaintRadius);
+        PaintingManager.PaintSphere(OrbValueManager.getColor(element), transform.position, spherePaintRadius);
     }
 
     void Update()

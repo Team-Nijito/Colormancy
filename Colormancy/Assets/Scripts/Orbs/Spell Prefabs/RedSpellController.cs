@@ -14,7 +14,7 @@ public class RedSpellController : MonoBehaviour
     private GameObject redEdge;
     private Renderer baseMaterial;
     private Renderer edgeMaterial;
-    private Orb.Element element = Orb.Element.Wrath;
+    private const Orb.Element element = Orb.Element.Wrath;
 
     [Space]
 

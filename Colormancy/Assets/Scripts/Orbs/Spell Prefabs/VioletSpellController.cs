@@ -9,6 +9,7 @@ public class VioletSpellController : MonoBehaviour
     public int greaterCastLevel;
     public int lesserCastLevel;
     public float spellEffectMod;
+    private const Orb.Element element = Orb.Element.Poison;
 
     [Space]
 
@@ -30,7 +31,7 @@ public class VioletSpellController : MonoBehaviour
     {
         starttime = Time.time;
 
-        PaintingManager.PaintSphere(paintColor, transform.position + Vector3.down, spherePaintRadius);
+        PaintingManager.PaintSphere(OrbValueManager.getColor(element), transform.position + Vector3.down, spherePaintRadius);
     }
 
     // Update is called once per frame
