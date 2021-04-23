@@ -627,7 +627,7 @@ GameObject:
   - component: {fileID: 2541053460267380745}
   - component: {fileID: 3183121963216691932}
   - component: {fileID: 3743356869417274038}
-  - component: {fileID: 1927268648518331006}
+  - component: {fileID: 563668893613083287}
   - component: {fileID: 2689978470580284610}
   - component: {fileID: 5098352021510522856}
   - component: {fileID: 1342937965760010381}
@@ -818,7 +818,7 @@ MonoBehaviour:
   m_fieldOfView: 60
   m_attackRange: 3
   m_rememberTargetDuration: 6
---- !u!114 &1927268648518331006
+--- !u!114 &563668893613083287
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -827,7 +827,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 5161377573530120741}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 31770462cc982fb4991bc653a75df62a, type: 3}
+  m_Script: {fileID: 11500000, guid: 471293fd30b52284cbb2a231a4de1c11, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_hitBoxesArray:
