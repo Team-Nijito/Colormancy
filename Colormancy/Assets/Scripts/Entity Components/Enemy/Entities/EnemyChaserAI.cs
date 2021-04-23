@@ -211,7 +211,6 @@ public class EnemyChaserAI : MonoBehaviourPun, IEnemyDetection
     {
         m_enemTargeting.StopAllTasks();
         m_enemMovement.StopAllTasks();
-        GetComponent<EnemySync>().enabled = false; // disable enemy sync
         enabled = false;
     }
 
