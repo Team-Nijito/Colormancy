@@ -6,16 +6,16 @@ public class IndigoSpellSphereController : MonoBehaviour
 {
     public Orb.GreaterCast greaterCast;
     public Orb.LesserCast lesserCast;
-    public int greaterCastAmt;
-    public int lesserCastAmt;
+    public int greaterCastLevel;
+    public int lesserCastLevel;
     public float spellEffectMod;
 
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.CompareTag("Enemy"))
-            greaterCast(collision.gameObject, greaterCastAmt, spellEffectMod);
+            greaterCast(collision.gameObject, greaterCastLevel, spellEffectMod);
         else if (collision.gameObject.CompareTag("Player"))
-            lesserCast(collision.gameObject, lesserCastAmt, spellEffectMod);
+            lesserCast(collision.gameObject, lesserCastLevel, spellEffectMod);
         
         Destroy(gameObject);
     }

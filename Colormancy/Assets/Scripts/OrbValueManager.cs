@@ -19,7 +19,7 @@ public class OrbValueManager : MonoBehaviour
     public struct OrbValues
     {
         [SerializeField]
-        string m_name;
+        Orb.Element element;
         [SerializeField]
         Color m_OrbColor;
         [SerializeField]
@@ -41,10 +41,51 @@ public class OrbValueManager : MonoBehaviour
     }
 
     public List<OrbValues> orbValues;
-    public static OrbValueManager s_instance;
-
+    private static OrbValueManager s_instance;
+    
+    // set static object first
     void Awake()
     {
         s_instance = this;
     }
+
+    #region Getters
+    public static Color getColor(Orb.Element element)
+    {
+        return Color.white;
+    }
+    public static float getGreaterEffectDamage(Orb.Element element, int level)
+    {
+        return 20f;
+    }
+    public static float getGreaterEffectPercentile(Orb.Element element)
+    {
+        return 20f;
+    }
+    public static float getGreaterEffectDuration(Orb.Element element, int level)
+    {
+        return 20f;
+    }
+    public static float getLesserEffectValue(Orb.Element element, int level)
+    {
+        return 20f;
+    }
+    public static float getLesserEffectDuration(Orb.Element element, int level)
+    {
+        return 20f;
+    }
+    public static float getSpellEffectMod(Orb.Element element)
+    {
+        return 20f;
+    }
+    public static float getCooldownMod(Orb.Element element)
+    {
+        return 20f;
+    }
+    public static float getShapeManaMod(Orb.Element element)
+    {
+        return 20f;
+    }
+
+    #endregion
 }

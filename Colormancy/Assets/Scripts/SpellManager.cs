@@ -22,8 +22,8 @@ public class SpellManager : MonoBehaviourPun
         {
             orbs = _orbs;
             
-            SpellCooldown = BASE_COOLDOWN * orbs[2].getCooldownMod();
-            SpellManaCost = BASE_SPELL_MANA * orbs[2].getShapeManaMod();
+            SpellCooldown = BASE_COOLDOWN * OrbValueManager.getShapeManaMod(orbs[2].getElement());
+            SpellManaCost = BASE_SPELL_MANA * OrbValueManager.getShapeManaMod(orbs[2].getElement());
             OrbTuple = (orbs[0].GetType(), orbs[1].GetType(), orbs[2].GetType());
         }
 

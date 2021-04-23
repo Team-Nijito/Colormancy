@@ -6,8 +6,8 @@ public class OrangeSpellController : MonoBehaviour
 {
     public Orb.GreaterCast greaterCast;
     public Orb.LesserCast lesserCast;
-    public int greaterCastAmt;
-    public int lesserCastAmt;
+    public int greaterCastLevel;
+    public int lesserCastLevel;
     public float spellEffectMod;
 
     [Space]
@@ -63,9 +63,9 @@ public class OrangeSpellController : MonoBehaviour
         foreach (Collider c in sphereCollisions)
         {
             if (c.gameObject.CompareTag("Enemy"))
-                greaterCast(c.gameObject, greaterCastAmt, spellEffectMod);
+                greaterCast(c.gameObject, greaterCastLevel, spellEffectMod);
             else if (c.gameObject.CompareTag("Player"))
-                lesserCast(c.gameObject, lesserCastAmt, spellEffectMod);
+                lesserCast(c.gameObject, lesserCastLevel, spellEffectMod);
         }
 
         Destroy(gameObject);

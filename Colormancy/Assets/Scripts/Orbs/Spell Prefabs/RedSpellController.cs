@@ -19,8 +19,8 @@ public class RedSpellController : MonoBehaviour
 
     public Orb.GreaterCast greaterCast;
     public Orb.LesserCast lesserCast;
-    public int greaterCastAmt;
-    public int lesserCastAmt;
+    public int greaterCastLevel;
+    public int lesserCastLevel;
     public float spellEffectMod;
 
     [Space]
@@ -125,13 +125,13 @@ public class RedSpellController : MonoBehaviour
                     vectorCastData = vectorCastData | ((int)Mathf.Abs(PlayerToEnemy.z) + (PlayerToEnemy.z > 0 ? 0 : 128));
                     vectorCastData = vectorCastData << 8;
 
-                    vectorCastData = vectorCastData | greaterCastAmt;
+                    vectorCastData = vectorCastData | greaterCastLevel;
 
                     greaterCast(hitCollider.gameObject, vectorCastData, spellEffectMod);
                 }
                 else if (hitCollider.CompareTag("Player"))
                 {
-                    lesserCast(hitCollider.gameObject, lesserCastAmt, spellEffectMod);
+                    lesserCast(hitCollider.gameObject, lesserCastLevel, spellEffectMod);
                 }
             }
 
