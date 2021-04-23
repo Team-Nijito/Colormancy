@@ -41,10 +41,10 @@ public class OrbValueManager : MonoBehaviour
     }
 
     public List<OrbValues> orbValues;
-    public OrbManager orbManager;
+    public static OrbValueManager s_instance;
 
-    private void OnValidate()
+    void Awake()
     {
-        
+        s_instance = this;
     }
 }
