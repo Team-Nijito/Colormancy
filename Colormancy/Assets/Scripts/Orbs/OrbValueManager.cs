@@ -19,25 +19,25 @@ public class OrbValueManager : MonoBehaviour
     public struct OrbValues
     {
         [SerializeField]
-        Orb.Element element;
+        public Orb.Element element;
         [SerializeField]
-        Color m_OrbColor;
+        public Color m_OrbColor;
         [SerializeField]
-        LeveledValues m_GreaterEffectDamage;
+        public LeveledValues m_GreaterEffectDamage;
         [SerializeField]
-        float m_GreaterEffectPercentile;
+        public float m_GreaterEffectPercentile;
         [SerializeField]
-        LeveledValues m_GreaterEffectDuration;
+        public LeveledValues m_GreaterEffectDuration;
         [SerializeField]
-        LeveledValues m_LesserEffectValue;
+        public LeveledValues m_LesserEffectValue;
         [SerializeField]
-        LeveledValues m_LesserEffectDuration;
+        public LeveledValues m_LesserEffectDuration;
         [SerializeField]
-        float m_SpellEffectMod;
+        public float m_SpellEffectMod;
         [SerializeField]
-        float m_CooldownMod;
+        public float m_CooldownMod;
         [SerializeField]
-        float m_ShapeManaMod;
+        public float m_ShapeManaMod;
     }
 
     public List<OrbValues> orbValues;
@@ -52,7 +52,7 @@ public class OrbValueManager : MonoBehaviour
     #region Getters
     public static Color getColor(Orb.Element element)
     {
-        return Color.white;
+        return s_instance.orbValues.Find(x => x.element == element).m_OrbColor;
     }
     public static float getGreaterEffectDamage(Orb.Element element, int level)
     {
@@ -76,15 +76,15 @@ public class OrbValueManager : MonoBehaviour
     }
     public static float getSpellEffectMod(Orb.Element element)
     {
-        return 20f;
+        return 1f;
     }
     public static float getCooldownMod(Orb.Element element)
     {
-        return 20f;
+        return 1f;
     }
     public static float getShapeManaMod(Orb.Element element)
     {
-        return 20f;
+        return 1f;
     }
 
     #endregion

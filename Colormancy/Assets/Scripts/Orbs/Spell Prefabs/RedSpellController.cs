@@ -14,6 +14,7 @@ public class RedSpellController : MonoBehaviour
     private GameObject redEdge;
     private Renderer baseMaterial;
     private Renderer edgeMaterial;
+    private Orb.Element element = Orb.Element.Wrath;
 
     [Space]
 
@@ -104,7 +105,7 @@ public class RedSpellController : MonoBehaviour
 
             transform.position = playerTransform.position + Vector3.down;
 
-            PaintingManager.PaintSphere(paintColor, transform.position, spherePaintRadius);
+            PaintingManager.PaintSphere(OrbValueManager.getColor(element), transform.position, spherePaintRadius);
 
             // search in enemy layermask
             Collider[] hitColliders = Physics.OverlapSphere(transform.position, spherePaintRadius, 1 << 10);

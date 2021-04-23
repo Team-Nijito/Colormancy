@@ -39998,7 +39998,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   orbValues:
-  - m_name: 
+  - element: 0
     m_OrbColor: {r: 0, g: 0, b: 0, a: 0}
     m_GreaterEffectDamage:
       m_Level1: 0
@@ -40020,7 +40020,7 @@ MonoBehaviour:
     m_SpellEffectMod: 0
     m_CooldownMod: 0
     m_ShapeManaMod: 0
-  - m_name: 
+  - element: 1
     m_OrbColor: {r: 0, g: 0, b: 0, a: 0}
     m_GreaterEffectDamage:
       m_Level1: 0
@@ -40042,7 +40042,7 @@ MonoBehaviour:
     m_SpellEffectMod: 0
     m_CooldownMod: 0
     m_ShapeManaMod: 0
-  - m_name: 
+  - element: 2
     m_OrbColor: {r: 0, g: 0, b: 0, a: 0}
     m_GreaterEffectDamage:
       m_Level1: 0
@@ -40064,7 +40064,7 @@ MonoBehaviour:
     m_SpellEffectMod: 0
     m_CooldownMod: 0
     m_ShapeManaMod: 0
-  - m_name: 
+  - element: 3
     m_OrbColor: {r: 0, g: 0, b: 0, a: 0}
     m_GreaterEffectDamage:
       m_Level1: 0
@@ -40086,7 +40086,7 @@ MonoBehaviour:
     m_SpellEffectMod: 0
     m_CooldownMod: 0
     m_ShapeManaMod: 0
-  - m_name: 
+  - element: 4
     m_OrbColor: {r: 0, g: 0, b: 0, a: 0}
     m_GreaterEffectDamage:
       m_Level1: 0
@@ -40108,7 +40108,7 @@ MonoBehaviour:
     m_SpellEffectMod: 0
     m_CooldownMod: 0
     m_ShapeManaMod: 0
-  - m_name: 
+  - element: 5
     m_OrbColor: {r: 0, g: 0, b: 0, a: 0}
     m_GreaterEffectDamage:
       m_Level1: 0
@@ -40130,7 +40130,7 @@ MonoBehaviour:
     m_SpellEffectMod: 0
     m_CooldownMod: 0
     m_ShapeManaMod: 0
-  - m_name: 
+  - element: 6
     m_OrbColor: {r: 0, g: 0, b: 0, a: 0}
     m_GreaterEffectDamage:
       m_Level1: 0
@@ -40152,7 +40152,7 @@ MonoBehaviour:
     m_SpellEffectMod: 0
     m_CooldownMod: 0
     m_ShapeManaMod: 0
-  - m_name: 
+  - element: 7
     m_OrbColor: {r: 0, g: 0, b: 0, a: 0}
     m_GreaterEffectDamage:
       m_Level1: 0
@@ -40174,7 +40174,7 @@ MonoBehaviour:
     m_SpellEffectMod: 0
     m_CooldownMod: 0
     m_ShapeManaMod: 0
-  - m_name: 
+  - element: 8
     m_OrbColor: {r: 0, g: 0, b: 0, a: 0}
     m_GreaterEffectDamage:
       m_Level1: 0
@@ -40196,7 +40196,6 @@ MonoBehaviour:
     m_SpellEffectMod: 0
     m_CooldownMod: 0
     m_ShapeManaMod: 0
-  orbManager: {fileID: 0}
 --- !u!4 &924871523
 Transform:
   m_ObjectHideFlags: 0
