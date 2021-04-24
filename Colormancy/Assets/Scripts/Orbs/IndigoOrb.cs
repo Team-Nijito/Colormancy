@@ -8,24 +8,16 @@ public class IndigoOrb : Orb
 {
     public IndigoOrb()
     {
+        /*
         OrbColor = Color.yellow;
-        OrbShape = SpellShape.ExpandingOrbs;
         CooldownMod = 1.4f;
         ShapeManaMod = 1.2f;
-        OrbElement = Element.Darkness;
         ModAmount = .1f;
         SpellEffectMod = 1f;
-        UIPrefab = (GameObject)Resources.Load("Orbs/IndigoOrbUI");
-    }
-
-    public override void AddHeldEffect(SpellTest test)
-    {
-        test.HealthRegenMod += ModAmount;
-    }
-
-    public override void RevertHeldEffect(SpellTest test)
-    {
-        test.HealthRegenMod -= ModAmount;
+        */
+        m_OrbShape = SpellShape.ExpandingOrbs;
+        m_OrbElement = Element.Darkness;
+        m_UIPrefab = (GameObject)Resources.Load("Orbs/IndigoOrbUI");
     }
 
     public override void CastGreaterEffect(GameObject hit, int orbAmount, float spellEffectMod)
@@ -61,7 +53,7 @@ public class IndigoOrb : Orb
             sphereController.lesserCast = lesserEffectMethod;
             sphereController.greaterCastAmt = amounts.Item1;
             sphereController.lesserCastAmt = amounts.Item2;
-            sphereController.spellEffectMod = SpellEffectMod;
+            sphereController.spellEffectMod = m_SpellEffectMod;
 
             if ((i % 2 == 1 && amounts.Item3 == 2) || (i % 4 != 0 && amounts.Item3 == 1))
                 GameObject.Destroy(g.transform.GetChild(i).gameObject);
@@ -74,16 +66,16 @@ public class IndigoOrb : Orb
     public static object Deserialize(byte[] data)
     {
         IndigoOrb result = new IndigoOrb();
-        result.OrbColor = new Color(data[0], data[1], data[2]);
-        result.CooldownMod = data[3];
-        result.ShapeManaMod = data[4];
-        result.ModAmount = data[5];
+        result.setColor(new Color(data[0], data[1], data[2]));
+        result.setCooldownMod(data[3]);
+        result.setShapeManaMod(data[4]);
+        result.setSpellEffectMod(data[5]);
         return result;
     }
 
     public static byte[] Serialize(object customType)
     {
-        IndigoOrb c = (IndigoOrb)customType;
-        return new byte[] { (byte)c.OrbColor.r, (byte)c.OrbColor.g, (byte)c.OrbColor.b, (byte)c.CooldownMod,  (byte)c.ShapeManaMod, (byte)c.ModAmount};
+        IndigoOrb o = (IndigoOrb)customType;
+        return new byte[] { (byte)o.getColor().r, (byte)o.getColor().g, (byte)o.getColor().b, (byte)o.getCooldownMod(), (byte)o.getShapeManaMod(), (byte)o.getSpellEffectMod() };
     }
 }

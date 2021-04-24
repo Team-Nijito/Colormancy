@@ -14,7 +14,7 @@ public class OrangeSpellController : MonoBehaviour
 
     [SerializeField]
     private float speed;
-    private float starttime;
+    private float startTime;
     [SerializeField]
     private float lifetime;
 
@@ -31,7 +31,7 @@ public class OrangeSpellController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        starttime = Time.time;
+        startTime = Time.time;
     }
 
     // Update is called once per frame
@@ -48,7 +48,7 @@ public class OrangeSpellController : MonoBehaviour
         {
             transform.position += transform.forward * speed;
 
-            if (Time.time - starttime > lifetime && !debug)
+            if (Time.time - startTime > lifetime && !debug)
                 Destroy(gameObject);
         }
 

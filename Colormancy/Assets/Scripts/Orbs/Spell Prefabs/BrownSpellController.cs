@@ -10,9 +10,7 @@ public class BrownSpellController : MonoBehaviour
     public int lesserCastAmt;
     public float spellEffectMod;
 
-    private float startTime;
-    [SerializeField]
-    private float lifetime;
+    [Space]
 
     [SerializeField]
     private AnimationCurve ImpactLerp;
@@ -25,6 +23,19 @@ public class BrownSpellController : MonoBehaviour
 
     private Material impactMat;
     private Material waveMat;
+
+    [Space]
+
+    private float startTime;
+    [SerializeField]
+    private float lifetime;
+
+    [Space]
+
+    [SerializeField]
+    private float spherePaintRadius;
+    [SerializeField]
+    private Color paintColor;
 
     [SerializeField]
     private bool debug;
@@ -44,6 +55,8 @@ public class BrownSpellController : MonoBehaviour
 
         rocks = transform.GetChild(2).gameObject;
         rocks.GetComponent<ParticleSystem>().Play();
+
+        PaintingManager.PaintSphere(paintColor, transform.position, spherePaintRadius);
     }
 
     // Update is called once per frame
@@ -51,9 +64,22 @@ public class BrownSpellController : MonoBehaviour
     {
         float currentTime = Time.time - startTime;
 
+        if (Time.time - startTime > lifetime && !debug)
+            Destroy(gameObject);
+
         impactMat.SetFloat("_Lerp", WaveLerp.Evaluate(currentTime));
 
         waveMat.SetFloat("_Lerp", WaveLerp.Evaluate(currentTime));
+
+        // apply curve to capsule collider
+        if (TryGetComponent(out CapsuleCollider collider))
+        {
+            collider.radius = WaveLerp.Evaluate(currentTime) * 3;
+
+            // remove collider if no wave
+            if (currentTime > 1f)
+                collider.enabled = false;
+        }
 
         if (debug && startAnimation)
         {
@@ -61,5 +87,13 @@ public class BrownSpellController : MonoBehaviour
             startTime = Time.time;
             rocks.GetComponent<ParticleSystem>().Play();
         }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.tag.Equals("Enemy"))
+            greaterCast(collision.gameObject, greaterCastAmt, spellEffectMod);
+        else if (collision.gameObject.tag.Equals("Player"))
+            lesserCast(collision.gameObject, lesserCastAmt, spellEffectMod);
     }
 }

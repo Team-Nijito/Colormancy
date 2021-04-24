@@ -13,11 +13,11 @@ public class OrbInfo
     public float manaMod;
 }
 
-public class SpellTest : MonoBehaviourPun
+public class OrbManager : MonoBehaviourPun
 {
     public static List<Orb> orbHistory = new List<Orb>(); // static variable that keep tracks of orbs in between scenes
 
-    List<Orb> orbs = new List<Orb>();
+    public List<Orb> orbs = new List<Orb>();
 
     SpellManager manager;
     ManaScript mana;
@@ -31,40 +31,6 @@ public class SpellTest : MonoBehaviourPun
     SpellManager.Spell currentSpell;
 
     PlayerMovement playerMoveScript; // need a ref to this component so we can check if we're stunned or not, so we'll prevent casting while stunned
-
-    #region Dummy Player Attributes
-
-    static readonly float BASE_ATTACK_SPEED = 1f;
-    static readonly float BASE_HEALTH_REGEN = 1f;
-
-    float attackSpeed = BASE_ATTACK_SPEED;
-    float healthRegen = BASE_HEALTH_REGEN;
-
-    float _attackSpeedMod = 1f;
-    public float AttackSpeedMod
-    {
-        get => _attackSpeedMod;
-        set
-        {
-            _attackSpeedMod = value;
-            attackSpeed = BASE_ATTACK_SPEED * _attackSpeedMod;
-            print("Current attack speed: " + attackSpeed);
-        }
-    }
-
-    float _healthRegenMod = 1f;
-    public float HealthRegenMod
-    {
-        get => _healthRegenMod;
-        set
-        {
-            _healthRegenMod = value;
-            healthRegen = BASE_HEALTH_REGEN * _healthRegenMod;
-            print("Current health regen: " + healthRegen);
-        }
-    }
-
-    #endregion
 
     // Start is called before the first frame update
     void Start()
@@ -197,7 +163,7 @@ public class SpellTest : MonoBehaviourPun
         // update the player's orbs from the previous scene
         foreach (Orb o in orbHistory.ToArray())
         {
-            switch (o.OrbElement)
+            switch (o.getElement())
             {
                 case Orb.Element.Wrath:
                     AddSpellOrb(new RedOrb());
@@ -227,7 +193,7 @@ public class SpellTest : MonoBehaviourPun
                     AddSpellOrb(new IndigoOrb());
                     break;
                 default:
-                    throw new NotImplementedException("Didn't implement adding " + o.OrbElement + " yet");
+                    throw new NotImplementedException("Didn't implement adding " + o.getElement() + " yet");
             }
         }
     }
@@ -268,10 +234,10 @@ public class SpellTest : MonoBehaviourPun
     }
 
     /// <summary>
-    /// Clear out all current spells.
+    /// Clear out all current orbs.
     /// (although this will not update the UI).
     /// </summary>
-    public void ResetSpells()
+    public void ResetOrbs()
     {
         orbHistory.Clear();
         orbs.Clear();

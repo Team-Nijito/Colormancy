@@ -23,7 +23,7 @@ public class PodiumController : MonoBehaviour
     [SerializeField]
     private Sprite[] images;
 
-    private SpellTest playerSpellTest = null;
+    private OrbManager playerSpellTest = null;
 
     public bool InRange { get { return m_inRange; } }
     private bool m_inRange = false;
@@ -174,7 +174,7 @@ public class PodiumController : MonoBehaviour
 
                     m_inRange = true;
                     indicatorSprite.enabled = true;
-                    playerSpellTest = other.gameObject.GetComponent<SpellTest>();
+                    playerSpellTest = other.gameObject.GetComponent<OrbManager>();
                 }
             }
         }

@@ -7689,7 +7689,7 @@ PrefabInstance:
     - target: {fileID: 1858970735588863968, guid: f3c0e5b18270531468bb1ff4a5ba57e5,
         type: 3}
       propertyPath: m_desiredEnemiesOnField
-      value: 1
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 1858970735588863968, guid: f3c0e5b18270531468bb1ff4a5ba57e5,
         type: 3}
@@ -39968,6 +39968,248 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 920041751}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &924871521
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 924871523}
+  - component: {fileID: 924871522}
+  m_Layer: 0
+  m_Name: OrbValueManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &924871522
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 924871521}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 354df758b0cc5974c8caad95c5342edb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  orbValues:
+  - m_name: 
+    m_OrbColor: {r: 0, g: 0, b: 0, a: 0}
+    m_GreaterEffectDamage:
+      m_Level1: 0
+      m_Level2: 0
+      m_Level3: 0
+    m_GreaterEffectPercentile: 0
+    m_GreaterEffectDuration:
+      m_Level1: 0
+      m_Level2: 0
+      m_Level3: 0
+    m_LesserEffectValue:
+      m_Level1: 0
+      m_Level2: 0
+      m_Level3: 0
+    m_LesserEffectDuration:
+      m_Level1: 0
+      m_Level2: 0
+      m_Level3: 0
+    m_SpellEffectMod: 0
+    m_CooldownMod: 0
+    m_ShapeManaMod: 0
+  - m_name: 
+    m_OrbColor: {r: 0, g: 0, b: 0, a: 0}
+    m_GreaterEffectDamage:
+      m_Level1: 0
+      m_Level2: 0
+      m_Level3: 0
+    m_GreaterEffectPercentile: 0
+    m_GreaterEffectDuration:
+      m_Level1: 0
+      m_Level2: 0
+      m_Level3: 0
+    m_LesserEffectValue:
+      m_Level1: 0
+      m_Level2: 0
+      m_Level3: 0
+    m_LesserEffectDuration:
+      m_Level1: 0
+      m_Level2: 0
+      m_Level3: 0
+    m_SpellEffectMod: 0
+    m_CooldownMod: 0
+    m_ShapeManaMod: 0
+  - m_name: 
+    m_OrbColor: {r: 0, g: 0, b: 0, a: 0}
+    m_GreaterEffectDamage:
+      m_Level1: 0
+      m_Level2: 0
+      m_Level3: 0
+    m_GreaterEffectPercentile: 0
+    m_GreaterEffectDuration:
+      m_Level1: 0
+      m_Level2: 0
+      m_Level3: 0
+    m_LesserEffectValue:
+      m_Level1: 0
+      m_Level2: 0
+      m_Level3: 0
+    m_LesserEffectDuration:
+      m_Level1: 0
+      m_Level2: 0
+      m_Level3: 0
+    m_SpellEffectMod: 0
+    m_CooldownMod: 0
+    m_ShapeManaMod: 0
+  - m_name: 
+    m_OrbColor: {r: 0, g: 0, b: 0, a: 0}
+    m_GreaterEffectDamage:
+      m_Level1: 0
+      m_Level2: 0
+      m_Level3: 0
+    m_GreaterEffectPercentile: 0
+    m_GreaterEffectDuration:
+      m_Level1: 0
+      m_Level2: 0
+      m_Level3: 0
+    m_LesserEffectValue:
+      m_Level1: 0
+      m_Level2: 0
+      m_Level3: 0
+    m_LesserEffectDuration:
+      m_Level1: 0
+      m_Level2: 0
+      m_Level3: 0
+    m_SpellEffectMod: 0
+    m_CooldownMod: 0
+    m_ShapeManaMod: 0
+  - m_name: 
+    m_OrbColor: {r: 0, g: 0, b: 0, a: 0}
+    m_GreaterEffectDamage:
+      m_Level1: 0
+      m_Level2: 0
+      m_Level3: 0
+    m_GreaterEffectPercentile: 0
+    m_GreaterEffectDuration:
+      m_Level1: 0
+      m_Level2: 0
+      m_Level3: 0
+    m_LesserEffectValue:
+      m_Level1: 0
+      m_Level2: 0
+      m_Level3: 0
+    m_LesserEffectDuration:
+      m_Level1: 0
+      m_Level2: 0
+      m_Level3: 0
+    m_SpellEffectMod: 0
+    m_CooldownMod: 0
+    m_ShapeManaMod: 0
+  - m_name: 
+    m_OrbColor: {r: 0, g: 0, b: 0, a: 0}
+    m_GreaterEffectDamage:
+      m_Level1: 0
+      m_Level2: 0
+      m_Level3: 0
+    m_GreaterEffectPercentile: 0
+    m_GreaterEffectDuration:
+      m_Level1: 0
+      m_Level2: 0
+      m_Level3: 0
+    m_LesserEffectValue:
+      m_Level1: 0
+      m_Level2: 0
+      m_Level3: 0
+    m_LesserEffectDuration:
+      m_Level1: 0
+      m_Level2: 0
+      m_Level3: 0
+    m_SpellEffectMod: 0
+    m_CooldownMod: 0
+    m_ShapeManaMod: 0
+  - m_name: 
+    m_OrbColor: {r: 0, g: 0, b: 0, a: 0}
+    m_GreaterEffectDamage:
+      m_Level1: 0
+      m_Level2: 0
+      m_Level3: 0
+    m_GreaterEffectPercentile: 0
+    m_GreaterEffectDuration:
+      m_Level1: 0
+      m_Level2: 0
+      m_Level3: 0
+    m_LesserEffectValue:
+      m_Level1: 0
+      m_Level2: 0
+      m_Level3: 0
+    m_LesserEffectDuration:
+      m_Level1: 0
+      m_Level2: 0
+      m_Level3: 0
+    m_SpellEffectMod: 0
+    m_CooldownMod: 0
+    m_ShapeManaMod: 0
+  - m_name: 
+    m_OrbColor: {r: 0, g: 0, b: 0, a: 0}
+    m_GreaterEffectDamage:
+      m_Level1: 0
+      m_Level2: 0
+      m_Level3: 0
+    m_GreaterEffectPercentile: 0
+    m_GreaterEffectDuration:
+      m_Level1: 0
+      m_Level2: 0
+      m_Level3: 0
+    m_LesserEffectValue:
+      m_Level1: 0
+      m_Level2: 0
+      m_Level3: 0
+    m_LesserEffectDuration:
+      m_Level1: 0
+      m_Level2: 0
+      m_Level3: 0
+    m_SpellEffectMod: 0
+    m_CooldownMod: 0
+    m_ShapeManaMod: 0
+  - m_name: 
+    m_OrbColor: {r: 0, g: 0, b: 0, a: 0}
+    m_GreaterEffectDamage:
+      m_Level1: 0
+      m_Level2: 0
+      m_Level3: 0
+    m_GreaterEffectPercentile: 0
+    m_GreaterEffectDuration:
+      m_Level1: 0
+      m_Level2: 0
+      m_Level3: 0
+    m_LesserEffectValue:
+      m_Level1: 0
+      m_Level2: 0
+      m_Level3: 0
+    m_LesserEffectDuration:
+      m_Level1: 0
+      m_Level2: 0
+      m_Level3: 0
+    m_SpellEffectMod: 0
+    m_CooldownMod: 0
+    m_ShapeManaMod: 0
+--- !u!4 &924871523
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 924871521}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 32.14, y: 0.42500013, z: 30.57}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 12
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &927946912
 PrefabInstance:
   m_ObjectHideFlags: 0

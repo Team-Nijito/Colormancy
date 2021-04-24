@@ -15,32 +15,21 @@ public class SpellManager : MonoBehaviourPun
         float SpellManaCost;
         (System.Type, System.Type, System.Type) OrbTuple;
 
-        Dictionary<Orb.Element, int> orbDict;
-
         Orb[] orbs;
 
 
         public Spell(Orb[] _orbs)
         {
-            orbDict = new Dictionary<Orb.Element, int>();
-            foreach (Orb orb in _orbs)
-            {
-                if (orbDict.ContainsKey(orb.OrbElement))
-                    orbDict[orb.OrbElement]++;
-                else
-                    orbDict[orb.OrbElement] = 1;
-            }
-
             orbs = _orbs;
             
-            SpellCooldown = BASE_COOLDOWN * orbs[2].CooldownMod;
-            SpellManaCost = BASE_SPELL_MANA * orbs[2].ShapeManaMod;
+            SpellCooldown = BASE_COOLDOWN * orbs[2].getCooldownMod();
+            SpellManaCost = BASE_SPELL_MANA * orbs[2].getShapeManaMod();
             OrbTuple = (orbs[0].GetType(), orbs[1].GetType(), orbs[2].GetType());
         }
 
         public void Cast(Transform t, Vector3 clickedPosition)
         {
-            orbs[2].CastShape(orbs[0].CastGreaterEffect, orbs[1].CastLesserEffect, (orbDict[orbs[0].OrbElement], orbDict[orbs[1].OrbElement], orbDict[orbs[2].OrbElement]), t, clickedPosition);
+            orbs[2].CastShape(orbs[0].CastGreaterEffect, orbs[1].CastLesserEffect, (orbs[0].getLevel(), orbs[1].getLevel(), orbs[2].getLevel()), t, clickedPosition);
         }
 
         public float GetSpellCooldown()
@@ -61,7 +50,7 @@ public class SpellManager : MonoBehaviourPun
 
     OrbUIController uiController;
 
-    SpellTest test;
+    OrbManager orbManager;
     List<Orb> currentSpellOrbs = new List<Orb>();
 
     public Orb FirstOrb { get; private set; }
@@ -70,12 +59,7 @@ public class SpellManager : MonoBehaviourPun
     {
         if (photonView.IsMine && PhotonNetwork.IsConnected)
         {
-            if (FirstOrb != null)
-            {
-                FirstOrb.RevertHeldEffect(test);
-            }
             FirstOrb = orb;
-            FirstOrb.AddHeldEffect(test);
 
             uiController.AddOrb(orb);
         }
@@ -95,7 +79,7 @@ public class SpellManager : MonoBehaviourPun
 
     private void Start()
     {
-        test = GetComponent<SpellTest>();
+        orbManager = GetComponent<OrbManager>();
 
         Initialization();
     }

@@ -7,7 +7,7 @@ public class OrbUIController : MonoBehaviourPun
 
     public void AddOrb(Orb orb)
     {
-        GameObject gUI = Instantiate(orb.UIPrefab, transform.position, Quaternion.identity, transform);
+        GameObject gUI = Instantiate(orb.m_UIPrefab, transform.position, Quaternion.identity, transform);
         Vector2 uiPos = gUI.GetComponent<RectTransform>().anchoredPosition;
 
         if (orbs[2] != null)
