@@ -10,34 +10,21 @@ public class EnemyAnimationManager : MonoBehaviour
     public enum EnemyState
     {
         Idle,
-        Walk,
-        Run,
+        Move,
         Attack,
         Death
     }
 
-    // Animation names
-    const string ENEMY_IDLE = "Idle";
-    const string ENEMY_WALK = "Walk";
-    const string ENEMY_RUN = "Run";
-    const string ENEMY_ATTACK = "Attack";
-    const string ENEMY_DEATH = "Death";
-
-    // Enable any of these animations to be played / or not
-    [SerializeField]
-    private bool m_EnemyIdleExist = true;
-    [SerializeField]
-    private bool m_EnemyWalkExist = true;
-    [SerializeField]
-    private bool m_EnemyRunExist = true;
-    [SerializeField]
-    private bool m_EnemyAttackExist = true;
-    [SerializeField]
-    private bool m_EnemyDeathExist = true;
+    // Animator parameter hashes
+    public readonly int speedHash = Animator.StringToHash("Speed");
+    public readonly int isMovingAnimHash = Animator.StringToHash("IsMoving");
+    public readonly int isAttackingAnimHash = Animator.StringToHash("IsAttacking");
+    public readonly int isDyingAnimHash = Animator.StringToHash("IsDying");
 
     private void Start()
     {
         m_animator = GetComponent<Animator>();
+
         if (m_animator)
         {
             m_animator.cullingMode = AnimatorCullingMode.CullUpdateTransforms;
@@ -56,34 +43,21 @@ public class EnemyAnimationManager : MonoBehaviour
         switch (newState)
         {
             case EnemyState.Idle:
-                if (m_EnemyIdleExist)
-                {
-                    m_animator.Play(ENEMY_IDLE);
-                }
+                m_animator.SetBool(isAttackingAnimHash, false);
+                m_animator.SetBool(isMovingAnimHash, false);
                 break;
-            case EnemyState.Walk:
-                if (m_EnemyWalkExist)
-                {
-                    m_animator.Play(ENEMY_WALK);
-                }
-                break;
-            case EnemyState.Run:
-                if (m_EnemyRunExist)
-                {
-                    m_animator.Play(ENEMY_RUN);
-                }
+            case EnemyState.Move:
+                m_animator.SetBool(isAttackingAnimHash, false);
+                m_animator.SetBool(isMovingAnimHash, true);
                 break;
             case EnemyState.Attack:
-                if (m_EnemyAttackExist)
-                {
-                    m_animator.Play(ENEMY_ATTACK);
-                }
+                m_animator.SetBool(isAttackingAnimHash, true);
+                m_animator.SetBool(isMovingAnimHash, false);
                 break;
             case EnemyState.Death:
-                if (m_EnemyDeathExist)
-                {
-                    m_animator.Play(ENEMY_DEATH);
-                }
+                m_animator.SetBool(isDyingAnimHash, true);
+                m_animator.SetBool(isAttackingAnimHash, false);
+                m_animator.SetBool(isMovingAnimHash, false);
                 break;
         }
         m_currentState = newState;
@@ -92,5 +66,14 @@ public class EnemyAnimationManager : MonoBehaviour
     public EnemyState GetCurrentState()
     {
         return m_currentState;
+    }
+
+    /// <summary>
+    /// Set the entity movement animation's speed.
+    /// </summary>
+    /// <param name="newSpeed"></param>
+    public void SetSpeed(float newSpeed)
+    {
+        m_animator.SetFloat(speedHash, newSpeed);
     }
 }

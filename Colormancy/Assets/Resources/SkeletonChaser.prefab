@@ -627,10 +627,9 @@ GameObject:
   - component: {fileID: 2541053460267380745}
   - component: {fileID: 3183121963216691932}
   - component: {fileID: 3743356869417274038}
+  - component: {fileID: 8261332007669540399}
   - component: {fileID: 1927268648518331006}
   - component: {fileID: 2689978470580284610}
-  - component: {fileID: 5098352021510522856}
-  - component: {fileID: 1342937965760010381}
   - component: {fileID: 5251512313771479071}
   m_Layer: 10
   m_Name: SkeletonChaser
@@ -696,8 +695,8 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.05
-  m_Speed: 18
-  m_Acceleration: 15
+  m_Speed: 15
+  m_Acceleration: 50
   avoidancePriority: 50
   m_AngularSpeed: 999
   m_StoppingDistance: 3
@@ -706,7 +705,7 @@ NavMeshAgent:
   m_AutoRepath: 1
   m_Height: 0.18
   m_BaseOffset: 0
-  m_WalkableMask: 4294967295
+  m_WalkableMask: 5
   m_ObstacleAvoidanceType: 3
 --- !u!95 &5161377573522850219
 Animator:
@@ -739,11 +738,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9ba24a809eb142e44bfc0f3df8a39b90, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_EnemyIdleExist: 1
-  m_EnemyWalkExist: 1
-  m_EnemyRunExist: 1
-  m_EnemyAttackExist: 1
-  m_EnemyDeathExist: 1
 --- !u!114 &5161377573530219718
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -790,7 +784,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_speed: 14
-  m_speedTriggerRun: 15
   m_wanderTime:
     minTime: 2
     maxTime: 5
@@ -798,6 +791,9 @@ MonoBehaviour:
     minTime: 2
     maxTime: 5
   m_wanderRadius: 10
+  m_mainAIScript: {fileID: 2689978470580284610}
+  m_enemTargeting: {fileID: 3743356869417274038}
+  m_enemView: {fileID: 5251512313771479071}
 --- !u!114 &3743356869417274038
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -810,14 +806,45 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1debee2c94412d041bf87ca10128c148, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_ignoreOtherEnemiesLayer:
+  m_playerLayer:
     serializedVersion: 2
-    m_Bits: 1078
+    m_Bits: 512
   m_closeDetectionRadius: 1.5
   m_detectionRadius: 15
-  m_fieldOfView: 60
+  m_fieldOfView: 135
   m_attackRange: 3
   m_rememberTargetDuration: 6
+  m_isMeleeCharacter: 1
+--- !u!114 &8261332007669540399
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5161377573530120741}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b8c4a61274f60b4ea5fb4299cfdbf14, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowLayerWeightsInspector: 1
+  ShowParameterInspector: 1
+  m_SynchronizeParameters:
+  - Type: 1
+    SynchronizeType: 1
+    Name: Speed
+  - Type: 4
+    SynchronizeType: 1
+    Name: IsMoving
+  - Type: 4
+    SynchronizeType: 1
+    Name: IsAttacking
+  - Type: 4
+    SynchronizeType: 1
+    Name: IsDying
+  m_SynchronizeLayers:
+  - SynchronizeType: 0
+    LayerIndex: 0
 --- !u!114 &1927268648518331006
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -846,34 +873,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be9b07ed247fd19459ff28ed86a61311, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &5098352021510522856
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5161377573530120741}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 63520c0543a120d41a104ab6fdadd4a4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &1342937965760010381
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5161377573530120741}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_SynchronizePosition: 1
-  m_SynchronizeRotation: 1
-  m_SynchronizeScale: 0
-  m_UseLocal: 0
 --- !u!114 &5251512313771479071
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -895,8 +894,7 @@ MonoBehaviour:
   ObservedComponents:
   - {fileID: 5161377573530219718}
   - {fileID: 3183121963216691932}
-  - {fileID: 5098352021510522856}
-  - {fileID: 1342937965760010381}
+  - {fileID: 8261332007669540399}
   viewIdField: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0

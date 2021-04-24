@@ -185,13 +185,22 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
         // disable health bar and name
         m_healthBar.gameObject.SetActive(false);
 
-        // disable movement, collider
-        GetComponent<NavMeshAgent>().velocity = Vector3.zero;
-        GetComponent<NavMeshAgent>().enabled = false;
-        GetComponent<Collider>().enabled = false;
+        // disable movement
+        NavMeshAgent agent = GetComponent<NavMeshAgent>();
+        agent.velocity = Vector3.zero;
+        agent.enabled = false;
 
-        // for other objects, we may want to destroy them
-        StartCoroutine(DelayedDestruction(m_timeUntilDestroy));
+        // make collider smaller so that we won't notice it when we bump into it
+        // but also permit it to still be affected by any ongoing forces
+        CapsuleCollider capCollider = GetComponent<CapsuleCollider>();
+        capCollider.height = capCollider.radius;
+        capCollider.center = new Vector3(0, 0.02f, 0);
+        
+        if (PhotonNetwork.IsMasterClient)
+        {
+            // only destroy this object if we're the master client
+            StartCoroutine(DelayedDestruction(m_timeUntilDestroy));
+        }
     }
 
     // Used for destroying dead enemies
@@ -204,7 +213,7 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
         if (PhotonNetwork.IsMasterClient)
         {
             // Notify the Enemy Manager that an enemy has died
-            PhotonView.Get(GameObject.Find("EnemyManager")).RPC("EnemyHasDied", RpcTarget.MasterClient);
+            GameObject.Find("EnemyManager").GetComponent<EnemyManager>().EnemyHasDied();
         }
     }
 
@@ -273,7 +282,8 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
             {
                 return;
             }
-        } else
+        }
+        else
         {
             if (!m_isPlayer)
             {
@@ -318,7 +328,8 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     public void TakeDamage(float damageValue)
     {
         // damage formula: health = health - (damage - (damage * armorPercentage))
-        Debug.Log(("Taking: ", damageValue, " damage"));
+        //Debug.Log(("Taking: ", damageValue, " damage"));
+
         // ignore RPCs for dead enemies
         if (m_animManager != null)
         {

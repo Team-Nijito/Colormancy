@@ -16,7 +16,7 @@ public class EnemyTargeting : MonoBehaviourPun
     #region Accessors (c# Properties)
     
     public Transform TargetPlayer { get { return m_targetPlayer; } protected set { m_targetPlayer = value;  } }
-    public LayerMask IgnoreOtherEnemies { get { return m_ignoreOtherEnemiesLayer; } protected set { m_ignoreOtherEnemiesLayer = value; } }
+    public LayerMask PlayerLayer { get { return m_playerLayer; } protected set { m_playerLayer = value; } }
     
     public float CloseDetectionRadius { get { return m_closeDetectionRadius; } protected set { m_closeDetectionRadius = value; } }
     public float DetectionRadius { get { return m_detectionRadius; } protected set { m_detectionRadius = value; } }
@@ -35,7 +35,7 @@ public class EnemyTargeting : MonoBehaviourPun
 
     protected Transform m_targetPlayer;
 
-    [SerializeField] protected LayerMask m_ignoreOtherEnemiesLayer;
+    [SerializeField] protected LayerMask m_playerLayer;
 
     [SerializeField] protected float m_closeDetectionRadius = 1.5f; // used when a player gets too close to an enemy
     [SerializeField] protected float m_detectionRadius = 30f; // used in every other case
@@ -54,6 +54,14 @@ public class EnemyTargeting : MonoBehaviourPun
 
     protected bool m_canTargetPlayers = true; // stun variable
 
+    protected bool m_canSeePlayerCached = false;
+    protected bool m_rayCastUnderCooldown = false;
+    protected readonly float m_rayCastCooldown = 0.5f; // cannot raycast more than once under half a second
+    protected float m_rayCastCooldownTimer = 0f;
+
+    [SerializeField]
+    protected bool m_isMeleeCharacter = false; // melee characters get assigned a higher avoidance priority A.K.A they can bust through crowds of other enemies more easily
+
     #endregion
 
     #region Components
@@ -66,17 +74,61 @@ public class EnemyTargeting : MonoBehaviourPun
 
     #region MonoBehaviour callbacks
 
+    protected void Awake()
+    {
+        // This code chunk in Awake() is called here instead of Start so that you won't have to endure 1-2 extra second(s) of loading when 
+        // booting up a level for the first time
+    }
+
     // Start is called before the first frame update
     protected void Start()
     {
-        m_animManager = GetComponent<EnemyAnimationManager>();
-        m_enemMovement = GetComponent<EnemyMovement>();
+        // Randomize the NavMeshAgent priority
         m_navMeshAgent = GetComponent<NavMeshAgent>();
 
-        m_ignoreOtherEnemiesLayer = LayerMask.GetMask("Ignore Raycast"); // obviously change this once we get a dedicated layer for enemies
+        if (m_isMeleeCharacter)
+        {
+            // the melee-oriented enemies need to get to the player, set
+            // their priority to 0 thru 10 (0 being highest priority)
+            m_navMeshAgent.avoidancePriority = Random.Range(0, 20);
+        }
+        else
+        {
+            m_navMeshAgent.avoidancePriority = Random.Range(20, 99);
+        }
+
+        m_animManager = GetComponent<EnemyAnimationManager>();
+        m_enemMovement = GetComponent<EnemyMovement>();
 
         // Override the variables in m_navMeshAgent if they're not set already.
         m_navMeshAgent.stoppingDistance = m_attackRange;
+
+        // disable this component and NavMeshAgent if not master client
+        if (!PhotonNetwork.IsMasterClient)
+        {
+            enabled = false;
+            m_navMeshAgent.enabled = false;
+        }
+    }
+
+    protected void Update()
+    {
+        // In order to prevent a lot of Raycast originating from ProcessAIIntent
+        // especially if enemies are looking straight at the player
+        // so why don't we try keeping a cache of the previous result (if its true)
+        // and then when request for a raycast multiple times, skip every other raycast?
+        if (m_rayCastUnderCooldown)
+        {
+            if (m_rayCastCooldownTimer >= m_rayCastCooldown)
+            {
+                m_rayCastUnderCooldown = false;
+                m_rayCastCooldownTimer = 0;
+            }
+            else
+            {
+                m_rayCastCooldownTimer += Time.deltaTime;
+            }
+        }
     }
 
     #endregion
@@ -107,18 +159,22 @@ public class EnemyTargeting : MonoBehaviourPun
     [PunRPC]
     protected void PlayerIsDetected()
     {
-        Vector3 oldDirection = m_enemMovement.DirectionToPlayer;
-        oldDirection.y = 0;
-        m_enemMovement.SetDirectionToPlayer(oldDirection);
-
-        // Reset the m_rememberTarget task
-        m_rememberTarget = true;
-        if (m_forgettingTargetCoroutineRef != null)
+        // precursory check that is literally done for the purpose of hiding an error if you join a game in progress
+        if (m_enemMovement)
         {
-            StopCoroutine(m_forgettingTargetCoroutineRef);
-        }
+            Vector3 oldDirection = m_enemMovement.DirectionToPlayer;
+            oldDirection.y = 0;
+            m_enemMovement.SetDirectionToPlayer(oldDirection);
 
-        PlayerIsTargeted();
+            // Reset the m_rememberTarget task
+            m_rememberTarget = true;
+            if (m_forgettingTargetCoroutineRef != null)
+            {
+                StopCoroutine(m_forgettingTargetCoroutineRef);
+            }
+
+            PlayerIsTargeted();
+        }
     }
     
     /// <summary>
@@ -130,14 +186,7 @@ public class EnemyTargeting : MonoBehaviourPun
     {
         if (m_enemMovement.DirectionToPlayer.magnitude > m_attackRange)
         {
-            if (m_enemMovement.Speed > m_enemMovement.SpeedTriggerRun)
-            {
-                m_animManager.ChangeState(EnemyAnimationManager.EnemyState.Run);
-            }
-            else
-            {
-                m_animManager.ChangeState(EnemyAnimationManager.EnemyState.Walk);
-            }
+            m_animManager.ChangeState(EnemyAnimationManager.EnemyState.Move);
         }
         else
         {
@@ -169,50 +218,32 @@ public class EnemyTargeting : MonoBehaviourPun
     /// <summary>
     /// The AI raycast to see if there is any obstacle between the AI and a player target.
     /// The ray currently originates from the chest of the AI.
+    /// If the RayCast is under a cooldown timer, then just return the last cached bool (canSee) value from
+    /// up to 0.5 seconds ago.
     /// </summary>
     /// <returns>Returns true if there is no obstacle between the transform and the target.</returns>
     public bool CanSeePlayer()
     {
-        bool canSee = false;
-        Ray ray = new Ray(transform.position, m_targetPlayer.transform.position - transform.position);
-        RaycastHit hit;
-
-        if (Physics.Raycast(ray, out hit, 1000f, ~m_ignoreOtherEnemiesLayer))
+        if (m_rayCastUnderCooldown)
         {
-            if (hit.transform == m_targetPlayer)
-            {
-                canSee = true;
-            }
-        }
-        return canSee;
-    }
-
-    /// <summary>
-    /// Change the attack and stopping range so that the AI would move closer to / farther away from the player.
-    /// </summary>
-    /// <param name="changeVal">How much to decrease the range by</param>
-    /// <param name="tempAttackRange">Your variable for attack range that you pass in by reference</param>
-    public void ChangeAttackStoppingRange(float changeVal, ref float tempAttackRange)
-    {
-        if (changeVal < 0)
-        {
-            // decrease range
-            if ((m_navMeshAgent.stoppingDistance + changeVal) >= m_closeDetectionRadius)
-            {
-                tempAttackRange += changeVal;
-                m_navMeshAgent.stoppingDistance += changeVal;
-            }
+            return m_canSeePlayerCached;
         }
         else
         {
-            // increase range
-            if ((tempAttackRange + changeVal) < m_attackRange)
+            bool canSee = false;
+            Ray ray = new Ray(transform.position, m_targetPlayer.transform.position - transform.position);
+            RaycastHit hit;
+            if (Physics.Raycast(ray, out hit, m_detectionRadius, m_playerLayer))
             {
-                tempAttackRange += changeVal;
-                m_navMeshAgent.stoppingDistance += changeVal;
-
-                m_navMeshAgent.Move((transform.position - m_targetPlayer.position).normalized * changeVal);
+                if (hit.transform == m_targetPlayer)
+                {
+                    canSee = true;
+                }
             }
+            // we just raycasted, set the cooldown for raycasting
+            m_canSeePlayerCached = canSee;
+            m_rayCastUnderCooldown = true;
+            return canSee;
         }
     }
 
@@ -228,7 +259,6 @@ public class EnemyTargeting : MonoBehaviourPun
         Transform playerTransform = PhotonView.Find(playerPhotonViewID).transform;
         m_targetPlayer = playerTransform;
     }
-
 
     /// <summary>
     /// Determine which player to seek out (if omnipotent), or just check

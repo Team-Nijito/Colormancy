@@ -32,7 +32,12 @@ public class EnemyManager : MonoBehaviourPun, IPunObservable
             // currently have problem for spawning in more enemies for each player
             if (m_numEnemiesOnField < m_desiredEnemiesOnField)
             {
-                photonView.RPC("SpawnEnemyRPC", RpcTarget.MasterClient);
+                // Assume that we'll spawn an enemy successfully and increment numEnemiesOnField to prevent
+                // a race condition (many enemies spawning at once)
+
+                // If anything goes wrong when spawning the enemy, decrement numEnemiesOnField
+                m_numEnemiesOnField++;
+                StartCoroutine(TrySpawnEnemy());
             }
         }
     }
@@ -41,18 +46,7 @@ public class EnemyManager : MonoBehaviourPun, IPunObservable
 
     #region Private functions
 
-    [PunRPC]
-    private void SpawnEnemyRPC()
-    {
-        // Assume that we'll spawn an enemy successfully and increment numEnemiesOnField to prevent
-        // a race condition (many enemies spawning at once)
-
-        // If anything goes wrong when spawning the enemy, decrement numEnemiesOnField
-        m_numEnemiesOnField++;
-        StartCoroutine(SpawnEnemy());
-    }
-
-    private IEnumerator SpawnEnemy(float delay = 0f)
+    private IEnumerator TrySpawnEnemy(float delay = 0f)
     {
         GameObject entity = ChooseEntityForSpawning();
 
@@ -73,7 +67,7 @@ public class EnemyManager : MonoBehaviourPun, IPunObservable
 
         if (goodSpawnpointScripts.Count == 0)
         {
-            //Debug.LogError("No unobstructed spawnpoints to spawn on!!!");
+            Debug.LogError("No unobstructed spawnpoints to spawn on!!!");
             m_numEnemiesOnField--;
         }
         else
@@ -102,10 +96,9 @@ public class EnemyManager : MonoBehaviourPun, IPunObservable
     #region Public functions
 
     /// <summary>
-    /// The manager is notified that the number of enemies on the field is decreased. This should be invoked whenever
+    /// The manager is notified that the number of enemies on the field is decreased. This should be invoked by the masterclient whenever
     /// an enemy entity has died.
     /// </summary>
-    [PunRPC]
     public void EnemyHasDied()
     {
         if (m_numEnemiesOnField > 0)
