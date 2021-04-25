@@ -22,14 +22,14 @@ public class SpellManager : MonoBehaviourPun
         {
             orbs = _orbs;
             
-            SpellCooldown = BASE_COOLDOWN * orbs[2].getCooldownMod();
-            SpellManaCost = BASE_SPELL_MANA * orbs[2].getShapeManaMod();
+            SpellCooldown = BASE_COOLDOWN * OrbValueManager.getCooldownMod(orbs[2].getElement());
+            SpellManaCost = BASE_SPELL_MANA * OrbValueManager.getShapeManaMod(orbs[2].getElement());
             OrbTuple = (orbs[0].GetType(), orbs[1].GetType(), orbs[2].GetType());
         }
 
         public void Cast(Transform t, Vector3 clickedPosition)
         {
-            orbs[2].CastShape(orbs[0].CastGreaterEffect, orbs[1].CastLesserEffect, (orbs[0].getLevel(), orbs[1].getLevel(), orbs[2].getLevel()), t, clickedPosition);
+            orbs[2].CastShape(orbs[0].CastGreaterEffect, orbs[1].CastLesserEffect, t, clickedPosition);
         }
 
         public float GetSpellCooldown()

@@ -23,8 +23,8 @@ public class OrbManager : MonoBehaviourPun
     ManaScript mana;
     OrbTrayUIController uIController;
 
-    private readonly bool TestingMode = true; // DEBUG LOL
- 
+    private readonly bool TestingMode = true;
+
     [SerializeField]
     Dictionary<(Type, Type, Type), (float, float)> spellCooldowns = new Dictionary<(Type, Type, Type), (float, float)>(); // key: Orb Tuple, value: (current cooldown, Spell base cooldown)
 
@@ -68,7 +68,7 @@ public class OrbManager : MonoBehaviourPun
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
             if (Physics.Raycast(ray, out hit, 100f, 1 << PaintingManager.paintingMask)) { }
-            
+
             photonView.RPC("TryCastSpell", RpcTarget.All, hit.point);
         }
     }

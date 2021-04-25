@@ -6,9 +6,8 @@ public class QuickSilverSpellController : MonoBehaviour
 {
     public Orb.GreaterCast greaterCast;
     public Orb.LesserCast lesserCast;
-    public int greaterCastAmt;
-    public int lesserCastAmt;
     public float spellEffectMod;
+    private const Orb.Element element = Orb.Element.Wind;
 
     [Space]
 
@@ -46,11 +45,6 @@ public class QuickSilverSpellController : MonoBehaviour
     [Space]
 
     [SerializeField]
-    private float spherePaintRadius;
-    [SerializeField]
-    private Color paintColor;
-
-    [SerializeField]
     private bool debug;
     [SerializeField]
     private bool startAnimation;
@@ -73,7 +67,7 @@ public class QuickSilverSpellController : MonoBehaviour
 
         sparkLight = GetComponent<Light>();
 
-        PaintingManager.PaintSphere(paintColor, transform.position, spherePaintRadius);
+        PaintingManager.PaintSphere(OrbValueManager.getColor(element), transform.position, OrbValueManager.getPaintRadius(element));
     }
 
     void Update()
@@ -123,8 +117,8 @@ public class QuickSilverSpellController : MonoBehaviour
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.tag.Equals("Enemy"))
-            greaterCast(collision.gameObject, greaterCastAmt, spellEffectMod);
+            greaterCast(collision.gameObject, spellEffectMod, null);
         else if (collision.gameObject.tag.Equals("Player"))
-            lesserCast(collision.gameObject, lesserCastAmt, spellEffectMod);
+            lesserCast(collision.gameObject, spellEffectMod, null);
     }
 }

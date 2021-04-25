@@ -627,9 +627,9 @@ GameObject:
   - component: {fileID: 2541053460267380745}
   - component: {fileID: 3183121963216691932}
   - component: {fileID: 3743356869417274038}
-  - component: {fileID: 8261332007669540399}
-  - component: {fileID: 1927268648518331006}
+  - component: {fileID: 8570741369705929608}
   - component: {fileID: 2689978470580284610}
+  - component: {fileID: 8261332007669540399}
   - component: {fileID: 5251512313771479071}
   m_Layer: 10
   m_Name: SkeletonChaser
@@ -815,6 +815,34 @@ MonoBehaviour:
   m_attackRange: 3
   m_rememberTargetDuration: 6
   m_isMeleeCharacter: 1
+--- !u!114 &8570741369705929608
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5161377573530120741}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: abefe54026f8d6340bba59f55fa2bbfe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_hitBoxesArray:
+  - m_hitBoxObject: {fileID: 6645883346320435226}
+    m_hitBoxScript: {fileID: 6464981389841251426}
+  m_numPlayersCanHitInOneAttack: 4
+--- !u!114 &2689978470580284610
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5161377573530120741}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be9b07ed247fd19459ff28ed86a61311, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &8261332007669540399
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -845,34 +873,6 @@ MonoBehaviour:
   m_SynchronizeLayers:
   - SynchronizeType: 0
     LayerIndex: 0
---- !u!114 &1927268648518331006
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5161377573530120741}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 31770462cc982fb4991bc653a75df62a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_hitBoxesArray:
-  - m_hitBoxObject: {fileID: 6645883346320435226}
-    m_hitBoxScript: {fileID: 6464981389841251426}
-  m_numPlayersCanHitInOneAttack: 4
---- !u!114 &2689978470580284610
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5161377573530120741}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: be9b07ed247fd19459ff28ed86a61311, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &5251512313771479071
 MonoBehaviour:
   m_ObjectHideFlags: 0
