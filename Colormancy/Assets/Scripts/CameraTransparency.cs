@@ -41,7 +41,7 @@ public class CameraTransparency : MonoBehaviour
         savedHits.Clear();
 
         RaycastHit[] hits = Physics.SphereCastAll(transform.position, m_spherecastRadius, transform.forward, 
-                                     m_currentPlayerDistance);
+                                     m_currentPlayerDistance, ~(1 << 9));
         if (m_debug) { Debug.Log("SpherecastAll() complete"); }
 
         foreach (RaycastHit hit in hits)
