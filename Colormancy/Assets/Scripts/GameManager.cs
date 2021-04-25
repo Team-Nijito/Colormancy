@@ -100,6 +100,13 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
     #endregion
 
+    #region Components
+
+    [SerializeField]
+    private EnemyManager m_enemManager;
+
+    #endregion
+
     #region MonoBehaviour callbacks
 
     private void Start()
@@ -610,6 +617,22 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
             else
             {
                 m_playersReady = (int)stream.ReceiveNext();
+            }
+        }
+        else
+        {
+            // Synchronize the number of enemies across all clients
+            if (m_enemManager)
+            {
+                // If enemManager doesn't exist, don't sync anything.
+                if (stream.IsWriting)
+                {
+                    stream.SendNext(m_enemManager.CurrentNumberEnemiesInLevel);
+                }
+                else
+                {
+                    m_enemManager.SetNumEnemiesOnField((byte)stream.ReceiveNext());
+                }
             }
         }
     }

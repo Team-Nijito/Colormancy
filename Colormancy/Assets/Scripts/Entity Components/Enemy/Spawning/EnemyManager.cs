@@ -3,8 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyManager : MonoBehaviourPun, IPunObservable
+public class EnemyManager : MonoBehaviourPun
 {
+    #region Accessors (c# Properties)
+    
+    public byte CurrentNumberEnemiesInLevel { get { return m_numEnemiesOnField; } private set { m_numEnemiesOnField = value; } }
+
+    #endregion
+
     #region Private Fields
 
     [SerializeField]
@@ -37,7 +43,7 @@ public class EnemyManager : MonoBehaviourPun, IPunObservable
 
                 // If anything goes wrong when spawning the enemy, decrement numEnemiesOnField
                 m_numEnemiesOnField++;
-                StartCoroutine(TrySpawnEnemy());
+                StartCoroutine(TrySpawnEnemy(4f)); // all enemies have a 4 second spawn delay
             }
         }
     }
@@ -49,8 +55,6 @@ public class EnemyManager : MonoBehaviourPun, IPunObservable
     private IEnumerator TrySpawnEnemy(float delay = 0f)
     {
         GameObject entity = ChooseEntityForSpawning();
-
-        yield return new WaitForSecondsRealtime(delay);
 
         // store the components of "Good" spawnpoints, where "Good" means an empty spawnpoint
         // or a spawnpoint where a enemy was just spawnkilled, and now it should be empty
@@ -74,10 +78,11 @@ public class EnemyManager : MonoBehaviourPun, IPunObservable
         {
             // choose a random good spawnpoint
             SpawnpointBehaviour chosenScript = goodSpawnpointScripts[Random.Range(0, goodSpawnpointScripts.Count)];
+
+            // wait before spawning
+            yield return new WaitForSecondsRealtime(delay);
             chosenScript.HandleSpawning(m_enemyFolder, entity.name);
         }
-
-        yield return null;
     }
 
 
@@ -107,21 +112,15 @@ public class EnemyManager : MonoBehaviourPun, IPunObservable
         }
     }
 
-    #endregion
-
-    #region Photon functions
-
-    // Synchronize the number of enemies across all clients
-    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    /// <summary>
+    /// Public setter function, for use in OnPhotonSerializeView in GameManager.cs.
+    /// I wanted to avoid having an extra PhotonView in the scene, so I'd rather the GameManager
+    /// handle the syncing for the number of enemies on the field.
+    /// </summary>
+    /// <param name="numEnemies"></param>
+    public void SetNumEnemiesOnField(byte numEnemies)
     {
-        if (stream.IsWriting)
-        {
-            stream.SendNext(m_numEnemiesOnField);
-        }
-        else
-        {
-            m_numEnemiesOnField = (byte)stream.ReceiveNext();
-        }
+        m_numEnemiesOnField = numEnemies;
     }
 
     #endregion
