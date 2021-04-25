@@ -8,30 +8,23 @@ public class GreenOrb : Orb
 {
     public GreenOrb()
     {
-        /*
-        OrbColor = Color.green;
-        CooldownMod = 2.2f;
-        ShapeManaMod = 1.1f;
-        ModAmount = .1f;
-        SpellEffectMod = 0.18f;
-        */
         m_OrbShape = SpellShape.Vines;
         m_OrbElement = Element.Nature;
         m_UIPrefab = (GameObject)Resources.Load("Orbs/GreenOrbUI");
     }
 
-    public override void CastGreaterEffect(GameObject hit, int orbLevels, float spellEffectMod)
+    public override void CastGreaterEffect(GameObject hit, float spellEffectMod, float[] data)
     {
         PhotonView photonView = PhotonView.Get(hit);
-        photonView.RPC("TakeDamage", RpcTarget.All, OrbValueManager.getGreaterEffectDamage(m_OrbElement, m_Level));
+        photonView.RPC("TakeDamage", RpcTarget.All, OrbValueManager.getGreaterEffectDamage(m_OrbElement, m_Level) * spellEffectMod);
     }
 
-    public override void CastLesserEffect(GameObject hit, int orbLevels, float spellEffectMod)
+    public override void CastLesserEffect(GameObject hit, float spellEffectMod, float[] data)
     {
         throw new System.NotImplementedException();
     }
 
-    public override void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, (int, int, int) levels, Transform t, Vector3 clickedPosition)
+    public override void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, Transform t, Vector3 clickedPosition)
     {
         Transform wizard = t.GetChild(0);
 
@@ -43,9 +36,7 @@ public class GreenOrb : Orb
 
         spellController.greaterCast = greaterEffectMethod;
         spellController.lesserCast = lesserEffectMethod;
-        spellController.greaterCastLevel = levels.Item1;
-        spellController.lesserCastLevel = levels.Item2;
-        spellController.spellEffectMod = OrbValueManager.getSpellEffectMod(m_OrbElement);
+        spellController.spellEffectMod = OrbValueManager.getShapeEffectMod(m_OrbElement);
     }
 
     public static object Deserialize(byte[] data)

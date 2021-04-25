@@ -13,21 +13,21 @@ public class IndigoOrb : Orb
         m_UIPrefab = (GameObject)Resources.Load("Orbs/IndigoOrbUI");
     }
 
-    public override void CastGreaterEffect(GameObject hit, int orbLevel, float spellEffectMod)
+    public override void CastGreaterEffect(GameObject hit, float spellEffectMod, float[] data)
     {
         PhotonView photonView = hit.GetPhotonView();
-        photonView.RPC("TakeDamage", RpcTarget.All, OrbValueManager.getGreaterEffectDamage(m_OrbElement, m_Level));
+        photonView.RPC("TakeDamage", RpcTarget.All, OrbValueManager.getGreaterEffectDamage(m_OrbElement, m_Level) * spellEffectMod);
 
         StatusEffectScript status = hit.GetComponent<StatusEffectScript>();
-        status.RPCApplyBlind(orbLevel);
+        //status.RPCApplyBlind(orbLevel);
     }
 
-    public override void CastLesserEffect(GameObject hit, int orbLevel, float spellEffectMod)
+    public override void CastLesserEffect(GameObject hit, float spellEffectMod, float[] data)
     {
         throw new System.NotImplementedException();
     }
 
-    public override void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, (int, int, int) levels, Transform t, Vector3 clickedPosition)
+    public override void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, Transform t, Vector3 clickedPosition)
     {
         GameObject g = GameObject.Instantiate(Resources.Load("Orbs/Indigo Orbs", typeof(GameObject))) as GameObject;
         g.transform.position = t.position;
@@ -37,11 +37,9 @@ public class IndigoOrb : Orb
             IndigoSpellSphereController sphereController = g.transform.GetChild(i).GetComponent<IndigoSpellSphereController>();
             sphereController.greaterCast = greaterEffectMethod;
             sphereController.lesserCast = lesserEffectMethod;
-            sphereController.greaterCastLevel = levels.Item1;
-            sphereController.lesserCastLevel = levels.Item2;
-            sphereController.spellEffectMod = OrbValueManager.getSpellEffectMod(m_OrbElement);
+            sphereController.spellEffectMod = OrbValueManager.getShapeEffectMod(m_OrbElement);
 
-            if ((i % 2 == 1 && levels.Item3 == 2) || (i % 4 != 0 && levels.Item3 == 1))
+            if ((i % 2 == 1 && m_Level == 2) || (i % 4 != 0 && m_Level == 1))
                 GameObject.Destroy(g.transform.GetChild(i).gameObject);
         }
 

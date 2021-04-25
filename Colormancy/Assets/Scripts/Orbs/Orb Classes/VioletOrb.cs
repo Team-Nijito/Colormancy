@@ -13,26 +13,21 @@ public class VioletOrb : Orb
         m_UIPrefab = (GameObject)Resources.Load("Orbs/VioletOrbUI");
     }
 
-    public override void CastGreaterEffect(GameObject hit, int orbLevel, float spellEffectMod)
+    public override void CastGreaterEffect(GameObject hit, float spellEffectMod, float[] data)
     {
         StatusEffectScript status = hit.GetComponent<StatusEffectScript>();
         // currently stacks, should not
-        status.RPCApplyOrStackDoT(true, 50 * spellEffectMod, orbLevel * 2 + 3, "Poison");
-        status.RPCApplySlowdown("Slow", 10, orbLevel * 2 + 3);
+        status.RPCApplyOrStackDoT(true, OrbValueManager.getGreaterEffectDamage(m_OrbElement, m_Level) * spellEffectMod, OrbValueManager.getGreaterEffectDuration(m_OrbElement, m_Level), "Poison");
+        //status.RPCApplySlowdown("Slow", 10, orbLevel * 2 + 3);
     }
 
-    public override void CastLesserEffect(GameObject hit, int orbLevel, float spellEffectMod)
+    public override void CastLesserEffect(GameObject hit, float spellEffectMod, float[] data)
     {
         throw new System.NotImplementedException();
     }
 
-    public override void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, (int, int, int) levels, Transform t, Vector3 clickedPosition)
+    public override void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, Transform t, Vector3 clickedPosition)
     {
-        //Cast specific orb shape depending on shapeAmnt
-        //For any enemies hit
-        //greaterEffectMethod(enemy game object, greaterEffectAmnt);
-        //For any allies hit 
-        //lesserEffectMethod(ally game object, lesserEffectAmnt);
         Vector3 direction = clickedPosition - t.position;
 
         GameObject g = GameObject.Instantiate(Resources.Load("Orbs/Violet Sphere"), t.position + direction.normalized, t.rotation) as GameObject;
@@ -40,9 +35,7 @@ public class VioletOrb : Orb
 
         spellController.greaterCast = greaterEffectMethod;
         spellController.lesserCast = lesserEffectMethod;
-        spellController.greaterCastLevel = levels.Item1;
-        spellController.lesserCastLevel = levels.Item2;
-        spellController.spellEffectMod = OrbValueManager.getSpellEffectMod(m_OrbElement);
+        spellController.spellEffectMod = OrbValueManager.getShapeEffectMod(m_OrbElement);
 
         spellController.endPosition = clickedPosition;
     }

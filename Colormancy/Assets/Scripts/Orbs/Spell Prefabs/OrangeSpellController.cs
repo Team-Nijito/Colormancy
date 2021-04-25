@@ -6,8 +6,6 @@ public class OrangeSpellController : MonoBehaviour
 {
     public Orb.GreaterCast greaterCast;
     public Orb.LesserCast lesserCast;
-    public int greaterCastLevel;
-    public int lesserCastLevel;
     public float spellEffectMod;
     private Orb.Element element = Orb.Element.Fire;
 
@@ -18,13 +16,8 @@ public class OrangeSpellController : MonoBehaviour
     private float startTime;
     [SerializeField]
     private float lifetime;
-
+    
     [Space]
-
-    [SerializeField]
-    private float spherePaintRadius;
-    [SerializeField]
-    private Color paintColor;
 
     [SerializeField]
     private bool debug;
@@ -53,20 +46,22 @@ public class OrangeSpellController : MonoBehaviour
                 Destroy(gameObject);
         }
 
-        PaintingManager.PaintSphere(OrbValueManager.getColor(element), transform.position, spherePaintRadius);
+        PaintingManager.PaintSphere(OrbValueManager.getColor(element), transform.position, OrbValueManager.getPaintRadius(element));
     }
 
     private void OnCollisionEnter(Collision collision)
     {
-        PaintingManager.PaintSphere(OrbValueManager.getColor(element), collision.GetContact(0).point, spherePaintRadius * 2);
+        float paintRadius = OrbValueManager.getPaintRadius(element);
 
-        Collider[] sphereCollisions = Physics.OverlapSphere(collision.GetContact(0).point, spherePaintRadius * 2);
+        PaintingManager.PaintSphere(OrbValueManager.getColor(element), collision.GetContact(0).point, paintRadius * 2);
+
+        Collider[] sphereCollisions = Physics.OverlapSphere(collision.GetContact(0).point, paintRadius * 2);
         foreach (Collider c in sphereCollisions)
         {
             if (c.gameObject.CompareTag("Enemy"))
-                greaterCast(c.gameObject, greaterCastLevel, spellEffectMod);
+                greaterCast(c.gameObject, spellEffectMod, null);
             else if (c.gameObject.CompareTag("Player"))
-                lesserCast(c.gameObject, lesserCastLevel, spellEffectMod);
+                lesserCast(c.gameObject, spellEffectMod, null);
         }
 
         Destroy(gameObject);

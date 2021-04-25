@@ -604,6 +604,8 @@ GameObject:
   - component: {fileID: 7303220452640342148}
   - component: {fileID: 7120465011620947821}
   - component: {fileID: 7784100726361586853}
+  - component: {fileID: 8129414937997008697}
+  - component: {fileID: 8753572967449746225}
   m_Layer: 9
   m_Name: Green Vine
   m_TagString: Untagged
@@ -659,6 +661,53 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 11.857811, y: 5.640504, z: 2.100835}
   m_Center: {x: 4.4763546, y: 2.3202512, z: 0.05575016}
+--- !u!23 &8129414937997008697
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7931279719671962174}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 5e8e51238d13e624fb8f8787733a737a, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+--- !u!33 &8753572967449746225
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7931279719671962174}
+  m_Mesh: {fileID: -4239996054845334411, guid: 916de86c9a357354e99920981ce42a77, type: 3}
 --- !u!1 &8502084039977589699
 GameObject:
   m_ObjectHideFlags: 0

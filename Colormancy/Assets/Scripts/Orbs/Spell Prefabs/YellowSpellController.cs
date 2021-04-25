@@ -18,8 +18,6 @@ public class YellowSpellController : MonoBehaviour
 
     public Orb.GreaterCast greaterCast;
     public Orb.LesserCast lesserCast;
-    public int greaterCastLevel;
-    public int lesserCastLevel;
     public float spellEffectMod;
 
     [Space]
@@ -31,11 +29,6 @@ public class YellowSpellController : MonoBehaviour
     private float lifetime;
    
     [Space]
-
-    [SerializeField]
-    private float spherePaintRadius;
-    [SerializeField]
-    private Color paintColor;
 
     [SerializeField]
     private bool debug;
@@ -69,7 +62,7 @@ public class YellowSpellController : MonoBehaviour
             transform.GetChild(i).RotateAround(transform.position, Vector3.up, rotationScale.Evaluate((Time.time - startTime) / lifetime) * rotationSpeed / fromPlayer.magnitude);
 
             if (tick == (PaintingManager.paintingTickFrequency - i) % PaintingManager.paintingTickFrequency + 1)
-                PaintingManager.PaintSphere(OrbValueManager.getColor(element), transform.GetChild(i).position, spherePaintRadius);
+                PaintingManager.PaintSphere(OrbValueManager.getColor(element), transform.GetChild(i).position, OrbValueManager.getPaintRadius(element));
         }
 
         if (tick == PaintingManager.paintingTickFrequency)
@@ -80,11 +73,11 @@ public class YellowSpellController : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Enemy"))
         {
-            greaterCast(collision.gameObject, greaterCastLevel, spellEffectMod);
+            greaterCast(collision.gameObject, spellEffectMod, null);
         }
         else if (collision.gameObject.CompareTag("Player"))
         {
-            lesserCast(collision.gameObject, lesserCastLevel, spellEffectMod);
+            lesserCast(collision.gameObject, spellEffectMod, null);
         }
     }
 }

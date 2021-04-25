@@ -12,23 +12,23 @@ public class OrangeOrb : Orb
         m_UIPrefab = (GameObject)Resources.Load("Orbs/OrangeOrbUI");
     }
 
-    public override void CastGreaterEffect(GameObject hit, int orbLevel, float spellEffectMod)
+    public override void CastGreaterEffect(GameObject hit, float spellEffectMod, float[] data)
     {
         PhotonView photonView = PhotonView.Get(hit);
-        photonView.RPC("TakeDamage", RpcTarget.All, OrbValueManager.getGreaterEffectDamage(m_OrbElement, m_Level));
+        photonView.RPC("TakeDamage", RpcTarget.All, OrbValueManager.getGreaterEffectDamage(m_OrbElement, m_Level) * spellEffectMod);
         // temporary until autoattack increase is implemented
-        photonView.RPC("AlterArmorValueAdditive", RpcTarget.All, -20f * spellEffectMod, 3f);
+        // photonView.RPC("AlterArmorValueAdditive", RpcTarget.All, -20f * spellEffectMod, 3f);
     }
 
-    public override void CastLesserEffect(GameObject hit, int orbLevel, float spellEffectMod)
+    public override void CastLesserEffect(GameObject hit, float spellEffectMod, float[] data)
     {
-        PhotonView photonView = PhotonView.Get(hit);
+        // PhotonView photonView = PhotonView.Get(hit);
 
         // right now assume that all cooldowns are reduced by base 30f * modifiers ...
-        photonView.RPC("ReduceAllCooldowns", RpcTarget.All, orbLevel * 30f * spellEffectMod);
+        // photonView.RPC("ReduceAllCooldowns", RpcTarget.All, orbLevel * 30f * spellEffectMod);
     }
 
-    public override void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, (int, int, int) levels, Transform t, Vector3 clickedPosition)
+    public override void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, Transform t, Vector3 clickedPosition)
     {
         // get the wizard rotation
         Transform wizard = t.GetChild(0);
@@ -41,9 +41,7 @@ public class OrangeOrb : Orb
 
         spellController.greaterCast = greaterEffectMethod;
         spellController.lesserCast = lesserEffectMethod;
-        spellController.greaterCastLevel = levels.Item1;
-        spellController.lesserCastLevel = levels.Item2;
-        spellController.spellEffectMod = OrbValueManager.getSpellEffectMod(m_OrbElement);
+        spellController.spellEffectMod = OrbValueManager.getShapeEffectMod(m_OrbElement);
     }
 
     public static object Deserialize(byte[] data)

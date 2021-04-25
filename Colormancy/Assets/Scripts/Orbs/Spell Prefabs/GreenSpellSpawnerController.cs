@@ -6,8 +6,6 @@ public class GreenSpellSpawnerController : MonoBehaviour
 {
     public Orb.GreaterCast greaterCast;
     public Orb.LesserCast lesserCast;
-    public int greaterCastLevel;
-    public int lesserCastLevel;
     public float spellEffectMod;
     private const Orb.Element element = Orb.Element.Nature;
 
@@ -37,9 +35,6 @@ public class GreenSpellSpawnerController : MonoBehaviour
     private float lifetime;
 
     [Space]
-
-    [SerializeField]
-    private float spherePaintRadius;
 
     [SerializeField]
     private bool debug;
@@ -87,7 +82,7 @@ public class GreenSpellSpawnerController : MonoBehaviour
                         vine.transform.position -= transform.right * hPlacement;
                     }
 
-                    PaintingManager.PaintSphere(OrbValueManager.getColor(element), vine.transform.position, spherePaintRadius);
+                    PaintingManager.PaintSphere(OrbValueManager.getColor(element), vine.transform.position, OrbValueManager.getPaintRadius(element));
 
                     vine.transform.position += transform.right * displacement * Random.Range(-1, 1);
                     vine.transform.position += transform.forward * displacement * Random.Range(-1, 1);
@@ -139,8 +134,8 @@ public class GreenSpellSpawnerController : MonoBehaviour
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.tag.Equals("Enemy"))
-            greaterCast(collision.gameObject, greaterCastLevel, spellEffectMod);
+            greaterCast(collision.gameObject, spellEffectMod, null);
         else if (collision.gameObject.tag.Equals("Player"))
-            lesserCast(collision.gameObject, lesserCastLevel, spellEffectMod);
+            lesserCast(collision.gameObject, spellEffectMod, null);
     }
 }

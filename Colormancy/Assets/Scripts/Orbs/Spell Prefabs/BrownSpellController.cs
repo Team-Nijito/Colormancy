@@ -6,8 +6,6 @@ public class BrownSpellController : MonoBehaviour
 {
     public Orb.GreaterCast greaterCast;
     public Orb.LesserCast lesserCast;
-    public int greaterCastLevel;
-    public int lesserCastLevel;
     public float spellEffectMod;
     private const Orb.Element element = Orb.Element.Earth;
 
@@ -34,11 +32,6 @@ public class BrownSpellController : MonoBehaviour
     [Space]
 
     [SerializeField]
-    private float spherePaintRadius;
-    [SerializeField]
-    private Color paintColor;
-
-    [SerializeField]
     private bool debug;
     [SerializeField]
     private bool startAnimation;
@@ -57,7 +50,7 @@ public class BrownSpellController : MonoBehaviour
         rocks = transform.GetChild(2).gameObject;
         rocks.GetComponent<ParticleSystem>().Play();
 
-        PaintingManager.PaintSphere(OrbValueManager.getColor(element), transform.position, spherePaintRadius);
+        PaintingManager.PaintSphere(OrbValueManager.getColor(element), transform.position, OrbValueManager.getPaintRadius(element));
     }
 
     // Update is called once per frame
@@ -93,8 +86,8 @@ public class BrownSpellController : MonoBehaviour
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.tag.Equals("Enemy"))
-            greaterCast(collision.gameObject, greaterCastLevel, spellEffectMod);
+            greaterCast(collision.gameObject, spellEffectMod, null);
         else if (collision.gameObject.tag.Equals("Player"))
-            lesserCast(collision.gameObject, lesserCastLevel, spellEffectMod);
+            lesserCast(collision.gameObject, spellEffectMod, null);
     }
 }

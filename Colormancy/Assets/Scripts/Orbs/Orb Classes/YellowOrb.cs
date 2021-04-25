@@ -13,35 +13,33 @@ public class YellowOrb : Orb
         m_UIPrefab = (GameObject) Resources.Load("Orbs/YellowOrbUI");
     }
 
-    public override void CastGreaterEffect(GameObject hit, int orbLevel, float spellEffectMod)
+    public override void CastGreaterEffect(GameObject hit, float spellEffectMod, float[] data)
     {
         PhotonView photonView = PhotonView.Get(hit);
-        photonView.RPC("TakeDamage", RpcTarget.All, OrbValueManager.getGreaterEffectDamage(m_OrbElement, m_Level));
+        photonView.RPC("TakeDamage", RpcTarget.All, OrbValueManager.getGreaterEffectDamage(m_OrbElement, m_Level) * spellEffectMod);
 
         //missing 20% less damage
     }
 
-    public override void CastLesserEffect(GameObject hit, int orbLevel, float spellEffectMod)
+    public override void CastLesserEffect(GameObject hit, float spellEffectMod, float[] data)
     {
         throw new System.NotImplementedException();
     }
 
-    public override void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, (int, int, int) levels, Transform t, Vector3 clickedPosition)
+    public override void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, Transform t, Vector3 clickedPosition)
     {
         GameObject g = GameObject.Instantiate(Resources.Load("Orbs/Yellow Orbs"), t.position, t.rotation) as GameObject;
         YellowSpellController spellController = g.GetComponent<YellowSpellController>();
 
         spellController.greaterCast = greaterEffectMethod;
         spellController.lesserCast = lesserEffectMethod;
-        spellController.greaterCastLevel = levels.Item1;
-        spellController.lesserCastLevel = levels.Item2;
-        spellController.spellEffectMod = OrbValueManager.getSpellEffectMod(m_OrbElement);
+        spellController.spellEffectMod = OrbValueManager.getShapeEffectMod(m_OrbElement);
 
         spellController.playerTransform = t;
 
         for (int i = 0; i < 3; i++)
         {
-            if (i - levels.Item3 >= 0)
+            if (i - m_Level >= 0)
                 GameObject.Destroy(g.transform.GetChild(i).gameObject);
         }
     }

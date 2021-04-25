@@ -13,16 +13,21 @@ public class RedOrb : Orb
         m_UIPrefab = (GameObject)Resources.Load("Orbs/RedOrbUI");
     }
 
-    public override void CastGreaterEffect(GameObject hit, int orbLevel, float spellEffectMod)
+    public override void CastGreaterEffect(GameObject hit, float spellEffectMod, float[] data)
     {
-        int trueOrbLevel = orbLevel & 255;
-        float launchX = (float)((orbLevel >> 24) & 127) * (((orbLevel >> 31) & 1) == 1 ? -1 : 1);
-        float launchY = (float)((orbLevel >> 16) & 127) * (((orbLevel >> 23) & 1) == 1 ? -1 : 1);
-        float launchZ = (float)((orbLevel >> 8) & 127) * (((orbLevel >> 15) & 1) == 1 ? -1 : 1);
-        Vector3 launchVector = new Vector3(launchX, launchY, launchZ).normalized;
+        float vector_x = 0;
+        float vector_y = 0;
+        float vector_z = 0;
+        if (data != null)
+        {
+            vector_x = data[0];
+            vector_y = data[1];
+            vector_z = data[2];
+        }
+        Vector3 launchVector = new Vector3(vector_x, vector_y, vector_z);
 
         PhotonView photonView = PhotonView.Get(hit);
-        photonView.RPC("TakeDamage", RpcTarget.All, OrbValueManager.getGreaterEffectDamage(m_OrbElement, m_Level));
+        photonView.RPC("TakeDamage", RpcTarget.All, OrbValueManager.getGreaterEffectDamage(m_OrbElement, m_Level) * spellEffectMod);
 
         float orbDuration = OrbValueManager.getGreaterEffectDuration(m_OrbElement, m_Level);
         StatusEffectScript status = hit.GetComponent<StatusEffectScript>();
@@ -30,12 +35,12 @@ public class RedOrb : Orb
         status.RPCApplyForce("Knockback", orbDuration, launchVector + Vector3.up, 40f);
     }
 
-    public override void CastLesserEffect(GameObject hit, int orbLevel, float spellEffectMod)
+    public override void CastLesserEffect(GameObject hit, float spellEffectMod, float[] data)
     {
         throw new System.NotImplementedException();
     }
 
-    public override void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, (int, int, int) levels, Transform t, Vector3 clickedPosition)
+    public override void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, Transform t, Vector3 clickedPosition)
     {
         Transform wizard = t.GetChild(0);
 
@@ -47,9 +52,7 @@ public class RedOrb : Orb
 
         spellController.greaterCast = greaterEffectMethod;
         spellController.lesserCast = lesserEffectMethod;
-        spellController.greaterCastLevel = levels.Item1;
-        spellController.lesserCastLevel = levels.Item2;
-        spellController.spellEffectMod = OrbValueManager.getSpellEffectMod(m_OrbElement);
+        spellController.spellEffectMod = OrbValueManager.getShapeEffectMod(m_OrbElement);
 
         spellController.endPosition = clickedPosition + Vector3.up * 1.6f;
         spellController.playerTransform = t;

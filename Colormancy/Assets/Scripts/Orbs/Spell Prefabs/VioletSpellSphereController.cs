@@ -6,8 +6,6 @@ public class VioletSpellSphereController : MonoBehaviour
 {
     public Orb.GreaterCast greaterCast;
     public Orb.LesserCast lesserCast;
-    public int greaterCastLevel;
-    public int lesserCastLevel;
     public float spellEffectMod;
 
     [Space]
@@ -64,8 +62,6 @@ public class VioletSpellSphereController : MonoBehaviour
 
         spellController.greaterCast = greaterCast;
         spellController.lesserCast = lesserCast;
-        spellController.greaterCastLevel = greaterCastLevel;
-        spellController.lesserCastLevel = lesserCastLevel;
         spellController.spellEffectMod = spellEffectMod;
 
         Destroy(gameObject);

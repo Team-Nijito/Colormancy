@@ -13,32 +13,25 @@ public class BrownOrb : Orb
         m_UIPrefab = (GameObject)Resources.Load("Orbs/BrownOrbUI");
     }
 
-    public override void CastGreaterEffect(GameObject hit, int orbLevel, float spellEffectMod)
+    public override void CastGreaterEffect(GameObject hit, float spellEffectMod, float[] data)
     {
         PhotonView photonView = PhotonView.Get(hit);
-        photonView.RPC("TakeDamage", RpcTarget.All, OrbValueManager.getGreaterEffectDamage(m_OrbElement, m_Level));
+        photonView.RPC("TakeDamage", RpcTarget.All, OrbValueManager.getGreaterEffectDamage(m_OrbElement, m_Level) * spellEffectMod);
     }
 
-    public override void CastLesserEffect(GameObject hit, int orbLevel, float spellEffectMod)
+    public override void CastLesserEffect(GameObject hit, float spellEffectMod, float[] data)
     {
         throw new System.NotImplementedException();
     }
 
-    public override void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, (int, int, int) levels, Transform t, Vector3 clickedPosition)
+    public override void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, Transform t, Vector3 clickedPosition)
     {
-        //Cast specific orb shape depending on shapeAmnt
-        //For any enemies hit
-        //greaterEffectMethod(enemy game object, greaterEffectAmnt);
-        //For any allies hit 
-        //lesserEffectMethod(ally game object, lesserEffectAmnt);
         GameObject g = GameObject.Instantiate(Resources.Load("Orbs/Brown Shockwave"), t.position + Vector3.up * 0.03f, t.rotation) as GameObject;
         BrownSpellController spellController = g.GetComponent<BrownSpellController>();
 
         spellController.greaterCast = greaterEffectMethod;
         spellController.lesserCast = lesserEffectMethod;
-        spellController.greaterCastLevel = levels.Item1;
-        spellController.lesserCastLevel = levels.Item2;
-        spellController.spellEffectMod = OrbValueManager.getSpellEffectMod(m_OrbElement);
+        spellController.spellEffectMod = OrbValueManager.getShapeEffectMod(m_OrbElement);
     }
 
     public static object Deserialize(byte[] data)

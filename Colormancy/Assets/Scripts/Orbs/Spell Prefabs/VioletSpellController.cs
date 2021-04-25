@@ -6,8 +6,6 @@ public class VioletSpellController : MonoBehaviour
 {
     public Orb.GreaterCast greaterCast;
     public Orb.LesserCast lesserCast;
-    public int greaterCastLevel;
-    public int lesserCastLevel;
     public float spellEffectMod;
     private const Orb.Element element = Orb.Element.Poison;
 
@@ -20,18 +18,13 @@ public class VioletSpellController : MonoBehaviour
     [Space]
 
     [SerializeField]
-    private float spherePaintRadius;
-    [SerializeField]
-    private Color paintColor;
-
-    [SerializeField]
     private bool debug;
 
     void OnEnable()
     {
         starttime = Time.time;
 
-        PaintingManager.PaintSphere(OrbValueManager.getColor(element), transform.position + Vector3.down, spherePaintRadius);
+        PaintingManager.PaintSphere(OrbValueManager.getColor(element), transform.position + Vector3.down, OrbValueManager.getPaintRadius(element));
     }
 
     // Update is called once per frame
@@ -45,9 +38,9 @@ public class VioletSpellController : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Enemy"))
         {
-            greaterCast(collision.gameObject, greaterCastLevel, spellEffectMod);
+            greaterCast(collision.gameObject, spellEffectMod, null);
         }
         else if (collision.gameObject.CompareTag("Player"))
-            lesserCast(collision.gameObject, lesserCastLevel, spellEffectMod);
+            lesserCast(collision.gameObject, spellEffectMod, null);
     }
 }

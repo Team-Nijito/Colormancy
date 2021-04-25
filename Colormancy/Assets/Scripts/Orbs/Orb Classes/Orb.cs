@@ -38,11 +38,11 @@ public abstract class Orb
     #endregion
 
     //SpellTest will just be the player controller
-    public delegate void GreaterCast(GameObject hit, int orbLevel, float spellEffectMod);
-    public delegate void LesserCast(GameObject hit, int orbLevel, float spellEffectMod);
+    public delegate void GreaterCast(GameObject hit, float spellEffectMod, float[] data);
+    public delegate void LesserCast(GameObject hit, float spellEffectMod, float[] data);
 
-    public abstract void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, (int, int, int) levels, Transform t, Vector3 clickedPosition);
-    public abstract void CastGreaterEffect(GameObject hit, int orbAmount, float spellEffectMod);
+    public abstract void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, Transform t, Vector3 clickedPosition);
+    public abstract void CastGreaterEffect(GameObject hit, float spellEffectMod, float[] data);
     //Will have to do something different and send over server for this one since most are for allies
-    public abstract void CastLesserEffect(GameObject hit, int orbAmount, float spellEffectMod);
+    public abstract void CastLesserEffect(GameObject hit, float spellEffectMod, float[] data);
 }

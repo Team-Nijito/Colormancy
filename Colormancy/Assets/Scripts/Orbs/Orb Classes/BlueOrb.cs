@@ -12,28 +12,26 @@ public class BlueOrb : Orb
         m_UIPrefab = (GameObject)Resources.Load("Orbs/BlueOrbUI");
     }
 
-    public override void CastGreaterEffect(GameObject hit, int orbLevel, float spellEffectMod)
+    public override void CastGreaterEffect(GameObject hit, float spellEffectMod, float[] data)
     {
         PhotonView photonView = hit.GetPhotonView();
-        photonView.RPC("TakeDamage", RpcTarget.All, OrbValueManager.getGreaterEffectDamage(m_OrbElement, m_Level));
+        photonView.RPC("TakeDamage", RpcTarget.All, OrbValueManager.getGreaterEffectDamage(m_OrbElement, m_Level) * spellEffectMod);
     }
 
-    public override void CastLesserEffect(GameObject hit, int orbLevel, float spellEffectMod)
+    public override void CastLesserEffect(GameObject hit, float spellEffectMod, float[] data)
     {
         PhotonView photonView = hit.GetPhotonView();
-        photonView.RPC("ManaRegeneration", RpcTarget.All, OrbValueManager.getLesserEffectValue(m_OrbElement, m_Level));
+        // photonView.RPC("ManaRegeneration", RpcTarget.All, OrbValueManager.getLesserEffectValue(m_OrbElement, m_Level));
     }
 
-    public override void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, (int, int, int) amounts, Transform t, Vector3 clickedPosition)
+    public override void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, Transform t, Vector3 clickedPosition)
     {
         GameObject g = GameObject.Instantiate(Resources.Load("Orbs/Blue Puddle Spawner"), t.position, t.rotation) as GameObject;
         BlueSpellSpawnerController spellController = g.GetComponent<BlueSpellSpawnerController>();
 
         spellController.greaterCast = greaterEffectMethod;
         spellController.lesserCast = lesserEffectMethod;
-        spellController.greaterCastAmt = amounts.Item1;
-        spellController.lesserCastAmt = amounts.Item2;
-        spellController.spellEffectMod = OrbValueManager.getSpellEffectMod(m_OrbElement);
+        spellController.spellEffectMod = OrbValueManager.getShapeEffectMod(m_OrbElement);
 
         spellController.playerTransform = t;
     }
