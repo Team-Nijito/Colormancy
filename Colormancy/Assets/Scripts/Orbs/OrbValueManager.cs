@@ -103,7 +103,7 @@ public class OrbValueManager : MonoBehaviour
     {
         return s_instance.orbValues.Find(x => x.element == element).m_ShapeManaMod;
     }
-    public static float getLevel(Orb.Element element, int level)
+    public static int getLevel(Orb.Element element, int level)
     {
         return s_instance.debug == true ? s_instance.orbValues.Find(x => x.element == element).m_Level : level;
     }
