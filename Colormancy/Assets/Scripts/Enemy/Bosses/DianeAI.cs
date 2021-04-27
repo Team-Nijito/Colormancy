@@ -7,16 +7,22 @@ using UnityEngine.AI;
 
 public class DianeAI : BossAI
 {
-    [SerializeField]
-    float SlashRange = 2f;
+    
+    public float SlashRange = 2f;
+    
+    public float SlashCooldown = 5f;
+    public float HamstringCooldown = 15f;
+    public float FocusFireCooldown = 30f;
+    public float IdleCooldown = 5f;
 
-    [SerializeField]
-    float SLASH_COOLDOWN = 5f;
-    [SerializeField]
-    float HAMSTRING_COOLDOWN = 15f;
-
-    float currentSlashCooldown;
-    float currentHamstringCooldown;
+    [HideInInspector]
+    public float currentIdleCooldown = 5f;
+    [HideInInspector]
+    public float currentSlashCooldown = 0f;
+    [HideInInspector]
+    public float currentHamstringCooldown = 13f;
+    [HideInInspector]
+    public float currentFocusFireCooldown = 0f;
 
     // Start is called before the first frame update
     void Start()
@@ -24,37 +30,17 @@ public class DianeAI : BossAI
         Animator = GetComponent<Animator>();
         EnemyHitbox = GetComponent<EnemyHitbox>();
         MeshAgent = GetComponent<NavMeshAgent>();
-
-        currentSlashCooldown = SLASH_COOLDOWN;
-        currentHamstringCooldown = HAMSTRING_COOLDOWN;
+        StatusEffect = GetComponent<StatusEffectScript>();
+        SetState(new DianeChase(this));
     }
 
     // Update is called once per frame
     void Update()
-    {
+    { 
         if (Target == null)
         {
             GameObject target = GetTarget();
             SetTarget(target);
-        }
-
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            SetState(new DianeChase(this));
-        }
-
-        if (currentHamstringCooldown >= HAMSTRING_COOLDOWN)
-        {
-            currentHamstringCooldown = 0f;
-            SetState(new DianeHamstring(this));
-            Target = null;
-        }
-
-        if (DistanceToTarget() < SlashRange && currentSlashCooldown >= SLASH_COOLDOWN)
-        {
-            currentSlashCooldown = 0f;
-            SetState(new DianeSlash(this));
-            Target = null;
         }
 
         if (State != null)
@@ -63,6 +49,7 @@ public class DianeAI : BossAI
         //Tick Cooldowns
         currentSlashCooldown += Time.deltaTime;
         currentHamstringCooldown += Time.deltaTime;
+        currentIdleCooldown += Time.deltaTime;
     }
 
     //Gets target (For Diane that means the player with the highest HP)

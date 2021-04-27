@@ -2106,8 +2106,10 @@ GameObject:
   - component: {fileID: 1214972457554634}
   - component: {fileID: 1214972457554639}
   - component: {fileID: 1214972457554641}
+  - component: {fileID: 1214972457554643}
   - component: {fileID: 1214972457554632}
   - component: {fileID: 1214972457554640}
+  - component: {fileID: 1214972457554642}
   m_Layer: 10
   m_Name: Diane, Doer of Deeds
   m_TagString: Enemy
@@ -2154,6 +2156,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SlashRange: 2
   SLASH_COOLDOWN: 5
+  HAMSTRING_COOLDOWN: 15
+  FOCUS_FIRE_COOLDOWN: 30
+  IDLE_COOLDOWN: 5
+  currentIdleCooldown: 0
+  currentSlashCooldown: 0
+  currentHamstringCooldown: 0
+  currentFocusFireCooldown: 0
 --- !u!114 &1214972457554634
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2241,7 +2250,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 1
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 80
   m_CollisionDetection: 0
 --- !u!114 &1214972457554639
 MonoBehaviour:
@@ -2295,6 +2304,44 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aea2c7aba3e4e6343a67593e4e5823ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1214972457554642
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1214972457554631}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ba24a809eb142e44bfc0f3df8a39b90, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EnemyIdleExist: 1
+  m_EnemyWalkExist: 1
+  m_EnemyRunExist: 1
+  m_EnemyAttackExist: 1
+  m_EnemyDeathExist: 1
+--- !u!114 &1214972457554643
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1214972457554631}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7fc410d693ecca6418b2d06f11383381, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_speed: 5
+  m_speedTriggerRun: 15
+  m_wanderTime:
+    minTime: 2
+    maxTime: 5
+  m_idleTime:
+    minTime: 2
+    maxTime: 5
+  m_wanderRadius: 10
 --- !u!1 &1251721287110273
 GameObject:
   m_ObjectHideFlags: 0

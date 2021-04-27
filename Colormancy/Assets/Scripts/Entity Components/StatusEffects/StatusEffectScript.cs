@@ -278,6 +278,8 @@ public class StatusEffectScript : MonoBehaviourPun
 
     #region Public functions
 
+    //public void RPCSet
+
     /// <summary>
     /// Blind a characters. If it's an AI, they will panic and will not be able to target players.
     /// </summary>
