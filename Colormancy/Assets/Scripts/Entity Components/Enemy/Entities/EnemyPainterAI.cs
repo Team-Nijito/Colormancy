@@ -16,8 +16,8 @@ public class EnemyPainterAI : EnemyChaserAI
 
     protected override void Start()
     {
-        m_enemPaintAbility = GetComponent<EnemyPaintAbility>();
         base.Start();
+        m_enemPaintAbility = GetComponent<EnemyPaintAbility>();
     }
 
     #endregion
@@ -38,14 +38,14 @@ public class EnemyPainterAI : EnemyChaserAI
                 oldDirection.y = 0;
                 m_enemMovement.SetDirectionToPlayer(oldDirection);
 
-                m_enemMovement.RunOrWalkDependingOnSpeed();
+                m_animManager.ChangeState(EnemyAnimationManager.EnemyState.Move);
             }
             else
             {
                 // wander so we can paint randomly around us
-                if (m_enemMovement.currentWanderState == EnemyMovement.WanderState.Wander)
+                if (m_enemMovement.CurrentWanderState == EnemyMovement.WanderState.Wander)
                 {
-                    m_enemMovement.RunOrWalkDependingOnSpeed();
+                    m_animManager.ChangeState(EnemyAnimationManager.EnemyState.Move);
                 }
                 else
                 {
@@ -56,13 +56,13 @@ public class EnemyPainterAI : EnemyChaserAI
         else
         {
             // wander around in offline mode
-            if (m_enemMovement.currentWanderState == EnemyMovement.WanderState.Wander)
+            if (m_enemMovement.CurrentWanderState == EnemyMovement.WanderState.Wander)
             {
-                m_enemMovement.RunOrWalkDependingOnSpeed();
+                m_animManager.ChangeState(EnemyAnimationManager.EnemyState.Move);
             }
             else
             {
-                m_animManager.ChangeState(EnemyAnimationManager.EnemyState.Idle);
+                m_animManager.ChangeState(EnemyAnimationManager.EnemyState.Move);
             }
         }
     }
@@ -73,7 +73,6 @@ public class EnemyPainterAI : EnemyChaserAI
         if (PhotonNetwork.InRoom && m_enemTargeting.TargetPlayer)
         {
             m_enemMovement.SetCurrentAnimState(m_animManager.GetCurrentState());
-            //Vector3.Distance(m_enemTargeting.TargetPlayer.position, transform.position) < m_enemTargeting.DetectionRadius
             if (TargetIsWithinDetectionRadius())
             {
                 m_enemMovement.ExitWanderingMode(true);

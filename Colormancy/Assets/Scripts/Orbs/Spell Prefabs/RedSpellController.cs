@@ -14,13 +14,12 @@ public class RedSpellController : MonoBehaviour
     private GameObject redEdge;
     private Renderer baseMaterial;
     private Renderer edgeMaterial;
+    private const Orb.Element element = Orb.Element.Wrath;
 
     [Space]
 
     public Orb.GreaterCast greaterCast;
     public Orb.LesserCast lesserCast;
-    public int greaterCastAmt;
-    public int lesserCastAmt;
     public float spellEffectMod;
 
     [Space]
@@ -41,10 +40,6 @@ public class RedSpellController : MonoBehaviour
 
     [Space]
 
-    [SerializeField]
-    private float spherePaintRadius;
-    [SerializeField]
-    private Color paintColor;
     [SerializeField]
     [Range(0, 1)]
     private float m_lerp;
@@ -104,34 +99,23 @@ public class RedSpellController : MonoBehaviour
 
             transform.position = playerTransform.position + Vector3.down;
 
-            PaintingManager.PaintSphere(paintColor, transform.position, spherePaintRadius);
+            PaintingManager.PaintSphere(OrbValueManager.getColor(element), transform.position, OrbValueManager.getPaintRadius(element));
 
             // search in enemy layermask
-            Collider[] hitColliders = Physics.OverlapSphere(transform.position, spherePaintRadius, 1 << 10);
+            Collider[] hitColliders = Physics.OverlapSphere(transform.position, OrbValueManager.getPaintRadius(element), 1 << 10);
 
             foreach (var hitCollider in hitColliders)
             {
                 if (hitCollider.CompareTag("Enemy"))
                 {
                     Vector3 PlayerToEnemy = (hitCollider.gameObject.transform.position - transform.position).normalized;
-                    PlayerToEnemy *= 127;
+                    float[] vectorData = { PlayerToEnemy.x, PlayerToEnemy.y, PlayerToEnemy.z };
 
-                    int vectorCastData = (int)Mathf.Abs(PlayerToEnemy.x) + (PlayerToEnemy.x > 0 ? 0 : 128);
-                    vectorCastData = vectorCastData << 8;
-
-                    vectorCastData = vectorCastData | ((int)Mathf.Abs(PlayerToEnemy.y) + (PlayerToEnemy.y > 0 ? 0 : 128));
-                    vectorCastData = vectorCastData << 8;
-
-                    vectorCastData = vectorCastData | ((int)Mathf.Abs(PlayerToEnemy.z) + (PlayerToEnemy.z > 0 ? 0 : 128));
-                    vectorCastData = vectorCastData << 8;
-
-                    vectorCastData = vectorCastData | greaterCastAmt;
-
-                    greaterCast(hitCollider.gameObject, vectorCastData, spellEffectMod);
+                    greaterCast(hitCollider.gameObject, spellEffectMod, vectorData);
                 }
                 else if (hitCollider.CompareTag("Player"))
                 {
-                    lesserCast(hitCollider.gameObject, lesserCastAmt, spellEffectMod);
+                    lesserCast(hitCollider.gameObject, spellEffectMod, null);
                 }
             }
 

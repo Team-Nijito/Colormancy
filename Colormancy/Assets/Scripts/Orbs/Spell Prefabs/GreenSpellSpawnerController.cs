@@ -6,9 +6,8 @@ public class GreenSpellSpawnerController : MonoBehaviour
 {
     public Orb.GreaterCast greaterCast;
     public Orb.LesserCast lesserCast;
-    public int greaterCastAmt;
-    public int lesserCastAmt;
     public float spellEffectMod;
+    private const Orb.Element element = Orb.Element.Nature;
 
     private Vector3 raycastOrigin;
 
@@ -29,10 +28,13 @@ public class GreenSpellSpawnerController : MonoBehaviour
     private int currentTick;
     private bool spawnVine;
 
+    [Space]
+
+    private float startTime;
     [SerializeField]
-    private float spherePaintRadius;
-    [SerializeField]
-    private Color paintColor;
+    private float lifetime;
+
+    [Space]
 
     [SerializeField]
     private bool debug;
@@ -42,6 +44,7 @@ public class GreenSpellSpawnerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        startTime = Time.time;
         currentTick = 0;
         currentIteration = 0;
         spawnVine = true;
@@ -52,6 +55,9 @@ public class GreenSpellSpawnerController : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
+        if (Time.time - startTime > lifetime && !debug)
+            Destroy(gameObject);
+
         if (spawnVine)
         {
             if (!Physics.Raycast(raycastOrigin, transform.forward, fRaycastDistance, PaintingManager.paintingMask))
@@ -76,7 +82,7 @@ public class GreenSpellSpawnerController : MonoBehaviour
                         vine.transform.position -= transform.right * hPlacement;
                     }
 
-                    PaintingManager.PaintSphere(paintColor, vine.transform.position, spherePaintRadius);
+                    PaintingManager.PaintSphere(OrbValueManager.getColor(element), vine.transform.position, OrbValueManager.getPaintRadius(element));
 
                     vine.transform.position += transform.right * displacement * Random.Range(-1, 1);
                     vine.transform.position += transform.forward * displacement * Random.Range(-1, 1);
@@ -123,5 +129,13 @@ public class GreenSpellSpawnerController : MonoBehaviour
             for (int i = 0; i < transform.childCount; ++i)
                 Destroy(transform.GetChild(i).gameObject);
         }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.tag.Equals("Enemy"))
+            greaterCast(collision.gameObject, spellEffectMod, null);
+        else if (collision.gameObject.tag.Equals("Player"))
+            lesserCast(collision.gameObject, spellEffectMod, null);
     }
 }

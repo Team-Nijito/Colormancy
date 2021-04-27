@@ -4,17 +4,12 @@ using UnityEngine;
 
 public class QuickSilverSpellController : MonoBehaviour
 {
-    [Space]
-
     public Orb.GreaterCast greaterCast;
     public Orb.LesserCast lesserCast;
-    public int greaterCastAmt;
-    public int lesserCastAmt;
     public float spellEffectMod;
+    private const Orb.Element element = Orb.Element.Wind;
 
-    private float startTime;
-    [SerializeField]
-    private float lifetime;
+    [Space]
 
     private GameObject bolt;
     private GameObject contact;
@@ -34,11 +29,20 @@ public class QuickSilverSpellController : MonoBehaviour
     [SerializeField]
     private AnimationCurve ContactRadius;
 
+    [Space]
+
     private Material boltMat;
     private Material contactMat;
     private Material waveMat;
-
     private Light sparkLight;
+
+    [Space]
+
+    private float startTime;
+    [SerializeField]
+    private float lifetime;
+
+    [Space]
 
     [SerializeField]
     private bool debug;
@@ -62,11 +66,16 @@ public class QuickSilverSpellController : MonoBehaviour
         sparks.GetComponent<ParticleSystem>().Play();
 
         sparkLight = GetComponent<Light>();
+
+        PaintingManager.PaintSphere(OrbValueManager.getColor(element), transform.position, OrbValueManager.getPaintRadius(element));
     }
 
     void Update()
     {
         float currentTime = Time.time - startTime;
+
+        if (Time.time - startTime > lifetime && !debug)
+            Destroy(gameObject);
 
         // apply curves to shaders
         boltMat.SetFloat("_ScrollSpeed", BoltDisplacementSpeed.Evaluate(currentTime));
@@ -103,5 +112,13 @@ public class QuickSilverSpellController : MonoBehaviour
 
             collider.enabled = true;
         }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.tag.Equals("Enemy"))
+            greaterCast(collision.gameObject, spellEffectMod, null);
+        else if (collision.gameObject.tag.Equals("Player"))
+            lesserCast(collision.gameObject, spellEffectMod, null);
     }
 }

@@ -7,13 +7,12 @@ public class BlueSpellController : MonoBehaviour
     private float starttime;
     [SerializeField]
     private float lifetime;
+    private const Orb.Element element = Orb.Element.Water;
 
     [Space]
 
     [SerializeField]
     private float spherePaintRadius;
-    [SerializeField]
-    private Color paintColor;
 
     [SerializeField]
     private bool debug;
@@ -22,7 +21,7 @@ public class BlueSpellController : MonoBehaviour
     {
         starttime = Time.time;
 
-        PaintingManager.PaintSphere(paintColor, transform.position, spherePaintRadius);
+        PaintingManager.PaintSphere(OrbValueManager.getColor(element), transform.position, spherePaintRadius);
     }
 
     // Update is called once per frame

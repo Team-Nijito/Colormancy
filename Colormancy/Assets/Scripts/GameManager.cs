@@ -94,10 +94,16 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     bool PodiumMessage = false;
 
     Orb currentOrbType;
-    SpellTest playerSpellTest;
     PodiumController currentPodium; // keep track of current podium so we can close access to orb after player has obtained it
-
+    OrbManager playerOrbManager;
     int dialoguePage = 0;
+
+    #endregion
+
+    #region Components
+
+    [SerializeField]
+    private EnemyManager m_enemManager;
 
     #endregion
 
@@ -200,7 +206,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
                         player.GetComponent<SpellManager>().Initialization();
 
                         // Reset their spell GUI reference
-                        player.GetComponent<SpellTest>().Initialization();
+                        player.GetComponent<OrbManager>().Initialization();
                     }
                 }
             }
@@ -320,10 +326,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     {
         if (currentOrbType != null)
         {
-            playerSpellTest.AddSpellOrb(currentOrbType, true);
+            playerOrbManager.AddSpellOrb(currentOrbType, true);
 
             // Update custom properties
-            string orbKey = FetchOrbKey(currentOrbType.OrbElement);
+            string orbKey = FetchOrbKey(currentOrbType.getElement());
 
             // fetch, alter, then set room custom properties
             PhotonHashtable roomProperties = PhotonNetwork.CurrentRoom.CustomProperties;
@@ -363,7 +369,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         {
             animator.SetTrigger("close");
             WindowOpen = false;
-            playerSpellTest = null;
+            playerOrbManager = null;
             currentOrbType = null;
             acceptButton.SetActive(false);
             nextButton.SetActive(true);
@@ -375,7 +381,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     /// </summary>
     public void LeaveRoom()
     {
-        SpellTest.orbHistory.Clear(); // don't retain memory of spells after leaving game
+        OrbManager.orbHistory.Clear(); // don't retain memory of spells after leaving game
 
         if (SceneManager.GetActiveScene().name == LobbySceneName)
         {
@@ -418,13 +424,13 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         SetPage();
     }
 
-    public void PodiumPopUp(string[] messages, Sprite[] images, Orb orbType, SpellTest spellTest, PodiumController orbPodiumScript)
+    public void PodiumPopUp(string[] messages, Sprite[] images, Orb orbType, OrbManager orbManager, PodiumController orbPodiumScript)
     {
         if (!WindowOpen)
         {
             currentPodium = orbPodiumScript;
             currentOrbType = orbType;
-            playerSpellTest = spellTest;
+            playerOrbManager = orbManager;
 
             dialogueMessages = messages;
             dialogueImages = images;
@@ -458,10 +464,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     {
         if (currentOrbType != null)
         {
-            playerSpellTest.RemoveSpellOrb(currentOrbType, true);
+            playerOrbManager.RemoveSpellOrb(currentOrbType, true);
 
             // Update custom properties
-            string orbKey = FetchOrbKey(currentOrbType.OrbElement);
+            string orbKey = FetchOrbKey(currentOrbType.getElement());
 
             // fetch, alter, then set room custom properties
             PhotonHashtable roomProperties = PhotonNetwork.CurrentRoom.CustomProperties;
@@ -611,6 +617,22 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
             else
             {
                 m_playersReady = (int)stream.ReceiveNext();
+            }
+        }
+        else
+        {
+            // Synchronize the number of enemies across all clients
+            if (m_enemManager)
+            {
+                // If enemManager doesn't exist, don't sync anything.
+                if (stream.IsWriting)
+                {
+                    stream.SendNext(m_enemManager.CurrentNumberEnemiesInLevel);
+                }
+                else
+                {
+                    m_enemManager.SetNumEnemiesOnField((byte)stream.ReceiveNext());
+                }
             }
         }
     }

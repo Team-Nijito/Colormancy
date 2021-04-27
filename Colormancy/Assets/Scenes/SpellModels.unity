@@ -1650,6 +1650,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1442922397831603985, guid: c9df2b82a06b8da459b9b80745aa1c4d,
+        type: 3}
+      propertyPath: spherePaintRadius
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 1785434909946404452, guid: c9df2b82a06b8da459b9b80745aa1c4d,
         type: 3}
       propertyPath: m_Name
@@ -1990,6 +1995,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Green Vine Spawner
+      objectReference: {fileID: 0}
+    - target: {fileID: 4301647996006536239, guid: 0034d49430bf3cb45bd9de46afc8a6ef,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0034d49430bf3cb45bd9de46afc8a6ef, type: 3}
