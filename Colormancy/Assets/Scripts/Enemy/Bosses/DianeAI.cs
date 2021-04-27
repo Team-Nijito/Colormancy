@@ -12,8 +12,11 @@ public class DianeAI : BossAI
 
     [SerializeField]
     float SLASH_COOLDOWN = 5f;
+    [SerializeField]
+    float HAMSTRING_COOLDOWN = 15f;
 
     float currentSlashCooldown;
+    float currentHamstringCooldown;
 
     // Start is called before the first frame update
     void Start()
@@ -21,7 +24,9 @@ public class DianeAI : BossAI
         Animator = GetComponent<Animator>();
         EnemyHitbox = GetComponent<EnemyHitbox>();
         MeshAgent = GetComponent<NavMeshAgent>();
+
         currentSlashCooldown = SLASH_COOLDOWN;
+        currentHamstringCooldown = HAMSTRING_COOLDOWN;
     }
 
     // Update is called once per frame
@@ -38,6 +43,13 @@ public class DianeAI : BossAI
             SetState(new DianeChase(this));
         }
 
+        if (currentHamstringCooldown >= HAMSTRING_COOLDOWN)
+        {
+            currentHamstringCooldown = 0f;
+            SetState(new DianeHamstring(this));
+            Target = null;
+        }
+
         if (DistanceToTarget() < SlashRange && currentSlashCooldown >= SLASH_COOLDOWN)
         {
             currentSlashCooldown = 0f;
@@ -50,6 +62,7 @@ public class DianeAI : BossAI
 
         //Tick Cooldowns
         currentSlashCooldown += Time.deltaTime;
+        currentHamstringCooldown += Time.deltaTime;
     }
 
     //Gets target (For Diane that means the player with the highest HP)
