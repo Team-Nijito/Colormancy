@@ -1434,7 +1434,7 @@ GameObject:
   - component: {fileID: 2281381293356762768}
   - component: {fileID: -2047396381289531555}
   - component: {fileID: 1888834727555426332}
-  - component: {fileID: 6131654479823208912}
+  - component: {fileID: 4214830320729379172}
   - component: {fileID: 1106213245304768834}
   m_Layer: 10
   m_Name: SkeletonRanged
@@ -1482,13 +1482,13 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7868359989750648}
   serializedVersion: 2
-  m_Mass: 1
-  m_Drag: 0
+  m_Mass: 2.5
+  m_Drag: 10
   m_AngularDrag: 0.05
   m_UseGravity: 1
   m_IsKinematic: 1
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 80
   m_CollisionDetection: 0
 --- !u!195 &4492902978810850956
 NavMeshAgent:
@@ -1500,17 +1500,17 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.05
-  m_Speed: 18
-  m_Acceleration: 15
+  m_Speed: 10
+  m_Acceleration: 50
   avoidancePriority: 50
   m_AngularSpeed: 999
   m_StoppingDistance: 15
   m_AutoTraverseOffMeshLink: 1
-  m_AutoBraking: 0
+  m_AutoBraking: 1
   m_AutoRepath: 1
   m_Height: 0.18
   m_BaseOffset: 0
-  m_WalkableMask: 4294967295
+  m_WalkableMask: 5
   m_ObstacleAvoidanceType: 3
 --- !u!95 &7868359999101174
 Animator:
@@ -1543,11 +1543,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9ba24a809eb142e44bfc0f3df8a39b90, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_EnemyIdleExist: 1
-  m_EnemyWalkExist: 1
-  m_EnemyRunExist: 1
-  m_EnemyAttackExist: 1
-  m_EnemyDeathExist: 1
 --- !u!114 &7868359989718427
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1594,7 +1589,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_speed: 14
-  m_speedTriggerRun: 15
   m_wanderTime:
     minTime: 2
     maxTime: 5
@@ -1602,6 +1596,9 @@ MonoBehaviour:
     minTime: 2
     maxTime: 5
   m_wanderRadius: 10
+  m_mainAIScript: {fileID: 1888834727555426332}
+  m_enemTargeting: {fileID: 2281381293356762768}
+  m_enemView: {fileID: 1106213245304768834}
 --- !u!114 &2281381293356762768
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1614,14 +1611,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1debee2c94412d041bf87ca10128c148, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_ignoreOtherEnemiesLayer:
+  m_playerLayer:
     serializedVersion: 2
-    m_Bits: 1078
+    m_Bits: 512
   m_closeDetectionRadius: 1.5
   m_detectionRadius: 15
-  m_fieldOfView: 60
+  m_fieldOfView: 135
   m_attackRange: 6
   m_rememberTargetDuration: 6
+  m_isMeleeCharacter: 0
 --- !u!114 &-2047396381289531555
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1652,7 +1650,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6aaab6021a9b3564aae58e0b3e51edae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &6131654479823208912
+--- !u!114 &4214830320729379172
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1661,13 +1659,27 @@ MonoBehaviour:
   m_GameObject: {fileID: 7868359989750648}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
+  m_Script: {fileID: 11500000, guid: 9b8c4a61274f60b4ea5fb4299cfdbf14, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_SynchronizePosition: 1
-  m_SynchronizeRotation: 0
-  m_SynchronizeScale: 0
-  m_UseLocal: 1
+  ShowLayerWeightsInspector: 1
+  ShowParameterInspector: 1
+  m_SynchronizeParameters:
+  - Type: 1
+    SynchronizeType: 1
+    Name: Speed
+  - Type: 4
+    SynchronizeType: 1
+    Name: IsMoving
+  - Type: 4
+    SynchronizeType: 1
+    Name: IsAttacking
+  - Type: 4
+    SynchronizeType: 1
+    Name: IsDying
+  m_SynchronizeLayers:
+  - SynchronizeType: 0
+    LayerIndex: 0
 --- !u!114 &1106213245304768834
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1689,7 +1701,7 @@ MonoBehaviour:
   ObservedComponents:
   - {fileID: 7868359989718427}
   - {fileID: 2569626399134901076}
-  - {fileID: 6131654479823208912}
+  - {fileID: 4214830320729379172}
   viewIdField: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0

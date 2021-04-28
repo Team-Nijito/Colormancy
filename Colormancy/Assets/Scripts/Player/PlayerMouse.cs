@@ -48,7 +48,7 @@ public class PlayerMouse : MonoBehaviourPunCallbacks
                     PlayerFacingMouse(mousePosition);
                 }
 
-                if (m_data.collider.gameObject) // && m_data.collider.gameObject.tag != "Player") // prevent friendly fire
+                if (m_data.collider.gameObject) // && !m_data.collider.gameObject.CompareTag("Player")) // prevent friendly fire
                 {
                     if (m_animator && m_paScript.isAttackReady())
                     {
@@ -100,7 +100,7 @@ public class PlayerMouse : MonoBehaviourPunCallbacks
             }
             return Vector3.zero;
         }
-        if (Physics.Raycast(ray, out hitData, depth) && hitData.transform.tag == focusTag)
+        if (Physics.Raycast(ray, out hitData, depth) && hitData.transform.CompareTag(focusTag))
         {
             m_data = hitData;
             return hitData.point;

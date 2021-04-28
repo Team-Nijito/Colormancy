@@ -294,7 +294,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 11a8e5837e19c6e44ba6df06a9c31fd5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TestingMode: 0
 --- !u!114 &5820395927475117110
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -328,6 +327,7 @@ MonoBehaviour:
   m_maxZoom: 25
   m_rotationAmount: 2
   m_camSpeed: 10
+  m_cameraShake: 0
   m_sceneToDeactivateCharacter: YouWinScene
 --- !u!114 &5820395927475117114
 MonoBehaviour:

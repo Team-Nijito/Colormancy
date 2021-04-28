@@ -41,6 +41,7 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     [SerializeField]
     private bool m_isRegenHealth = false;
 
+    [MyBox.ConditionalField("m_isRegenHealth", false)]
     [SerializeField]
     [Range(0f, 100f)]
     private float m_regenHealthPercentage = 1f;
@@ -54,6 +55,8 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     [SerializeField]
     [Tooltip("Used for destroying dead enemies")]
     private float m_timeUntilDestroy = 3.0f;
+
+    private bool m_deathDebounce = false; // if we die, we don't want to invoke cleanup functions more than once!!
 
     #endregion
 
@@ -135,34 +138,21 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
                 m_username.text = owner.NickName;
             }
             // die
-            if (m_effectiveHealth <= 0 && transform.gameObject.tag == "Player")
+            if (m_effectiveHealth <= 0 && transform.gameObject.CompareTag("Player") && !m_deathDebounce)
             {
+                m_deathDebounce = true;
                 // player respawns in the middle
                 photonView.RPC("RespawnPlayer", RpcTarget.All);
             }
         }
         else
         {
-            if (m_effectiveHealth <= 0)
+            // die
+            if (m_effectiveHealth <= 0 && !m_deathDebounce)
             {
-                {
-                    EnemyChaserAI controllerScript = GetComponent<EnemyChaserAI>();
-                    controllerScript.StopAllTasks(); // stop all ongoing status effects
-                    controllerScript.enabled = false; // works for all AI b/c all AI scripts derive from EnemyChaserAI
-
-                    // disable movement, collider
-                    GetComponent<NavMeshAgent>().velocity = Vector3.zero;
-                    GetComponent<NavMeshAgent>().enabled = false;
-                    GetComponent<Collider>().enabled = false;
-
-                    // disable health bar and name
-                    m_healthBar.gameObject.SetActive(false);
-
-                    // play dying animation
-                    m_animManager.ChangeState(EnemyAnimationManager.EnemyState.Death);
-                    // for other objects, we may want to destroy them
-                    StartCoroutine(DelayedDestruction(m_timeUntilDestroy));
-                }
+                m_deathDebounce = true;
+                // tell everyone this enemy is deceased
+                photonView.RPC("EnemyCleanup", RpcTarget.All);
             }
         }
 
@@ -182,6 +172,65 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
 
     #region Private functions
 
+    // (PunRPC) Invoke to share the fact that this entity (at this point assumed to be an enemy) has died
+    [PunRPC]
+    private void EnemyCleanup()
+    {
+        EnemyChaserAI controllerScript = GetComponent<EnemyChaserAI>(); // works for all AI b/c all AI scripts derive from EnemyChaserAI
+        controllerScript.StopAllTasks(); // stop all ongoing status effects, then disable any fellow scripts
+
+        // play dying animation
+        m_animManager.ChangeState(EnemyAnimationManager.EnemyState.Death);
+
+        // disable health bar and name
+        m_healthBar.gameObject.SetActive(false);
+
+        // disable movement
+        NavMeshAgent agent = GetComponent<NavMeshAgent>();
+        agent.velocity = Vector3.zero;
+        agent.enabled = false;
+
+        // make collider smaller so that we won't notice it when we bump into it
+        // but also permit it to still be affected by any ongoing forces
+        CapsuleCollider capCollider = GetComponent<CapsuleCollider>();
+        capCollider.height = capCollider.radius;
+        capCollider.center = new Vector3(0, 0.02f, 0);
+        
+        if (PhotonNetwork.IsMasterClient)
+        {
+            // only destroy this object if we're the master client
+            StartCoroutine(DelayedDestruction(m_timeUntilDestroy));
+        }
+    }
+
+    // Used for destroying dead enemies
+    private IEnumerator DelayedDestruction(float seconds)
+    {
+        yield return new WaitForSecondsRealtime(seconds);
+        PhotonNetwork.Destroy(transform.gameObject);
+
+        // only invoke this once so we don't get multiple enemies to spawn
+        if (PhotonNetwork.IsMasterClient)
+        {
+            // Notify the Enemy Manager that an enemy has died
+            GameObject.Find("EnemyManager").GetComponent<EnemyManager>().EnemyHasDied();
+        }
+    }
+
+    // The healthbar gui faces the main camera (if it exists)
+    private void HealthBarFaceCamera()
+    {
+        // make the health bar orient towards the main camera
+        if (m_healthBarTransform && Camera.main)
+        {
+            m_healthBarTransform.LookAt(Camera.main.transform);
+        }
+    }
+
+    /// <summary>
+    /// This function is invoked during Update() to regen hp if m_isRegenHealth is enabled.
+    /// </summary>
+    /// <param name="percentage"></param>
     private void HealthRegeneration(float percentage)
     {
         if (percentage < 0)
@@ -193,25 +242,6 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
             m_effectiveHealth = m_maxEffectiveHealth;
         else
             m_effectiveHealth = tempNewHealth;
-    }
-
-    // Used for destroying dead enemies
-    private IEnumerator DelayedDestruction(float seconds)
-    {
-        yield return new WaitForSecondsRealtime(seconds);
-        PhotonNetwork.Destroy(transform.gameObject);
-
-        // Notify the Enemy Manager that an enemy has died
-        PhotonView.Get(GameObject.Find("EnemyManager")).RPC("EnemyHasDied", RpcTarget.All);
-    }
-
-    private void HealthBarFaceCamera()
-    {
-        // make the health bar orient towards the main camera
-        if (m_healthBarTransform && Camera.main)
-        {
-            m_healthBarTransform.LookAt(Camera.main.transform);
-        }
     }
 
     #endregion
@@ -246,9 +276,19 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
         // replaces the armorPercentage with new value
 
         // ignore RPCs for dead enemies
-        if (!m_isPlayer && m_animManager.GetCurrentState() == EnemyAnimationManager.EnemyState.Death)
+        if (m_animManager != null)
         {
-            return;
+            if (!m_isPlayer && m_animManager.GetCurrentState() == EnemyAnimationManager.EnemyState.Death)
+            {
+                return;
+            }
+        }
+        else
+        {
+            if (!m_isPlayer)
+            {
+                return;
+            }
         }
 
         m_armorPercentage += armorPercent;
@@ -288,11 +328,15 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     public void TakeDamage(float damageValue)
     {
         // damage formula: health = health - (damage - (damage * armorPercentage))
-        
+        //Debug.Log(("Taking: ", damageValue, " damage"));
+
         // ignore RPCs for dead enemies
-        if (!m_isPlayer && m_animManager.GetCurrentState() == EnemyAnimationManager.EnemyState.Death)
+        if (m_animManager != null)
         {
-            return;
+            if (!m_isPlayer && m_animManager.GetCurrentState() == EnemyAnimationManager.EnemyState.Death)
+            {
+                return;
+            }
         }
 
         if (damageValue <= 0)
@@ -303,6 +347,10 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
         }
     }
 
+    /// <summary>
+    /// (PunRPC) Respawns a player at the spawnpoint they've spawned in, and reset all necessary private fields in any player-related
+    /// components that are initialized at start / awake.
+    /// </summary>
     [PunRPC]
     public void RespawnPlayer()
     {
@@ -337,6 +385,7 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     public void ResetHealth()
     {
         m_effectiveHealth = m_maxEffectiveHealth;
+        m_deathDebounce = false;
     }
 
     #endregion

@@ -9,6 +9,7 @@ public class IndigoSpellController : MonoBehaviour
     [SerializeField]
     private AnimationCurve positionScale;
     private Vector3 fromPlayer;
+    private const Orb.Element element = Orb.Element.Darkness;
 
     [Space]
 
@@ -20,8 +21,6 @@ public class IndigoSpellController : MonoBehaviour
 
     [SerializeField]
     private float spherePaintRadius;
-    [SerializeField]
-    private Color paintColor;
 
     [SerializeField]
     private bool debug;
@@ -51,7 +50,7 @@ public class IndigoSpellController : MonoBehaviour
 
             // paint calls on separate ticks to prevent overloading of physics engine
             if (tick == (PaintingManager.paintingTickFrequency - i) % PaintingManager.paintingTickFrequency + 1)
-                PaintingManager.PaintSphere(paintColor, transform.GetChild(i).position, spherePaintRadius);
+                PaintingManager.PaintSphere(OrbValueManager.getColor(element), transform.GetChild(i).position, spherePaintRadius);
         }
 
         if (tick == PaintingManager.paintingTickFrequency)

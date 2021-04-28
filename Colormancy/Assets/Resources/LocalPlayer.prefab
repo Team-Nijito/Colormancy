@@ -294,7 +294,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 11a8e5837e19c6e44ba6df06a9c31fd5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TestingMode: 0
 --- !u!114 &5820395927475117110
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -309,16 +308,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_walkSpeed: 18
   m_runSpeed: 20
-  m_isMoving: 0
-  m_canMove: 1
-  m_isDashing: 0
-  m_movement: {x: 0, y: 0, z: 0}
-  m_gravity: 9.81
-  m_characterMass: 3
-  m_impactDecay: 5
   m_character: {fileID: 8719925113848596262}
-  m_playerState: 0
-  m_animator: {fileID: 0}
 --- !u!114 &5820395927475117109
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -337,6 +327,7 @@ MonoBehaviour:
   m_maxZoom: 25
   m_rotationAmount: 2
   m_camSpeed: 10
+  m_cameraShake: 0
   m_sceneToDeactivateCharacter: YouWinScene
 --- !u!114 &5820395927475117114
 MonoBehaviour:
@@ -389,7 +380,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aea2c7aba3e4e6343a67593e4e5823ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_statusEffectTickPerXSecond: 0.1
 --- !u!114 &6914068583315090777
 MonoBehaviour:
   m_ObjectHideFlags: 0

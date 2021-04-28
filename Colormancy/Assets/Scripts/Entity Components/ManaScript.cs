@@ -17,6 +17,7 @@ public class ManaScript : MonoBehaviour, IPunObservable
     [SerializeField]
     private bool m_isRegenMana = false;
 
+    [MyBox.ConditionalField("m_isRegenMana", false)]
     [SerializeField]
     [Range(0f, 100f)]
     private float m_regenManaPercentage = 1f;

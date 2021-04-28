@@ -12,8 +12,6 @@ public class BlueSpellSpawnerController : MonoBehaviour
 
     public Orb.GreaterCast greaterCast;
     public Orb.LesserCast lesserCast;
-    public int greaterCastAmt;
-    public int lesserCastAmt;
     public float spellEffectMod;
 
     [Space]
@@ -64,28 +62,28 @@ public class BlueSpellSpawnerController : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.tag.Equals("Enemy"))
+        if (collision.gameObject.CompareTag("Enemy"))
         {
             if (!entitiesEntered.Contains(collision.gameObject))
             {
                 entitiesEntered.Add(collision.gameObject);
-                greaterCast(collision.gameObject, greaterCastAmt, spellEffectMod);
+                greaterCast(collision.gameObject, spellEffectMod, null);
             }
         }
-        else if (collision.gameObject.tag.Equals("Player"))
+        else if (collision.gameObject.CompareTag("Player"))
         {
-            lesserCast(collision.gameObject, lesserCastAmt, spellEffectMod);
+            lesserCast(collision.gameObject, spellEffectMod, null);
         }
     }
 
     private void OnCollisionExit(Collision collision)
     {
-        if (collision.gameObject.tag.Equals("Enemy"))
+        if (collision.gameObject.CompareTag("Enemy"))
         {
             if (!entitiesEntered.Contains(collision.gameObject))
                 entitiesEntered.Remove(collision.gameObject);
         }
-        else if (collision.gameObject.tag.Equals("Player"))
+        else if (collision.gameObject.CompareTag("Player"))
         {
             
         }

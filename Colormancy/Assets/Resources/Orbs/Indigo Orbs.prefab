@@ -123,8 +123,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06a4846db595cbc4c92ae2f0da060162, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  greaterCastAmt: 0
-  lesserCastAmt: 0
   spellEffectMod: 0
 --- !u!1 &886578988284781218
 GameObject:
@@ -249,8 +247,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06a4846db595cbc4c92ae2f0da060162, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  greaterCastAmt: 0
-  lesserCastAmt: 0
   spellEffectMod: 0
 --- !u!1 &1473980875905217965
 GameObject:
@@ -336,9 +332,8 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  lifetime: 20
+  lifetime: 5
   spherePaintRadius: 2
-  paintColor: {r: 0.2056875, g: 0.06038627, b: 0.5566038, a: 0}
   debug: 0
 --- !u!1 &1473980876237145431
 GameObject:
@@ -463,8 +458,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06a4846db595cbc4c92ae2f0da060162, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  greaterCastAmt: 0
-  lesserCastAmt: 0
   spellEffectMod: 0
 --- !u!1 &1473980876778606413
 GameObject:
@@ -589,8 +582,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06a4846db595cbc4c92ae2f0da060162, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  greaterCastAmt: 0
-  lesserCastAmt: 0
   spellEffectMod: 0
 --- !u!1 &1473980877241064068
 GameObject:
@@ -715,8 +706,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06a4846db595cbc4c92ae2f0da060162, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  greaterCastAmt: 0
-  lesserCastAmt: 0
   spellEffectMod: 0
 --- !u!1 &1473980877437192367
 GameObject:
@@ -841,8 +830,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06a4846db595cbc4c92ae2f0da060162, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  greaterCastAmt: 0
-  lesserCastAmt: 0
   spellEffectMod: 0
 --- !u!1 &2068735082402337248
 GameObject:
@@ -967,8 +954,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06a4846db595cbc4c92ae2f0da060162, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  greaterCastAmt: 0
-  lesserCastAmt: 0
   spellEffectMod: 0
 --- !u!1 &2132313222528598097
 GameObject:
@@ -1093,8 +1078,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06a4846db595cbc4c92ae2f0da060162, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  greaterCastAmt: 0
-  lesserCastAmt: 0
   spellEffectMod: 0
 --- !u!1 &2804608864995485702
 GameObject:
@@ -1219,8 +1202,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06a4846db595cbc4c92ae2f0da060162, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  greaterCastAmt: 0
-  lesserCastAmt: 0
   spellEffectMod: 0
 --- !u!1 &3034098667555604794
 GameObject:
@@ -1345,8 +1326,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06a4846db595cbc4c92ae2f0da060162, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  greaterCastAmt: 0
-  lesserCastAmt: 0
   spellEffectMod: 0
 --- !u!1 &5850872045483897601
 GameObject:
@@ -1471,8 +1450,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06a4846db595cbc4c92ae2f0da060162, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  greaterCastAmt: 0
-  lesserCastAmt: 0
   spellEffectMod: 0
 --- !u!1 &6404678564735254771
 GameObject:
@@ -1597,8 +1574,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06a4846db595cbc4c92ae2f0da060162, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  greaterCastAmt: 0
-  lesserCastAmt: 0
   spellEffectMod: 0
 --- !u!1 &6915124530430154221
 GameObject:
@@ -1723,8 +1698,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06a4846db595cbc4c92ae2f0da060162, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  greaterCastAmt: 0
-  lesserCastAmt: 0
   spellEffectMod: 0
 --- !u!1 &7475946755629996231
 GameObject:
@@ -1849,8 +1822,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06a4846db595cbc4c92ae2f0da060162, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  greaterCastAmt: 0
-  lesserCastAmt: 0
   spellEffectMod: 0
 --- !u!1 &8067606989056757931
 GameObject:
@@ -1975,8 +1946,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06a4846db595cbc4c92ae2f0da060162, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  greaterCastAmt: 0
-  lesserCastAmt: 0
   spellEffectMod: 0
 --- !u!1 &9125681601737445567
 GameObject:
@@ -2101,6 +2070,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06a4846db595cbc4c92ae2f0da060162, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  greaterCastAmt: 0
-  lesserCastAmt: 0
   spellEffectMod: 0

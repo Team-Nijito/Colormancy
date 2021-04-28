@@ -48,7 +48,7 @@ public class Stun : StatusEffect
         m_isPlayer = false;
         m_enemyMove = eMove;
 
-        m_enemyMove.DisableAgent();
+        m_enemyMove.DisableAgent(true, true);
     }
 
     /// <summary>
