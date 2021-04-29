@@ -108,5 +108,8 @@ public class PlayerAttack : MonoBehaviourPun
         Quaternion characterRotation = m_playerCharacter.transform.rotation;
 
         // do attack here (instantiate, add velocity, etc...)
+        GameObject g = GameObject.Instantiate(Resources.Load("AutoAttackProjectile"), characterPosition + Vector3.up, characterRotation) as GameObject;
+        AutoAttackProjectileController controller = g.GetComponent<AutoAttackProjectileController>();
+        controller.playerColor = m_paintColor;
     }
 }
