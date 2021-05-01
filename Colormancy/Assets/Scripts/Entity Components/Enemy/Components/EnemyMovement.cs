@@ -559,25 +559,5 @@ public class EnemyMovement : MonoBehaviourPun, IPunObservable
         }
     }
 
-
-    // IPunObservable Implementation
-    //public void OnMasterClientSwitched(Player newMasterClient)
-    //{
-    //    print("BAZINGA!");
-
-    //    // If the master client leaves, a new player will be assigned as a master client
-    //    // Check to see if the current client is the master client, and so we'll reenable the AI scripts
-    //    // enemyTargeting and the main AI script (EnemyChaser, EnemyRangedAI, etc)
-
-    //    if (newMasterClient.IsLocal)
-    //    {
-    //        // Reactivate this AI for this client, and begin syncing to the other clients.
-    //        m_canInvokeMovementFunctions = true;
-    //        m_enemTargeting.enabled = true;
-    //        m_mainAIScript.enabled = true;
-    //        m_navMeshAgent.enabled = true;
-    //    }
-    //}
-
     #endregion
 }

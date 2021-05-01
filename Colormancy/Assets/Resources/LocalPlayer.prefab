@@ -294,7 +294,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 11a8e5837e19c6e44ba6df06a9c31fd5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TestingMode: 1
 --- !u!114 &5820395927475117110
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -369,6 +368,7 @@ MonoBehaviour:
   m_isRegenHealth: 1
   m_regenHealthPercentage: 0.5
   m_timeUntilDestroy: 3
+  m_playAnimationOnDeathIfAttacking: 1
 --- !u!114 &8874534546471761686
 MonoBehaviour:
   m_ObjectHideFlags: 0

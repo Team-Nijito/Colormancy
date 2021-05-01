@@ -191,7 +191,7 @@ GameObject:
   - component: {fileID: 3708072816501428869}
   - component: {fileID: 3708072816501428868}
   m_Layer: 10
-  m_Name: PlayerName
+  m_Name: EntityName
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -256,7 +256,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Skeleton
+  m_Text: Skeleton chaser
 --- !u!114 &3708072816501428868
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1107,6 +1107,7 @@ MonoBehaviour:
   m_isRegenHealth: 0
   m_regenHealthPercentage: 1
   m_timeUntilDestroy: 3
+  m_playAnimationOnDeathIfAttacking: 1
 --- !u!114 &-3158070480734117150
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1154,9 +1155,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1debee2c94412d041bf87ca10128c148, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_playerLayer:
+  m_raycastLayer:
     serializedVersion: 2
-    m_Bits: 512
+    m_Bits: 769
   m_closeDetectionRadius: 1.5
   m_detectionRadius: 15
   m_fieldOfView: 135

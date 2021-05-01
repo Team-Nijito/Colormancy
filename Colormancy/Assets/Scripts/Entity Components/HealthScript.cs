@@ -58,6 +58,9 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
 
     private bool m_deathDebounce = false; // if we die, we don't want to invoke cleanup functions more than once!!
 
+    [SerializeField]
+    private bool m_playAnimationOnDeathIfAttacking = true; // only false if their attack animation is supposed to destroy the character (i.e. bomb)
+
     #endregion
 
     #region Components
@@ -68,8 +71,6 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     private EnemyAnimationManager m_animManager;
     private Chromaturgy.CameraController m_camController;
     private Transform m_healthBarTransform;
-
-    private PlayerMovement m_playerMovement;
 
     #endregion
 
@@ -84,7 +85,6 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
         {
             m_mScript = GetComponent<ManaScript>();
             m_camController = GetComponent<Chromaturgy.CameraController>();
-            m_playerMovement = GetComponent<PlayerMovement>();
 
             if (photonView.IsMine)
             {
@@ -179,9 +179,6 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
         EnemyChaserAI controllerScript = GetComponent<EnemyChaserAI>(); // works for all AI b/c all AI scripts derive from EnemyChaserAI
         controllerScript.StopAllTasks(); // stop all ongoing status effects, then disable any fellow scripts
 
-        // play dying animation
-        m_animManager.ChangeState(EnemyAnimationManager.EnemyState.Death);
-
         // disable health bar and name
         m_healthBar.gameObject.SetActive(false);
 
@@ -195,11 +192,40 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
         CapsuleCollider capCollider = GetComponent<CapsuleCollider>();
         capCollider.height = capCollider.radius;
         capCollider.center = new Vector3(0, 0.02f, 0);
-        
-        if (PhotonNetwork.IsMasterClient)
+
+        if (m_playAnimationOnDeathIfAttacking)
         {
-            // only destroy this object if we're the master client
-            StartCoroutine(DelayedDestruction(m_timeUntilDestroy));
+            // play dying animation
+            m_animManager.ChangeState(EnemyAnimationManager.EnemyState.Death);
+
+            if (PhotonNetwork.IsMasterClient)
+            {
+                // only destroy this object if we're the master client
+                StartCoroutine(DelayedDestruction(m_timeUntilDestroy));
+            }
+        }
+        else
+        {
+            if (m_animManager.GetCurrentState() == EnemyAnimationManager.EnemyState.Attack)
+            {
+                // don't play dying animation, and simply destroy the object right away
+                if (PhotonNetwork.IsMasterClient)
+                {
+                    // only destroy this object if we're the master client
+                    StartCoroutine(DelayedDestruction(0));
+                }
+            }
+            else
+            {
+                // play dying animation
+                m_animManager.ChangeState(EnemyAnimationManager.EnemyState.Death);
+
+                if (PhotonNetwork.IsMasterClient)
+                {
+                    // only destroy this object if we're the master client
+                    StartCoroutine(DelayedDestruction(m_timeUntilDestroy));
+                }
+            }
         }
     }
 
@@ -209,12 +235,8 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
         yield return new WaitForSecondsRealtime(seconds);
         PhotonNetwork.Destroy(transform.gameObject);
 
-        // only invoke this once so we don't get multiple enemies to spawn
-        if (PhotonNetwork.IsMasterClient)
-        {
-            // Notify the Enemy Manager that an enemy has died
-            GameObject.Find("EnemyManager").GetComponent<EnemyManager>().EnemyHasDied();
-        }
+        // Notify the Enemy Manager that an enemy has died
+        GameObject.Find("EnemyManager").GetComponent<EnemyManager>().EnemyHasDied();
     }
 
     // The healthbar gui faces the main camera (if it exists)
@@ -386,6 +408,14 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     {
         m_effectiveHealth = m_maxEffectiveHealth;
         m_deathDebounce = false;
+    }
+
+    /// <summary>
+    /// Sets the effective health to 0, killing the entity.
+    /// </summary>
+    public void ZeroHealth()
+    {
+        m_effectiveHealth = 0;
     }
 
     #endregion
