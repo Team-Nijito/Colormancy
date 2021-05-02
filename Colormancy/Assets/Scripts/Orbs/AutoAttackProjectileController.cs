@@ -23,6 +23,9 @@ public class AutoAttackProjectileController : MonoBehaviour
     void Start()
     {
         startTime = Time.time;
+
+        Material projectileMaterial = GetComponent<TrailRenderer>().material;
+        projectileMaterial.SetColor("_Color", playerColor);
     }
 
     // Update is called once per frame
