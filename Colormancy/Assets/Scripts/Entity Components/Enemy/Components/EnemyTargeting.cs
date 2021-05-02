@@ -3,6 +3,7 @@ using Photon.Realtime;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
+using PhotonHashtable = ExitGames.Client.Photon.Hashtable; // to use with Photon's CustomProperties
 
 [RequireComponent(typeof(NavMeshAgent))]
 [RequireComponent(typeof(PhotonView))]
@@ -272,25 +273,34 @@ public class EnemyTargeting : MonoBehaviourPun
         Transform targetTransform = null;
         float targetDistance = -1;
 
-        // Focus on the closest players from all players
+        // Focus on the closest players from all alive players (ignore dead players)
         foreach (Player play in PhotonNetwork.PlayerList)
         {
-            GameObject playObj = play.TagObject as GameObject;
-            if (playObj)
+            // Check if player is alive
+            PhotonHashtable playerProperties = PhotonNetwork.LocalPlayer.CustomProperties;
+            object playerAliveProperty;
+            if (playerProperties.TryGetValue(GameManager.PlayerAliveKey, out playerAliveProperty))
             {
-                float tmpDistance = Vector3.Distance(playObj.transform.position, transform.position);
-                if (targetTransform)
+                if ((bool)playerAliveProperty)
                 {
-                    if (tmpDistance < Vector3.Distance(targetTransform.position, transform.position))
+                    GameObject playObj = play.TagObject as GameObject;
+                    if (playObj)
                     {
-                        targetTransform = playObj.transform;
-                        targetDistance = tmpDistance;
+                        float tmpDistance = Vector3.Distance(playObj.transform.position, transform.position);
+                        if (targetTransform)
+                        {
+                            if (tmpDistance < Vector3.Distance(targetTransform.position, transform.position))
+                            {
+                                targetTransform = playObj.transform;
+                                targetDistance = tmpDistance;
+                            }
+                        }
+                        else
+                        {
+                            targetTransform = playObj.transform;
+                            targetDistance = tmpDistance;
+                        }
                     }
-                }
-                else
-                {
-                    targetTransform = playObj.transform;
-                    targetDistance = tmpDistance;
                 }
             }
         }
