@@ -85,7 +85,7 @@ TrailRenderer:
       m_Curve:
       - serializedVersion: 3
         time: 0.048099518
-        value: 0.5151529
+        value: 0.27272886
         inSlope: 0
         outSlope: 0
         tangentMode: 0
@@ -94,7 +94,7 @@ TrailRenderer:
         outWeight: 0.33333334
       - serializedVersion: 3
         time: 1
-        value: 0.29545593
+        value: 0.05303192
         inSlope: 0
         outSlope: 0
         tangentMode: 0
@@ -224,6 +224,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 0.1
   lifetime: 10
-  paintRadius: 1.5
+  paintRadius: 1.4
   playerColor: {r: 0, g: 0, b: 0, a: 0}
   debug: 0
