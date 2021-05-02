@@ -16,13 +16,14 @@ public class DianeAI : BossAI
     public float IdleCooldown = 5f;
 
     [HideInInspector]
-    public float currentIdleCooldown = 5f;
-    [HideInInspector]
     public float currentSlashCooldown = 0f;
     [HideInInspector]
-    public float currentHamstringCooldown = 13f;
+    public float currentHamstringCooldown = 0f;
     [HideInInspector]
     public float currentFocusFireCooldown = 0f;
+    [HideInInspector]
+    public float currentIdleCooldown = 0f;
+
 
     // Start is called before the first frame update
     void Start()
@@ -49,6 +50,7 @@ public class DianeAI : BossAI
         //Tick Cooldowns
         currentSlashCooldown += Time.deltaTime;
         currentHamstringCooldown += Time.deltaTime;
+        currentFocusFireCooldown += Time.deltaTime;
         currentIdleCooldown += Time.deltaTime;
     }
 

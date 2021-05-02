@@ -40,6 +40,12 @@ public abstract class BossAI : StateMachine
         return dist;
     }
 
+    public Vector3 NormalizedDirectionToTarget()
+    {
+        Vector3 dir = Target.transform.position - transform.position;
+        return Vector3.Normalize(dir);
+    }
+
     public Vector3 DirectionToTarget()
     {
         Vector3 dir = Target.transform.position - transform.position;

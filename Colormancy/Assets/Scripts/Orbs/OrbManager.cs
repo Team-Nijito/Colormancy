@@ -13,7 +13,7 @@ public class OrbInfo
     public float manaMod;
 }
 
-public class SpellTest : MonoBehaviourPun
+public class OrbManager : MonoBehaviourPun
 {
     public static List<Orb> orbHistory = new List<Orb>(); // static variable that keep tracks of orbs in between scenes
 
@@ -198,7 +198,7 @@ public class SpellTest : MonoBehaviourPun
         // update the player's orbs from the previous scene
         foreach (Orb o in orbHistory.ToArray())
         {
-            switch (o.OrbElement)
+            switch (o.getElement())
             {
                 case Orb.Element.Wrath:
                     AddSpellOrb(new RedOrb());
@@ -228,7 +228,7 @@ public class SpellTest : MonoBehaviourPun
                     AddSpellOrb(new IndigoOrb());
                     break;
                 default:
-                    throw new NotImplementedException("Didn't implement adding " + o.OrbElement + " yet");
+                    throw new NotImplementedException("Didn't implement adding " + o.getElement() + " yet");
             }
         }
     }
