@@ -148,6 +148,10 @@ public class StatusEffectScript : MonoBehaviourPun
         }
     }
 
+    #endregion
+
+    #region RPC Calls
+
     /// <summary>
     /// (PunRPC) Apply a stun effect if it doesn't already exist on this player, otherwise
     /// reset the duration of the stun effect (doesn't stack stun effects)
@@ -277,6 +281,8 @@ public class StatusEffectScript : MonoBehaviourPun
     #endregion
 
     #region Public functions
+
+    //public void RPCApplyStatus(StatusEffect.StatusType status, float duration, float damage, )
 
     /// <summary>
     /// Blind a characters. If it's an AI, they will panic and will not be able to target players.
