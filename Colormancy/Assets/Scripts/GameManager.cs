@@ -105,6 +105,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     [SerializeField]
     private EnemyManager m_enemManager;
 
+    [SerializeField]
+    private GameObject paintingManagerObject;
+    [SerializeField]
+    private GameObject orbValueManagerObject;
+
     #endregion
 
     #region MonoBehaviour callbacks
@@ -164,6 +169,12 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
                 // these custom properties will be mutated whenver a player picks up a lobby orb / return a lobby orb
             }
 
+            // Add in Painting Manager and Orb Value Manager classes manually
+            if (!GameObject.Find("OrbValueManager"))
+                Instantiate(orbValueManagerObject);
+            if (!GameObject.Find("PaintingManager"))
+                Instantiate(paintingManagerObject);
+
             if (PlayerController.LocalPlayerInstance == null)
             {
                 if (HealthScript.LocalPlayerInstance == null)
@@ -207,6 +218,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
                         // Reset their spell GUI reference
                         player.GetComponent<OrbManager>().Initialization();
+
                     }
                 }
             }

@@ -49,13 +49,17 @@ MonoBehaviour:
   m_defaultSpawn: {x: 0, y: 3, z: 0}
   m_playerPrefab: {fileID: 5820395927475117105, guid: 7f1c285412074014d837633f8e97020d,
     type: 3}
-  m_doSpawnPlayer: 1
-  m_isLobby: 0
+  m_isLevel: 1
   m_playersNeededToStartGame: 4
   m_levelAfterLobbyLevel: Office Level 1
-  m_paintPercentageToWin: 0.75
   m_levelAfterBeatingStage: YouWinScene
+  m_paintPercentageNeededToWin: 0.75
   popUpBox: {fileID: 0}
+  m_enemManager: {fileID: 0}
+  paintingManagerObject: {fileID: 4357036746896951994, guid: 5b3942a94b38acd47a7c03b7a5f8d0e5,
+    type: 3}
+  orbValueManagerObject: {fileID: 655265155732083151, guid: cacc8b6a92ff8c54693eb64c39ea293c,
+    type: 3}
 --- !u!114 &-4774289116210966217
 MonoBehaviour:
   m_ObjectHideFlags: 0
