@@ -21,6 +21,8 @@ public abstract class BossAI : StateMachine
     /// <summary>
     /// Sets Target variable of boss, returns true if successful, false otherwise
     /// </summary>
+    ///
+    //Maybe make into RPC?
     public bool SetTarget(GameObject target)
     {
         if (target == null) return false;
@@ -38,6 +40,12 @@ public abstract class BossAI : StateMachine
         }
         dist = Vector3.Distance(transform.position, Target.transform.position);
         return dist;
+    }
+
+    public Vector3 NormalizedDirectionToTarget()
+    {
+        Vector3 dir = Target.transform.position - transform.position;
+        return Vector3.Normalize(dir);
     }
 
     public Vector3 DirectionToTarget()

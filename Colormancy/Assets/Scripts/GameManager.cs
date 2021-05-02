@@ -114,6 +114,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     [SerializeField]
     private EnemyManager m_enemManager;
 
+    [SerializeField]
+    private GameObject paintingManagerObject;
+    [SerializeField]
+    private GameObject orbValueManagerObject;
+
     #endregion
 
     #region MonoBehaviour callbacks
@@ -181,6 +186,12 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
                 };
                 PhotonNetwork.LocalPlayer.SetCustomProperties(properties);
             }
+
+            // Add in Painting Manager and Orb Value Manager classes manually
+            if (!GameObject.Find("OrbValueManager"))
+                Instantiate(orbValueManagerObject);
+            if (!GameObject.Find("PaintingManager"))
+                Instantiate(paintingManagerObject);
 
             if (PlayerController.LocalPlayerInstance == null)
             {

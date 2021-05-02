@@ -4,17 +4,18 @@ using UnityEngine;
 
 public class DianeFocusFire : State
 {
-    DianeAI dianeAI;
+    DianeAI m_dianeAI;
     public DianeFocusFire(BossAI bossAI) : base(bossAI)
     {
-        dianeAI = (DianeAI)BossAI;
+        m_dianeAI = (DianeAI)BossAI;
     }
 
     public override IEnumerator Start()
     {
         Debug.Log("Focus Fire State");
-        BossAI.StatusEffect.RPCApplyForce("Knockback", 1, BossAI.DirectionToTarget() + Vector3.up, 30f);
+        BossAI.StatusEffect.RPCApplyForce("Knockback", 2, BossAI.DirectionToTarget() + Vector3.up * 6, 30f);
         BossAI.SetState(new DianeChase(BossAI));
+        BossAI.SetAnimationTrigger("Focus Fire");
         return base.Start();
     }
 
@@ -26,6 +27,7 @@ public class DianeFocusFire : State
 
     public override IEnumerator Stop()
     {
+        m_dianeAI.currentIdleCooldown = 0f;
         return base.Stop();
     }
 }

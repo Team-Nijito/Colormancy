@@ -1206,6 +1206,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7fc410d693ecca6418b2d06f11383381, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  SetAnims: 1
   m_speed: 14
   m_wanderTime:
     minTime: 2
