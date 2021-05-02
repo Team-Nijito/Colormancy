@@ -155,7 +155,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 5055984131693843074}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &8031531064951061002
 BoxCollider:
@@ -291,7 +291,7 @@ RectTransform:
   m_Children:
   - {fileID: 3964398736466881577}
   m_Father: {fileID: 5055984131693843074}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -1110,11 +1110,11 @@ Transform:
   m_LocalScale: {x: 1.533157, y: 1.533157, z: 1.533157}
   m_Children:
   - {fileID: 5059191513281435512}
+  - {fileID: 8359844889555004358}
   - {fileID: 3080544103412659199}
   - {fileID: 2189347654008845692}
   - {fileID: 2426338250337477737}
   - {fileID: 7327824400527507303}
-  - {fileID: 8359844889555004358}
   - {fileID: 8359844889555004290}
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -1227,6 +1227,7 @@ MonoBehaviour:
   m_isRegenHealth: 0
   m_regenHealthPercentage: 1
   m_timeUntilDestroy: 3
+  m_playAnimationOnDeathIfAttacking: 1
 --- !u!114 &5053520976763481858
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2424,7 +2425,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 5055984131693843074}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &7496680896570385929
 MonoBehaviour:
@@ -2520,7 +2521,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 5055984131693843074}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &1791886612801548064
 BoxCollider:
@@ -5316,7 +5317,7 @@ GameObject:
   - component: {fileID: 8359844889555004358}
   - component: {fileID: 8359844889560447658}
   m_Layer: 0
-  m_Name: SM_Chr_Boss_Female_01
+  m_Name: Model
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5334,7 +5335,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 5055984131693843074}
-  m_RootOrder: 5
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!137 &8359844889560447658
 SkinnedMeshRenderer:

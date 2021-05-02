@@ -2,27 +2,23 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
-using Photon.Realtime;
 using UnityEngine.AI;
 
-public class DianeAI : BossAI
+public class HelenAI : BossAI
 {
-    public float SlashRange = 2f;
-    
-    public float SlashCooldown = 5f;
-    public float HamstringCooldown = 15f;
-    public float FocusFireCooldown = 30f;
+    public float ShankCooldown = 5f;
+    public float ShunpoCooldown = 15f;
+    public float HunterOfHeadsCooldown = 45f;
     public float IdleCooldown = 5f;
 
     [HideInInspector]
-    public float currentSlashCooldown = 0f;
+    public float currentShankCooldown = 0f;
     [HideInInspector]
-    public float currentHamstringCooldown = 0f;
+    public float currentShunpoCooldown = 0f;
     [HideInInspector]
-    public float currentFocusFireCooldown = 0f;
+    public float currentHunterOfHeadsCooldown = 0f;
     [HideInInspector]
     public float currentIdleCooldown = 0f;
-
 
     // Start is called before the first frame update
     void Start()
@@ -31,12 +27,12 @@ public class DianeAI : BossAI
         EnemyHitbox = GetComponent<EnemyHitbox>();
         MeshAgent = GetComponent<NavMeshAgent>();
         StatusEffect = GetComponent<StatusEffectScript>();
-        SetState(new DianeChase(this));
+        //SetState(new DianeChase(this));
     }
 
     // Update is called once per frame
     void Update()
-    { 
+    {
         if (Target == null)
         {
             GameObject target = GetTarget();
@@ -45,15 +41,8 @@ public class DianeAI : BossAI
 
         if (State != null)
             State.Update();
-
-        //Tick Cooldowns
-        currentSlashCooldown += Time.deltaTime;
-        currentHamstringCooldown += Time.deltaTime;
-        currentFocusFireCooldown += Time.deltaTime;
-        currentIdleCooldown += Time.deltaTime;
     }
 
-    //Gets target (For Diane that means the player with the highest HP)
     GameObject GetTarget()
     {
         GameObject targetPlayer = null;

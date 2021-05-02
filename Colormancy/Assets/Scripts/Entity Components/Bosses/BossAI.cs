@@ -21,6 +21,8 @@ public abstract class BossAI : StateMachine
     /// <summary>
     /// Sets Target variable of boss, returns true if successful, false otherwise
     /// </summary>
+    ///
+    //Maybe make into RPC?
     public bool SetTarget(GameObject target)
     {
         if (target == null) return false;

@@ -5,20 +5,19 @@ using UnityEngine.AI;
 
 public class DianeChase : State
 {
-    EnemyMovement EnemyMovement;
+    EnemyMovement m_EnemyMovement;
 
-    DianeAI m_dianeAI;
+    DianeAI m_DianeAI;
 
     public DianeChase(BossAI bossAI) : base(bossAI)
     {
-        m_dianeAI = (DianeAI)BossAI;
+        m_DianeAI = (DianeAI)BossAI;
     }
 
     public override IEnumerator Start()
     {
-        Debug.Log("Chase State");
         BossAI.photonView.RPC("SetAnimationBool", Photon.Pun.RpcTarget.All, "Chasing", true);
-        EnemyMovement = BossAI.GetComponent<EnemyMovement>();
+        m_EnemyMovement = BossAI.GetComponent<EnemyMovement>();
         return base.Start();
     }
 
@@ -35,25 +34,25 @@ public class DianeChase : State
         }
 
         //Attacks
-        if (m_dianeAI.currentIdleCooldown >= m_dianeAI.IdleCooldown)
+        if (m_DianeAI.currentIdleCooldown >= m_DianeAI.IdleCooldown)
         {
-            if (m_dianeAI.currentFocusFireCooldown >= m_dianeAI.FocusFireCooldown)
+            if (m_DianeAI.currentFocusFireCooldown >= m_DianeAI.FocusFireCooldown)
             {
-                m_dianeAI.currentFocusFireCooldown = 0f;
+                m_DianeAI.currentFocusFireCooldown = 0f;
                 BossAI.SetState(new DianeFocusFire(BossAI));
                 BossAI.SetTarget(null);
             }
 
-            if (m_dianeAI.currentHamstringCooldown >= m_dianeAI.HamstringCooldown)
+            if (m_DianeAI.currentHamstringCooldown >= m_DianeAI.HamstringCooldown)
             {
-                m_dianeAI.currentHamstringCooldown = 0f;
+                m_DianeAI.currentHamstringCooldown = 0f;
                 BossAI.SetState(new DianeHamstring(BossAI));
                 BossAI.SetTarget(null);
             }
 
-            if (BossAI.InRangeOfTarget(m_dianeAI.SlashRange) && m_dianeAI.currentSlashCooldown >= m_dianeAI.SlashCooldown)
+            if (BossAI.InRangeOfTarget(m_DianeAI.SlashRange) && m_DianeAI.currentSlashCooldown >= m_DianeAI.SlashCooldown)
             {
-                m_dianeAI.currentSlashCooldown = 0f;
+                m_DianeAI.currentSlashCooldown = 0f;
                 BossAI.SetState(new DianeSlash(BossAI));
                 BossAI.SetTarget(null);
             }

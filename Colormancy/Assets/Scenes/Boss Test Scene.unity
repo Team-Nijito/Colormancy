@@ -1501,6 +1501,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5148032849315043572, guid: 5501b673d9a632847a1c8c4c24e94229,
+        type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: d29e137d4dcdca74b82bab57a2a2f761, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5501b673d9a632847a1c8c4c24e94229, type: 3}
 --- !u!1001 &7527247312050948992
@@ -1538,7 +1543,7 @@ PrefabInstance:
     - target: {fileID: 7526208280804268361, guid: 3efeedf7f68e0464e87fb7154ca74f0e,
         type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7526208280804268361, guid: 3efeedf7f68e0464e87fb7154ca74f0e,
         type: 3}
@@ -1554,6 +1559,11 @@ PrefabInstance:
         type: 3}
       propertyPath: HamstringCooldown
       value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7526208280804268362, guid: 3efeedf7f68e0464e87fb7154ca74f0e,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7528249206559368399, guid: 3efeedf7f68e0464e87fb7154ca74f0e,
         type: 3}
