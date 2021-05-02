@@ -108,7 +108,7 @@ public class TestStatusEffect : MonoBehaviour
                 // online - we launched from the launcher and then joined the room
                 if (m_applyDamageOverTime)
                 {
-                    statEffectScript.RPCApplyOrStackDoT(m_isPercentageDamage, m_damage, m_secondDuration, m_damageTypeName);
+                    //statEffectScript.RPCApplyOrStackDoT(m_isPercentageDamage, m_damage, m_secondDuration, m_damageTypeName);
                 }
                 if (m_applyForce)
                 {
@@ -128,16 +128,16 @@ public class TestStatusEffect : MonoBehaviour
                 }
                 if (m_applySlowdown)
                 {
-                    statEffectScript.RPCApplySlowdown("Slow", m_percentReductionInSpeed, m_slowDownDuration);
+                    //statEffectScript.RPCApplySlowdown("Slow", m_percentReductionInSpeed, m_slowDownDuration);
                 }
                 if (m_applyStun)
                 {
-                    statEffectScript.RPCApplyStun(m_stunDuration);
+                    //statEffectScript.RPCApplyStun(m_stunDuration);
                     Destroy(gameObject); // destroy the gameobject to prevent consecutive stuns on collision
                 }
                 if (m_applyBlind)
                 {
-                    statEffectScript.RPCApplyBlind(m_blindDuration);
+                    //statEffectScript.RPCApplyBlind(m_blindDuration);
                     Destroy(gameObject); // destroy the gameobject to prevent consecutive blinds on collision
                 }
             }
@@ -162,7 +162,7 @@ public class TestStatusEffect : MonoBehaviour
             {
                 if (m_applyDamageOverTime)
                 {
-                    statEffectScript.RPCApplyOrStackDoT(m_isPercentageDamage, m_damage, m_secondDuration * Time.deltaTime, m_damageTypeName);
+                    //statEffectScript.RPCApplyOrStackDoT(m_isPercentageDamage, m_damage, m_secondDuration * Time.deltaTime, m_damageTypeName);
                 }
                 if (m_applyForce)
                 {

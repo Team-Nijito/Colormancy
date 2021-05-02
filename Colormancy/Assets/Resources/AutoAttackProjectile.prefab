@@ -222,7 +222,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0664196c8c73a6b4c992aa9a3b9f77d5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 0.1
+  speed: 0.2
   lifetime: 10
   paintRadius: 1.4
   playerColor: {r: 0, g: 0, b: 0, a: 0}

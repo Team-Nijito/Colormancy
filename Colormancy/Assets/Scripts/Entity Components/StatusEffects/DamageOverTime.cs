@@ -13,24 +13,21 @@ public class DamageOverTime : StatusEffect
     #region Accessors (c# Properties)
 
     public float DamagePerSecond { get { return m_dps; } protected set { m_dps = value; } }
-    public bool IsPercentDamage { get { return m_isPercentDamage; } protected set { m_isPercentDamage = value; } }
     
     #endregion
 
     #region Variables
 
     protected float m_dps;
-    protected bool m_isPercentDamage; // is it 1 damage or 1% of health damage
     
     #endregion
 
     #region Functions
 
-    public DamageOverTime(List<StatusEffect> parentList, string name, StatusType type, float duration, float DPS, bool isPercentDamage)
+    public DamageOverTime(List<StatusEffect> parentList, string name, StatusType type, float duration, float DPS)
         : base(parentList, name, type, duration)
     {
         m_dps = DPS;
-        m_isPercentDamage = isPercentDamage;
     }
 
     public override void DoStatusEffect()

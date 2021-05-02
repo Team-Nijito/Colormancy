@@ -17,7 +17,7 @@ public class VioletOrb : Orb
     {
         StatusEffectScript status = hit.GetComponent<StatusEffectScript>();
         // currently stacks, should not
-        status.RPCApplyOrStackDoT(true, OrbValueManager.getGreaterEffectDamage(m_OrbElement, m_Level) * spellEffectMod, OrbValueManager.getGreaterEffectDuration(m_OrbElement, m_Level), "Poison");
+        //status.RPCApplyStatus(true, OrbValueManager.getGreaterEffectDamage(m_OrbElement, m_Level) * spellEffectMod, OrbValueManager.getGreaterEffectDuration(m_OrbElement, m_Level), "Poison");
         //status.RPCApplySlowdown("Slow", 10, orbLevel * 2 + 3);
     }
 

@@ -31,7 +31,7 @@ public class RedOrb : Orb
 
         float orbDuration = OrbValueManager.getGreaterEffectDuration(m_OrbElement, m_Level);
         StatusEffectScript status = hit.GetComponent<StatusEffectScript>();
-        status.RPCApplyStun(orbDuration); // decoupled stun from force, now you need to call stun separately
+        //status.RPCApplyStun(orbDuration); // decoupled stun from force, now you need to call stun separately
         status.RPCApplyForce("Knockback", orbDuration, launchVector + Vector3.up, 40f);
     }
 
