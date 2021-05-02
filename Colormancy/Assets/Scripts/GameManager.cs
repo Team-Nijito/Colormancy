@@ -261,11 +261,14 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
             GameObject playerObj = PhotonNetwork.LocalPlayer.TagObject as GameObject;
 
-            while (playerObj == null)
+            if (playerObj)
             {
-                playerObj = PhotonNetwork.LocalPlayer.TagObject as GameObject;
+                playerObj.GetComponent<OrbManager>().ResetOrbs();
             }
-            playerObj.GetComponent<OrbManager>().ResetOrbs();
+            else
+            {
+                resetPlayerOrbs = false;
+            }
         }
 
         if (PhotonNetwork.IsMasterClient)
