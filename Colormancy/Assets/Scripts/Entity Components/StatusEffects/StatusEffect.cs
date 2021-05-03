@@ -13,7 +13,7 @@ public abstract class StatusEffect
 
     // if you want to mutate the status effect values after class construction, use setters.
     public float Duration { get { return m_duration; } protected set { m_duration = value; } }
-    public string StatusName { get { return m_statusName; } protected set { m_statusName = value; } }
+    public string StatusSource { get { return m_statusSource; } protected set { m_statusSource = value; } }
     public StatusType StatusEffectType { get { return m_statusType; } protected set { m_statusType = value; } }
     
     public List<StatusEffect> ParentList { get { return m_parentList; } protected set { m_parentList = value; } }
@@ -32,7 +32,7 @@ public abstract class StatusEffect
                                                // we would be able to remove the StatusEffect from the list just by
                                                // invoking Tick like normal
 
-    protected string m_statusName;
+    protected string m_statusSource;
     protected StatusType m_statusType;
     protected float m_duration;
 
@@ -48,11 +48,11 @@ public abstract class StatusEffect
     /// <param name="name">The name of the status effect</param>
     /// <param name="type">The type of the status effect</param>
     /// <param name="duration">The duration of the status effect</param>
-    protected StatusEffect(List<StatusEffect> parentList, string name, StatusType type, float duration)
+    protected StatusEffect(List<StatusEffect> parentList, StatusType type, float duration, string source)
     {
         m_parentList = parentList;
 
-        m_statusName = name;
+        m_statusSource = source;
         m_statusType = type;
         m_duration = duration;
     }
@@ -102,7 +102,7 @@ public abstract class StatusEffect
     /// <summary>
     /// Decrease the duration by Time.deltaTime. If duration is zero, invoke Stop, otherwise invokes DoStatusEffect.
     /// </summary>
-    public virtual void Tick()
+    public virtual void Update()
     {
         m_duration -= Time.deltaTime;
         if (m_duration <= 0)

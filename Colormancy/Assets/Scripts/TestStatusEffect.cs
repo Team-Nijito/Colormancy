@@ -109,6 +109,7 @@ public class TestStatusEffect : MonoBehaviour
                 if (m_applyDamageOverTime)
                 {
                     //statEffectScript.RPCApplyOrStackDoT(m_isPercentageDamage, m_damage, m_secondDuration, m_damageTypeName);
+                    //statEffectScript.RPCApplyStatus(StatusEffect.StatusType.DamageOverTime, m_)
                 }
                 if (m_applyForce)
                 {

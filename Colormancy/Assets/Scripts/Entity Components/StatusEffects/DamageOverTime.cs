@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using UnityEngine;
 
 public class DamageOverTime : StatusEffect
 {
@@ -12,22 +13,27 @@ public class DamageOverTime : StatusEffect
 
     #region Accessors (c# Properties)
 
-    public float DamagePerSecond { get { return m_dps; } protected set { m_dps = value; } }
-    
+    public float Damage { get { return m_currentDamage; } protected set { m_currentDamage = value; } }
+
     #endregion
 
     #region Variables
 
-    protected float m_dps;
+    protected float m_currentDamage;
+    protected float m_damage;
+    protected float m_secondsPerTick;
+
+    protected float m_tickTime;
     
     #endregion
 
     #region Functions
 
-    public DamageOverTime(List<StatusEffect> parentList, string name, StatusType type, float duration, float DPS)
-        : base(parentList, name, type, duration)
+    public DamageOverTime(List<StatusEffect> parentList, StatusType type, float duration, string source, float value, float secondsPerTick)
+        : base(parentList, type, duration, source)
     {
-        m_dps = DPS;
+        m_damage = value;
+        m_secondsPerTick = secondsPerTick
     }
 
     public override void DoStatusEffect()
@@ -38,6 +44,21 @@ public class DamageOverTime : StatusEffect
         // and then to send that damage through the network.
         // I don't think it's necessary to send each damage source per tick through the network anyways
         // since the end result will basically be the same.
+
+        // UPDATE: now works on a fixed interval set by the constructor.
+        // The current damage is updated if the time goes over said interval.
+
+        if (m_tickTime > m_secondsPerTick)
+        {
+            m_currentDamage = m_damage;
+            m_tickTime -= m_secondsPerTick;
+        }
+        else
+        {
+            m_currentDamage = 0;
+        }
+
+        m_tickTime += Time.deltaTime;
     }
 
     #endregion
