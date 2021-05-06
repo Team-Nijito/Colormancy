@@ -25392,12 +25392,12 @@ PrefabInstance:
     - target: {fileID: 7917960859537667781, guid: a2874b7c33b663f47add06323276b963,
         type: 3}
       propertyPath: m_levelAfterLobbyLevel
-      value: Office Level 1
+      value: Whitebox Level 1
       objectReference: {fileID: 0}
     - target: {fileID: 7917960859537667781, guid: a2874b7c33b663f47add06323276b963,
         type: 3}
       propertyPath: m_playersNeededToStartGame
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7917960859537667781, guid: a2874b7c33b663f47add06323276b963,
         type: 3}
