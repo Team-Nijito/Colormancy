@@ -48,6 +48,7 @@ public class PaintProgressUI : MonoBehaviour
     private void Update()
     {
         m_paintFillBar.fillAmount = PaintingManager.paintingProgress() / m_gmScript.PaintPercentageNeededToWin;
+        print(PaintingManager.paintingProgress());
         m_brush.position = new Vector2(m_brushInitialXPosition + m_brushTravelDistance * m_paintFillBar.fillAmount, m_brush.position.y);
     }
 

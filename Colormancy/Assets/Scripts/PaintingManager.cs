@@ -179,7 +179,7 @@ public class PaintingManager : MonoBehaviour
 
     public static float paintingProgress()
     {
-        return (float)paintedVertices / vertexCount;
+        return vertexCount != 0 ? (float)paintedVertices / vertexCount : 0;
     }
 
     // every x amount of fixed update ticks, do paint
