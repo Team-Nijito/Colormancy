@@ -62,6 +62,10 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     [SerializeField]
     private bool m_playAnimationOnDeathIfAttacking = true; // only false if their attack animation is supposed to destroy the character (i.e. bomb)
 
+    // spectating after death
+    private GameObject m_spectateGhost;
+    private GameObject m_mainCamera;
+
     #endregion
 
     #region Components
@@ -120,6 +124,9 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
 
         if (m_isPlayer)
         {
+            m_spectateGhost = Resources.Load<GameObject>("Player/SpectateGhost"); // load the ghost for players
+            m_mainCamera = Resources.Load<GameObject>("Main Camera"); // load the main camera for reinstantiate for spectating
+
             // Associate the GameObject that this script belongs to with the player
             // so that if we ever invoke PhotonNetwork.PlayList
             // we can access a player's GameObject with: player.TagObject
@@ -152,8 +159,9 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
                     PhotonNetwork.LocalPlayer.SetCustomProperties(playerProperties);
                 }
 
-                // player respawns in the middle
-                photonView.RPC("RespawnPlayer", RpcTarget.All);
+                // player respawns as spectate camera
+                photonView.RPC("RespawnPlayerAsGhost", PhotonNetwork.LocalPlayer);
+                photonView.RPC("RemovePlayer", RpcTarget.MasterClient);
             }
         }
         else
@@ -381,6 +389,18 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     }
 
     /// <summary>
+    /// (PunRPC) Send this RPC call to the master client if you want to destroy this particular player gameObject.
+    /// </summary>
+    [PunRPC]
+    public void RemovePlayer()
+    {
+        if (PhotonNetwork.IsMasterClient && gameObject)
+        {
+            PhotonNetwork.Destroy(gameObject);
+        }
+    }
+
+    /// <summary>
     /// (PunRPC) Respawns a player at the spawnpoint they've spawned in, and reset all necessary private fields in any player-related
     /// components that are initialized at start / awake.
     /// </summary>
@@ -413,6 +433,30 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     }
 
     /// <summary>
+    /// (PunRPC) Players will spawn in as a ghost. The player who died should send this RPC call to themself.
+    /// </summary>
+    [PunRPC]
+    public void RespawnPlayerAsGhost(PhotonMessageInfo info)
+    {
+        // deactivate the gameObject for now
+        gameObject.SetActive(false);
+
+        // spawn spectate ghost
+        Quaternion spawnRotation = Quaternion.identity;
+        Vector3 spawnPosition = m_gameManager.ReturnSpawnpointPosition(ref spawnRotation);
+        GameObject spectator = PhotonNetwork.Instantiate("Player/" + m_spectateGhost.name, spawnPosition, spawnRotation);
+        spectator.GetComponent<Chromaturgy.CameraController>().SetIsSpectateCamera(true);
+
+        // Instantiate a camera
+        Instantiate(m_mainCamera);
+
+        // Disable UI stuff (both OrbTray and the OrbUI to indicate that you can't cast spells)
+        GameObject canvas = GameObject.Find("Canvas");
+        canvas.transform.Find("LevelUI").transform.Find("OrbTray").gameObject.SetActive(false);
+        canvas.transform.Find("OrbUI(Clone)").gameObject.SetActive(false);
+    }
+
+    /// <summary>
     /// This should only be called when the player dies and respawns (caller should be a PunRPC function)
     /// </summary>
     public void ResetHealth()
@@ -432,17 +476,6 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     #endregion
 
     #region Photon functions
-
-    private void OnPhotonInstantiate(PhotonMessageInfo info)
-    {
-        if (m_isPlayer)
-        {
-            // Associate the GameObject that this script belongs to with the player
-            // so that if we ever invoke PhotonNetwork.PlayList
-            // we can access a player's GameObject with: player.TagObject
-            info.Sender.TagObject = gameObject;
-        }
-    }
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {

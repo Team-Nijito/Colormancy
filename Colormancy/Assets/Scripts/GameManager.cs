@@ -290,14 +290,12 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
                 if (!m_isLoadingNewScene)
                 {
                     bool isAnyPlayerAlive = false;
-                    string outputString = "";
 
                     foreach (Player p in PhotonNetwork.PlayerList)
                     {
                         object playerAliveProperty;
                         if (p.CustomProperties.TryGetValue(PlayerAliveKey, out playerAliveProperty))
                         {
-                            outputString += p.NickName + " " + (bool)playerAliveProperty + " ";
                             if ((bool)playerAliveProperty)
                             {
                                 isAnyPlayerAlive = true;
@@ -312,7 +310,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
                     if (!isAnyPlayerAlive)
                     {
-                        print("all players dead");
                         LoadLobbyLevel();
                     }
                 }
@@ -383,7 +380,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     [PunRPC]
     private void SpawnPlayer(Vector3 spawnPos, Quaternion spawnRot)
     {
-        PhotonNetwork.Instantiate(m_playerPrefab.name, spawnPos, spawnRot);
+        PhotonNetwork.Instantiate("Player/"+m_playerPrefab.name, spawnPos, spawnRot);
     }
 
     private void LoadFirstLevel()

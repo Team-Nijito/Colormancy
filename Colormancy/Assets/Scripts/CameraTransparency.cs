@@ -25,6 +25,12 @@ public class CameraTransparency : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (!m_player)
+        {
+            // if the player is missing, fetch the player's object (relevant when respawning as a spectating camera)
+            m_player = PhotonNetwork.LocalPlayer.TagObject as GameObject;
+        }
+
         m_currentPlayerDistance = CalculateCameraPlayerDistance();
 
         if (m_debug)
