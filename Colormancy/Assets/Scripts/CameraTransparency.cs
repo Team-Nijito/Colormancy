@@ -16,7 +16,7 @@ public class CameraTransparency : MonoBehaviour
 
     private void Start()
     {
-        m_player = GameObject.FindWithTag("Player");
+        m_player = PhotonNetwork.LocalPlayer.TagObject as GameObject; // fetch the local player gameobject
         // savedMats is initialized as an empty list to prevent runtime errors.
         savedMats = new Material[] { };
         savedHits = new HashSet<Transform>();

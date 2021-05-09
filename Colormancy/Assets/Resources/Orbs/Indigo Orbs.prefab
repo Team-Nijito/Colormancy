@@ -332,7 +332,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  lifetime: 5
+  lifetime: 1
   spherePaintRadius: 2
   debug: 0
 --- !u!1 &1473980876237145431

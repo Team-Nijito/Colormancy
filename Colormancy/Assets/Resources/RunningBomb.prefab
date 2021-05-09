@@ -85,7 +85,7 @@ MonoBehaviour:
   m_damage: 50
   m_applyForce: 1
   m_whatForce: 1
-  m_force: 75
+  m_force: 30
 --- !u!1 &3356567027944731674
 GameObject:
   m_ObjectHideFlags: 0

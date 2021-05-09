@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine.AI;
+using PhotonHashtable = ExitGames.Client.Photon.Hashtable; // to use with Photon's CustomProperties
 
 [DisallowMultipleComponent]
 public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
@@ -141,6 +142,16 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
             if (m_effectiveHealth <= 0 && transform.gameObject.CompareTag("Player") && !m_deathDebounce)
             {
                 m_deathDebounce = true;
+
+                // inform the player's custom property that the player has died
+                PhotonHashtable playerProperties = PhotonNetwork.LocalPlayer.CustomProperties;
+                object isPlayerAliveProperty;
+                if (playerProperties.TryGetValue(GameManager.PlayerAliveKey, out isPlayerAliveProperty))
+                {
+                    playerProperties[GameManager.PlayerAliveKey] = false;
+                    PhotonNetwork.LocalPlayer.SetCustomProperties(playerProperties);
+                }
+
                 // player respawns in the middle
                 photonView.RPC("RespawnPlayer", RpcTarget.All);
             }
