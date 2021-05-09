@@ -278,14 +278,14 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
                 // check if all players are ready
                 if (!m_isLoadingNewScene && m_playersReady >= m_playersNeededToStartGame)
                 {
-                    LoadFirstLevel();
+                    LoadLevel(m_levelAfterLobbyLevel);
                 }
             }
             else
             {
                 if (!m_isLoadingNewScene && PaintingManager.paintingProgress() > m_paintPercentageNeededToWin)
                 {
-                    LoadNewSceneAfterFinishedPainting();
+                    LoadLevel(m_levelAfterBeatingStage);
                 }
                 if (!m_isLoadingNewScene)
                 {
@@ -310,7 +310,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
                     if (!isAnyPlayerAlive)
                     {
-                        LoadLobbyLevel();
+                        LoadLevel(m_lobbyLevel);
                     }
                 }
             }
@@ -383,28 +383,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         PhotonNetwork.Instantiate("Player/"+m_playerPrefab.name, spawnPos, spawnRot);
     }
 
-    private void LoadFirstLevel()
-    {
-        if (!m_isLoadingNewScene)
-        {
-            m_isLoadingNewScene = true;
-
-            // do it instantly for now
-            PhotonNetwork.LoadLevel(m_levelAfterLobbyLevel);
-        }
-    }
-
-    private void LoadLobbyLevel()
-    {
-        if (!m_isLoadingNewScene)
-        {
-            m_isLoadingNewScene = true;
-
-            // do it instantly for now
-            PhotonNetwork.LoadLevel(m_lobbyLevel);
-        }
-    }
-    
     [PunRPC]
     private void ReadyUp()
     {
@@ -560,7 +538,25 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
             PhotonNetwork.LoadLevel(m_levelAfterBeatingStage);
         }
     }
-    
+
+    /// <summary>
+    /// Load a new level and transition everyone from the current scene to the new level immediately.
+    /// </summary>
+    /// <param name="pathToScene">Assuming the scene is located in Assets/Scenes/, give the path to the scene and leave out the extension (.unity)</param>
+    public void LoadLevel(string pathToScene)
+    {
+        if (!m_isLoadingNewScene)
+        {
+            m_isLoadingNewScene = true;
+
+            string scenePath = "Assets/Scenes/" + pathToScene + ".unity";
+
+            // Get level by build index because of file organization in the scenes folder, and we can't load a scene in a subfolder by name
+            PhotonNetwork.LoadLevel(SceneUtility.GetBuildIndexByScenePath(scenePath));
+        }
+    }
+
+
     public void NextPage()
     {
         dialoguePage++;

@@ -2,6 +2,7 @@
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Launcher : MonoBehaviourPunCallbacks
 {
@@ -114,11 +115,15 @@ public class Launcher : MonoBehaviourPunCallbacks
     {
         if (PhotonNetwork.CurrentRoom.PlayerCount == 1)
         {
+            string scenePath = "Assets/Scenes/" + sceneNameToLoadIn + ".unity";
+
             if (sceneNameToLoadIn == "Launcher")
             {
                 Debug.LogError("You shouldn't load the Launcher scene because we're already in Launcher.unity");
             }
-            PhotonNetwork.LoadLevel(sceneNameToLoadIn);
+
+            // Get level by build index because of file organization in the scenes folder, and we can't load a scene in a subfolder by name
+            PhotonNetwork.LoadLevel(SceneUtility.GetBuildIndexByScenePath(scenePath));
         }
     }
 
