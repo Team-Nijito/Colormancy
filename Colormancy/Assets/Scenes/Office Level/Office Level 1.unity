@@ -2964,7 +2964,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &57658687
 PrefabInstance:
@@ -3105,7 +3105,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 12
+  m_RootOrder: 13
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &65725501
 GameObject:
@@ -10939,6 +10939,75 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 261839436}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &261979206
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 655265155732083149, guid: cacc8b6a92ff8c54693eb64c39ea293c,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 655265155732083149, guid: cacc8b6a92ff8c54693eb64c39ea293c,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 32.14
+      objectReference: {fileID: 0}
+    - target: {fileID: 655265155732083149, guid: cacc8b6a92ff8c54693eb64c39ea293c,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.42500013
+      objectReference: {fileID: 0}
+    - target: {fileID: 655265155732083149, guid: cacc8b6a92ff8c54693eb64c39ea293c,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 30.57
+      objectReference: {fileID: 0}
+    - target: {fileID: 655265155732083149, guid: cacc8b6a92ff8c54693eb64c39ea293c,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 655265155732083149, guid: cacc8b6a92ff8c54693eb64c39ea293c,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 655265155732083149, guid: cacc8b6a92ff8c54693eb64c39ea293c,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 655265155732083149, guid: cacc8b6a92ff8c54693eb64c39ea293c,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 655265155732083149, guid: cacc8b6a92ff8c54693eb64c39ea293c,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 655265155732083149, guid: cacc8b6a92ff8c54693eb64c39ea293c,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 655265155732083149, guid: cacc8b6a92ff8c54693eb64c39ea293c,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 655265155732083151, guid: cacc8b6a92ff8c54693eb64c39ea293c,
+        type: 3}
+      propertyPath: m_Name
+      value: OrbValueManager
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: cacc8b6a92ff8c54693eb64c39ea293c, type: 3}
 --- !u!1001 &263105880
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -24642,7 +24711,7 @@ Transform:
   - {fileID: 516789217}
   - {fileID: 809309341}
   m_Father: {fileID: 0}
-  m_RootOrder: 9
+  m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &571272600
 PrefabInstance:
@@ -27857,7 +27926,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 8
+  m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &649157518
 PrefabInstance:
@@ -37346,7 +37415,7 @@ PrefabInstance:
     - target: {fileID: 5723581458983218512, guid: 01d23d3206da25e498de6b8ae745894e,
         type: 3}
       propertyPath: m_RootOrder
-      value: 10
+      value: 11
       objectReference: {fileID: 0}
     - target: {fileID: 5723581458983218512, guid: 01d23d3206da25e498de6b8ae745894e,
         type: 3}
@@ -39961,267 +40030,6 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 920041751}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &924871521
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 924871523}
-  - component: {fileID: 924871522}
-  m_Layer: 0
-  m_Name: OrbValueManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &924871522
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 924871521}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 354df758b0cc5974c8caad95c5342edb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  debug: 0
-  orbValues:
-  - element: 0
-    m_OrbColor: {r: 0, g: 0, b: 0, a: 0}
-    m_PaintRadius: 0
-    m_GreaterEffectDamage:
-      m_Level1: 0
-      m_Level2: 0
-      m_Level3: 0
-    m_GreaterEffectPercentile: 0
-    m_GreaterEffectDuration:
-      m_Level1: 0
-      m_Level2: 0
-      m_Level3: 0
-    m_LesserEffectValue:
-      m_Level1: 0
-      m_Level2: 0
-      m_Level3: 0
-    m_LesserEffectDuration:
-      m_Level1: 0
-      m_Level2: 0
-      m_Level3: 0
-    m_ShapeEffectMod: 0
-    m_CooldownMod: 0
-    m_ShapeManaMod: 0
-    m_Level: 0
-  - element: 0
-    m_OrbColor: {r: 0, g: 0, b: 0, a: 0}
-    m_PaintRadius: 0
-    m_GreaterEffectDamage:
-      m_Level1: 0
-      m_Level2: 0
-      m_Level3: 0
-    m_GreaterEffectPercentile: 0
-    m_GreaterEffectDuration:
-      m_Level1: 0
-      m_Level2: 0
-      m_Level3: 0
-    m_LesserEffectValue:
-      m_Level1: 0
-      m_Level2: 0
-      m_Level3: 0
-    m_LesserEffectDuration:
-      m_Level1: 0
-      m_Level2: 0
-      m_Level3: 0
-    m_ShapeEffectMod: 0
-    m_CooldownMod: 0
-    m_ShapeManaMod: 0
-    m_Level: 0
-  - element: 0
-    m_OrbColor: {r: 0, g: 0, b: 0, a: 0}
-    m_PaintRadius: 0
-    m_GreaterEffectDamage:
-      m_Level1: 0
-      m_Level2: 0
-      m_Level3: 0
-    m_GreaterEffectPercentile: 0
-    m_GreaterEffectDuration:
-      m_Level1: 0
-      m_Level2: 0
-      m_Level3: 0
-    m_LesserEffectValue:
-      m_Level1: 0
-      m_Level2: 0
-      m_Level3: 0
-    m_LesserEffectDuration:
-      m_Level1: 0
-      m_Level2: 0
-      m_Level3: 0
-    m_ShapeEffectMod: 0
-    m_CooldownMod: 0
-    m_ShapeManaMod: 0
-    m_Level: 0
-  - element: 0
-    m_OrbColor: {r: 0, g: 0, b: 0, a: 0}
-    m_PaintRadius: 0
-    m_GreaterEffectDamage:
-      m_Level1: 0
-      m_Level2: 0
-      m_Level3: 0
-    m_GreaterEffectPercentile: 0
-    m_GreaterEffectDuration:
-      m_Level1: 0
-      m_Level2: 0
-      m_Level3: 0
-    m_LesserEffectValue:
-      m_Level1: 0
-      m_Level2: 0
-      m_Level3: 0
-    m_LesserEffectDuration:
-      m_Level1: 0
-      m_Level2: 0
-      m_Level3: 0
-    m_ShapeEffectMod: 0
-    m_CooldownMod: 0
-    m_ShapeManaMod: 0
-    m_Level: 0
-  - element: 0
-    m_OrbColor: {r: 0, g: 0, b: 0, a: 0}
-    m_PaintRadius: 0
-    m_GreaterEffectDamage:
-      m_Level1: 0
-      m_Level2: 0
-      m_Level3: 0
-    m_GreaterEffectPercentile: 0
-    m_GreaterEffectDuration:
-      m_Level1: 0
-      m_Level2: 0
-      m_Level3: 0
-    m_LesserEffectValue:
-      m_Level1: 0
-      m_Level2: 0
-      m_Level3: 0
-    m_LesserEffectDuration:
-      m_Level1: 0
-      m_Level2: 0
-      m_Level3: 0
-    m_ShapeEffectMod: 0
-    m_CooldownMod: 0
-    m_ShapeManaMod: 0
-    m_Level: 0
-  - element: 0
-    m_OrbColor: {r: 0, g: 0, b: 0, a: 0}
-    m_PaintRadius: 0
-    m_GreaterEffectDamage:
-      m_Level1: 0
-      m_Level2: 0
-      m_Level3: 0
-    m_GreaterEffectPercentile: 0
-    m_GreaterEffectDuration:
-      m_Level1: 0
-      m_Level2: 0
-      m_Level3: 0
-    m_LesserEffectValue:
-      m_Level1: 0
-      m_Level2: 0
-      m_Level3: 0
-    m_LesserEffectDuration:
-      m_Level1: 0
-      m_Level2: 0
-      m_Level3: 0
-    m_ShapeEffectMod: 0
-    m_CooldownMod: 0
-    m_ShapeManaMod: 0
-    m_Level: 0
-  - element: 0
-    m_OrbColor: {r: 0, g: 0, b: 0, a: 0}
-    m_PaintRadius: 0
-    m_GreaterEffectDamage:
-      m_Level1: 0
-      m_Level2: 0
-      m_Level3: 0
-    m_GreaterEffectPercentile: 0
-    m_GreaterEffectDuration:
-      m_Level1: 0
-      m_Level2: 0
-      m_Level3: 0
-    m_LesserEffectValue:
-      m_Level1: 0
-      m_Level2: 0
-      m_Level3: 0
-    m_LesserEffectDuration:
-      m_Level1: 0
-      m_Level2: 0
-      m_Level3: 0
-    m_ShapeEffectMod: 0
-    m_CooldownMod: 0
-    m_ShapeManaMod: 0
-    m_Level: 0
-  - element: 0
-    m_OrbColor: {r: 0, g: 0, b: 0, a: 0}
-    m_PaintRadius: 0
-    m_GreaterEffectDamage:
-      m_Level1: 0
-      m_Level2: 0
-      m_Level3: 0
-    m_GreaterEffectPercentile: 0
-    m_GreaterEffectDuration:
-      m_Level1: 0
-      m_Level2: 0
-      m_Level3: 0
-    m_LesserEffectValue:
-      m_Level1: 0
-      m_Level2: 0
-      m_Level3: 0
-    m_LesserEffectDuration:
-      m_Level1: 0
-      m_Level2: 0
-      m_Level3: 0
-    m_ShapeEffectMod: 0
-    m_CooldownMod: 0
-    m_ShapeManaMod: 0
-    m_Level: 0
-  - element: 0
-    m_OrbColor: {r: 0, g: 0, b: 0, a: 0}
-    m_PaintRadius: 0
-    m_GreaterEffectDamage:
-      m_Level1: 0
-      m_Level2: 0
-      m_Level3: 0
-    m_GreaterEffectPercentile: 0
-    m_GreaterEffectDuration:
-      m_Level1: 0
-      m_Level2: 0
-      m_Level3: 0
-    m_LesserEffectValue:
-      m_Level1: 0
-      m_Level2: 0
-      m_Level3: 0
-    m_LesserEffectDuration:
-      m_Level1: 0
-      m_Level2: 0
-      m_Level3: 0
-    m_ShapeEffectMod: 0
-    m_CooldownMod: 0
-    m_ShapeManaMod: 0
-    m_Level: 0
---- !u!4 &924871523
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 924871521}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 32.14, y: 0.42500013, z: 30.57}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 13
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &927946912
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -41871,7 +41679,7 @@ Transform:
   - {fileID: 544676336}
   - {fileID: 697744656}
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &957005767
 PrefabInstance:
@@ -50724,7 +50532,7 @@ Transform:
   - {fileID: 518895139}
   - {fileID: 1219878518}
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1175036318
 PrefabInstance:
@@ -53130,7 +52938,7 @@ Transform:
   - {fileID: 257204497}
   - {fileID: 247795705}
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1219620219
 PrefabInstance:
@@ -62170,7 +61978,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1.0000001, z: 1.0000001}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 103.20999, y: -0.000015258789, z: -0.000015258789}
 --- !u!1001 &1474154752
 PrefabInstance:
@@ -89343,7 +89151,7 @@ PrefabInstance:
     - target: {fileID: 6177924026817183471, guid: bef253fdc542f2a45934df5485f93e00,
         type: 3}
       propertyPath: m_RootOrder
-      value: 11
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 6177924026817183471, guid: bef253fdc542f2a45934df5485f93e00,
         type: 3}
