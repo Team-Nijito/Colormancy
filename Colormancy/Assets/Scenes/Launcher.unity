@@ -583,7 +583,7 @@ MonoBehaviour:
   maxPlayersPerRoom: 5
   controlPanel: {fileID: 331092316}
   progressLabel: {fileID: 1583163699}
-  sceneNameToLoadIn: Starting Level
+  sceneNameToLoadIn: Whitebox Level 1
 --- !u!4 &962284967
 Transform:
   m_ObjectHideFlags: 0
