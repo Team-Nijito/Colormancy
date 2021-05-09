@@ -6,6 +6,8 @@ using UnityEngine.AI;
 
 public class HelenAI : BossAI
 {
+    public float ShankRange = 2f;
+
     public float ShankCooldown = 5f;
     public float ShunpoCooldown = 15f;
     public float HunterOfHeadsCooldown = 45f;
@@ -23,11 +25,12 @@ public class HelenAI : BossAI
     // Start is called before the first frame update
     void Start()
     {
+        print("Start");
         Animator = GetComponent<Animator>();
         EnemyHitbox = GetComponent<EnemyHitbox>();
         MeshAgent = GetComponent<NavMeshAgent>();
         StatusEffect = GetComponent<StatusEffectScript>();
-        //SetState(new DianeChase(this));
+        SetState(new HelenChase(this));
     }
 
     // Update is called once per frame
@@ -41,12 +44,17 @@ public class HelenAI : BossAI
 
         if (State != null)
             State.Update();
+
+        currentShankCooldown += Time.deltaTime;
+        currentShunpoCooldown += Time.deltaTime;
+        currentHunterOfHeadsCooldown += Time.deltaTime;
+        currentIdleCooldown += Time.deltaTime;
     }
 
     GameObject GetTarget()
     {
         GameObject targetPlayer = null;
-        float highestHealth = 0;
+        float lowestHealth = 10000;
         PhotonView[] photonViews = FindObjectsOfType<PhotonView>();
         foreach (PhotonView view in photonViews)
         {
@@ -55,9 +63,9 @@ public class HelenAI : BossAI
             if (healthScript && playObj.tag == "Player")
             {
                 float currentHealth = healthScript.GetEffectiveHealth();
-                if (currentHealth > highestHealth)
+                if (currentHealth < lowestHealth)
                 {
-                    highestHealth = currentHealth;
+                    lowestHealth = currentHealth;
                     targetPlayer = playObj;
                 }
             }
