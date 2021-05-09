@@ -16,14 +16,13 @@ public class HelenChase : State
     public override IEnumerator Start()
     {
         Debug.Log("Chase State");
-        BossAI.photonView.RPC("SetAnimationBool", Photon.Pun.RpcTarget.All, "Chasing", true);
+        m_HelenAI.photonView.RPC("SetAnimationBool", Photon.Pun.RpcTarget.All, "Chasing", true);
         m_EnemyMovement = BossAI.GetComponent<EnemyMovement>();
         return base.Start();
     }
 
     public override IEnumerator Update()
     {
-        //Chase player
         if (BossAI.Target != null)
         {
             if (BossAI.DistanceToTarget() > 2f)
@@ -35,15 +34,23 @@ public class HelenChase : State
 
         if (m_HelenAI.currentIdleCooldown >= m_HelenAI.IdleCooldown)
         {
-            if (m_HelenAI.currentShankCooldown >= m_HelenAI.ShankCooldown)
+            if (m_HelenAI.currentShankCooldown >= m_HelenAI.ShankCooldown && m_HelenAI.InRangeOfTarget(m_HelenAI.ShankRange))
             {
                 m_HelenAI.currentShankCooldown = 0f;
                 m_HelenAI.SetState(new HelenShank(BossAI));
                 m_HelenAI.SetTarget(null);
             }
+
+            if (m_HelenAI.currentShunpoCooldown >= m_HelenAI.ShunpoCooldown)
+            {
+                m_HelenAI.currentShunpoCooldown = 0f;
+                m_HelenAI.SetState(new HelenShunpo(BossAI));
+                m_HelenAI.SetTarget(null);
+            }
         }
         return base.Update();
     }
+
     public override IEnumerator Stop()
     {
         BossAI.photonView.RPC("SetAnimationBool", Photon.Pun.RpcTarget.All, "Chasing", false);

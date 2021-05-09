@@ -12,13 +12,16 @@ class HelenShank : State
 
     public override IEnumerator Start()
     {
-
+        Debug.Log("Shank State");
+        m_HelenAI.Movement.FaceTarget(m_HelenAI.DirectionToTarget());
+        m_HelenAI.photonView.RPC("SetAnimationTrigger", Photon.Pun.RpcTarget.All, "Shank");
+        m_HelenAI.SetState(new HelenChase(BossAI));
         return base.Start();
     }
 
     public override IEnumerator Stop()
     {
-        m_HelenAI.currentShankCooldown = 0f;
+        m_HelenAI.currentIdleCooldown = 0f;
         return base.Stop();
     }
 }
