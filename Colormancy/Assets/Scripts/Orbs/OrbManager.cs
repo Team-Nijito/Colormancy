@@ -23,7 +23,7 @@ public class OrbManager : MonoBehaviourPun
     ManaScript mana;
     OrbTrayUIController uIController;
 
-    private readonly bool TestingMode = true; // DEBUG
+    private readonly bool TestingMode = false;
 
     [SerializeField]
     Dictionary<(Type, Type, Type), (float, float)> spellCooldowns = new Dictionary<(Type, Type, Type), (float, float)>(); // key: Orb Tuple, value: (current cooldown, Spell base cooldown)
