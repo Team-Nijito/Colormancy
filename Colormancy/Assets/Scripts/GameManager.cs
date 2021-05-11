@@ -526,33 +526,17 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     }
 
     /// <summary>
-    /// Invoked whenever the % of the stage painted exceeds the goal, and loads a new scene according to m_levelAfterBeatingStage.
-    /// </summary>
-    public void LoadNewSceneAfterFinishedPainting()
-    {
-        if (!m_isLoadingNewScene)
-        {
-            m_isLoadingNewScene = true;
-
-            // do it instantly for now
-            PhotonNetwork.LoadLevel(m_levelAfterBeatingStage);
-        }
-    }
-
-    /// <summary>
     /// Load a new level and transition everyone from the current scene to the new level immediately.
+    /// Guarentees that the level will only be loaded once if this function is invoked more than once.
     /// </summary>
-    /// <param name="pathToScene">Assuming the scene is located in Assets/Scenes/, give the path to the scene and leave out the extension (.unity)</param>
-    public void LoadLevel(string pathToScene)
+    /// <param name="nameOfScene">The name of the scene to load</param>
+    public void LoadLevel(string nameOfScene)
     {
         if (!m_isLoadingNewScene)
         {
             m_isLoadingNewScene = true;
 
-            string scenePath = "Assets/Scenes/" + pathToScene + ".unity";
-
-            // Get level by build index because of file organization in the scenes folder, and we can't load a scene in a subfolder by name
-            PhotonNetwork.LoadLevel(SceneUtility.GetBuildIndexByScenePath(scenePath));
+            PhotonNetwork.LoadLevel(nameOfScene);        
         }
     }
 
