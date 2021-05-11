@@ -22,20 +22,28 @@ public class HelenAI : BossAI
     [HideInInspector]
     public float currentIdleCooldown = 0f;
 
+    public enum States
+    {
+        Shank, Chase, Shunpo
+    }
+
     // Start is called before the first frame update
     void Start()
     {
-        print("Start");
-        Animator = GetComponent<Animator>();
-        EnemyHitbox = GetComponent<EnemyHitbox>();
-        MeshAgent = GetComponent<NavMeshAgent>();
-        StatusEffect = GetComponent<StatusEffectScript>();
-        SetState(new HelenChase(this));
+        if (PhotonNetwork.IsMasterClient)
+        {
+            Animator = GetComponent<Animator>();
+            EnemyHitbox = GetComponent<EnemyHitbox>();
+            MeshAgent = GetComponent<NavMeshAgent>();
+            StatusEffect = GetComponent<StatusEffectScript>();
+            photonView.RPC("SetHelenState", Photon.Pun.RpcTarget.AllViaServer, HelenAI.States.Chase);
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (!PhotonNetwork.IsMasterClient) return;
         if (Target == null)
         {
             GameObject target = GetTarget();
@@ -72,5 +80,23 @@ public class HelenAI : BossAI
         }
 
         return targetPlayer;
+    }
+
+    [PunRPC]
+    public void SetHelenState(States state)
+    {
+        if (photonView.IsMine)
+        {
+            if (state == States.Shank)
+            {
+                SetState(new HelenShank(this));
+            } else if (state == States.Chase)
+            {
+                SetState(new HelenChase(this));
+            } else if (state == States.Shunpo)
+            {
+                SetState(new HelenShunpo(this));
+            }
+        }
     }
 }

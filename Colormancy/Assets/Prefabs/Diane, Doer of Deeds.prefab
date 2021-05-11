@@ -804,8 +804,8 @@ GameObject:
   - component: {fileID: 7526208280804268369}
   - component: {fileID: 7526208280804268371}
   - component: {fileID: 7526208280804268360}
-  - component: {fileID: 7526208280804268368}
   - component: {fileID: 7526208280804268370}
+  - component: {fileID: 7526208280804268368}
   m_Layer: 10
   m_Name: Diane, Doer of Deeds
   m_TagString: Enemy
@@ -962,6 +962,7 @@ MonoBehaviour:
   m_isRegenHealth: 0
   m_regenHealthPercentage: 1
   m_timeUntilDestroy: 3
+  m_playAnimationOnDeathIfAttacking: 1
 --- !u!114 &7526208280804268367
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1044,6 +1045,18 @@ MonoBehaviour:
   viewIdField: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
+--- !u!114 &7526208280804268370
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7526208280804268359}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ba24a809eb142e44bfc0f3df8a39b90, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &7526208280804268368
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1065,21 +1078,15 @@ MonoBehaviour:
   - Type: 4
     SynchronizeType: 2
     Name: Chasing
+  - Type: 9
+    SynchronizeType: 0
+    Name: Focus Fire
+  - Type: 9
+    SynchronizeType: 0
+    Name: Hamstring
   m_SynchronizeLayers:
   - SynchronizeType: 0
     LayerIndex: 0
---- !u!114 &7526208280804268370
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7526208280804268359}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9ba24a809eb142e44bfc0f3df8a39b90, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &7526244861321755801
 GameObject:
   m_ObjectHideFlags: 0

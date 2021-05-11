@@ -23,7 +23,10 @@ public class DianeAI : BossAI
     [HideInInspector]
     public float currentIdleCooldown = 0f;
 
-
+    public enum States
+    {
+        Slash, Chase, FocusFire, Hamstring
+    }
     // Start is called before the first frame update
     void Start()
     {
@@ -31,7 +34,7 @@ public class DianeAI : BossAI
         EnemyHitbox = GetComponent<EnemyHitbox>();
         MeshAgent = GetComponent<NavMeshAgent>();
         StatusEffect = GetComponent<StatusEffectScript>();
-        SetState(new DianeChase(this));
+        photonView.RPC("SetDianeState", Photon.Pun.RpcTarget.AllViaServer, "Chase");
     }
 
     // Update is called once per frame
@@ -75,5 +78,29 @@ public class DianeAI : BossAI
         }
 
         return targetPlayer;
+    }
+
+    [PunRPC]
+    public void SetDianeState(States state)
+    {
+        if (photonView.IsMine)
+        {
+            if (state == States.Slash)
+            {
+                SetState(new DianeSlash(this));
+            }
+            else if (state == States.Chase)
+            {
+                SetState(new DianeChase(this));
+            }
+            else if (state == States.FocusFire)
+            {
+                SetState(new DianeFocusFire(this));
+            }
+            else if (state == States.Hamstring)
+            {
+                SetState(new DianeHamstring(this));
+            }
+        }
     }
 }
