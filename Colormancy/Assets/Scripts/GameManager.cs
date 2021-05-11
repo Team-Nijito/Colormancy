@@ -7,6 +7,44 @@ using PhotonHashtable = ExitGames.Client.Photon.Hashtable; // to use with Photon
 
 public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 {
+    #region Public fields
+
+    // Don't leave the m_levelType as None, set it to a value as soon as possible (when making new scenes)
+    public enum LevelTypes
+    {
+        None,
+        Level,
+        Lobby,
+        Narrative
+    }
+
+    // C# properties for accessing the private variables
+    public LevelTypes TypeOfLevel { get { return m_levelType; } private set { m_levelType = value; } }
+    public int PlayersReady { get { return m_playersReady; } private set { m_playersReady = value; } }
+    public uint PlayersNeededToReady { get { return m_playersNeededToStartGame; } private set { m_playersNeededToStartGame = value; } }
+    public float PaintPercentageNeededToWin { get { return m_paintPercentageNeededToWin; } private set { m_paintPercentageNeededToWin = value; } }
+
+    // Room custom properties
+    public const string RedOrbKey = "RedLoanedToPhotonID";
+    public const string OrangeOrbKey = "OrangeLoanedToPhotonID";
+    public const string YellowOrbKey = "YellowLoanedToPhotonID";
+    public const string GreenOrbKey = "GreenLoanedToPhotonID";
+    public const string BlueOrbKey = "BlueLoanedToPhotonID";
+    public const string VioletOrbKey = "VioletLoanedToPhotonID";
+    public const string BrownOrbKey = "BrownLoanedToPhotonID";
+    public const string QuicksilverOrbKey = "QuicksilverLoanedToPhotonID";
+    public const string IndigoOrbKey = "IndigoLoanedToPhotonID";
+
+    // Player custom properties
+    public const string OrbOwnedInLobbyKey = "OrbOwned";
+    public const string PlayerAliveKey = "IsPlayerAlive";
+
+    // Name of scenes
+    public const string LobbySceneName = "Starting Level";
+    public const string WinSceneName = "YouWinScene";
+    public const string OfficeLv1Name = "Office Level 1";
+    #endregion
+
     #region Private Fields
 
     // General variables
@@ -25,62 +63,34 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     private uint m_currentSpawnIndex = 0; // index of the current spawn to spawn the player, used if m_playerSpawnpoints exists
 
     // Ready up variables
-
-    public bool IsLevel { get { return m_isLevel; } private set { m_isLevel = value; } }
     [SerializeField]
-    private bool m_isLevel = true;
-
-    public int PlayersReady { get { return m_playersReady; } private set { m_playersReady = value; } }
-    public uint PlayersNeededToReady { get { return m_playersNeededToStartGame; } private set { m_playersNeededToStartGame = value; } }
+    private LevelTypes m_levelType = LevelTypes.None;
 
     private int m_playersReady = 0;
 
-    [MyBox.ConditionalField("m_isLevel", true)]
+    [MyBox.ConditionalField(nameof(m_levelType), true, LevelTypes.Level)]
     [SerializeField]
     private uint m_playersNeededToStartGame = 5;
 
-    [MyBox.ConditionalField("m_isLevel", true)]
+    [MyBox.ConditionalField(nameof(m_levelType), true, LevelTypes.Level)]
     [SerializeField]
-    private string m_levelAfterLobbyLevel = OfficeLv1Name;
+    private string m_levelAfterReadyUp = OfficeLv1Name;
 
-    [MyBox.ConditionalField("m_isLevel", true)]
-    [SerializeField]
-    private GameObject m_cameraPrefab;
+    private GameObject m_cameraPrefab; // Instantiate a camera prefab once a player returns back from a level
 
-    [MyBox.ConditionalField("m_isLevel")]
+    [MyBox.ConditionalField(nameof(m_levelType), false, LevelTypes.Level)]
     [SerializeField]
     private string m_levelAfterBeatingStage = WinSceneName;
 
-    private const string m_lobbyLevel = "Starting Level";
     private bool m_isLoadingNewScene = false;
 
     // Painting variables
-    public float PaintPercentageNeededToWin { get { return m_paintPercentageNeededToWin; } private set { m_paintPercentageNeededToWin = value; } }
     [Range(0, 1)]
     [SerializeField]
     private float m_paintPercentageNeededToWin = 0.75f;
 
-    // Room custom properties
-    public const string RedOrbKey = "RedLoanedToPhotonID";
-    public const string OrangeOrbKey = "OrangeLoanedToPhotonID";
-    public const string YellowOrbKey = "YellowLoanedToPhotonID";
-    public const string GreenOrbKey = "GreenLoanedToPhotonID";
-    public const string BlueOrbKey = "BlueLoanedToPhotonID";
-    public const string VioletOrbKey = "VioletLoanedToPhotonID";
-    public const string BrownOrbKey = "BrownLoanedToPhotonID";
-    public const string QuicksilverOrbKey = "QuicksilverLoanedToPhotonID";
-    public const string IndigoOrbKey = "IndigoLoanedToPhotonID";
-
-    // Player custom properties
-    public const string OrbOwnedInLobbyKey = "OrbOwned";
-    public const string PlayerAliveKey = "IsPlayerAlive";
-
+    // Confiscate player orbs var
     private bool resetPlayerOrbs = false; // this flag tells us whenever a player lost and returns to the lobby, confiscate their orbs!
-
-    // Name of scenes
-    public const string LobbySceneName = "Starting Level";
-    public const string WinSceneName = "YouWinScene";
-    public const string OfficeLv1Name = "Office Level 1";
 
     #endregion
 
@@ -127,7 +137,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     {
         if ((SceneManager.GetActiveScene().name == WinSceneName) || !PhotonNetwork.InRoom)
         {
-            // don't do anything
+            // don't run the rest of the start statement, return immediately
             return;
         }
 
@@ -137,6 +147,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         }
         else
         {
+            m_cameraPrefab = Resources.Load<GameObject>("Main Camera"); // load the camera resource before we might need it
+
             if (SceneManager.GetActiveScene().name == LobbySceneName)
             {
                 // Initalize the Room's custom properties once for the starting level
@@ -177,7 +189,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
                 PhotonNetwork.LocalPlayer.SetCustomProperties(properties);
                 // these custom properties will be mutated whenver a player picks up a lobby orb / return a lobby orb
             }
-            else if (m_isLevel)
+            else if (m_levelType == LevelTypes.Level)
             {
                 // Keep track of whether a player is still alive or not
                 PhotonHashtable properties = new PhotonHashtable
@@ -206,8 +218,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
                     // This portion of the code is reached whenever HealthScript.LocalPlayerInstance exists
                     // meaning we're loading a new scene (player is Don't Destroy on load)
 
-                    GameObject playerObject;
-                    if (!m_isLevel && (playerObject = PhotonNetwork.LocalPlayer.TagObject as GameObject) != null)
+                    GameObject playerObject = PhotonNetwork.LocalPlayer.TagObject as GameObject;
+
+                    if (!(m_levelType==LevelTypes.Level) && playerObject)
                     {
                         object playerAliveProperty;
                         bool spawnNewPlayerInstance = false;
@@ -254,8 +267,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
     private void Update()
     {
-        // confiscate player orbs for all players
-        if (!m_isLevel && !resetPlayerOrbs)
+        // Only confiscate player orbs for all players if players have just returned from a level and are all dead
+        if (SceneManager.GetActiveScene().name == LobbySceneName && !resetPlayerOrbs)
         {
             resetPlayerOrbs = true;
 
@@ -263,22 +276,32 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
             if (playerObj)
             {
-                playerObj.GetComponent<OrbManager>().ResetOrbs();
+                object playerAliveProperty;
+
+                if (PhotonNetwork.LocalPlayer.CustomProperties.TryGetValue(PlayerAliveKey, out playerAliveProperty))
+                {
+                    if (!(bool)playerAliveProperty)
+                    {
+                        // the player is dead, remove all of their orbs
+                        playerObj.GetComponent<OrbManager>().ResetOrbs();
+                    }
+                }
             }
             else
             {
+                // playerObj not ready to check yet
                 resetPlayerOrbs = false;
             }
         }
 
         if (PhotonNetwork.IsMasterClient)
         {
-            if (!m_isLevel)
+            if (!(m_levelType == LevelTypes.Level))
             {
                 // check if all players are ready
                 if (!m_isLoadingNewScene && m_playersReady >= m_playersNeededToStartGame)
                 {
-                    LoadLevel(m_levelAfterLobbyLevel);
+                    LoadLevel(m_levelAfterReadyUp);
                 }
             }
             else
@@ -310,7 +333,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
                     if (!isAnyPlayerAlive)
                     {
-                        LoadLevel(m_lobbyLevel);
+                        LoadLevel(LobbySceneName);
                     }
                 }
             }
@@ -730,7 +753,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
-        if (!m_isLevel)
+        if (!(m_levelType == LevelTypes.Level))
         {
             // Synchronize the number of players ready across all clients
             if (stream.IsWriting)
