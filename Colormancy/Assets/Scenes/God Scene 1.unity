@@ -2901,7 +2901,7 @@ PrefabInstance:
     - target: {fileID: 7159188414134713501, guid: b38a1a4117b10d64f8990f0977f034e1,
         type: 3}
       propertyPath: m_RootOrder
-      value: 1
+      value: 9
       objectReference: {fileID: 0}
     - target: {fileID: 7159188414134713501, guid: b38a1a4117b10d64f8990f0977f034e1,
         type: 3}
@@ -6343,6 +6343,11 @@ PrefabInstance:
       propertyPath: m_textInfo.characterCount
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4185180856312476872, guid: 01d23d3206da25e498de6b8ae745894e,
+        type: 3}
+      propertyPath: m_doWeCareThatYouHaveOrbs
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4185180857932783697, guid: 01d23d3206da25e498de6b8ae745894e,
         type: 3}
       propertyPath: m_textInfo.lineCount
@@ -9199,7 +9204,7 @@ PrefabInstance:
     - target: {fileID: 6713501385978202045, guid: a2874b7c33b663f47add06323276b963,
         type: 3}
       propertyPath: m_RootOrder
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6713501385978202045, guid: a2874b7c33b663f47add06323276b963,
         type: 3}
@@ -9263,6 +9268,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7917960859537667781, guid: a2874b7c33b663f47add06323276b963,
         type: 3}
+      propertyPath: m_levelType
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 7917960859537667781, guid: a2874b7c33b663f47add06323276b963,
+        type: 3}
       propertyPath: m_playerPrefab
       value: 
       objectReference: {fileID: 5820395927475117105, guid: 0581afa7c6d1af948a396e0436033cfa,
@@ -9280,7 +9290,7 @@ PrefabInstance:
     - target: {fileID: 7917960859537667781, guid: a2874b7c33b663f47add06323276b963,
         type: 3}
       propertyPath: m_playersNeededToStartGame
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7917960859537667781, guid: a2874b7c33b663f47add06323276b963,
         type: 3}

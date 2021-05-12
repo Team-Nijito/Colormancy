@@ -31,7 +31,7 @@ public class PaintProgressUI : MonoBehaviour
     private void Start()
     {
         m_gmScript = GameObject.Find("GameManager").GetComponent<GameManager>();
-        if (!m_gmScript.IsLevel)
+        if (!(m_gmScript.TypeOfLevel == GameManager.LevelTypes.Level))
         {
             // destroy this gameObject for nonlevel scenes
             Destroy(gameObject);
