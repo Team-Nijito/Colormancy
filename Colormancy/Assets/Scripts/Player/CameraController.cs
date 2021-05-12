@@ -52,6 +52,12 @@ namespace Chromaturgy
         [SerializeField]
         private string m_sceneToDeactivateCharacter = "YouWinScene";
 
+        [Tooltip("This should only be true if this is a spectating camera, which is a camera that is not attached to any player.")]
+        [SerializeField]
+        private bool m_isSpectateCamera = false;
+
+        private Vector3 m_movement = Vector3.zero;
+
         private PlayerMovement m_playerMovementScript;
 
         #endregion
@@ -73,28 +79,41 @@ namespace Chromaturgy
             {
                 gameObject.SetActive(false);
             }
-            else
+            else if (photonView.IsMine)
             {
-                if (m_TCamera && m_isFollowing && m_playerMovementScript.CanMove)
+                if (m_TCamera && m_isFollowing && (m_isSpectateCamera || (!m_isSpectateCamera && m_playerMovementScript.CanMove) ))
                 {
                     HandleCameraZoomInputs();
                     HandleCameraRotationInputs();
+
+                    if (m_isSpectateCamera)
+                    {
+                        HandleCameraMoveInputs();
+                    }
                 }
             }
         }
 
         void FixedUpdate()
         {
-            if (m_TCamera && m_isFollowing)
+            if (photonView.IsMine)
             {
-                // Load saved camera position at start of each update after the first shake occurs.
-                if (m_cameraShake != 0f)
+                if (m_TCamera && m_isFollowing)
                 {
-                    m_TCameraTransform.localPosition = m_TCameraSaved;
+                    // Load saved camera position at start of each update after the first shake occurs.
+                    if (m_cameraShake != 0f)
+                    {
+                        m_TCameraTransform.localPosition = m_TCameraSaved;
+                    }
+                    HandleCameraZoom();
+                    HandleCameraRotation();
+                    HandleCameraShake();
                 }
-                HandleCameraZoom();
-                HandleCameraRotation();
-                HandleCameraShake();
+
+                if (m_isSpectateCamera)
+                {
+                    HandleCameraMove();
+                }
             }
         }
 
@@ -106,6 +125,28 @@ namespace Chromaturgy
         {
             m_TCameraTransform.position = transform.position + m_initialCameraOffset;
             m_TCameraTransform.LookAt(transform);
+        }
+
+        private void HandleCameraMoveInputs()
+        {
+            // Normalize movement vector, so that we don't move faster when
+            // we move diagonally
+            m_movement = new Vector3
+            {
+                x = Input.GetAxisRaw("Horizontal"),
+                y = 0,
+                z = Input.GetAxisRaw("Vertical")
+            }.normalized;
+
+            //CONVERT direction from local to world relative to camera
+            m_movement = Camera.main.transform.TransformDirection(m_movement);
+
+            m_movement.y = 0; // Don't move up and down.
+        }
+
+        private void HandleCameraMove()
+        {
+            transform.position = Vector3.Lerp(transform.position, transform.position + m_movement * m_camSpeed, Time.deltaTime * m_camSpeed);
         }
 
         private void HandleCameraZoomInputs()
@@ -219,6 +260,13 @@ namespace Chromaturgy
         public void SetCameraShake(float shakeAmount)
         {
             m_cameraShake = shakeAmount;
+        }
+
+        // Is this CameraController object a camera rig without a "player object"?
+        public void SetIsSpectateCamera(bool isSpectateCamera)
+        {
+            photonView.Owner.TagObject = gameObject; // we're the player object now
+            m_isSpectateCamera = isSpectateCamera;
         }
 
         #endregion

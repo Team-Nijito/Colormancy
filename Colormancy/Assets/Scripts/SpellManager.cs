@@ -29,6 +29,14 @@ public class SpellManager : MonoBehaviourPun
 
         public void Cast(Transform t, Vector3 clickedPosition)
         {
+            // exception just for quicksilver
+            if(orbs[0].getElement() == Orb.Element.Wind)
+            {
+                GameObject storm = Instantiate(Resources.Load("Orbs/QuickSilver Storm"), t.position, t.rotation) as GameObject;
+                QuickSilverStormController g = storm.GetComponent<QuickSilverStormController>();
+                g.duration = OrbValueManager.getGreaterEffectDuration(Orb.Element.Wind, OrbValueManager.getLevel(Orb.Element.Wind, orbs[0].getLevel()));
+            }
+
             orbs[2].CastShape(orbs[0].CastGreaterEffect, orbs[1].CastLesserEffect, t, clickedPosition);
         }
 

@@ -16,7 +16,7 @@ public class CameraTransparency : MonoBehaviour
 
     private void Start()
     {
-        m_player = GameObject.FindWithTag("Player");
+        m_player = PhotonNetwork.LocalPlayer.TagObject as GameObject; // fetch the local player gameobject
         // savedMats is initialized as an empty list to prevent runtime errors.
         savedMats = new Material[] { };
         savedHits = new HashSet<Transform>();
@@ -25,6 +25,12 @@ public class CameraTransparency : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (!m_player)
+        {
+            // if the player is missing, fetch the player's object (relevant when respawning as a spectating camera)
+            m_player = PhotonNetwork.LocalPlayer.TagObject as GameObject;
+        }
+
         m_currentPlayerDistance = CalculateCameraPlayerDistance();
 
         if (m_debug)
@@ -41,7 +47,7 @@ public class CameraTransparency : MonoBehaviour
         savedHits.Clear();
 
         RaycastHit[] hits = Physics.SphereCastAll(transform.position, m_spherecastRadius, transform.forward, 
-                                     m_currentPlayerDistance);
+                                     m_currentPlayerDistance, ~(1 << 9));
         if (m_debug) { Debug.Log("SpherecastAll() complete"); }
 
         foreach (RaycastHit hit in hits)

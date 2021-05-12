@@ -57,10 +57,10 @@ public class PlayerMouse : MonoBehaviourPunCallbacks
                     }
 
                     // currently unimplemented
-                    //photonView.RPC("ShootPaintball", RpcTarget.All, false, mousePosition);
+                    photonView.RPC("ShootPaintball", RpcTarget.All, false, mousePosition);
 
                     //print(m_data.collider.name);
-                    DebugClickDamage(m_basicClickDamage);
+                    //DebugClickDamage(m_basicClickDamage);
                 }
             }
         }

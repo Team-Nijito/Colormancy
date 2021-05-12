@@ -3,6 +3,7 @@ using Photon.Realtime;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
+using PhotonHashtable = ExitGames.Client.Photon.Hashtable; // to use with Photon's CustomProperties
 
 [RequireComponent(typeof(NavMeshAgent))]
 [RequireComponent(typeof(PhotonView))]
@@ -16,7 +17,7 @@ public class EnemyTargeting : MonoBehaviourPun
     #region Accessors (c# Properties)
     
     public Transform TargetPlayer { get { return m_targetPlayer; } protected set { m_targetPlayer = value;  } }
-    public LayerMask PlayerLayer { get { return m_playerLayer; } protected set { m_playerLayer = value; } }
+    public LayerMask RaycastLayer { get { return m_raycastLayer; } protected set { m_raycastLayer = value; } }
     
     public float CloseDetectionRadius { get { return m_closeDetectionRadius; } protected set { m_closeDetectionRadius = value; } }
     public float DetectionRadius { get { return m_detectionRadius; } protected set { m_detectionRadius = value; } }
@@ -35,7 +36,7 @@ public class EnemyTargeting : MonoBehaviourPun
 
     protected Transform m_targetPlayer;
 
-    [SerializeField] protected LayerMask m_playerLayer;
+    [SerializeField] protected LayerMask m_raycastLayer; // focus on players, and the environment
 
     [SerializeField] protected float m_closeDetectionRadius = 1.5f; // used when a player gets too close to an enemy
     [SerializeField] protected float m_detectionRadius = 30f; // used in every other case
@@ -233,7 +234,7 @@ public class EnemyTargeting : MonoBehaviourPun
             bool canSee = false;
             Ray ray = new Ray(transform.position, m_targetPlayer.transform.position - transform.position);
             RaycastHit hit;
-            if (Physics.Raycast(ray, out hit, m_detectionRadius, m_playerLayer))
+            if (Physics.Raycast(ray, out hit, m_detectionRadius, m_raycastLayer))
             {
                 if (hit.transform == m_targetPlayer)
                 {
@@ -272,28 +273,38 @@ public class EnemyTargeting : MonoBehaviourPun
         Transform targetTransform = null;
         float targetDistance = -1;
 
-        // Focus on the closest players from all players
+        // Focus on the closest players from all alive players (ignore dead players)
         foreach (Player play in PhotonNetwork.PlayerList)
         {
-            GameObject playObj = play.TagObject as GameObject;
-            if (playObj)
+            // Check if player is alive
+            PhotonHashtable playerProperties = play.CustomProperties;
+            object playerAliveProperty;
+            if (playerProperties.TryGetValue(GameManager.PlayerAliveKey, out playerAliveProperty))
             {
-                float tmpDistance = Vector3.Distance(playObj.transform.position, transform.position);
-                if (targetTransform)
+                if ((bool)playerAliveProperty)
                 {
-                    if (tmpDistance < Vector3.Distance(targetTransform.position, transform.position))
+                    GameObject playObj = play.TagObject as GameObject;
+                    if (playObj)
                     {
-                        targetTransform = playObj.transform;
-                        targetDistance = tmpDistance;
+                        float tmpDistance = Vector3.Distance(playObj.transform.position, transform.position);
+                        if (targetTransform)
+                        {
+                            if (tmpDistance < Vector3.Distance(targetTransform.position, transform.position))
+                            {
+                                targetTransform = playObj.transform;
+                                targetDistance = tmpDistance;
+                            }
+                        }
+                        else
+                        {
+                            targetTransform = playObj.transform;
+                            targetDistance = tmpDistance;
+                        }
                     }
-                }
-                else
-                {
-                    targetTransform = playObj.transform;
-                    targetDistance = tmpDistance;
                 }
             }
         }
+
         distanceFromPlayer = targetDistance;
         return targetTransform;
     }

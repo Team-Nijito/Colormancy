@@ -23,7 +23,7 @@ public class OrbManager : MonoBehaviourPun
     ManaScript mana;
     OrbTrayUIController uIController;
 
-    private readonly bool TestingMode = true;
+    private readonly bool TestingMode = false;
 
     [SerializeField]
     Dictionary<(Type, Type, Type), (float, float)> spellCooldowns = new Dictionary<(Type, Type, Type), (float, float)>(); // key: Orb Tuple, value: (current cooldown, Spell base cooldown)
@@ -235,10 +235,18 @@ public class OrbManager : MonoBehaviourPun
 
     /// <summary>
     /// Clear out all current orbs.
-    /// (although this will not update the UI).
     /// </summary>
     public void ResetOrbs()
     {
+        // clean up the UI
+        if (uIController)
+        {
+            foreach (Orb o in orbs)
+            {
+                uIController.RemoveOrb(o);
+            }
+        }
+
         orbHistory.Clear();
         orbs.Clear();
     }

@@ -74,6 +74,7 @@ public class EnemyAnimationManager : MonoBehaviour
     /// <param name="newSpeed"></param>
     public void SetSpeed(float newSpeed)
     {
-        m_animator.SetFloat(speedHash, newSpeed);
+        if (m_animator)
+            m_animator.SetFloat(speedHash, newSpeed);
     }
 }

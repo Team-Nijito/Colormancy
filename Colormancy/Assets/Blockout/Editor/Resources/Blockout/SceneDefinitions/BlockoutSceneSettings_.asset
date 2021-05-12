@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c5a117cf368dd7e4faa602390226be41, type: 3}
+  m_Name: BlockoutSceneSettings_
+  m_EditorClassIdentifier: 
+  sceneName: 
+  currentTheme: 0
+  currentTexture: 0
+  cameraAnchor: []
+  assetDictionary:
+  - assetName: Floor_Angle_Double_4x-025x6
+    assetQuantity: 199
+  - assetName: Floor_Corner_5x-025x5
+    assetQuantity: 14
+  - assetName: Floor_1x-025x2
+    assetQuantity: 397

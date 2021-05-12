@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine.AI;
+using PhotonHashtable = ExitGames.Client.Photon.Hashtable; // to use with Photon's CustomProperties
 
 [DisallowMultipleComponent]
 public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
@@ -58,6 +59,13 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
 
     private bool m_deathDebounce = false; // if we die, we don't want to invoke cleanup functions more than once!!
 
+    [SerializeField]
+    private bool m_playAnimationOnDeathIfAttacking = true; // only false if their attack animation is supposed to destroy the character (i.e. bomb)
+
+    // spectating after death
+    private GameObject m_spectateGhost;
+    private GameObject m_mainCamera;
+
     #endregion
 
     #region Components
@@ -68,8 +76,6 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     private EnemyAnimationManager m_animManager;
     private Chromaturgy.CameraController m_camController;
     private Transform m_healthBarTransform;
-
-    private PlayerMovement m_playerMovement;
 
     #endregion
 
@@ -84,7 +90,6 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
         {
             m_mScript = GetComponent<ManaScript>();
             m_camController = GetComponent<Chromaturgy.CameraController>();
-            m_playerMovement = GetComponent<PlayerMovement>();
 
             if (photonView.IsMine)
             {
@@ -119,6 +124,9 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
 
         if (m_isPlayer)
         {
+            m_spectateGhost = Resources.Load<GameObject>("Player/SpectateGhost"); // load the ghost for players
+            m_mainCamera = Resources.Load<GameObject>("Main Camera"); // load the main camera for reinstantiate for spectating
+
             // Associate the GameObject that this script belongs to with the player
             // so that if we ever invoke PhotonNetwork.PlayList
             // we can access a player's GameObject with: player.TagObject
@@ -141,8 +149,19 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
             if (m_effectiveHealth <= 0 && transform.gameObject.CompareTag("Player") && !m_deathDebounce)
             {
                 m_deathDebounce = true;
-                // player respawns in the middle
-                photonView.RPC("RespawnPlayer", RpcTarget.All);
+
+                // inform the player's custom property that the player has died
+                PhotonHashtable playerProperties = PhotonNetwork.LocalPlayer.CustomProperties;
+                object isPlayerAliveProperty;
+                if (playerProperties.TryGetValue(GameManager.PlayerAliveKey, out isPlayerAliveProperty))
+                {
+                    playerProperties[GameManager.PlayerAliveKey] = false;
+                    PhotonNetwork.LocalPlayer.SetCustomProperties(playerProperties);
+                }
+
+                // player respawns as spectate camera
+                photonView.RPC("RespawnPlayerAsGhost", PhotonNetwork.LocalPlayer);
+                photonView.RPC("RemovePlayer", RpcTarget.MasterClient);
             }
         }
         else
@@ -179,9 +198,6 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
         EnemyChaserAI controllerScript = GetComponent<EnemyChaserAI>(); // works for all AI b/c all AI scripts derive from EnemyChaserAI
         controllerScript.StopAllTasks(); // stop all ongoing status effects, then disable any fellow scripts
 
-        // play dying animation
-        m_animManager.ChangeState(EnemyAnimationManager.EnemyState.Death);
-
         // disable health bar and name
         m_healthBar.gameObject.SetActive(false);
 
@@ -195,11 +211,40 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
         CapsuleCollider capCollider = GetComponent<CapsuleCollider>();
         capCollider.height = capCollider.radius;
         capCollider.center = new Vector3(0, 0.02f, 0);
-        
-        if (PhotonNetwork.IsMasterClient)
+
+        if (m_playAnimationOnDeathIfAttacking)
         {
-            // only destroy this object if we're the master client
-            StartCoroutine(DelayedDestruction(m_timeUntilDestroy));
+            // play dying animation
+            m_animManager.ChangeState(EnemyAnimationManager.EnemyState.Death);
+
+            if (PhotonNetwork.IsMasterClient)
+            {
+                // only destroy this object if we're the master client
+                StartCoroutine(DelayedDestruction(m_timeUntilDestroy));
+            }
+        }
+        else
+        {
+            if (m_animManager.GetCurrentState() == EnemyAnimationManager.EnemyState.Attack)
+            {
+                // don't play dying animation, and simply destroy the object right away
+                if (PhotonNetwork.IsMasterClient)
+                {
+                    // only destroy this object if we're the master client
+                    StartCoroutine(DelayedDestruction(0));
+                }
+            }
+            else
+            {
+                // play dying animation
+                m_animManager.ChangeState(EnemyAnimationManager.EnemyState.Death);
+
+                if (PhotonNetwork.IsMasterClient)
+                {
+                    // only destroy this object if we're the master client
+                    StartCoroutine(DelayedDestruction(m_timeUntilDestroy));
+                }
+            }
         }
     }
 
@@ -209,12 +254,8 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
         yield return new WaitForSecondsRealtime(seconds);
         PhotonNetwork.Destroy(transform.gameObject);
 
-        // only invoke this once so we don't get multiple enemies to spawn
-        if (PhotonNetwork.IsMasterClient)
-        {
-            // Notify the Enemy Manager that an enemy has died
-            GameObject.Find("EnemyManager").GetComponent<EnemyManager>().EnemyHasDied();
-        }
+        // Notify the Enemy Manager that an enemy has died
+        GameObject.Find("EnemyManager").GetComponent<EnemyManager>().EnemyHasDied();
     }
 
     // The healthbar gui faces the main camera (if it exists)
@@ -348,6 +389,18 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     }
 
     /// <summary>
+    /// (PunRPC) Send this RPC call to the master client if you want to destroy this particular player gameObject.
+    /// </summary>
+    [PunRPC]
+    public void RemovePlayer()
+    {
+        if (PhotonNetwork.IsMasterClient && gameObject)
+        {
+            PhotonNetwork.Destroy(gameObject);
+        }
+    }
+
+    /// <summary>
     /// (PunRPC) Respawns a player at the spawnpoint they've spawned in, and reset all necessary private fields in any player-related
     /// components that are initialized at start / awake.
     /// </summary>
@@ -380,6 +433,30 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     }
 
     /// <summary>
+    /// (PunRPC) Players will spawn in as a ghost. The player who died should send this RPC call to themself.
+    /// </summary>
+    [PunRPC]
+    public void RespawnPlayerAsGhost(PhotonMessageInfo info)
+    {
+        // deactivate the gameObject for now
+        gameObject.SetActive(false);
+
+        // spawn spectate ghost
+        Quaternion spawnRotation = Quaternion.identity;
+        Vector3 spawnPosition = m_gameManager.ReturnSpawnpointPosition(ref spawnRotation);
+        GameObject spectator = PhotonNetwork.Instantiate("Player/" + m_spectateGhost.name, spawnPosition, spawnRotation);
+        spectator.GetComponent<Chromaturgy.CameraController>().SetIsSpectateCamera(true);
+
+        // Instantiate a camera
+        Instantiate(m_mainCamera);
+
+        // Disable UI stuff (both OrbTray and the OrbUI to indicate that you can't cast spells)
+        GameObject canvas = GameObject.Find("Canvas");
+        canvas.transform.Find("LevelUI").transform.Find("OrbTray").gameObject.SetActive(false);
+        canvas.transform.Find("OrbUI(Clone)").gameObject.SetActive(false);
+    }
+
+    /// <summary>
     /// This should only be called when the player dies and respawns (caller should be a PunRPC function)
     /// </summary>
     public void ResetHealth()
@@ -388,20 +465,17 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
         m_deathDebounce = false;
     }
 
+    /// <summary>
+    /// Sets the effective health to 0, killing the entity.
+    /// </summary>
+    public void ZeroHealth()
+    {
+        m_effectiveHealth = 0;
+    }
+
     #endregion
 
     #region Photon functions
-
-    private void OnPhotonInstantiate(PhotonMessageInfo info)
-    {
-        if (m_isPlayer)
-        {
-            // Associate the GameObject that this script belongs to with the player
-            // so that if we ever invoke PhotonNetwork.PlayList
-            // we can access a player's GameObject with: player.TagObject
-            info.Sender.TagObject = gameObject;
-        }
-    }
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {

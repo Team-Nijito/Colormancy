@@ -12,22 +12,23 @@ public abstract class BossAI : StateMachine
     public Animator Animator { get; protected set; }
     public EnemyHitbox EnemyHitbox { get; protected set; }
     public NavMeshAgent MeshAgent { get; protected set; }
+    public StatusEffectScript StatusEffect { get; protected set; }
     //public PhotonView PhotonView { get; protected set; }
     #endregion
+        
+    #region Public Methods
 
-    #region Protected Methods
     /// <summary>
     /// Sets Target variable of boss, returns true if successful, false otherwise
     /// </summary>
-    protected bool SetTarget (GameObject target)
+    ///
+    //Maybe make into RPC?
+    public bool SetTarget(GameObject target)
     {
         if (target == null) return false;
         Target = target;
         return true;
     }
-    #endregion
-
-    #region Public Methods
 
     public float DistanceToTarget()
     {
@@ -41,10 +42,21 @@ public abstract class BossAI : StateMachine
         return dist;
     }
 
+    public Vector3 NormalizedDirectionToTarget()
+    {
+        Vector3 dir = Target.transform.position - transform.position;
+        return Vector3.Normalize(dir);
+    }
+
     public Vector3 DirectionToTarget()
     {
-        Vector3 dir = transform.position - Target.transform.position;
+        Vector3 dir = Target.transform.position - transform.position;
         return dir;
+    }
+
+    public bool InRangeOfTarget(float range)
+    {
+        return DistanceToTarget() <= range;
     }
     #endregion
 

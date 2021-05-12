@@ -60,6 +60,9 @@ public class EnemyMovement : MonoBehaviourPun, IPunObservable
         public float maxTime = 5.0f;
     }
 
+    //Set to false false for enemies using their own animation system
+    public bool SetAnims = true;
+
     // Syncing (photon) variables
     protected bool m_canInvokeMovementFunctions = true; // false if Photon.IsMasterClient is false
     protected bool m_hasReinitialized = true; // invoked whenever this client becomes new master client
@@ -171,7 +174,8 @@ public class EnemyMovement : MonoBehaviourPun, IPunObservable
             if (m_navMeshLastSpeed != m_navMeshAgent.speed)
             {
                 m_navMeshLastSpeed = m_navMeshAgent.velocity.magnitude / m_navMeshAgent.speed; // constrain to 0 -> 1 for blend tree animation
-                m_animManager.SetSpeed(m_navMeshLastSpeed);
+                if (SetAnims)
+                    m_animManager.SetSpeed(m_navMeshLastSpeed);
             }
         }
 
@@ -186,8 +190,10 @@ public class EnemyMovement : MonoBehaviourPun, IPunObservable
 
             // Reactivate this AI for this client, and begin syncing to the other clients.
             m_canInvokeMovementFunctions = true;
-            m_enemTargeting.enabled = true;
-            m_mainAIScript.enabled = true;
+            if (m_enemTargeting)
+                m_enemTargeting.enabled = true;
+            if (m_mainAIScript)
+                m_mainAIScript.enabled = true;
             m_navMeshAgent.enabled = true;
         }
         else if (m_hasReinitialized)
@@ -335,6 +341,17 @@ public class EnemyMovement : MonoBehaviourPun, IPunObservable
 
         // turn towards player when attacking
         transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(m_directionToPlayer), 0.1f);
+    }
+
+    /// <summary>
+    /// Rotates the character towards the given target.
+    /// </summary>
+    public void FaceTarget(Vector3 directionToTarget)
+    {
+        if (!m_canInvokeMovementFunctions) return;
+
+        // turn towards player when attacking
+        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(directionToTarget), 0.1f);
     }
 
     /// <summary>
@@ -558,26 +575,6 @@ public class EnemyMovement : MonoBehaviourPun, IPunObservable
             m_rotationAtLastUpdate = transform.rotation;
         }
     }
-
-
-    // IPunObservable Implementation
-    //public void OnMasterClientSwitched(Player newMasterClient)
-    //{
-    //    print("BAZINGA!");
-
-    //    // If the master client leaves, a new player will be assigned as a master client
-    //    // Check to see if the current client is the master client, and so we'll reenable the AI scripts
-    //    // enemyTargeting and the main AI script (EnemyChaser, EnemyRangedAI, etc)
-
-    //    if (newMasterClient.IsLocal)
-    //    {
-    //        // Reactivate this AI for this client, and begin syncing to the other clients.
-    //        m_canInvokeMovementFunctions = true;
-    //        m_enemTargeting.enabled = true;
-    //        m_mainAIScript.enabled = true;
-    //        m_navMeshAgent.enabled = true;
-    //    }
-    //}
 
     #endregion
 }

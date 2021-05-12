@@ -97,13 +97,15 @@ public class OrbValueManager : MonoBehaviour
     }
     public static float getCooldownMod(Orb.Element element)
     {
+        print(element);
+        print(s_instance.orbValues.Find(x => x.element == element));
         return s_instance.orbValues.Find(x => x.element == element).m_CooldownMod;
     }
     public static float getShapeManaMod(Orb.Element element)
     {
         return s_instance.orbValues.Find(x => x.element == element).m_ShapeManaMod;
     }
-    public static float getLevel(Orb.Element element, int level)
+    public static int getLevel(Orb.Element element, int level)
     {
         return s_instance.debug == true ? s_instance.orbValues.Find(x => x.element == element).m_Level : level;
     }
