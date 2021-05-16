@@ -115,5 +115,10 @@ public abstract class StatusEffect
         }
     }
 
+    public StatusType GetStatusType()
+    {
+        return m_statusType;
+    }
+
     #endregion
 }

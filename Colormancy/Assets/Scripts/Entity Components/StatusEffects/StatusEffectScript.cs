@@ -219,6 +219,21 @@ public class StatusEffectScript : MonoBehaviourPun
         m_statusEffects.Clear();
     }
 
+    [PunRPC]
+    private void ClearStatusEffect(StatusEffect.StatusType type, string source)
+    {
+        if (source != null)
+        {
+            StatusEffect statusEffect = m_statusEffects.Find(s => (s.GetStatusType() == type && s.StatusSource.Equals(source)));
+            m_statusEffects.Remove(statusEffect);
+        }
+        else
+        {
+            StatusEffect statusEffect = m_statusEffects.Find(s => (s.GetStatusType() == type));
+            m_statusEffects.Remove(statusEffect);
+        }
+    }
+
     #endregion
 
     #region Public functions
@@ -252,6 +267,14 @@ public class StatusEffectScript : MonoBehaviourPun
     public void RPCClearAllStatusEffects()
     {
         photonView.RPC("ClearAllStatusEffects", m_isPlayer == true ? photonView.Owner : PhotonNetwork.MasterClient);
+    }
+
+    /// <summary>
+    /// Clear a specific status effect.
+    /// </summary>
+    public void RPCClearStatusEffect(StatusEffect.StatusType type, string source = null)
+    {
+        photonView.RPC("ClearStatusEffect", m_isPlayer == true ? photonView.Owner : PhotonNetwork.MasterClient, type, source);
     }
 
     /// <summary>

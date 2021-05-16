@@ -33,7 +33,7 @@ public class DamageOverTime : StatusEffect
         : base(parentList, type, duration, source)
     {
         m_damage = value;
-        m_secondsPerTick = secondsPerTick
+        m_secondsPerTick = secondsPerTick;
     }
 
     public override void DoStatusEffect()
