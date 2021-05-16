@@ -90941,6 +90941,36 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 655265155732083148, guid: cacc8b6a92ff8c54693eb64c39ea293c,
+        type: 3}
+      propertyPath: orbValues.Array.data[0].m_PaintRadius
+      value: 7.53
+      objectReference: {fileID: 0}
+    - target: {fileID: 655265155732083148, guid: cacc8b6a92ff8c54693eb64c39ea293c,
+        type: 3}
+      propertyPath: orbValues.Array.data[2].m_PaintRadius
+      value: 2.35
+      objectReference: {fileID: 0}
+    - target: {fileID: 655265155732083148, guid: cacc8b6a92ff8c54693eb64c39ea293c,
+        type: 3}
+      propertyPath: orbValues.Array.data[3].m_PaintRadius
+      value: 3.14
+      objectReference: {fileID: 0}
+    - target: {fileID: 655265155732083148, guid: cacc8b6a92ff8c54693eb64c39ea293c,
+        type: 3}
+      propertyPath: orbValues.Array.data[4].m_PaintRadius
+      value: 6.73
+      objectReference: {fileID: 0}
+    - target: {fileID: 655265155732083148, guid: cacc8b6a92ff8c54693eb64c39ea293c,
+        type: 3}
+      propertyPath: orbValues.Array.data[5].m_PaintRadius
+      value: 6.12
+      objectReference: {fileID: 0}
+    - target: {fileID: 655265155732083148, guid: cacc8b6a92ff8c54693eb64c39ea293c,
+        type: 3}
+      propertyPath: orbValues.Array.data[8].m_PaintRadius
+      value: 2.63
+      objectReference: {fileID: 0}
     - target: {fileID: 655265155732083149, guid: cacc8b6a92ff8c54693eb64c39ea293c,
         type: 3}
       propertyPath: m_RootOrder

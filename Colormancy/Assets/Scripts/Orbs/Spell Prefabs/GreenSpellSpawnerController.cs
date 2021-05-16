@@ -34,6 +34,7 @@ public class GreenSpellSpawnerController : MonoBehaviour
     private float startTime;
     [SerializeField]
     private float lifetime;
+    private float currentTime;
 
     [Space]
 
@@ -51,6 +52,8 @@ public class GreenSpellSpawnerController : MonoBehaviour
         spawnVine = true;
 
         raycastOrigin = transform.position + Vector3.up;
+
+        entitiesEntered = new List<GameObject>();
     }
 
     // Update is called once per frame
@@ -132,30 +135,43 @@ public class GreenSpellSpawnerController : MonoBehaviour
         }
     }
 
+    private void Update()
+    {
+        currentTime += Time.deltaTime;
+
+        if (currentTime > 0.5f)
+        {
+            currentTime -= 0.5f;
+
+            foreach (GameObject g in entitiesEntered)
+            {
+                if (g.CompareTag("Enemy"))
+                    greaterCast(g, spellEffectMod, null);
+                else if (g.CompareTag("Player"))
+                    lesserCast(g, 1, null);
+            }
+        }
+    }
+
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.CompareTag("Enemy"))
+        if (collision.gameObject.CompareTag("Enemy") || collision.gameObject.tag.Equals("Player"))
         {
             if (!entitiesEntered.Contains(collision.gameObject))
             {
                 entitiesEntered.Add(collision.gameObject);
-                greaterCast(collision.gameObject, spellEffectMod, null);
             }
         }
-        else if (collision.gameObject.tag.Equals("Player"))
-            lesserCast(collision.gameObject, spellEffectMod, null);
     }
 
     private void OnCollisionExit(Collision collision)
     {
-        if (collision.gameObject.CompareTag("Enemy"))
+        if (collision.gameObject.CompareTag("Enemy") || collision.gameObject.tag.Equals("Player"))
         {
-            if (!entitiesEntered.Contains(collision.gameObject))
+            if (entitiesEntered.Contains(collision.gameObject))
+            {
                 entitiesEntered.Remove(collision.gameObject);
-        }
-        else if (collision.gameObject.CompareTag("Player"))
-        {
-
+            }
         }
     }
 }
