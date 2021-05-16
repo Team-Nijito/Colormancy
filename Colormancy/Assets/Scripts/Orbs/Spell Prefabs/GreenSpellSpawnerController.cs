@@ -27,6 +27,7 @@ public class GreenSpellSpawnerController : MonoBehaviour
     private int ticksPerIteration;
     private int currentTick;
     private bool spawnVine;
+    private List<GameObject> entitiesEntered;
 
     [Space]
 
@@ -133,9 +134,28 @@ public class GreenSpellSpawnerController : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.tag.Equals("Enemy"))
-            greaterCast(collision.gameObject, spellEffectMod, null);
+        if (collision.gameObject.CompareTag("Enemy"))
+        {
+            if (!entitiesEntered.Contains(collision.gameObject))
+            {
+                entitiesEntered.Add(collision.gameObject);
+                greaterCast(collision.gameObject, spellEffectMod, null);
+            }
+        }
         else if (collision.gameObject.tag.Equals("Player"))
             lesserCast(collision.gameObject, spellEffectMod, null);
+    }
+
+    private void OnCollisionExit(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Enemy"))
+        {
+            if (!entitiesEntered.Contains(collision.gameObject))
+                entitiesEntered.Remove(collision.gameObject);
+        }
+        else if (collision.gameObject.CompareTag("Player"))
+        {
+
+        }
     }
 }
