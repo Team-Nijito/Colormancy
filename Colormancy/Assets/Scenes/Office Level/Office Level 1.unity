@@ -23279,8 +23279,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_enemyToSpawn
       value: 
-      objectReference: {fileID: 9186146974418002411, guid: 7b2d9bc4fe4f6e74ca8897f9475f5ffb,
-        type: 3}
+      objectReference: {fileID: 0}
     - target: {fileID: 3651905936326184988, guid: d9c8d6d3085b4834b964980d5ab0b06f,
         type: 3}
       propertyPath: m_spawnCustomEnemy
@@ -23676,8 +23675,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_enemyToSpawn
       value: 
-      objectReference: {fileID: 9186146974418002411, guid: 7b2d9bc4fe4f6e74ca8897f9475f5ffb,
-        type: 3}
+      objectReference: {fileID: 0}
     - target: {fileID: 3651905936326184988, guid: d9c8d6d3085b4834b964980d5ab0b06f,
         type: 3}
       propertyPath: m_spawnCustomEnemy
@@ -29691,8 +29689,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_enemyToSpawn
       value: 
-      objectReference: {fileID: 9186146974418002411, guid: 7b2d9bc4fe4f6e74ca8897f9475f5ffb,
-        type: 3}
+      objectReference: {fileID: 0}
     - target: {fileID: 3651905936326184988, guid: d9c8d6d3085b4834b964980d5ab0b06f,
         type: 3}
       propertyPath: m_spawnCustomEnemy
@@ -34143,8 +34140,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_enemyToSpawn
       value: 
-      objectReference: {fileID: 9186146974418002411, guid: 7b2d9bc4fe4f6e74ca8897f9475f5ffb,
-        type: 3}
+      objectReference: {fileID: 0}
     - target: {fileID: 3651905936326184988, guid: d9c8d6d3085b4834b964980d5ab0b06f,
         type: 3}
       propertyPath: m_spawnCustomEnemy

@@ -3,6 +3,7 @@
     #region Private variables
 
     private bool m_isExploding = false; // if we're exploding, stand still, don't let any other animation play
+    private bool m_disableMoveDebounce = false; // if invoking the function multiple times, only let it happen once
 
     #endregion
 
@@ -28,6 +29,10 @@
         {
             base.Update();
         }
+        else
+        {
+            DisableMove();
+        }
     }
 
     protected override void FixedUpdate()
@@ -35,6 +40,10 @@
         if (!m_isExploding)
         {
             base.FixedUpdate();
+        }
+        else
+        {
+            DisableMove();
         }
     }
 
@@ -49,8 +58,12 @@
     /// </summary>
     public void DisableMove()
     {
-        m_isExploding = true;
-        m_enemMove.MoveToPosition(transform.position); // stop moving
+        if (!m_disableMoveDebounce)
+        {
+            m_disableMoveDebounce = true;
+            m_isExploding = true;
+            m_enemMove.MoveToPosition(transform.position); // stop moving
+        }
     }
 
     /// <summary>
