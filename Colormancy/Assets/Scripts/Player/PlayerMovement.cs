@@ -28,8 +28,11 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
     public static GameObject LocalPlayerInstance;
 
     // Movement
-    [SerializeField] private float m_walkSpeed = 18f;
-    [SerializeField] private float m_runSpeed = 20f;
+    [SerializeField] private float m_baseWalkSpeed = 8f;
+    [SerializeField] private float m_baseRunSpeed = 15f;
+
+    private float m_walkSpeed;
+    private float m_runSpeed;
 
     private bool m_isMoving = false;
     private bool m_canMove = true;
@@ -83,6 +86,10 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
     {
         m_controller = GetComponent<CharacterController>();
         m_blindPanel = GameObject.Find("Canvas").transform.Find("LevelUI").transform.Find("BlindPanel").gameObject;
+
+        // Initially set speed depending on what level we join right away (invoked once upon initial instantiation)
+        GameManager levelGM = GameObject.Find("GameManager").GetComponent<GameManager>();
+        SetSpeedDependingOnLevel(levelGM.IsLevel);
     }
 
     // Update is called once per frame
@@ -231,6 +238,28 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
     public void AlterWalkSpeed(float newSpeed)
     {
         m_walkSpeed = newSpeed;
+    }
+
+    /// <summary>
+    /// If it's a normal level, set speeds to base speed, otherwise, set speed to double the base speed.
+    /// This is done for convenience for walking around in the lobby and narrative scenes.
+    /// Invoked by GameManager when transitioning players to new scenes.
+    /// </summary>
+    /// <param name="isNormalLevel">Is this level normal or not</param>
+    public void SetSpeedDependingOnLevel(bool isNormalLevel)
+    {
+        if (isNormalLevel)
+        {
+            // If it's a normal level, retrieve base speeds
+            m_walkSpeed = m_baseWalkSpeed;
+            m_runSpeed = m_baseRunSpeed;
+        }
+        else
+        {
+            // Double speed in lobby and narrative levels
+            m_walkSpeed = m_baseWalkSpeed * 2f;
+            m_runSpeed = m_baseRunSpeed * 2f;
+        }
     }
 
     /// <summary>

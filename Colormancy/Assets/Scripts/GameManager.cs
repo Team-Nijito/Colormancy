@@ -20,6 +20,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
     // C# properties for accessing the private variables
     public LevelTypes TypeOfLevel { get { return m_levelType; } private set { m_levelType = value; } }
+    public bool IsLevel { get { return !(m_levelType == LevelTypes.Lobby || m_levelType == LevelTypes.Narrative);  } }
+    
     public int PlayersReady { get { return m_playersReady; } private set { m_playersReady = value; } }
     public uint PlayersNeededToReady { get { return m_playersNeededToStartGame; } private set { m_playersNeededToStartGame = value; } }
     public float PaintPercentageNeededToWin { get { return m_paintPercentageNeededToWin; } private set { m_paintPercentageNeededToWin = value; } }
@@ -439,6 +441,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     private void TransitionPlayerToNewRoom()
     {
         PhotonView playerView = PhotonView.Get(HealthScript.LocalPlayerInstance);
+        GameManager newLevelGameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
 
         TidyUpBeforeStartingNewLevel();
 
@@ -459,6 +462,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
             // Reset their spell GUI reference
             player.GetComponent<OrbManager>().Initialization();
+
+            // Set the character's speed depending on the level
+            player.GetComponent<PlayerMovement>().SetSpeedDependingOnLevel(newLevelGameManager.IsLevel);
         }
     }
 

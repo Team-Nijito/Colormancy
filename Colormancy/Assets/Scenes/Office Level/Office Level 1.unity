@@ -7775,7 +7775,7 @@ PrefabInstance:
     - target: {fileID: 1858970735588863968, guid: f3c0e5b18270531468bb1ff4a5ba57e5,
         type: 3}
       propertyPath: m_enemyEntities.Array.size
-      value: 3
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 1858970735588863968, guid: f3c0e5b18270531468bb1ff4a5ba57e5,
         type: 3}
@@ -7814,6 +7814,12 @@ PrefabInstance:
       propertyPath: m_enemyEntities.Array.data[2]
       value: 
       objectReference: {fileID: 6031526756423788185, guid: 9a22b1d0b5670444b8ecb51b4d15e086,
+        type: 3}
+    - target: {fileID: 1858970735588863968, guid: f3c0e5b18270531468bb1ff4a5ba57e5,
+        type: 3}
+      propertyPath: m_enemyEntities.Array.data[3]
+      value: 
+      objectReference: {fileID: 9186146974418002411, guid: 7b2d9bc4fe4f6e74ca8897f9475f5ffb,
         type: 3}
     - target: {fileID: 1858970735588863969, guid: f3c0e5b18270531468bb1ff4a5ba57e5,
         type: 3}
@@ -23269,6 +23275,17 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3651905936326184988, guid: d9c8d6d3085b4834b964980d5ab0b06f,
+        type: 3}
+      propertyPath: m_enemyToSpawn
+      value: 
+      objectReference: {fileID: 9186146974418002411, guid: 7b2d9bc4fe4f6e74ca8897f9475f5ffb,
+        type: 3}
+    - target: {fileID: 3651905936326184988, guid: d9c8d6d3085b4834b964980d5ab0b06f,
+        type: 3}
+      propertyPath: m_spawnCustomEnemy
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3651905936326184991, guid: d9c8d6d3085b4834b964980d5ab0b06f,
         type: 3}
       propertyPath: m_Name
@@ -23653,6 +23670,17 @@ PrefabInstance:
     - target: {fileID: 3651905936326184987, guid: d9c8d6d3085b4834b964980d5ab0b06f,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3651905936326184988, guid: d9c8d6d3085b4834b964980d5ab0b06f,
+        type: 3}
+      propertyPath: m_enemyToSpawn
+      value: 
+      objectReference: {fileID: 9186146974418002411, guid: 7b2d9bc4fe4f6e74ca8897f9475f5ffb,
+        type: 3}
+    - target: {fileID: 3651905936326184988, guid: d9c8d6d3085b4834b964980d5ab0b06f,
+        type: 3}
+      propertyPath: m_spawnCustomEnemy
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3651905936326184991, guid: d9c8d6d3085b4834b964980d5ab0b06f,
@@ -29659,6 +29687,17 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3651905936326184988, guid: d9c8d6d3085b4834b964980d5ab0b06f,
+        type: 3}
+      propertyPath: m_enemyToSpawn
+      value: 
+      objectReference: {fileID: 9186146974418002411, guid: 7b2d9bc4fe4f6e74ca8897f9475f5ffb,
+        type: 3}
+    - target: {fileID: 3651905936326184988, guid: d9c8d6d3085b4834b964980d5ab0b06f,
+        type: 3}
+      propertyPath: m_spawnCustomEnemy
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3651905936326184991, guid: d9c8d6d3085b4834b964980d5ab0b06f,
         type: 3}
       propertyPath: m_Name
@@ -34098,6 +34137,17 @@ PrefabInstance:
     - target: {fileID: 3651905936326184987, guid: d9c8d6d3085b4834b964980d5ab0b06f,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3651905936326184988, guid: d9c8d6d3085b4834b964980d5ab0b06f,
+        type: 3}
+      propertyPath: m_enemyToSpawn
+      value: 
+      objectReference: {fileID: 9186146974418002411, guid: 7b2d9bc4fe4f6e74ca8897f9475f5ffb,
+        type: 3}
+    - target: {fileID: 3651905936326184988, guid: d9c8d6d3085b4834b964980d5ab0b06f,
+        type: 3}
+      propertyPath: m_spawnCustomEnemy
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3651905936326184991, guid: d9c8d6d3085b4834b964980d5ab0b06f,
