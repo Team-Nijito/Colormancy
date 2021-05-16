@@ -115,16 +115,16 @@ public class TestStatusEffect : MonoBehaviour
                 {
                     if (m_whatForce == ForceType.Knockback && other.gameObject)
                     {
-                        statEffectScript.RPCApplyForce("Knockback", Time.deltaTime * 1.5f, (other.gameObject.transform.position - transform.position + Vector3.up).normalized,
+                        statEffectScript.RPCApplyForce(Time.deltaTime * 1.5f, "Knockback", (other.gameObject.transform.position - transform.position + Vector3.up).normalized,
                                                         m_force);
                     }
                     else if (m_whatForce == ForceType.Suck && other.gameObject)
                     {
-                        statEffectScript.RPCApplyForce("Suck", Time.deltaTime * 1.5f, (transform.position - other.gameObject.transform.position).normalized, m_force);
+                        statEffectScript.RPCApplyForce(Time.deltaTime * 1.5f, "Suck", (transform.position - other.gameObject.transform.position).normalized, m_force);
                     }
                     else if (m_whatForce == ForceType.Push && other.gameObject)
                     {
-                        statEffectScript.RPCApplyForce("Push", Time.deltaTime * 1.5f, transform.forward, m_force);
+                        statEffectScript.RPCApplyForce(Time.deltaTime * 1.5f, "Push", transform.forward, m_force);
                     }
                 }
                 if (m_applySlowdown)
@@ -169,16 +169,16 @@ public class TestStatusEffect : MonoBehaviour
                 {
                     if (m_whatForce == ForceType.Knockback && other.gameObject)
                     {
-                        statEffectScript.RPCApplyForce("Knockback", Time.deltaTime * 1.5f, (other.gameObject.transform.position - transform.position + Vector3.up).normalized,
+                        statEffectScript.RPCApplyForce(Time.deltaTime * 1.5f, "Knockback", (other.gameObject.transform.position - transform.position + Vector3.up).normalized,
                                                         m_force * Time.deltaTime);
                     }
                     else if (m_whatForce == ForceType.Suck && other.gameObject)
                     {
-                        statEffectScript.RPCApplyForce("Suck", Time.deltaTime * 1.5f, (transform.position - other.gameObject.transform.position).normalized, m_force * Time.deltaTime);
+                        statEffectScript.RPCApplyForce(Time.deltaTime * 1.5f, "Suck", (transform.position - other.gameObject.transform.position).normalized, m_force * Time.deltaTime);
                     }
                     else if (m_whatForce == ForceType.Push && other.gameObject)
                     {
-                        statEffectScript.RPCApplyForce("Push", Time.deltaTime * 1.5f, transform.forward, m_force * Time.deltaTime);
+                        statEffectScript.RPCApplyForce(Time.deltaTime * 1.5f, "Push", transform.forward, m_force * Time.deltaTime);
                     }
                 }
             }
