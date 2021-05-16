@@ -12,6 +12,9 @@ public class PlayerAttack : MonoBehaviourPun
     [SerializeField]
     private float m_paintballCooldown = .7f;
 
+    private float m_attackDamage = 10f;
+    private float m_attackMultiplier = 1f;
+
     //[SerializeField]
     //private float m_paintballSpawnHeight = 3f;
     //[SerializeField]
@@ -77,6 +80,14 @@ public class PlayerAttack : MonoBehaviourPun
         m_paintColor = new Color(inputColor.x, inputColor.y, inputColor.z);
     }
 
+    /// <summary>
+    /// Sets attack multiplier, but percentage based.
+    /// </summary>
+    public void SetAttackMultiplier(float multiplier)
+    {
+        m_attackMultiplier += multiplier / 100f;
+    }
+
     [PunRPC]
     public void ShootPaintball(bool beam, Vector3 mousePos)
     {
@@ -111,5 +122,7 @@ public class PlayerAttack : MonoBehaviourPun
         GameObject g = GameObject.Instantiate(Resources.Load("AutoAttackProjectile"), characterPosition + Vector3.up, characterRotation) as GameObject;
         AutoAttackProjectileController controller = g.GetComponent<AutoAttackProjectileController>();
         controller.playerColor = m_paintColor;
+        controller.attackDamage = m_attackDamage;
+        controller.attackMultiplier = m_attackMultiplier;
     }
 }

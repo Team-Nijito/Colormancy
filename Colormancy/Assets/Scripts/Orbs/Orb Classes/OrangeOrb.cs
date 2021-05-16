@@ -16,8 +16,9 @@ public class OrangeOrb : Orb
     {
         PhotonView photonView = PhotonView.Get(hit);
         photonView.RPC("TakeDamage", RpcTarget.All, OrbValueManager.getGreaterEffectDamage(m_OrbElement, m_Level) * spellEffectMod);
-        // temporary until autoattack increase is implemented
-        // photonView.RPC("AlterArmorValueAdditive", RpcTarget.All, -20f * spellEffectMod, 3f);
+
+        StatusEffectScript status = hit.GetComponent<StatusEffectScript>();
+        status.RPCApplyStatus(StatusEffect.StatusType.AutoAttackIncreasedDamage, OrbValueManager.getGreaterEffectDuration(m_OrbElement, m_Level), 0, 20);
     }
 
     public override void CastLesserEffect(GameObject hit, float spellEffectMod, float[] data)

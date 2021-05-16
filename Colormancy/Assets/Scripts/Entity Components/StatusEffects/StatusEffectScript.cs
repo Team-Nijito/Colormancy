@@ -27,6 +27,7 @@ public class StatusEffectScript : MonoBehaviourPun
     // Player components
     private PlayerMovement m_playerMovement;
     private CharacterController m_controller;
+    private PlayerAttack m_playerAttack;
 
     // AI components
     private EnemyMovement m_enemMovement;
@@ -181,6 +182,14 @@ public class StatusEffectScript : MonoBehaviourPun
 
                     m_statusEffects.Add(newStatusEffect);
                     break;
+                case StatusEffect.StatusType.AutoAttackIncreasedDamage:
+                    if (m_isPlayer)
+                        throw new System.Exception("Cannot apply AutoAttackIncreasedDamage on players."); 
+                    else
+                        newStatusEffect = new AutoAttackIncreasedDamage(m_statusEffects, type, duration, source, value, m_playerAttack);
+
+                    m_statusEffects.Add(newStatusEffect);
+                    break;
             }
         }
     }
@@ -278,6 +287,17 @@ public class StatusEffectScript : MonoBehaviourPun
     }
 
     /// <summary>
+    /// Separate function for finding existence of status
+    /// </summary>
+    public bool StatusExists(StatusEffect.StatusType type, string source = null)
+    {
+        if (source != null)
+            return m_statusEffects.Find(s => (s.GetStatusType() == type && s.StatusSource.Equals(source))) != null;
+        else
+            return m_statusEffects.Find(s => (s.GetStatusType() == type)) != null;
+    }
+
+    /// <summary>
     /// Fetch all references to other components. This is called once on Start() and more if we're missing any scene-dependent references whenever
     /// we switch to another scene
     /// </summary>
@@ -292,6 +312,7 @@ public class StatusEffectScript : MonoBehaviourPun
                 // This is a player entity
                 m_isPlayer = true;
                 m_playerMovement = GetComponent<PlayerMovement>();
+                m_playerAttack = GetComponent<PlayerAttack>();
             }
             else
             {
