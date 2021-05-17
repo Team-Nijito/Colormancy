@@ -62,8 +62,6 @@ public class AutoAttackProjectileController : MonoBehaviour
             if (status.StatusExists(StatusEffect.StatusType.AutoAttackIncreasedDamage))
                 attackMultiplier += 0.5f;
 
-            print(attackMultiplier * attackDamage);
-
             PhotonView photonView = PhotonView.Get(collision.gameObject);
             photonView.RPC("TakeDamage", RpcTarget.All, attackDamage * attackMultiplier);
         }

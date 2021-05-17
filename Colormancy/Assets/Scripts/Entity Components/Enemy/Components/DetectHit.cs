@@ -21,6 +21,7 @@ public class DetectHit : MonoBehaviour
 
     [SerializeField]
     private float m_damage = 12f;
+    private float m_damageMultiplier = 1;
 
     private EnemyRangedAI m_parentERScript;
     private EnemyHitbox m_parentHurtboxScript;

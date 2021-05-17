@@ -30,6 +30,7 @@ public class StatusEffectScript : MonoBehaviourPun
     private PlayerAttack m_playerAttack;
 
     // AI components
+    private DetectHit m_enemDetectHit;
     private EnemyMovement m_enemMovement;
     private EnemyTargeting m_enemTargetting;
     private NavMeshAgent m_enemNavMeshAgent;
@@ -317,6 +318,7 @@ public class StatusEffectScript : MonoBehaviourPun
             else
             {
                 // This an AI entity
+                m_enemDetectHit = GetComponent<DetectHit>();
                 m_enemMovement = GetComponent<EnemyMovement>();
                 m_enemTargetting = GetComponent<EnemyTargeting>();
                 m_enemNavMeshAgent = GetComponent<NavMeshAgent>();
