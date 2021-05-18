@@ -1,4 +1,5 @@
 ﻿using Photon.Pun;
+using Photon.Realtime;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
@@ -7,16 +8,17 @@ using UnityEngine.AI;
 [RequireComponent(typeof(PhotonView))]
 [RequireComponent(typeof(EnemyAnimationManager))]
 [DisallowMultipleComponent]
-public class EnemyMovement : MonoBehaviourPun
+public class EnemyMovement : MonoBehaviourPun, IPunObservable
 {
     // This class is responsible for AI movement variables
     // The AI utilizes the Unity Navmesh and the Photon framework to sync its position
+    // This class must remain enabled at all times, in order to sync the movement
+    // in multiplayer.
 
     #region Accessors (c# Properties)
 
     // Movement accessors
     public float Speed { get { return m_speed; } protected set { m_speed = value; } }
-    public float SpeedTriggerRun { get { return m_speedTriggerRun; } protected set { m_speedTriggerRun = value; } }
     
     public Vector3 CurrentVelocity { get { return m_navMeshAgent.velocity; } protected set { m_navMeshAgent.velocity = value; } }
 
@@ -34,8 +36,8 @@ public class EnemyMovement : MonoBehaviourPun
 
     public Task WanderRandomDirectionTask { get { return m_wanderRandomDirectionTask; } protected set { m_wanderRandomDirectionTask = value; } }
 
-    public WanderState currentWanderState { get { return m_wState; } protected set { m_wState = value; } }
-    public WanderState lastWanderState { get { return m_lastWState; } protected set { m_lastWState = value; } }
+    public WanderState CurrentWanderState { get { return m_wState; } protected set { m_wState = value; } }
+    public WanderState LastWanderState { get { return m_lastWState; } protected set { m_lastWState = value; } }
 
     // Rigidbody accessors
     public float Mass { get { return m_rb.mass; } protected set { m_rb.mass = value; } } // mass of character
@@ -58,13 +60,37 @@ public class EnemyMovement : MonoBehaviourPun
         public float maxTime = 5.0f;
     }
 
+    //Set to false false for enemies using their own animation system
+    public bool SetAnims = true;
+
+    // Syncing (photon) variables
+    protected bool m_canInvokeMovementFunctions = true; // false if Photon.IsMasterClient is false
+    protected bool m_hasReinitialized = true; // invoked whenever this client becomes new master client
+
+    // Maximum time delay before we catch up to our position - Lower is stiffer
+    // i.e: 0.5f means every half second the replica will have caught up to the master
+    protected const float m_maxLerpTime = 0.2f;
+
+    // Desired position given from network
+    protected Vector3 m_latestPosition = Vector3.zero;
+
+    // Where we were last time a new position was given
+    protected Vector3 m_positionAtLastUpdate = Vector3.zero;
+
+    // Desired rotation given from network
+    protected Quaternion m_latestRotation = Quaternion.identity;
+
+    //Where we were last time a new rotation was given
+    protected Quaternion m_rotationAtLastUpdate = Quaternion.identity;
+
+    protected float m_lerpTimer = 0;
+
+    protected float m_navMeshLastSpeed = 0; // cache NavMeshSpeed so that we don't have to update the animation if its the same as the last frame
+
     // Movement variables
 
     [Tooltip("Speed of character")]
     [SerializeField] protected float m_speed = 18f;
-
-    [Tooltip("The speed at which the Run animation is triggered")]
-    [SerializeField] protected float m_speedTriggerRun = 15f;
 
     protected EnemyAnimationManager.EnemyState m_currentAnimState = EnemyAnimationManager.EnemyState.Idle;
 
@@ -97,6 +123,15 @@ public class EnemyMovement : MonoBehaviourPun
     protected EnemyAnimationManager m_animManager;
     protected Rigidbody m_rb;
 
+    // These components will be reenable when this client becomes the master client
+    // so that the AI will continue to work
+    [SerializeField]
+    protected EnemyChaserAI m_mainAIScript; // all "normal" AI scripts derive from EnemyChaserAI
+    [SerializeField]
+    protected EnemyTargeting m_enemTargeting;
+    [SerializeField]
+    protected PhotonView m_enemView;
+
     #endregion
 
     #region MonoBehaviour callbacks
@@ -115,6 +150,57 @@ public class EnemyMovement : MonoBehaviourPun
         // This is different than disabling autostart (because that implies you will start it later)
         m_wanderRandomDirectionTask = new Task(ShuffleRandomDirection());
         m_wanderRandomDirectionTask.Pause();
+
+        m_canInvokeMovementFunctions = PhotonNetwork.IsMasterClient; // don't disable this class b/c we would like to sync the transforms and rotations
+        m_hasReinitialized = !PhotonNetwork.IsMasterClient;
+    }
+
+    protected void Update()
+    {
+        if (!photonView.IsMine)
+        {
+            // do interpolation for other clients (not me)
+            if (m_lerpTimer < m_maxLerpTime)
+            {
+                m_lerpTimer += Time.deltaTime;
+                float t = Mathf.Clamp01(m_lerpTimer / m_maxLerpTime);
+                transform.position = Vector3.Lerp(m_positionAtLastUpdate, m_latestPosition, t);
+                transform.rotation = Quaternion.Lerp(m_rotationAtLastUpdate, m_latestRotation, t);
+            }
+        }
+
+        if (PhotonNetwork.IsMasterClient)
+        {
+            if (m_navMeshLastSpeed != m_navMeshAgent.speed)
+            {
+                m_navMeshLastSpeed = m_navMeshAgent.velocity.magnitude / m_navMeshAgent.speed; // constrain to 0 -> 1 for blend tree animation
+                if (SetAnims)
+                    m_animManager.SetSpeed(m_navMeshLastSpeed);
+            }
+        }
+
+        // check if we're now the master client
+        if (m_enemView.Controller == PhotonNetwork.LocalPlayer && PhotonNetwork.IsMasterClient && !m_hasReinitialized)
+        {
+            m_hasReinitialized = true;
+
+            //If the master client leaves, a new player will be assigned as a master client
+            // Check to see if the current client is the master client, and so we'll reenable the AI scripts
+            // enemyTargeting and the main AI script (EnemyChaser, EnemyRangedAI, etc)
+
+            // Reactivate this AI for this client, and begin syncing to the other clients.
+            m_canInvokeMovementFunctions = true;
+            if (m_enemTargeting)
+                m_enemTargeting.enabled = true;
+            if (m_mainAIScript)
+                m_mainAIScript.enabled = true;
+            m_navMeshAgent.enabled = true;
+        }
+        else if (m_hasReinitialized)
+        {
+            // reset this value if we're no longer master client so that we are able to recieve the master client position later on
+            m_hasReinitialized = false;
+        }
     }
 
     #endregion
@@ -200,6 +286,8 @@ public class EnemyMovement : MonoBehaviourPun
     /// </summary>
     public void DisableAgent(bool enableRigidbody = false, bool playIdleAnimation = false)
     {
+        if (!m_canInvokeMovementFunctions) return;
+
         m_navMeshAgent.enabled = false;
         if (playIdleAnimation)
         {
@@ -216,6 +304,8 @@ public class EnemyMovement : MonoBehaviourPun
     /// </summary>
     public void EnableAgent(bool disableRigidbody = false)
     {
+        if (!m_canInvokeMovementFunctions) return;
+
         m_navMeshAgent.enabled = true;
         if (disableRigidbody && !m_rb.isKinematic)
         {
@@ -228,6 +318,8 @@ public class EnemyMovement : MonoBehaviourPun
     /// </summary>
     public void ExitWanderingMode(bool disableNavMeshAgent = false)
     {
+        if (!m_canInvokeMovementFunctions) return;
+
         if (m_wState == WanderState.Wander || m_wState == WanderState.Idle)
         {
             if (disableNavMeshAgent)
@@ -245,8 +337,21 @@ public class EnemyMovement : MonoBehaviourPun
     /// </summary>
     public void FacePlayer()
     {
+        if (!m_canInvokeMovementFunctions) return;
+
         // turn towards player when attacking
         transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(m_directionToPlayer), 0.1f);
+    }
+
+    /// <summary>
+    /// Rotates the character towards the given target.
+    /// </summary>
+    public void FaceTarget(Vector3 directionToTarget)
+    {
+        if (!m_canInvokeMovementFunctions) return;
+
+        // turn towards player when attacking
+        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(directionToTarget), 0.1f);
     }
 
     /// <summary>
@@ -257,6 +362,8 @@ public class EnemyMovement : MonoBehaviourPun
     /// <returns>A valid random position on the NavMesh</returns>
     public Vector3 GetRandomPosition()
     {
+        if (!m_canInvokeMovementFunctions) return Vector3.zero;
+
         Vector3 newPosition;
         while (true)
         {
@@ -282,7 +389,7 @@ public class EnemyMovement : MonoBehaviourPun
     /// <returns>Returns true if the current animation state is walking or running</returns>
     public bool IsAgentMoving()
     {
-        return m_currentAnimState == EnemyAnimationManager.EnemyState.Walk || m_currentAnimState == EnemyAnimationManager.EnemyState.Run;
+        return m_currentAnimState == EnemyAnimationManager.EnemyState.Move;
     }
 
     /// <summary>
@@ -314,16 +421,21 @@ public class EnemyMovement : MonoBehaviourPun
     /// </summary>
     public void ManuallyMove(Vector3 offset)
     {
+        if (!m_canInvokeMovementFunctions) return;
+
         m_navMeshAgent.Move(offset);
     }
 
     /// <summary>
-    /// (PunRPC) Wrapper function for NavMeshAgent's SetDestination. This should only be called if we know for certain
+    /// Wrapper function for NavMeshAgent's SetDestination. This should only be called if we know for certain
     /// that the position is on the level's NavMesh, otherwise errors may occur.
     /// </summary>
-    [PunRPC]
+    /// [PunRPC] temporarily changed this to regular function so that the masterclient would control .SetDestination
+    /// and not have this be calculated for every clietn
     public void MoveToPosition(Vector3 pos)
     {
+        if (!m_canInvokeMovementFunctions) return;
+
         // don't do the "is position on NavMesh" check here, because if we were to invoke this function via PunRPC
         // only to realize that the position isn't even valid, we wasted time sending unnecessary data thru the network
         m_navMeshAgent.SetDestination(pos);
@@ -335,6 +447,7 @@ public class EnemyMovement : MonoBehaviourPun
     /// <returns>The Quaternion that faces away from the direction to the player.</returns>
     public Quaternion OppositePlayerDirection()
     {
+        if (!m_canInvokeMovementFunctions) return Quaternion.identity;
         return Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(m_directionToPlayer) * Quaternion.Euler(0, 180f, 0), 0.1f); ;
     }
 
@@ -345,29 +458,16 @@ public class EnemyMovement : MonoBehaviourPun
     /// <param name="mode"></param>
     public void RigidbodyAddForce(Vector3 force, ForceMode mode)
     {
+        if (!m_canInvokeMovementFunctions) return;
         if (!m_rb.isKinematic)
         {
             m_rb.AddForce(force, mode);
         }
     }
 
-    /// <summary>
-    /// Change the AI animation depending on its speed values.
-    /// </summary>
-    public void RunOrWalkDependingOnSpeed()
-    {
-        if (m_speed > m_speedTriggerRun)
-        {
-            m_animManager.ChangeState(EnemyAnimationManager.EnemyState.Run);
-        }
-        else
-        {
-            m_animManager.ChangeState(EnemyAnimationManager.EnemyState.Walk);
-        }
-    }
-
     public void SetNavMeshVelocity(Vector3 newVel)
     {
+        if (!m_canInvokeMovementFunctions) return;
         m_navMeshAgent.velocity = newVel;
     }
 
@@ -376,6 +476,7 @@ public class EnemyMovement : MonoBehaviourPun
     /// </summary>
     public void StartWandering(bool enableNavMeshAgent = false)
     {
+        if (!m_canInvokeMovementFunctions) return;
         if (m_wState == WanderState.NotWandering)
         {
             if (m_lastWState != WanderState.NotWandering)
@@ -395,6 +496,7 @@ public class EnemyMovement : MonoBehaviourPun
     /// </summary>
     public void StopAllTasks()
     {
+        if (!m_canInvokeMovementFunctions) return;
         if (m_wanderRandomDirectionTask != null)
         {
             m_wanderRandomDirectionTask.Stop();
@@ -408,6 +510,7 @@ public class EnemyMovement : MonoBehaviourPun
     /// </summary>
     public void StopMovingAndDontChangeAnimation()
     {
+        if (!m_canInvokeMovementFunctions) return;
         // Stop the agent from moving
         if (m_navMeshAgent.isOnNavMesh && IsPositionOnNavMesh(transform.position, out _))
         {
@@ -421,6 +524,7 @@ public class EnemyMovement : MonoBehaviourPun
     /// </summary>
     public void WanderIdle()
     {
+        if (!m_canInvokeMovementFunctions) return;
         StopMovingAndDontChangeAnimation();
         m_wState = WanderState.Idle;
         m_animManager.ChangeState(EnemyAnimationManager.EnemyState.Idle);
@@ -431,16 +535,44 @@ public class EnemyMovement : MonoBehaviourPun
     /// </summary>
     public void WanderToRandomDirection()
     {
+        if (!m_canInvokeMovementFunctions) return;
         if (m_navMeshAgent && m_navMeshAgent.isOnNavMesh)
         {
             Vector3 ranPosition = GetRandomPosition();
             if (IsPositionOnNavMesh(ranPosition, out _))
             {
-                photonView.RPC("MoveToPosition", RpcTarget.All, ranPosition);
+                //photonView.RPC("MoveToPosition", RpcTarget.All, ranPosition);
+                MoveToPosition(ranPosition);
             }
 
             m_wState = WanderState.Wander;
-            RunOrWalkDependingOnSpeed();
+            m_animManager.ChangeState(EnemyAnimationManager.EnemyState.Move);
+        }
+    }
+
+    #endregion
+
+    #region Photon functions
+
+    // IPunObservable Implementation
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        // Syncing both position and rotation
+
+        if (stream.IsWriting)
+        {
+            stream.SendNext(transform.position);
+            stream.SendNext(transform.rotation);
+        }
+        else
+        {
+            //New position received
+            //Reset timer and record positions to lerp between
+            m_lerpTimer = 0;
+            m_latestPosition = (Vector3)stream.ReceiveNext();
+            m_latestRotation = (Quaternion)stream.ReceiveNext();
+            m_positionAtLastUpdate = transform.position;
+            m_rotationAtLastUpdate = transform.rotation;
         }
     }
 

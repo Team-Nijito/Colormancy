@@ -2,6 +2,7 @@
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Launcher : MonoBehaviourPunCallbacks
 {
@@ -118,6 +119,7 @@ public class Launcher : MonoBehaviourPunCallbacks
             {
                 Debug.LogError("You shouldn't load the Launcher scene because we're already in Launcher.unity");
             }
+
             PhotonNetwork.LoadLevel(sceneNameToLoadIn);
         }
     }

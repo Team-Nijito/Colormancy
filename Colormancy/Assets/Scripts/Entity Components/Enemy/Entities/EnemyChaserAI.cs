@@ -27,9 +27,12 @@ public class EnemyChaserAI : MonoBehaviourPun, IEnemyDetection
         m_animManager = GetComponent<EnemyAnimationManager>();
         m_enemMovement = GetComponent<EnemyMovement>();
         m_enemHurtbox = GetComponent<EnemyHitbox>();
-        if (m_enemTargeting == null)
+        m_enemTargeting = GetComponent<EnemyTargeting>();
+
+        // disable this component if not master client
+        if (!PhotonNetwork.IsMasterClient)
         {
-            m_enemTargeting = GetComponent<EnemyTargeting>();
+            enabled = false;
         }
     }
 
@@ -117,9 +120,9 @@ public class EnemyChaserAI : MonoBehaviourPun, IEnemyDetection
                 else
                 {
                     // wander randomly if we don't sense nor remember player
-                    if (m_enemMovement.currentWanderState == EnemyMovement.WanderState.Wander)
+                    if (m_enemMovement.CurrentWanderState == EnemyMovement.WanderState.Wander)
                     {
-                        m_enemMovement.RunOrWalkDependingOnSpeed();
+                        m_animManager.ChangeState(EnemyAnimationManager.EnemyState.Move);
                     }
                     else
                     {
@@ -131,9 +134,9 @@ public class EnemyChaserAI : MonoBehaviourPun, IEnemyDetection
         else
         {
             // wander around in offline mode
-            if (m_enemMovement.currentWanderState == EnemyMovement.WanderState.Wander)
+            if (m_enemMovement.CurrentWanderState == EnemyMovement.WanderState.Wander)
             {
-                m_enemMovement.RunOrWalkDependingOnSpeed();
+                m_animManager.ChangeState(EnemyAnimationManager.EnemyState.Move);
             }
             else
             {
@@ -149,7 +152,7 @@ public class EnemyChaserAI : MonoBehaviourPun, IEnemyDetection
     {
         if (PhotonNetwork.InRoom && m_enemTargeting.TargetPlayer)
         {
-            m_enemMovement.SetCurrentAnimState(m_animManager.GetCurrentState());
+            m_enemMovement.SetCurrentAnimState(m_animManager.GetCurrentState()); // this makes AI transition between wandering and targetting
 
             if (m_enemTargeting.IsActivelyTargetingPlayer())
             {
@@ -211,7 +214,6 @@ public class EnemyChaserAI : MonoBehaviourPun, IEnemyDetection
     {
         m_enemTargeting.StopAllTasks();
         m_enemMovement.StopAllTasks();
-        GetComponent<EnemySync>().enabled = false; // disable enemy sync
         enabled = false;
     }
 

@@ -1,4 +1,5 @@
 ﻿using Photon.Pun;
+using Photon.Realtime;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -42,10 +43,15 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     [SerializeField]
     private string m_levelAfterLobbyLevel = OfficeLv1Name;
 
+    [MyBox.ConditionalField("m_isLevel", true)]
+    [SerializeField]
+    private GameObject m_cameraPrefab;
+
     [MyBox.ConditionalField("m_isLevel")]
     [SerializeField]
     private string m_levelAfterBeatingStage = WinSceneName;
 
+    private const string m_lobbyLevel = "Starting Level";
     private bool m_isLoadingNewScene = false;
 
     // Painting variables
@@ -67,6 +73,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
     // Player custom properties
     public const string OrbOwnedInLobbyKey = "OrbOwned";
+    public const string PlayerAliveKey = "IsPlayerAlive";
+
+    private bool resetPlayerOrbs = false; // this flag tells us whenever a player lost and returns to the lobby, confiscate their orbs!
 
     // Name of scenes
     public const string LobbySceneName = "Starting Level";
@@ -100,6 +109,18 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
     #endregion
 
+    #region Components
+
+    [SerializeField]
+    private EnemyManager m_enemManager;
+
+    [SerializeField]
+    private GameObject paintingManagerObject;
+    [SerializeField]
+    private GameObject orbValueManagerObject;
+
+    #endregion
+
     #region MonoBehaviour callbacks
 
     private void Start()
@@ -122,7 +143,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
                 // be sure to clear these properties when moving to the first level
 
                 PhotonHashtable properties;
-                if (PhotonNetwork.PlayerList.Length == 1)
+                if (PhotonNetwork.IsMasterClient)
                 {
                     // only initialize the Room custom properties once upon joining new scene
 
@@ -156,16 +177,27 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
                 PhotonNetwork.LocalPlayer.SetCustomProperties(properties);
                 // these custom properties will be mutated whenver a player picks up a lobby orb / return a lobby orb
             }
+            else if (m_isLevel)
+            {
+                // Keep track of whether a player is still alive or not
+                PhotonHashtable properties = new PhotonHashtable
+                {
+                    {PlayerAliveKey, true},
+                };
+                PhotonNetwork.LocalPlayer.SetCustomProperties(properties);
+            }
+
+            // Add in Painting Manager and Orb Value Manager classes manually
+            if (!GameObject.Find("OrbValueManager"))
+                Instantiate(orbValueManagerObject);
+            if (!GameObject.Find("PaintingManager"))
+                Instantiate(paintingManagerObject);
 
             if (PlayerController.LocalPlayerInstance == null)
             {
                 if (HealthScript.LocalPlayerInstance == null)
                 {
-                    // Determine the spawnpoint to spawn the player on
-                    m_currentSpawnIndex = (uint)(m_playerSpawnpoints.Length > 0 ? (PhotonNetwork.LocalPlayer.ActorNumber % m_playerSpawnpoints.Length) - 1 : 0);
-                    Quaternion spawnRotation = Quaternion.identity;
-                    Vector3 spawnPosition = ReturnSpawnpointPosition(ref spawnRotation);
-                    photonView.RPC("SpawnPlayer", PhotonNetwork.LocalPlayer, spawnPosition, spawnRotation);
+                    SpawnEntirelyNewPlayerAtSpawnpoint();
                 }
                 else
                 {
@@ -174,32 +206,40 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
                     // This portion of the code is reached whenever HealthScript.LocalPlayerInstance exists
                     // meaning we're loading a new scene (player is Don't Destroy on load)
 
-                    PhotonView playerView = PhotonView.Get(HealthScript.LocalPlayerInstance);
+                    GameObject playerObject;
+                    if (!m_isLevel && (playerObject = PhotonNetwork.LocalPlayer.TagObject as GameObject) != null)
+                    {
+                        object playerAliveProperty;
+                        bool spawnNewPlayerInstance = false;
 
-                    // Clear the custom properties as we transition to a new scene
-                    PhotonNetwork.CurrentRoom.CustomProperties.Clear(); // clear room's custom properties (will be called more than once)
-                    playerView.Controller.CustomProperties.Clear(); // clear player's custom properties
+                        if (PhotonNetwork.LocalPlayer.CustomProperties.TryGetValue(PlayerAliveKey, out playerAliveProperty))
+                        {
+                            if (!(bool)playerAliveProperty)
+                            {
+                                // the player is dead, remove any existing gameObject and spawn a new one
 
-                    // Destroy the current camera because the player already has one
-                    Destroy(GameObject.Find("Main Camera"));
+                                spawnNewPlayerInstance = true;
 
-                    if (playerView.IsMine)
-                    {    
-                        // Teleport only all players to the first spawn? (bug)
-                        playerView.RPC("RespawnPlayer", PhotonNetwork.LocalPlayer);
+                                TidyUpBeforeStartingNewLevel();
 
-                        GameObject player = playerView.gameObject;
+                                // We need to instantiate a new main camera 
+                                // because we've destroyed our previous one and the lobby doesn't have it anymore
+                                Instantiate(m_cameraPrefab);
 
-                        // IMPORTANT: reset the references to gui b/c old references won't work after scene load
+                                PhotonNetwork.Destroy(PhotonView.Get(playerObject));
 
-                        // Reset their health GUI
-                        player.GetComponent<SpawnGUI>().ResetUIAfterSceneLoad();
+                                SpawnEntirelyNewPlayerAtSpawnpoint();
+                            }
+                        }
 
-                        // Reset their spell manager GUI reference
-                        player.GetComponent<SpellManager>().Initialization();
-
-                        // Reset their spell GUI reference
-                        player.GetComponent<OrbManager>().Initialization();
+                        if (!spawnNewPlayerInstance)
+                        {
+                            TransitionPlayerToNewRoom();
+                        }
+                    }
+                    else
+                    {
+                        TransitionPlayerToNewRoom();
                     }
                 }
             }
@@ -214,21 +254,64 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
     private void Update()
     {
+        // confiscate player orbs for all players
+        if (!m_isLevel && !resetPlayerOrbs)
+        {
+            resetPlayerOrbs = true;
+
+            GameObject playerObj = PhotonNetwork.LocalPlayer.TagObject as GameObject;
+
+            if (playerObj)
+            {
+                playerObj.GetComponent<OrbManager>().ResetOrbs();
+            }
+            else
+            {
+                resetPlayerOrbs = false;
+            }
+        }
+
         if (PhotonNetwork.IsMasterClient)
         {
             if (!m_isLevel)
             {
                 // check if all players are ready
-                if (m_playersReady >= m_playersNeededToStartGame)
+                if (!m_isLoadingNewScene && m_playersReady >= m_playersNeededToStartGame)
                 {
-                    LoadFirstLevel();
+                    LoadLevel(m_levelAfterLobbyLevel);
                 }
             }
             else
             {
-                if (PaintingManager.paintingProgress() > m_paintPercentageNeededToWin)
+                if (!m_isLoadingNewScene && PaintingManager.paintingProgress() > m_paintPercentageNeededToWin)
                 {
-                    LoadNewSceneAfterFinishedPainting();
+                    LoadLevel(m_levelAfterBeatingStage);
+                }
+                if (!m_isLoadingNewScene)
+                {
+                    bool isAnyPlayerAlive = false;
+
+                    foreach (Player p in PhotonNetwork.PlayerList)
+                    {
+                        object playerAliveProperty;
+                        if (p.CustomProperties.TryGetValue(PlayerAliveKey, out playerAliveProperty))
+                        {
+                            if ((bool)playerAliveProperty)
+                            {
+                                isAnyPlayerAlive = true;
+                            }
+                        }
+                        else
+                        {
+                            // race condition (need to load properties), players are still loading in
+                            isAnyPlayerAlive = true;
+                        }
+                    }
+
+                    if (!isAnyPlayerAlive)
+                    {
+                        LoadLevel(m_lobbyLevel);
+                    }
                 }
             }
         }
@@ -281,24 +364,25 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         acceptButton = popUpBox.transform.Find("AcceptButton").gameObject;
         acceptButton.SetActive(false);
     }
-    
+
+    /// <summary>
+    /// Create a new instance for the player and spawns them at a spawnpoint.
+    /// </summary>
+    private void SpawnEntirelyNewPlayerAtSpawnpoint()
+    {
+        // Determine the spawnpoint to spawn the player on for the first time
+        m_currentSpawnIndex = (uint)(m_playerSpawnpoints.Length > 0 ? (PhotonNetwork.LocalPlayer.ActorNumber % m_playerSpawnpoints.Length) - 1 : 0);
+        Quaternion spawnRotation = Quaternion.identity;
+        Vector3 spawnPosition = ReturnSpawnpointPosition(ref spawnRotation);
+        photonView.RPC("SpawnPlayer", PhotonNetwork.LocalPlayer, spawnPosition, spawnRotation);
+    }
+
     [PunRPC]
     private void SpawnPlayer(Vector3 spawnPos, Quaternion spawnRot)
     {
-        PhotonNetwork.Instantiate(m_playerPrefab.name, spawnPos, spawnRot);
+        PhotonNetwork.Instantiate("Player/"+m_playerPrefab.name, spawnPos, spawnRot);
     }
 
-    private void LoadFirstLevel()
-    {
-        if (!m_isLoadingNewScene)
-        {
-            m_isLoadingNewScene = true;
-
-            // do it instantly for now
-            PhotonNetwork.LoadLevel(m_levelAfterLobbyLevel);
-        }
-    }
-    
     [PunRPC]
     private void ReadyUp()
     {
@@ -309,6 +393,50 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     private void UnReady()
     {
         m_playersReady--;
+    }
+
+    /// <summary>
+    /// Clean up everything as we load the character into the new level.
+    /// </summary>
+    private void TidyUpBeforeStartingNewLevel()
+    {
+        // Clear the custom properties as we transition to a new scene
+        PhotonNetwork.CurrentRoom.CustomProperties.Clear(); // clear room's custom properties (will be called more than once)
+        PhotonNetwork.LocalPlayer.CustomProperties.Clear(); // clear player's custom properties
+
+        // Destroy the current camera because the player already has one
+        Destroy(GameObject.Find("Main Camera"));
+    }
+
+    /// <summary>
+    /// Given that the Player's TabObject (or instance) already exist, just reset the references
+    /// to GUI and stuff, and set players at the level's spawnpoints so that we won't have to spawn
+    /// an entirely new player instance
+    /// </summary>
+    private void TransitionPlayerToNewRoom()
+    {
+        PhotonView playerView = PhotonView.Get(HealthScript.LocalPlayerInstance);
+
+        TidyUpBeforeStartingNewLevel();
+
+        if (playerView.IsMine)
+        {
+            // Teleport only all players to the first spawn? (bug)
+            playerView.RPC("RespawnPlayer", PhotonNetwork.LocalPlayer);
+
+            GameObject player = playerView.gameObject;
+
+            // IMPORTANT: reset the references to gui b/c old references won't work after scene load
+
+            // Reset their health GUI
+            player.GetComponent<SpawnGUI>().ResetUIAfterSceneLoad();
+
+            // Reset their spell manager GUI reference
+            player.GetComponent<SpellManager>().Initialization();
+
+            // Reset their spell GUI reference
+            player.GetComponent<OrbManager>().Initialization();
+        }
     }
 
     #endregion
@@ -398,19 +526,21 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     }
 
     /// <summary>
-    /// Invoked whenever the % of the stage painted exceeds the goal, and loads a new scene according to m_levelAfterBeatingStage.
+    /// Load a new level and transition everyone from the current scene to the new level immediately.
+    /// Guarentees that the level will only be loaded once if this function is invoked more than once.
     /// </summary>
-    public void LoadNewSceneAfterFinishedPainting()
+    /// <param name="nameOfScene">The name of the scene to load</param>
+    public void LoadLevel(string nameOfScene)
     {
         if (!m_isLoadingNewScene)
         {
             m_isLoadingNewScene = true;
 
-            // do it instantly for now
-            PhotonNetwork.LoadLevel(m_levelAfterBeatingStage);
+            PhotonNetwork.LoadLevel(nameOfScene);        
         }
     }
-    
+
+
     public void NextPage()
     {
         dialoguePage++;
@@ -610,6 +740,22 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
             else
             {
                 m_playersReady = (int)stream.ReceiveNext();
+            }
+        }
+        else
+        {
+            // Synchronize the number of enemies across all clients
+            if (m_enemManager)
+            {
+                // If enemManager doesn't exist, don't sync anything.
+                if (stream.IsWriting)
+                {
+                    stream.SendNext(m_enemManager.CurrentNumberEnemiesInLevel);
+                }
+                else
+                {
+                    m_enemManager.SetNumEnemiesOnField((byte)stream.ReceiveNext());
+                }
             }
         }
     }

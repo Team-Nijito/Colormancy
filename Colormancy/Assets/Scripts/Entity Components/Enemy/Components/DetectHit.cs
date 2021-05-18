@@ -7,31 +7,31 @@ public class DetectHit : MonoBehaviour
 
     #region Variables
 
-    private enum TriggerType{
+    protected enum TriggerType{
         Enter,
         Stay,
         Exit
     }
 
     [SerializeField]
-    private GameObject m_parentGameObject; // the parent gameobject with the PhotonView
+    protected GameObject m_parentGameObject; // the parent gameobject with the PhotonView
     
     [SerializeField]
-    private bool m_isProjectile = false;
+    protected bool m_isProjectile = false;
 
     [SerializeField]
     private float m_damage = 12f;
     private float m_damageMultiplier = 1;
 
-    private EnemyRangedAI m_parentERScript;
-    private EnemyHitbox m_parentHurtboxScript;
-    private PhotonView m_parentPhotonView;
+    protected EnemyRangedAI m_parentERScript;
+    protected EnemyHitbox m_parentHurtboxScript;
+    protected PhotonView m_parentPhotonView;
 
     #endregion
 
     #region MonoBehaviour callbacks
 
-    private void Start()
+    protected virtual void Start()
     {
         if (!m_isProjectile)
         {
@@ -48,7 +48,7 @@ public class DetectHit : MonoBehaviour
 
     #region Trigger functions
 
-    private void OnTriggerEnter(Collider other)
+    protected virtual void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
         {
@@ -57,7 +57,6 @@ public class DetectHit : MonoBehaviour
             if (m_isProjectile)
             {
                 Destroy(gameObject);
-                //m_parentPhotonView.RPC("RangeGetFarther", RpcTarget.All); // Tell ranged enemy to get closer
             }
         }
         else if (other.gameObject.layer != LayerMask.NameToLayer("Enemy") && !other.CompareTag("Projectile"))
@@ -66,12 +65,11 @@ public class DetectHit : MonoBehaviour
             if (m_isProjectile && other.name != "Zone")
             {
                 Destroy(gameObject);
-                //m_parentPhotonView.RPC("RangeGetCloser", RpcTarget.All); // Tell ranged enemy to get closer
             }
         }
     }
 
-    private void OnTriggerStay(Collider other)
+    protected virtual void OnTriggerStay(Collider other)
     {
         if (other.CompareTag("Player"))
         {
@@ -96,7 +94,7 @@ public class DetectHit : MonoBehaviour
 
     #region Private functions
 
-    private void CheckApplyDamage(Collider player, TriggerType trigType)
+    protected void CheckApplyDamage(Collider player, TriggerType trigType)
     {
         PhotonView playerPhotonView = PhotonView.Get(player.gameObject);
         if (playerPhotonView.IsMine)
@@ -126,6 +124,10 @@ public class DetectHit : MonoBehaviour
             }
         }
     }
+
+    #endregion
+
+    #region Public functions
 
     public void SetParentGameObject(GameObject parent)
     {
