@@ -15,6 +15,8 @@ class HelenShank : State
     {
         if (PhotonNetwork.IsMasterClient)
         {
+            if (m_HelenAI.DebugMode)
+                Debug.Log("Start Shank State");
             m_HelenAI.Movement.FaceTarget(m_HelenAI.DirectionToTarget());
             m_HelenAI.photonView.RPC("SetAnimationTrigger", Photon.Pun.RpcTarget.All, "Shank");
             m_HelenAI.photonView.RPC("SetHelenState", Photon.Pun.RpcTarget.AllViaServer, HelenAI.States.Chase);
@@ -25,7 +27,10 @@ class HelenShank : State
     public override IEnumerator Stop()
     {
         if (PhotonNetwork.IsMasterClient)
-            m_HelenAI.currentIdleCooldown = 0f;
+        {
+            if (m_HelenAI.DebugMode)
+                Debug.Log("Stop Shank State");
+        }
         return base.Stop();
     }
 }

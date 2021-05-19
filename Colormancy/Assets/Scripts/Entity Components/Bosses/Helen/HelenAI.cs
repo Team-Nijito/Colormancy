@@ -6,8 +6,11 @@ using UnityEngine.AI;
 
 public class HelenAI : BossAI
 {
-    public float ShankRange = 2f;
 
+    //Controls if there are debug messages when changing states amongst other prints
+    public bool DebugMode = true;
+
+    public float ShankRange = 3f;
     public float ShankCooldown = 5f;
     public float ShunpoCooldown = 15f;
     public float HunterOfHeadsCooldown = 45f;

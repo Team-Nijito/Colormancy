@@ -18,6 +18,10 @@ public class HelenChase : State
     public override IEnumerator Start()
     {
         if (!PhotonNetwork.IsMasterClient) return base.Start();
+
+        if (m_HelenAI.DebugMode)
+            Debug.Log("Start Chase State");
+
         m_HelenAI.photonView.RPC("SetAnimationBool", Photon.Pun.RpcTarget.All, "Chase", true);
         m_EnemyMovement = BossAI.GetComponent<EnemyMovement>();
         return base.Start();
@@ -38,18 +42,16 @@ public class HelenChase : State
 
         if (m_HelenAI.currentIdleCooldown >= m_HelenAI.IdleCooldown)
         {
-            if (m_HelenAI.currentShankCooldown >= m_HelenAI.ShankCooldown && m_HelenAI.InRangeOfTarget(m_HelenAI.ShankRange))
-            {
-                m_HelenAI.currentShankCooldown = 0f;
-                m_HelenAI.photonView.RPC("SetHelenState", Photon.Pun.RpcTarget.AllViaServer, HelenAI.States.Shank);
-                m_HelenAI.SetTarget(null);
-            }
-
             if (m_HelenAI.currentShunpoCooldown >= m_HelenAI.ShunpoCooldown)
             {
-                m_HelenAI.currentShunpoCooldown = 0f;
                 m_HelenAI.photonView.RPC("SetHelenState", Photon.Pun.RpcTarget.AllViaServer, HelenAI.States.Shunpo);
-                m_HelenAI.SetTarget(null);
+                m_HelenAI.currentShunpoCooldown = 0f;
+                m_HelenAI.currentIdleCooldown = 0f;
+            } else if (m_HelenAI.currentShankCooldown >= m_HelenAI.ShankCooldown && m_HelenAI.InRangeOfTarget(m_HelenAI.ShankRange))
+            {
+                m_HelenAI.photonView.RPC("SetHelenState", Photon.Pun.RpcTarget.AllViaServer, HelenAI.States.Shank);
+                m_HelenAI.currentShankCooldown = 0f;
+                m_HelenAI.currentIdleCooldown = 0f;
             }
         }
         return base.Update();
@@ -58,7 +60,10 @@ public class HelenChase : State
     public override IEnumerator Stop()
     {
         if (!PhotonNetwork.IsMasterClient) return base.Stop();
-        //BossAI.photonView.RPC("SetAnimationBool", Photon.Pun.RpcTarget.All, "Chase", false);
+
+        if (m_HelenAI.DebugMode)
+            Debug.Log("Stop Chase State");
+
         return base.Stop();
     }
 }

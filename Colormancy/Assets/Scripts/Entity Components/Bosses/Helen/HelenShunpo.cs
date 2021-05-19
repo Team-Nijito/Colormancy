@@ -15,6 +15,9 @@ class HelenShunpo : State
     {
         if (PhotonNetwork.IsMasterClient)
         {
+            if (m_HelenAI.DebugMode)
+                Debug.Log("Start Shunpo State");
+
             m_HelenAI.photonView.RPC("SetAnimationBool", Photon.Pun.RpcTarget.All, "Shunpo", true);
             m_HelenAI.StartCoroutine(WaitTime(.25f));
         }
@@ -25,7 +28,9 @@ class HelenShunpo : State
     {
         if (PhotonNetwork.IsMasterClient)
         {
-            m_HelenAI.currentIdleCooldown = 0f;
+            if (m_HelenAI.DebugMode)
+                Debug.Log("Stop Shunpo State");
+
             m_HelenAI.photonView.RPC("SetAnimationBool", Photon.Pun.RpcTarget.All, "Shunpo", false);
         }
         return base.Stop();

@@ -7,8 +7,11 @@ using UnityEngine.AI;
 
 public class DianeAI : BossAI
 {
+    //Controls if there are debug messages when changing states amongst other prints
+    public bool DebugMode = true;
+
+    //Ability variables
     public float SlashRange = 2f;
-    
     public float SlashCooldown = 5f;
     public float HamstringCooldown = 15f;
     public float FocusFireCooldown = 30f;
@@ -34,7 +37,7 @@ public class DianeAI : BossAI
         EnemyHitbox = GetComponent<EnemyHitbox>();
         MeshAgent = GetComponent<NavMeshAgent>();
         StatusEffect = GetComponent<StatusEffectScript>();
-        photonView.RPC("SetDianeState", Photon.Pun.RpcTarget.AllViaServer, "Chase");
+        photonView.RPC("SetDianeState", Photon.Pun.RpcTarget.AllViaServer, States.Chase);
     }
 
     // Update is called once per frame

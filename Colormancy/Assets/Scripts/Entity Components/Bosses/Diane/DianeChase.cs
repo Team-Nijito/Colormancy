@@ -18,6 +18,10 @@ public class DianeChase : State
     public override IEnumerator Start()
     {
         if (!PhotonNetwork.IsMasterClient) return base.Start();
+
+        if (m_dianeAI.DebugMode)
+            Debug.Log("Start Chase State");
+
         BossAI.photonView.RPC("SetAnimationBool", Photon.Pun.RpcTarget.All, "Chasing", true);
         m_EnemyMovement = BossAI.GetComponent<EnemyMovement>();
         return base.Start();
@@ -37,27 +41,26 @@ public class DianeChase : State
         }
 
         //Attacks
-        Debug.Log(m_dianeAI.currentIdleCooldown);
         if (m_dianeAI.currentIdleCooldown >= m_dianeAI.IdleCooldown)
         {
             if (m_dianeAI.currentFocusFireCooldown >= m_dianeAI.FocusFireCooldown)
             {
                 m_dianeAI.currentFocusFireCooldown = 0f;
-                m_dianeAI.photonView.RPC("SetDianeState", Photon.Pun.RpcTarget.AllViaServer, "Focus Fire");
+                m_dianeAI.photonView.RPC("SetDianeState", Photon.Pun.RpcTarget.AllViaServer, DianeAI.States.FocusFire);
                 BossAI.SetTarget(null);
             }
 
             if (m_dianeAI.currentHamstringCooldown >= m_dianeAI.HamstringCooldown)
             {
                 m_dianeAI.currentHamstringCooldown = 0f;
-                m_dianeAI.photonView.RPC("SetDianeState", Photon.Pun.RpcTarget.AllViaServer, "Hamstring");
+                m_dianeAI.photonView.RPC("SetDianeState", Photon.Pun.RpcTarget.AllViaServer, DianeAI.States.Hamstring);
                 BossAI.SetTarget(null);
             }
 
             if (BossAI.InRangeOfTarget(m_dianeAI.SlashRange) && m_dianeAI.currentSlashCooldown >= m_dianeAI.SlashCooldown)
             {
                 m_dianeAI.currentSlashCooldown = 0f;
-                m_dianeAI.photonView.RPC("SetDianeState", Photon.Pun.RpcTarget.AllViaServer, "Slash");
+                m_dianeAI.photonView.RPC("SetDianeState", Photon.Pun.RpcTarget.AllViaServer, DianeAI.States.Slash);
                 BossAI.SetTarget(null);
             }
         }
@@ -68,6 +71,10 @@ public class DianeChase : State
     public override IEnumerator Stop()
     {
         if (!PhotonNetwork.IsMasterClient) return base.Stop();
+
+        if (m_dianeAI.DebugMode)
+            Debug.Log("Stop Chase State");
+
         BossAI.photonView.RPC("SetAnimationBool", Photon.Pun.RpcTarget.All, "Chasing", false);
         return base.Stop();
     }

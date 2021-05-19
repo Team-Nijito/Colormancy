@@ -506,7 +506,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     public void CloseWindow()
     {
         CloseWindowVisually();
-        currentPodium.CloseWindow();
+        if (currentPodium)
+            currentPodium.CloseWindow();
     }
 
     public void CloseWindowVisually()

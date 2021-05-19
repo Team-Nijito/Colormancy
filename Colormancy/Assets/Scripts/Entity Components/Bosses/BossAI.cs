@@ -82,7 +82,6 @@ public abstract class BossAI : StateMachine
     [PunRPC]
     public void SetAnimationTrigger(string animation)
     {
-        print("Shanking");
         if (photonView.IsMine)
             Animator.SetTrigger(animation);
     }
