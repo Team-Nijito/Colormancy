@@ -41,6 +41,8 @@ public class AutoAttackIncreasedDamage : StatusEffect
 
         m_playerAttack = playerAttack;
         m_increaseValue = value;
+
+        m_playerAttack.AddAttackMultiplier(m_increaseValue);
     }
 
     /// <summary>
@@ -53,6 +55,8 @@ public class AutoAttackIncreasedDamage : StatusEffect
     /// </summary>
     public override void Stop()
     {
+        m_playerAttack.AddAttackMultiplier(-m_increaseValue);
+
         base.Stop();
     }
 

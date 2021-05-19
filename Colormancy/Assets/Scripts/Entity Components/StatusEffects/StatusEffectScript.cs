@@ -30,7 +30,7 @@ public class StatusEffectScript : MonoBehaviourPun
     private PlayerAttack m_playerAttack;
 
     // AI components
-    private DetectHit m_enemDetectHit;
+    private EnemyHitbox m_enemHitbox;
     private EnemyMovement m_enemMovement;
     private EnemyTargeting m_enemTargetting;
     private NavMeshAgent m_enemNavMeshAgent;
@@ -185,9 +185,17 @@ public class StatusEffectScript : MonoBehaviourPun
                     break;
                 case StatusEffect.StatusType.AutoAttackIncreasedDamage:
                     if (m_isPlayer)
-                        throw new System.Exception("Cannot apply AutoAttackIncreasedDamage on players."); 
+                        throw new System.Exception("Cannot currently apply AutoAttackIncreasedDamage on players wait what.");
                     else
                         newStatusEffect = new AutoAttackIncreasedDamage(m_statusEffects, type, duration, source, value, m_playerAttack);
+
+                    m_statusEffects.Add(newStatusEffect);
+                    break;
+                case StatusEffect.StatusType.AttackLessDamage:
+                    if (m_isPlayer)
+                        throw new System.Exception("Cannot currently apply AttackLessDamage on players.");
+                    else
+                        newStatusEffect = new AttackLessDamage(m_statusEffects, type, duration, source, value, m_enemHitbox);
 
                     m_statusEffects.Add(newStatusEffect);
                     break;
@@ -318,7 +326,7 @@ public class StatusEffectScript : MonoBehaviourPun
             else
             {
                 // This an AI entity
-                m_enemDetectHit = GetComponent<DetectHit>();
+                m_enemHitbox = GetComponent<EnemyHitbox>();
                 m_enemMovement = GetComponent<EnemyMovement>();
                 m_enemTargetting = GetComponent<EnemyTargeting>();
                 m_enemNavMeshAgent = GetComponent<NavMeshAgent>();

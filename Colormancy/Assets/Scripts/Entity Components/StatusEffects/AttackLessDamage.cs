@@ -21,24 +21,27 @@ public class AttackLessDamage : StatusEffect
 
     #region Player variables
 
-    protected GameObject m_blindPanel;
-
     #endregion
 
     #region variables
 
-    protected float m_increaseValue;
+    protected EnemyHitbox m_enemHitbox;
+    protected float m_value;
 
     #endregion
 
     #region Functions
 
-    public AttackLessDamage(List<StatusEffect> parentList, StatusType type, float duration, string source, float value, DetectHit enemDetectHit)
+    public AttackLessDamage(List<StatusEffect> parentList, StatusType type, float duration, string source, float value, EnemyHitbox enemHitbox)
                  : base(parentList, type, duration, source)
     {
-        m_isPlayer = true;
+        m_isPlayer = false;
 
-        m_increaseValue = value;
+        m_value = value;
+        m_enemHitbox = enemHitbox;
+
+        foreach (EnemyHitbox.HitBox h in enemHitbox.HitBoxesArray)
+            h.m_hitBoxScript.AddDamageMultiplier(m_value);
     }
 
     /// <summary>
@@ -51,6 +54,9 @@ public class AttackLessDamage : StatusEffect
     /// </summary>
     public override void Stop()
     {
+        foreach (EnemyHitbox.HitBox h in m_enemHitbox.HitBoxesArray)
+            h.m_hitBoxScript.AddDamageMultiplier(-m_value);
+
         base.Stop();
     }
 

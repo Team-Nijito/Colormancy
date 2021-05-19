@@ -83,7 +83,7 @@ public class PlayerAttack : MonoBehaviourPun
     /// <summary>
     /// Sets attack multiplier, but percentage based.
     /// </summary>
-    public void SetAttackMultiplier(float multiplier)
+    public void AddAttackMultiplier(float multiplier)
     {
         m_attackMultiplier += multiplier / 100f;
     }
