@@ -277,7 +277,7 @@ public class EnemyTargeting : MonoBehaviourPun
         foreach (Player play in PhotonNetwork.PlayerList)
         {
             // Check if player is alive
-            PhotonHashtable playerProperties = PhotonNetwork.LocalPlayer.CustomProperties;
+            PhotonHashtable playerProperties = play.CustomProperties;
             object playerAliveProperty;
             if (playerProperties.TryGetValue(GameManager.PlayerAliveKey, out playerAliveProperty))
             {
@@ -304,6 +304,7 @@ public class EnemyTargeting : MonoBehaviourPun
                 }
             }
         }
+
         distanceFromPlayer = targetDistance;
         return targetTransform;
     }

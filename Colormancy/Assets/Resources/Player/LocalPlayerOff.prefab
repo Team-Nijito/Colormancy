@@ -329,6 +329,7 @@ MonoBehaviour:
   m_camSpeed: 10
   m_cameraShake: 0
   m_sceneToDeactivateCharacter: YouWinScene
+  m_isSpectateCamera: 0
 --- !u!114 &5820395927475117114
 MonoBehaviour:
   m_ObjectHideFlags: 0

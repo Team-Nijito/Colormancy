@@ -278,26 +278,24 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
                 // check if all players are ready
                 if (!m_isLoadingNewScene && m_playersReady >= m_playersNeededToStartGame)
                 {
-                    LoadFirstLevel();
+                    LoadLevel(m_levelAfterLobbyLevel);
                 }
             }
             else
             {
                 if (!m_isLoadingNewScene && PaintingManager.paintingProgress() > m_paintPercentageNeededToWin)
                 {
-                    LoadNewSceneAfterFinishedPainting();
+                    LoadLevel(m_levelAfterBeatingStage);
                 }
                 if (!m_isLoadingNewScene)
                 {
                     bool isAnyPlayerAlive = false;
-                    string outputString = "";
 
                     foreach (Player p in PhotonNetwork.PlayerList)
                     {
                         object playerAliveProperty;
                         if (p.CustomProperties.TryGetValue(PlayerAliveKey, out playerAliveProperty))
                         {
-                            outputString += p.NickName + " " + (bool)playerAliveProperty + " ";
                             if ((bool)playerAliveProperty)
                             {
                                 isAnyPlayerAlive = true;
@@ -312,8 +310,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
                     if (!isAnyPlayerAlive)
                     {
-                        print("all players dead");
-                        LoadLobbyLevel();
+                        LoadLevel(m_lobbyLevel);
                     }
                 }
             }
@@ -383,31 +380,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     [PunRPC]
     private void SpawnPlayer(Vector3 spawnPos, Quaternion spawnRot)
     {
-        PhotonNetwork.Instantiate(m_playerPrefab.name, spawnPos, spawnRot);
+        PhotonNetwork.Instantiate("Player/"+m_playerPrefab.name, spawnPos, spawnRot);
     }
 
-    private void LoadFirstLevel()
-    {
-        if (!m_isLoadingNewScene)
-        {
-            m_isLoadingNewScene = true;
-
-            // do it instantly for now
-            PhotonNetwork.LoadLevel(m_levelAfterLobbyLevel);
-        }
-    }
-
-    private void LoadLobbyLevel()
-    {
-        if (!m_isLoadingNewScene)
-        {
-            m_isLoadingNewScene = true;
-
-            // do it instantly for now
-            PhotonNetwork.LoadLevel(m_lobbyLevel);
-        }
-    }
-    
     [PunRPC]
     private void ReadyUp()
     {
@@ -552,19 +527,21 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     }
 
     /// <summary>
-    /// Invoked whenever the % of the stage painted exceeds the goal, and loads a new scene according to m_levelAfterBeatingStage.
+    /// Load a new level and transition everyone from the current scene to the new level immediately.
+    /// Guarentees that the level will only be loaded once if this function is invoked more than once.
     /// </summary>
-    public void LoadNewSceneAfterFinishedPainting()
+    /// <param name="nameOfScene">The name of the scene to load</param>
+    public void LoadLevel(string nameOfScene)
     {
         if (!m_isLoadingNewScene)
         {
             m_isLoadingNewScene = true;
 
-            // do it instantly for now
-            PhotonNetwork.LoadLevel(m_levelAfterBeatingStage);
+            PhotonNetwork.LoadLevel(nameOfScene);        
         }
     }
-    
+
+
     public void NextPage()
     {
         dialoguePage++;
