@@ -23,6 +23,8 @@ public class EnemyProjectileAbility : MonoBehaviourPun
     [SerializeField]
     protected float m_projectileDecay = 1.5f;
 
+    protected float m_addDamageMultiplier = 0f;
+
     #endregion
 
     #region Protected functions
@@ -37,6 +39,11 @@ public class EnemyProjectileAbility : MonoBehaviourPun
     {
         Vector3 spawnPosition = m_projectileSpawnpoint.position;
         GameObject projectile = Instantiate(m_projectile, spawnPosition, m_projectileSpawnpoint.rotation);
+
+        // set the damage here based on parent damage
+        DetectHit d = projectile.GetComponent<DetectHit>();
+        d.AddDamageMultiplier(m_addDamageMultiplier);
+
         Rigidbody projectileRB = projectile.GetComponent<Rigidbody>();
         projectile.GetComponent<DetectHit>().SetParentGameObject(gameObject);
 
@@ -46,6 +53,12 @@ public class EnemyProjectileAbility : MonoBehaviourPun
         // angular velocity messes up trajectory
         // which is why projectile doesn't spin
         Destroy(projectile, m_projectileDecay);
+    }
+
+    [PunRPC]
+    protected void AddDamageMultiplier(float percent)
+    {
+        m_addDamageMultiplier += percent;
     }
 
     #endregion
@@ -61,6 +74,12 @@ public class EnemyProjectileAbility : MonoBehaviourPun
         {
             photonView.RPC("SpawnProjectile", RpcTarget.All);
         }
+    }
+
+    public void RPCAddDamageMultiplier(float percent)
+    {
+        photonView.RPC("AddDamageMultiplier", RpcTarget.All, percent);
+        print(percent);
     }
 
     #endregion

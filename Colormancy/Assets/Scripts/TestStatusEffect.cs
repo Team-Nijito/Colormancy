@@ -13,21 +13,21 @@ public class TestStatusEffect : MonoBehaviour
     [SerializeField]
     private bool m_applyDamageOverTime = false;
 
-    [MyBox.ConditionalField("m_applyDamageOverTime", false)]
-    [SerializeField]
-    private string m_damageTypeName = "Poison";
+    //[MyBox.ConditionalField("m_applyDamageOverTime", false)]
+    //[SerializeField]
+    //private string m_damageTypeName = "Poison";
 
-    [MyBox.ConditionalField("m_applyDamageOverTime", false)]
-    [SerializeField]
-    private bool m_isPercentageDamage = true; // if true, will inflict damage dependent on victim's health
+    //[MyBox.ConditionalField("m_applyDamageOverTime", false)]
+    //[SerializeField]
+    //private bool m_isPercentageDamage = true; // if true, will inflict damage dependent on victim's health
 
-    [MyBox.ConditionalField("m_applyDamageOverTime", false)]
-    [SerializeField]
-    private float m_damage = 4f;
+    //[MyBox.ConditionalField("m_applyDamageOverTime", false)]
+    //[SerializeField]
+    //private float m_damage = 4f;
 
-    [MyBox.ConditionalField("m_applyDamageOverTime", false)]
-    [SerializeField]
-    private float m_secondDuration = 5f;
+    //[MyBox.ConditionalField("m_applyDamageOverTime", false)]
+    //[SerializeField]
+    //private float m_secondDuration = 5f;
 
     #endregion
 
@@ -60,14 +60,14 @@ public class TestStatusEffect : MonoBehaviour
     [SerializeField]
     private bool m_applySlowdown = false;
 
-    [MyBox.ConditionalField("m_applySlowdown", false)]
-    [SerializeField]
-    private float m_slowDownDuration = 3f;
+    //[MyBox.ConditionalField("m_applySlowdown", false)]
+    //[SerializeField]
+    //private float m_slowDownDuration = 3f;
 
-    [MyBox.ConditionalField("m_applySlowdown", false)]
-    [Range(0,100)]
-    [SerializeField]
-    private float m_percentReductionInSpeed = 50f;
+    //[MyBox.ConditionalField("m_applySlowdown", false)]
+    //[(0,100)]
+    //[SerializeField]
+    //private float m_percentReductionInSpeed = 50f;
 
     #endregion
 
@@ -76,9 +76,9 @@ public class TestStatusEffect : MonoBehaviour
     [SerializeField]
     private bool m_applyStun = false;
 
-    [MyBox.ConditionalField("m_applyStun", false)]
-    [SerializeField]
-    private float m_stunDuration = 1.5f;
+    //[MyBox.ConditionalField("m_applyStun", false)]
+    //[SerializeField]
+    //private float m_stunDuration = 1.5f;
 
     #endregion
 
@@ -87,9 +87,9 @@ public class TestStatusEffect : MonoBehaviour
     [SerializeField]
     private bool m_applyBlind = false;
 
-    [MyBox.ConditionalField("m_applyBlind", false)]
-    [SerializeField]
-    private float m_blindDuration = 5f;
+    //[MyBox.ConditionalField("m_applyBlind", false)]
+    //[SerializeField]
+    //private float m_blindDuration = 5f;
 
     #endregion
 

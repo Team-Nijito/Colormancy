@@ -26,22 +26,30 @@ public class AttackLessDamage : StatusEffect
     #region variables
 
     protected EnemyHitbox m_enemHitbox;
+    protected EnemyProjectileAbility m_enemProjectile;
     protected float m_value;
 
     #endregion
 
     #region Functions
 
-    public AttackLessDamage(List<StatusEffect> parentList, StatusType type, float duration, string source, float value, EnemyHitbox enemHitbox)
+    public AttackLessDamage(List<StatusEffect> parentList, StatusType type, float duration, string source, float value, EnemyHitbox enemHitbox, EnemyProjectileAbility enemProjectile)
                  : base(parentList, type, duration, source)
     {
         m_isPlayer = false;
 
         m_value = value;
         m_enemHitbox = enemHitbox;
+        m_enemProjectile = enemProjectile;
 
-        foreach (EnemyHitbox.HitBox h in enemHitbox.HitBoxesArray)
-            h.m_hitBoxScript.AddDamageMultiplier(m_value);
+        if (m_enemHitbox)
+        {
+            foreach (EnemyHitbox.HitBox h in m_enemHitbox.HitBoxesArray)
+                h.m_hitBoxScript.AddDamageMultiplier(m_value);
+        }
+
+        if (m_enemProjectile)
+            m_enemProjectile.RPCAddDamageMultiplier(m_value);
     }
 
     /// <summary>
@@ -54,8 +62,14 @@ public class AttackLessDamage : StatusEffect
     /// </summary>
     public override void Stop()
     {
-        foreach (EnemyHitbox.HitBox h in m_enemHitbox.HitBoxesArray)
-            h.m_hitBoxScript.AddDamageMultiplier(-m_value);
+        if (m_enemHitbox)
+        {
+            foreach (EnemyHitbox.HitBox h in m_enemHitbox.HitBoxesArray)
+                h.m_hitBoxScript.AddDamageMultiplier(-m_value);
+        }
+
+        if (m_enemProjectile)
+            m_enemProjectile.RPCAddDamageMultiplier(-m_value);
 
         base.Stop();
     }

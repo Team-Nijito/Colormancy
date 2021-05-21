@@ -19,7 +19,7 @@ public class YellowOrb : Orb
         photonView.RPC("TakeDamage", RpcTarget.All, OrbValueManager.getGreaterEffectDamage(m_OrbElement, m_Level) * spellEffectMod);
 
         StatusEffectScript status = hit.GetComponent<StatusEffectScript>();
-        status.RPCApplyStatus(StatusEffect.StatusType.AttackLessDamage, OrbValueManager.getGreaterEffectDuration(m_OrbElement, m_Level), 0, OrbValueManager.getGreaterEffectPercentile(m_OrbElement));
+        status.RPCApplyStatus(StatusEffect.StatusType.AttackLessDamage, OrbValueManager.getGreaterEffectDuration(m_OrbElement, m_Level), 0, -OrbValueManager.getGreaterEffectPercentile(m_OrbElement));
     }
 
     public override void CastLesserEffect(GameObject hit, float spellEffectMod, float[] data)
