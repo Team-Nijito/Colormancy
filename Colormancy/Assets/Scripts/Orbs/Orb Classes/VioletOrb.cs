@@ -16,9 +16,9 @@ public class VioletOrb : Orb
     public override void CastGreaterEffect(GameObject hit, float spellEffectMod, float[] data)
     {
         StatusEffectScript status = hit.GetComponent<StatusEffectScript>();
-        // currently stacks, should not
-        //status.RPCApplyStatus(true, OrbValueManager.getGreaterEffectDamage(m_OrbElement, m_Level) * spellEffectMod, OrbValueManager.getGreaterEffectDuration(m_OrbElement, m_Level), "Poison");
-        //status.RPCApplySlowdown("Slow", 10, orbLevel * 2 + 3);
+        
+        status.RPCApplyStatus(StatusEffect.StatusType.DamageOverTime, OrbValueManager.getGreaterEffectDuration(m_OrbElement, m_Level), 1, OrbValueManager.getGreaterEffectDamage(m_OrbElement, m_Level) * spellEffectMod);
+        status.RPCApplyStatus(StatusEffect.StatusType.Slowdown, OrbValueManager.getGreaterEffectDuration(m_OrbElement, m_Level), 0, OrbValueManager.getGreaterEffectPercentile(m_OrbElement), "violet_orb");
     }
 
     public override void CastLesserEffect(GameObject hit, float spellEffectMod, float[] data)
