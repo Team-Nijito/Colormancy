@@ -10952,6 +10952,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 655265155732083148, guid: cacc8b6a92ff8c54693eb64c39ea293c,
+        type: 3}
+      propertyPath: orbValues.Array.data[2].m_GreaterEffectPercentile
+      value: 80
+      objectReference: {fileID: 0}
     - target: {fileID: 655265155732083149, guid: cacc8b6a92ff8c54693eb64c39ea293c,
         type: 3}
       propertyPath: m_RootOrder

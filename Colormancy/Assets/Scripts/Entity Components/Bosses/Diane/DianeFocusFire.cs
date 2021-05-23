@@ -18,7 +18,7 @@ public class DianeFocusFire : State
         if (m_dianeAI.DebugMode)
             Debug.Log("Start Focus Fire State");
 
-        BossAI.StatusEffect.RPCApplyForce("Knockback", 2, BossAI.DirectionToTarget() + Vector3.up * 6, 30f);
+        BossAI.StatusEffect.RPCApplyForce(2, "Knockback", BossAI.DirectionToTarget() + Vector3.up * 6, 30f);
         m_dianeAI.photonView.RPC("SetDianeState", Photon.Pun.RpcTarget.AllViaServer, DianeAI.States.Chase);
         BossAI.SetAnimationTrigger("Focus Fire");
         return base.Start();

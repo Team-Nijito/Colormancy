@@ -154,12 +154,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ca79b37548cc3349a0a8483b348ff74, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  greaterCastAmt: 0
-  lesserCastAmt: 0
-  speed: 0.39
+  spellEffectMod: 0
+  speed: 0.45
   lifetime: 3
-  spherePaintRadius: 2
-  paintColor: {r: 1, g: 0.5176471, b: 0, a: 0}
   debug: 0
 --- !u!135 &1147096089050445037
 SphereCollider:

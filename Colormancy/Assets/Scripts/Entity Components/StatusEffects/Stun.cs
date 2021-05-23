@@ -33,8 +33,8 @@ public class Stun : StatusEffect
 
     #region Functions
 
-    public Stun(List<StatusEffect> parentList, string name, StatusType type, float duration, PlayerMovement pMove)
-                 : base(parentList, name, type, duration)
+    public Stun(List<StatusEffect> parentList, StatusType type, float duration, string source, PlayerMovement pMove)
+                 : base(parentList, type, duration, source)
     {
         m_isPlayer = true;
         m_playMove = pMove;
@@ -42,8 +42,8 @@ public class Stun : StatusEffect
         m_playMove.Stun();
     }
 
-    public Stun(List<StatusEffect> parentList, string name, StatusType type, float duration, EnemyMovement eMove)
-                 : base(parentList, name, type, duration)
+    public Stun(List<StatusEffect> parentList, StatusType type, float duration, string source, EnemyMovement eMove)
+                 : base(parentList, type, duration, source)
     {
         m_isPlayer = false;
         m_enemyMove = eMove;
@@ -80,7 +80,7 @@ public class Stun : StatusEffect
     /// <summary>
     /// Decrease the duration by Time.deltaTime. If duration is zero, invoke Stop.
     /// </summary>
-    public override void Tick()
+    public override void Update()
     {
         m_duration -= Time.deltaTime;
         if (m_duration <= 0)

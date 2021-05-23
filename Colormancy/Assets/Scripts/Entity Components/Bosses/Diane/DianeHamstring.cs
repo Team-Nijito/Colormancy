@@ -19,7 +19,7 @@ public class DianeHamstring : State
             Debug.Log("Start Hamstring State");
 
         Debug.Log("Hamstring State");
-        BossAI.StatusEffect.RPCApplyForce("Knockback", 1f, BossAI.DirectionToTarget(), 25f);
+        BossAI.StatusEffect.RPCApplyForce(1f, "Knockback", BossAI.DirectionToTarget(), 25f);
         m_dianeAI.photonView.RPC("SetDianeState", Photon.Pun.RpcTarget.AllViaServer, DianeAI.States.Chase);
         BossAI.SetAnimationTrigger("Hamstring");
         return base.Start();

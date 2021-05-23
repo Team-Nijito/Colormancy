@@ -27,7 +27,7 @@ public class QuickSilverStormController : MonoBehaviour
         {
             Vector3 enemyToStorm = transform.position - collision.transform.position;
             StatusEffectScript status = collision.gameObject.GetComponent<StatusEffectScript>();
-            status.RPCApplyForce("Storm Pull", 0, enemyToStorm.normalized, enemyToStorm.sqrMagnitude);
+            status.RPCApplyForce(0, "storm_pull", enemyToStorm.normalized, enemyToStorm.sqrMagnitude);
         }
     }
 }

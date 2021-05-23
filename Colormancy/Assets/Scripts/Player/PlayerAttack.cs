@@ -10,7 +10,11 @@ public class PlayerAttack : MonoBehaviourPun
     //public Rigidbody m_paintball;
     public Color m_paintColor;
     [SerializeField]
-    private float m_paintballCooldown = .7f;
+    private float m_attackSpeed = .7f;
+    private float m_attackSpeedMultiplier = 1f;
+
+    private float m_attackDamage = 10f;
+    private float m_attackMultiplier = 1f;
 
     //[SerializeField]
     //private float m_paintballSpawnHeight = 3f;
@@ -77,6 +81,19 @@ public class PlayerAttack : MonoBehaviourPun
         m_paintColor = new Color(inputColor.x, inputColor.y, inputColor.z);
     }
 
+    /// <summary>
+    /// Sets attack multiplier, but percentage based.
+    /// </summary>
+    public void AddAttackMultiplier(float multiplier)
+    {
+        m_attackMultiplier += multiplier / 100f;
+    }
+
+    public void AddAttackSpeedMultplier(float multiplier)
+    {
+        m_attackSpeedMultiplier += multiplier / 100f;
+    }
+
     [PunRPC]
     public void ShootPaintball(bool beam, Vector3 mousePos)
     {
@@ -85,7 +102,7 @@ public class PlayerAttack : MonoBehaviourPun
         {
             return;
         }
-        m_currentCooldown = m_paintballCooldown;
+        m_currentCooldown = m_attackSpeed;
 
         // If you use PhotonNetwork.Instantiate, any player who joins will witness a lot of projectiles being spawned in
         // so that the newly joined player's scene will be updated as the other player's scene (lookup photon object pooling)
@@ -111,5 +128,7 @@ public class PlayerAttack : MonoBehaviourPun
         GameObject g = GameObject.Instantiate(Resources.Load("AutoAttackProjectile"), characterPosition + Vector3.up, characterRotation) as GameObject;
         AutoAttackProjectileController controller = g.GetComponent<AutoAttackProjectileController>();
         controller.playerColor = m_paintColor;
+        controller.attackDamage = m_attackDamage;
+        controller.attackMultiplier = m_attackMultiplier;
     }
 }

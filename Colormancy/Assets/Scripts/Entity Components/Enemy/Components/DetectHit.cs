@@ -20,7 +20,8 @@ public class DetectHit : MonoBehaviour
     protected bool m_isProjectile = false;
 
     [SerializeField]
-    protected float m_damage = 12f;
+    private float m_damage = 12f;
+    private float m_damageMultiplier = 1;
 
     protected EnemyRangedAI m_parentERScript;
     protected EnemyHitbox m_parentHurtboxScript;
@@ -102,11 +103,11 @@ public class DetectHit : MonoBehaviour
             {
                 if (trigType == TriggerType.Enter)
                 {
-                    playerPhotonView.RPC("TakeDamage", playerPhotonView.Owner, m_damage);
+                    playerPhotonView.RPC("TakeDamage", playerPhotonView.Owner, m_damage * m_damageMultiplier);
                 }
                 else
                 {
-                    playerPhotonView.RPC("TakeDamage", playerPhotonView.Owner, m_damage * Time.deltaTime);
+                    playerPhotonView.RPC("TakeDamage", playerPhotonView.Owner, m_damage * m_damageMultiplier * Time.deltaTime);
                 }
             }
             else if (m_parentHurtboxScript && m_parentHurtboxScript.IsPlayerValidTarget(playerPhotonView.ViewID))
@@ -114,11 +115,11 @@ public class DetectHit : MonoBehaviour
                 m_parentHurtboxScript.RPCInsertHurtVictim(playerPhotonView.ViewID);
                 if (trigType == TriggerType.Enter)
                 {
-                    playerPhotonView.RPC("TakeDamage", playerPhotonView.Owner, m_damage);
+                    playerPhotonView.RPC("TakeDamage", playerPhotonView.Owner, m_damage * m_damageMultiplier);
                 }
                 else
                 {
-                    playerPhotonView.RPC("TakeDamage", playerPhotonView.Owner, m_damage * Time.deltaTime);
+                    playerPhotonView.RPC("TakeDamage", playerPhotonView.Owner, m_damage * m_damageMultiplier * Time.deltaTime);
                 }
             }
         }
@@ -131,6 +132,15 @@ public class DetectHit : MonoBehaviour
     public void SetParentGameObject(GameObject parent)
     {
         m_parentGameObject = parent;
+    }
+
+    /// <summary>
+    /// Changes the damage multiplier by an additive amount.
+    /// </summary>
+    /// <param name="amount"></param>
+    public void AddDamageMultiplier(float percentAmount)
+    {
+        m_damageMultiplier += percentAmount / 100;
     }
 
     #endregion
