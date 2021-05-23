@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
 
 public class DianeFocusFire : State
 {
@@ -12,9 +13,13 @@ public class DianeFocusFire : State
 
     public override IEnumerator Start()
     {
-        Debug.Log("Focus Fire State");
+        if (!PhotonNetwork.IsMasterClient) return base.Start();
+
+        if (m_dianeAI.DebugMode)
+            Debug.Log("Start Focus Fire State");
+
         BossAI.StatusEffect.RPCApplyForce("Knockback", 2, BossAI.DirectionToTarget() + Vector3.up * 6, 30f);
-        BossAI.SetState(new DianeChase(BossAI));
+        m_dianeAI.photonView.RPC("SetDianeState", Photon.Pun.RpcTarget.AllViaServer, DianeAI.States.Chase);
         BossAI.SetAnimationTrigger("Focus Fire");
         return base.Start();
     }
@@ -27,6 +32,11 @@ public class DianeFocusFire : State
 
     public override IEnumerator Stop()
     {
+        if (!PhotonNetwork.IsMasterClient) return base.Stop();
+
+        if (m_dianeAI.DebugMode)
+            Debug.Log("Stop Focus Fire State");
+
         m_dianeAI.currentIdleCooldown = 0f;
         return base.Stop();
     }

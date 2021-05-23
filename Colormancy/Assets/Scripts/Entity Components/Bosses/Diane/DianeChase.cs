@@ -2,20 +2,26 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using Photon.Pun;
 
 public class DianeChase : State
 {
     EnemyMovement m_EnemyMovement;
 
-    DianeAI m_DianeAI;
+    DianeAI m_dianeAI;
 
     public DianeChase(BossAI bossAI) : base(bossAI)
     {
-        m_DianeAI = (DianeAI)BossAI;
+        m_dianeAI = (DianeAI)BossAI;
     }
 
     public override IEnumerator Start()
     {
+        if (!PhotonNetwork.IsMasterClient) return base.Start();
+
+        if (m_dianeAI.DebugMode)
+            Debug.Log("Start Chase State");
+
         BossAI.photonView.RPC("SetAnimationBool", Photon.Pun.RpcTarget.All, "Chasing", true);
         m_EnemyMovement = BossAI.GetComponent<EnemyMovement>();
         return base.Start();
@@ -23,6 +29,7 @@ public class DianeChase : State
 
     public override IEnumerator Update()
     {
+        if (!PhotonNetwork.IsMasterClient) return base.Update();
         //Chase player
         if (BossAI.Target != null)
         {
@@ -34,26 +41,26 @@ public class DianeChase : State
         }
 
         //Attacks
-        if (m_DianeAI.currentIdleCooldown >= m_DianeAI.IdleCooldown)
+        if (m_dianeAI.currentIdleCooldown >= m_dianeAI.IdleCooldown)
         {
-            if (m_DianeAI.currentFocusFireCooldown >= m_DianeAI.FocusFireCooldown)
+            if (m_dianeAI.currentFocusFireCooldown >= m_dianeAI.FocusFireCooldown)
             {
-                m_DianeAI.currentFocusFireCooldown = 0f;
-                BossAI.SetState(new DianeFocusFire(BossAI));
+                m_dianeAI.currentFocusFireCooldown = 0f;
+                m_dianeAI.photonView.RPC("SetDianeState", Photon.Pun.RpcTarget.AllViaServer, DianeAI.States.FocusFire);
                 BossAI.SetTarget(null);
             }
 
-            if (m_DianeAI.currentHamstringCooldown >= m_DianeAI.HamstringCooldown)
+            if (m_dianeAI.currentHamstringCooldown >= m_dianeAI.HamstringCooldown)
             {
-                m_DianeAI.currentHamstringCooldown = 0f;
-                BossAI.SetState(new DianeHamstring(BossAI));
+                m_dianeAI.currentHamstringCooldown = 0f;
+                m_dianeAI.photonView.RPC("SetDianeState", Photon.Pun.RpcTarget.AllViaServer, DianeAI.States.Hamstring);
                 BossAI.SetTarget(null);
             }
 
-            if (BossAI.InRangeOfTarget(m_DianeAI.SlashRange) && m_DianeAI.currentSlashCooldown >= m_DianeAI.SlashCooldown)
+            if (BossAI.InRangeOfTarget(m_dianeAI.SlashRange) && m_dianeAI.currentSlashCooldown >= m_dianeAI.SlashCooldown)
             {
-                m_DianeAI.currentSlashCooldown = 0f;
-                BossAI.SetState(new DianeSlash(BossAI));
+                m_dianeAI.currentSlashCooldown = 0f;
+                m_dianeAI.photonView.RPC("SetDianeState", Photon.Pun.RpcTarget.AllViaServer, DianeAI.States.Slash);
                 BossAI.SetTarget(null);
             }
         }
@@ -63,6 +70,11 @@ public class DianeChase : State
 
     public override IEnumerator Stop()
     {
+        if (!PhotonNetwork.IsMasterClient) return base.Stop();
+
+        if (m_dianeAI.DebugMode)
+            Debug.Log("Stop Chase State");
+
         BossAI.photonView.RPC("SetAnimationBool", Photon.Pun.RpcTarget.All, "Chasing", false);
         return base.Stop();
     }
