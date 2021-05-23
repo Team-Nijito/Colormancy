@@ -101,8 +101,8 @@ public class RedSpellController : MonoBehaviour
 
             PaintingManager.PaintSphere(OrbValueManager.getColor(element), transform.position, OrbValueManager.getPaintRadius(element));
 
-            // search in enemy layermask
-            Collider[] hitColliders = Physics.OverlapSphere(transform.position, OrbValueManager.getPaintRadius(element), 1 << 10);
+            // search in enemy and player layermasks
+            Collider[] hitColliders = Physics.OverlapSphere(transform.position, OrbValueManager.getPaintRadius(element), (1 << 10) | (1 << 9));
 
             foreach (var hitCollider in hitColliders)
             {

@@ -10,7 +10,8 @@ public class PlayerAttack : MonoBehaviourPun
     //public Rigidbody m_paintball;
     public Color m_paintColor;
     [SerializeField]
-    private float m_paintballCooldown = .7f;
+    private float m_attackSpeed = .7f;
+    private float m_attackSpeedMultiplier = 1f;
 
     private float m_attackDamage = 10f;
     private float m_attackMultiplier = 1f;
@@ -88,6 +89,13 @@ public class PlayerAttack : MonoBehaviourPun
         m_attackMultiplier += multiplier / 100f;
     }
 
+    public void AddAttackSpeedMultplier(float multiplier)
+    {
+        m_attackSpeedMultiplier += multiplier / 100f;
+    }
+
+    public void 
+
     [PunRPC]
     public void ShootPaintball(bool beam, Vector3 mousePos)
     {
@@ -96,7 +104,7 @@ public class PlayerAttack : MonoBehaviourPun
         {
             return;
         }
-        m_currentCooldown = m_paintballCooldown;
+        m_currentCooldown = m_attackSpeed;
 
         // If you use PhotonNetwork.Instantiate, any player who joins will witness a lot of projectiles being spawned in
         // so that the newly joined player's scene will be updated as the other player's scene (lookup photon object pooling)
