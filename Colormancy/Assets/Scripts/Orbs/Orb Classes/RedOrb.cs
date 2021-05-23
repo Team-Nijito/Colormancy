@@ -15,6 +15,10 @@ public class RedOrb : Orb
 
     public override void CastGreaterEffect(GameObject hit, float spellEffectMod, float[] data)
     {
+        float dmgMultiplier = 1;
+        if (hit.GetComponent<StatusEffectScript>().StatusExists(StatusEffect.StatusType.SpellIncreasedDamage))
+            dmgMultiplier += OrbValueManager.getGreaterEffectPercentile(Element.Water) / 100f;
+
         float vector_x = 0;
         float vector_y = 0;
         float vector_z = 0;
@@ -27,7 +31,7 @@ public class RedOrb : Orb
         Vector3 launchVector = new Vector3(vector_x, vector_y, vector_z);
 
         PhotonView photonView = PhotonView.Get(hit);
-        photonView.RPC("TakeDamage", RpcTarget.All, OrbValueManager.getGreaterEffectDamage(m_OrbElement, m_Level) * spellEffectMod);
+        photonView.RPC("TakeDamage", RpcTarget.All, OrbValueManager.getGreaterEffectDamage(m_OrbElement, m_Level) * spellEffectMod * dmgMultiplier);
 
         float orbDuration = OrbValueManager.getGreaterEffectDuration(m_OrbElement, m_Level);
         StatusEffectScript status = hit.GetComponent<StatusEffectScript>();

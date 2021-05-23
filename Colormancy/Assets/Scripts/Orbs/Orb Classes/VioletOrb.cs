@@ -15,9 +15,13 @@ public class VioletOrb : Orb
 
     public override void CastGreaterEffect(GameObject hit, float spellEffectMod, float[] data)
     {
+        float dmgMultiplier = 1;
+        if (hit.GetComponent<StatusEffectScript>().StatusExists(StatusEffect.StatusType.SpellIncreasedDamage))
+            dmgMultiplier += OrbValueManager.getGreaterEffectPercentile(Element.Water) / 100f;
+
         StatusEffectScript status = hit.GetComponent<StatusEffectScript>();
         
-        status.RPCApplyStatus(StatusEffect.StatusType.DamageOverTime, OrbValueManager.getGreaterEffectDuration(m_OrbElement, m_Level), 1, OrbValueManager.getGreaterEffectDamage(m_OrbElement, m_Level) * spellEffectMod);
+        status.RPCApplyStatus(StatusEffect.StatusType.DamageOverTime, OrbValueManager.getGreaterEffectDuration(m_OrbElement, m_Level), 1, OrbValueManager.getGreaterEffectDamage(m_OrbElement, m_Level) * spellEffectMod * dmgMultiplier);
         status.RPCApplyStatus(StatusEffect.StatusType.Slowdown, OrbValueManager.getGreaterEffectDuration(m_OrbElement, m_Level), 0, OrbValueManager.getGreaterEffectPercentile(m_OrbElement), "violet_orb");
     }
 

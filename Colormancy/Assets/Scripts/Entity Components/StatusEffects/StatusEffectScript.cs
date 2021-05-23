@@ -78,18 +78,21 @@ public class StatusEffectScript : MonoBehaviourPun
         // First search the list to see if status effect exists
         foreach (StatusEffect effect in m_statusEffects)
         {
-            if (effect.StatusEffectType == type && effect.StatusSource.Equals(source))
+            if (effect.StatusEffectType == type)
             {
-                if (effect.StatusEffectType == StatusEffect.StatusType.Slowdown || effect.StatusEffectType == StatusEffect.StatusType.Stun)
+                if (source != null && effect.StatusSource != null)
                 {
-                    // reset duration, DO NOT STACK SLOW DURATION TIMES
-                    effect.SetDuration(duration);
+                    if (effect.StatusEffectType == StatusEffect.StatusType.Slowdown || effect.StatusEffectType == StatusEffect.StatusType.Stun)
+                    {
+                        // reset duration, DO NOT STACK SLOW DURATION TIMES
+                        effect.SetDuration(duration);
+                    }
+                    else
+                    {
+                        effect.IncreaseDuration(duration);
+                    }
+                    return true;
                 }
-                else
-                {
-                    effect.IncreaseDuration(duration);
-                }
-                return true;
             }
         }
         return false;
@@ -199,6 +202,13 @@ public class StatusEffectScript : MonoBehaviourPun
                         newStatusEffect = new AttackLessDamage(m_statusEffects, type, duration, source, value, m_enemHitbox, m_enemProjectile);
 
                     m_statusEffects.Add(newStatusEffect);
+                    break;
+                case StatusEffect.StatusType.SpellIncreasedDamage:
+                    if (m_isPlayer)
+                        throw new System.Exception("Cannot currently apply SpellIncreasedDamage on players.");
+                    else
+                        newStatusEffect = new SpellIncreasedDamage(m_statusEffects, type, duration, source, value);
+
                     break;
             }
         }

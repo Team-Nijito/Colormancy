@@ -15,8 +15,12 @@ public class BrownOrb : Orb
 
     public override void CastGreaterEffect(GameObject hit, float spellEffectMod, float[] data)
     {
+        float dmgMultiplier = 1;
+        if (hit.GetComponent<StatusEffectScript>().StatusExists(StatusEffect.StatusType.SpellIncreasedDamage))
+            dmgMultiplier += OrbValueManager.getGreaterEffectPercentile(Element.Water) / 100f;
+
         PhotonView photonView = PhotonView.Get(hit);
-        photonView.RPC("TakeDamage", RpcTarget.All, OrbValueManager.getGreaterEffectDamage(m_OrbElement, m_Level) * spellEffectMod);
+        photonView.RPC("TakeDamage", RpcTarget.All, OrbValueManager.getGreaterEffectDamage(m_OrbElement, m_Level) * spellEffectMod * dmgMultiplier);
     }
 
     public override void CastLesserEffect(GameObject hit, float spellEffectMod, float[] data)
