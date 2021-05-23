@@ -21,6 +21,9 @@ public class BrownOrb : Orb
 
         PhotonView photonView = PhotonView.Get(hit);
         photonView.RPC("TakeDamage", RpcTarget.All, OrbValueManager.getGreaterEffectDamage(m_OrbElement, m_Level) * spellEffectMod * dmgMultiplier);
+
+        StatusEffectScript status = hit.GetComponent<StatusEffectScript>();
+        status.RPCApplyStatus(StatusEffect.StatusType.Slowdown, OrbValueManager.getGreaterEffectDuration(m_OrbElement, m_Level), 0, OrbValueManager.getGreaterEffectPercentile(m_OrbElement), "brown_orb");
     }
 
     public override void CastLesserEffect(GameObject hit, float spellEffectMod, float[] data)

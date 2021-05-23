@@ -23,7 +23,7 @@ public class IndigoOrb : Orb
         photonView.RPC("TakeDamage", RpcTarget.All, OrbValueManager.getGreaterEffectDamage(m_OrbElement, m_Level) * spellEffectMod * dmgMultiplier);
 
         StatusEffectScript status = hit.GetComponent<StatusEffectScript>();
-        //status.RPCApplyBlind(orbLevel);
+        status.RPCApplyStatus(StatusEffect.StatusType.Blind, OrbValueManager.getGreaterEffectDuration(m_OrbElement, m_Level), 0, OrbValueManager.getGreaterEffectPercentile(m_OrbElement));
     }
 
     public override void CastLesserEffect(GameObject hit, float spellEffectMod, float[] data)
