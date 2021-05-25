@@ -34,8 +34,17 @@ public class SpawnpointBehaviour : MonoBehaviour, IPunObservable
     private float m_timeUntilSpawnOriginal = 0f; 
     private float m_timeUntilSpawn = 0f; // count down to zero
 
+    private float m_timeUntilUpdateDisplay = 0f; // we don't need to update every frame
+    private const float TIME_UPDATE_DISPLAY = 0.2f; // every 0.2 seconds would suffice
+
     [SerializeField]
     private Image m_radialSpawnTimer;
+
+    [SerializeField]
+    private Transform m_radialPanel;
+
+    [SerializeField]
+    private Text m_displayText;
 
     private LayerMask m_playerLayer;
     private LayerMask m_enemyLayer;
@@ -67,13 +76,16 @@ public class SpawnpointBehaviour : MonoBehaviour, IPunObservable
         if (m_timeUntilSpawn > 0f)
         {
             m_timeUntilSpawn -= Time.deltaTime;
+            m_displayText.text = m_timeUntilSpawn.ToString("f1"); // keep only 1 decimal
             m_radialSpawnTimer.fillAmount = m_timeUntilSpawn / m_timeUntilSpawnOriginal;
+            ProgressPanelFaceCamera();
         }
         else
         {
             if (m_radialSpawnTimer.gameObject.activeInHierarchy)
             {
-                m_radialSpawnTimer.gameObject.SetActive(false);
+                m_displayText.text = "";
+                m_radialPanel.gameObject.SetActive(false);
             }
         }
     }
@@ -88,7 +100,8 @@ public class SpawnpointBehaviour : MonoBehaviour, IPunObservable
         m_timeUntilSpawn = delayBeforeSpawn;
         m_timeUntilSpawnOriginal = delayBeforeSpawn;
 
-        m_radialSpawnTimer.gameObject.SetActive(true);
+        m_radialPanel.gameObject.SetActive(true);
+        m_timeUntilUpdateDisplay = 0f;
 
         string enemyName = "Enemies/";
 
@@ -111,6 +124,19 @@ public class SpawnpointBehaviour : MonoBehaviour, IPunObservable
         entity.transform.parent = parentFolder.transform; // set the entity as a child of the parentFolder, for organizational purposes
 
         m_isCurrentlySpawningEnemy = false;
+    }
+
+    // The progress gui faces the main camera (if it exists)
+    private void ProgressPanelFaceCamera()
+    {
+        m_timeUntilUpdateDisplay += Time.deltaTime;
+
+        // make the health bar orient towards the main camera
+        if (m_timeUntilUpdateDisplay > TIME_UPDATE_DISPLAY && m_radialPanel && Camera.main)
+        {
+            m_timeUntilUpdateDisplay = 0f;
+            m_radialPanel.rotation = Quaternion.LookRotation(m_radialPanel.position - Camera.main.transform.position);
+        }
     }
 
     #endregion
