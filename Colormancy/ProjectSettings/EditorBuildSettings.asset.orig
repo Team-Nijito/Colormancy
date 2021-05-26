@@ -1,0 +1,50 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1045 &1
+EditorBuildSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/Launcher.unity
+    guid: 5970344aa787c914b84b86d19e663653
+  - enabled: 1
+    path: Assets/Scenes/WizardSpellTest.unity
+    guid: 6e5c7e8a67e824441aa650788630051e
+  - enabled: 1
+    path: Assets/Scenes/Dungeon Level/Dungeon Level 1.unity
+    guid: a2251e4d2c4a2c849891920aba73be05
+  - enabled: 1
+<<<<<<< HEAD
+    path: Assets/Scenes/Office Level/Office Level 1.unity
+    guid: 0af949e30a7f8784ab4c82a5fd41db63
+  - enabled: 1
+=======
+>>>>>>> b4bed1ff0120eec590f00b7fed581b6a0204e740
+    path: Assets/Scenes/Starting Level.unity
+    guid: 67b4f30bc37b6b845bafa711a5d860fc
+  - enabled: 1
+    path: Assets/Scenes/Dungeon Level/Dungeon Level 2.unity
+    guid: c3297d6c0e3b67e44bdd2616bd180c07
+  - enabled: 1
+<<<<<<< HEAD
+    path: Assets/Scenes/TestMoveChamber Level/TestMoveChamber.unity
+=======
+    path: Assets/Scenes/TMC Level/TestMoveChamber.unity
+>>>>>>> b4bed1ff0120eec590f00b7fed581b6a0204e740
+    guid: 224914af2d40b0c4eb28f5f816aae16b
+  - enabled: 1
+    path: Assets/Scenes/YouWinScene.unity
+    guid: 3d82e4e165a127b43956a047b671aa4d
+  - enabled: 1
+    path: Assets/Scenes/Boss Test Level/Boss Test Scene.unity
+    guid: 7d61b182f170b254191520c1885c9b87
+  - enabled: 1
+<<<<<<< HEAD
+    path: Assets/Scenes/Whitebox Levels/Whitebox Level 1.unity
+    guid: d494aadc750022046b05f82a0541024e
+=======
+    path: Assets/Scenes/Office Level/Office Level 1.unity
+    guid: 0af949e30a7f8784ab4c82a5fd41db63
+>>>>>>> b4bed1ff0120eec590f00b7fed581b6a0204e740
+  m_configObjects: {}

@@ -632,7 +632,7 @@ GameObject:
   - component: {fileID: 8261332007669540399}
   - component: {fileID: 5251512313771479071}
   m_Layer: 10
-  m_Name: SkeletonChaser
+  m_Name: Terminator Bot
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -754,7 +754,7 @@ MonoBehaviour:
   m_healthBar: {fileID: 5161377574794221134}
   m_username: {fileID: 5161377574221408627}
   m_gameManager: {fileID: 0}
-  m_baseHealth: 100
+  m_baseHealth: 15
   m_armorPercentage: 0
   m_isRegenHealth: 0
   m_regenHealthPercentage: 1
@@ -1824,7 +1824,9 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Skeleton chaser
+  m_Text: 'Terminator Bot
+
+'
 --- !u!114 &5161377574221408626
 MonoBehaviour:
   m_ObjectHideFlags: 0

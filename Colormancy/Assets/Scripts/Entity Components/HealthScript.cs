@@ -255,7 +255,9 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
         PhotonNetwork.Destroy(transform.gameObject);
 
         // Notify the Enemy Manager that an enemy has died
-        GameObject.Find("EnemyManager").GetComponent<EnemyManager>().EnemyHasDied();
+        GameObject manager = GameObject.Find("EnemyManager");
+        if (manager)
+            manager.GetComponent<EnemyManager>().EnemyHasDied();
     }
 
     // The healthbar gui faces the main camera (if it exists)

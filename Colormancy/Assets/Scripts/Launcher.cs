@@ -28,7 +28,7 @@ public class Launcher : MonoBehaviourPunCallbacks
 
     #region Private Fields
 
-    private string gameVersion = "1";
+    private string gameVersion = "7";
 
     private bool isConnecting;
 
