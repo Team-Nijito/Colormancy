@@ -30460,7 +30460,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SetAnims: 1
-  m_speed: 36
+  m_speed: 30
   m_wanderTime:
     minTime: 2
     maxTime: 5

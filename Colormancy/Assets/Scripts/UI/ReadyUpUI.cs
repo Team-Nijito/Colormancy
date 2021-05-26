@@ -19,6 +19,9 @@ public class ReadyUpUI : MonoBehaviour
     [SerializeField]
     private TextMeshProUGUI m_readyButtonText;
 
+    [SerializeField]
+    private bool m_doWeCareThatYouHaveOrbs = true;
+
     private bool m_isPlayerReady = false;
 
     private int m_currentPlayersReady = -1; // just store this so we don't have to constantly update text
@@ -37,7 +40,7 @@ public class ReadyUpUI : MonoBehaviour
         m_gmScript = GameObject.Find("GameManager").GetComponent<GameManager>();
         m_oldButtonTextSize = m_readyButtonText.fontSize;
 
-        if (m_gmScript.IsLevel)
+        if (m_gmScript.TypeOfLevel == GameManager.LevelTypes.Level)
         {
             Destroy(gameObject);
         }
@@ -80,21 +83,32 @@ public class ReadyUpUI : MonoBehaviour
     {
         if (!m_isPlayerReady)
         {
-            if (OrbManager.orbHistory.Count > 0)
+            if (m_doWeCareThatYouHaveOrbs)
             {
+                if (OrbManager.orbHistory.Count > 0)
+                {
+                    m_readyButtonText.text = "Ready!";
+                    m_readyButtonImg.color = Color.green;
+                    m_gmScript.RPCReadyUp();
+                    m_isPlayerReady = true;
+                }
+                else
+                {
+                    if (m_currentDisplayTextCouroutine != null)
+                    {
+                        // if the user spams the button, punish the user by restarting the countdown
+                        StopCoroutine(m_currentDisplayTextCouroutine);
+                    }
+                    m_currentDisplayTextCouroutine = StartCoroutine(TellPlayerTheyNeedAtleastOneOrb());
+                }
+            }
+            else
+            {
+                // don't care abouts orbs, this is a generic ready up system (anyone can ready up at any time they want)
                 m_readyButtonText.text = "Ready!";
                 m_readyButtonImg.color = Color.green;
                 m_gmScript.RPCReadyUp();
                 m_isPlayerReady = true;
-            }
-            else
-            {
-                if (m_currentDisplayTextCouroutine != null)
-                {
-                    // if the user spams the button, punish the user by restarting the countdown
-                    StopCoroutine(m_currentDisplayTextCouroutine);
-                }
-                m_currentDisplayTextCouroutine = StartCoroutine(TellPlayerTheyNeedAtleastOneOrb());
             }
         }
         else

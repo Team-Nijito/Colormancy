@@ -43,7 +43,7 @@ public class EnemyManager : MonoBehaviourPun
 
                 // If anything goes wrong when spawning the enemy, decrement numEnemiesOnField
                 m_numEnemiesOnField++;
-                StartCoroutine(TrySpawnEnemy(4f)); // all enemies have a 4 second spawn delay
+                TrySpawnEnemy(4f); 
             }
         }
     }
@@ -52,7 +52,7 @@ public class EnemyManager : MonoBehaviourPun
 
     #region Private functions
 
-    private IEnumerator TrySpawnEnemy(float delay = 0f)
+    private void TrySpawnEnemy(float delay = 0f)
     {
         GameObject entity = ChooseEntityForSpawning();
 
@@ -62,16 +62,19 @@ public class EnemyManager : MonoBehaviourPun
 
         foreach (GameObject spawn in m_spawnpoints)
         {
-            SpawnpointBehaviour spawnScript = spawn.GetComponent<SpawnpointBehaviour>();
-            if (spawnScript.IsSpawnSafe(entity))
+            if (spawn.activeInHierarchy)
             {
-                goodSpawnpointScripts.Add(spawnScript);
+                SpawnpointBehaviour spawnScript = spawn.GetComponent<SpawnpointBehaviour>();
+                if (!spawnScript.IsSpawningEnemy && spawnScript.IsSpawnSafe())
+                {
+                    goodSpawnpointScripts.Add(spawnScript);
+                }
             }
         }
 
         if (goodSpawnpointScripts.Count == 0)
         {
-            Debug.LogError("No unobstructed spawnpoints to spawn on!!!");
+            //Debug.Log("No unobstructed spawnpoints to spawn on, waiting");
             m_numEnemiesOnField--;
         }
         else
@@ -79,12 +82,9 @@ public class EnemyManager : MonoBehaviourPun
             // choose a random good spawnpoint
             SpawnpointBehaviour chosenScript = goodSpawnpointScripts[Random.Range(0, goodSpawnpointScripts.Count)];
 
-            // wait before spawning
-            yield return new WaitForSecondsRealtime(delay);
-            chosenScript.HandleSpawning(m_enemyFolder, entity.name);
+            chosenScript.HandleSpawning(m_enemyFolder, entity.name, delay);
         }
     }
-
 
     /// <summary>
     /// Chooses an entity to spawn.

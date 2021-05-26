@@ -92,7 +92,7 @@ SphereCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.5
+  m_Radius: 0.75
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!108 &852709482061136773
 Light:
@@ -269,13 +269,9 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  greaterCastAmt: 0
-  lesserCastAmt: 0
   spellEffectMod: 0
   rotationSpeed: 10
-  lifetime: 5
-  spherePaintRadius: 2.5
-  paintColor: {r: 0.98700476, g: 1, b: 0.3443396, a: 0}
+  lifetime: 3
   debug: 0
 --- !u!54 &3525512770331781792
 Rigidbody:
@@ -385,7 +381,7 @@ SphereCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.5
+  m_Radius: 0.75
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!108 &852709483024857159
 Light:
@@ -540,7 +536,7 @@ SphereCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.5
+  m_Radius: 0.75
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!108 &852709483522200640
 Light:

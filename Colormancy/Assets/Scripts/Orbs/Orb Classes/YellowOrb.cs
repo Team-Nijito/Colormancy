@@ -15,10 +15,15 @@ public class YellowOrb : Orb
 
     public override void CastGreaterEffect(GameObject hit, float spellEffectMod, float[] data)
     {
-        PhotonView photonView = PhotonView.Get(hit);
-        photonView.RPC("TakeDamage", RpcTarget.All, OrbValueManager.getGreaterEffectDamage(m_OrbElement, m_Level) * spellEffectMod);
+        float dmgMultiplier = 1;
+        if (hit.GetComponent<StatusEffectScript>().StatusExists(StatusEffect.StatusType.SpellIncreasedDamage))
+            dmgMultiplier += OrbValueManager.getGreaterEffectPercentile(Element.Water) / 100f;
 
-        //missing 20% less damage
+        PhotonView photonView = PhotonView.Get(hit);
+        photonView.RPC("TakeDamage", RpcTarget.All, OrbValueManager.getGreaterEffectDamage(m_OrbElement, m_Level) * spellEffectMod * dmgMultiplier);
+
+        StatusEffectScript status = hit.GetComponent<StatusEffectScript>();
+        status.RPCApplyStatus(StatusEffect.StatusType.AttackLessDamage, OrbValueManager.getGreaterEffectDuration(m_OrbElement, m_Level), 0, -OrbValueManager.getGreaterEffectPercentile(m_OrbElement));
     }
 
     public override void CastLesserEffect(GameObject hit, float spellEffectMod, float[] data)

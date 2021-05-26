@@ -415,7 +415,7 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
         // if we have a status effect component, then stop any onging status effects
         if (m_statusEffectScript)
         {
-            m_statusEffectScript.ClearStatusEffects();
+            m_statusEffectScript.RPCClearAllStatusEffects();
         }
 
         if (!m_gameManager)

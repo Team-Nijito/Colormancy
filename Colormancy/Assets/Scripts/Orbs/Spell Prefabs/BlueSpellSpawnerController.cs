@@ -80,7 +80,7 @@ public class BlueSpellSpawnerController : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Enemy"))
         {
-            if (!entitiesEntered.Contains(collision.gameObject))
+            if (entitiesEntered.Contains(collision.gameObject))
                 entitiesEntered.Remove(collision.gameObject);
         }
         else if (collision.gameObject.CompareTag("Player"))
