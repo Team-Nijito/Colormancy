@@ -15,6 +15,9 @@ namespace Com.MyCompany.Name
         // Store PlayerPref
         const string playerNamePrefKey = "PlayerName";
 
+        [SerializeField]
+        private Text m_nameDisplayText; // this text will be updated with the character's name as you type
+
         #endregion
 
         #region MonoBehaviour Callbacks
@@ -33,6 +36,11 @@ namespace Com.MyCompany.Name
                 }
             }
 
+            if (string.IsNullOrEmpty(defaultName))
+            {
+                // If you don't have a saved name, generate a random name.
+                defaultName = "Player" + Random.Range(0, 5000);
+            }
             PhotonNetwork.NickName = defaultName;
         }
 
@@ -43,15 +51,21 @@ namespace Com.MyCompany.Name
         //Sets name of player, and save it in PlayerPrefs for future
         public void SetPlayerName(string value)
         {
-            // #Important
             if (string.IsNullOrEmpty(value))
             {
-                Debug.LogError("Player name is null or empty");
-                return;
+                // If you have an empty name, just generate a random name
+                PhotonNetwork.NickName = "Player" + Random.Range(0, 5000);
             }
-            PhotonNetwork.NickName = value;
+            else
+            {
+                PhotonNetwork.NickName = value;
+                PlayerPrefs.SetString(playerNamePrefKey, value);
+            }
 
-            PlayerPrefs.SetString(playerNamePrefKey, value);
+            if (m_nameDisplayText)
+            {
+                m_nameDisplayText.text = PhotonNetwork.NickName;
+            }
         }
 
         #endregion
