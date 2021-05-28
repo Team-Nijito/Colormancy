@@ -553,6 +553,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         }
 
         PhotonNetwork.LeaveRoom();
+        PhotonNetwork.Disconnect();
     }
 
     /// <summary>
