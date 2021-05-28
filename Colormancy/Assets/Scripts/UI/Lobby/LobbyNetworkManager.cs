@@ -177,21 +177,20 @@ public class LobbyNetworkManager : MonoBehaviourPunCallbacks
             return;
         }
 
-        // Prevent creating rooms with no name
-        if (!string.IsNullOrEmpty(m_roomNameInput.text))
-        {
-            // add options for changing number of players
-            RoomOptions options = new RoomOptions();
-            options.MaxPlayers = (byte)m_playerCapacity.value;
+        string roomName = m_roomNameInput.text;
 
-            options.IsVisible = !m_hideRoomFromLobby.isOn;
-
-            PhotonNetwork.CreateRoom(m_roomNameInput.text, options, TypedLobby.Default);
-        }
-        else
+        if (string.IsNullOrEmpty(roomName))
         {
-            ButtonErrorWrapper(m_createRoomButton, "Invalid room name");
+            roomName = PhotonNetwork.LocalPlayer.NickName + "'s Room"; // if room name is empty, it should be USERNAME's room by default
         }
+
+        // add options for changing number of players
+        RoomOptions options = new RoomOptions();
+        options.MaxPlayers = (byte)m_playerCapacity.value;
+
+        options.IsVisible = !m_hideRoomFromLobby.isOn;
+
+        PhotonNetwork.CreateRoom(roomName, options, TypedLobby.Default);
     }
 
     public void OnClickJoinRoom()
