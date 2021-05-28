@@ -18,7 +18,6 @@ EditorBuildSettings:
     path: Assets/Scenes/Office Level/Office Level 1.unity
     guid: 0af949e30a7f8784ab4c82a5fd41db63
   - enabled: 1
->>>>>>>>> Temporary merge branch 2
     path: Assets/Scenes/Starting Level.unity
     guid: 67b4f30bc37b6b845bafa711a5d860fc
   - enabled: 1
