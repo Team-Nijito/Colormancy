@@ -86,7 +86,15 @@ public class OrbManager : MonoBehaviourPun
 
     public void RemoveSpellOrb(Orb orb, bool removeFromOrbHistory = false)
     {
-        orbs.Remove(orb);
+        Orb elementToRemove = null;
+        foreach (Orb searchOrb in orbs)
+        {
+            if (searchOrb.getElement() == orb.getElement())
+            {
+                elementToRemove = searchOrb;
+            }
+        }
+        orbs.Remove(elementToRemove);
         if (removeFromOrbHistory)
         {
             orbHistory.Remove(orb); // sync across scenes
