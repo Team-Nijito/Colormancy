@@ -127,7 +127,7 @@ public class PodiumController : MonoBehaviour
             {
                 if (PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue(FetchOrbKey(podiumType), out object obj))
                 {
-                    int[] orbInfo = (int[])obj; // first element, ID that is perusing orb, second element, ID that has obtained and now owns the orb
+                    int[] orbInfo = (int[])obj; // first element, ID that is perusing orb, second element, ID that has obtained and now owns the orb, third element is number of orbs the player currently has
 
                     if (orbInfo[0] == -1)
                     {
@@ -137,6 +137,7 @@ public class PodiumController : MonoBehaviour
                         // update the room properties to show that you're perusing this orb podium
                         PhotonHashtable roomProperties = PhotonNetwork.CurrentRoom.CustomProperties;
                         roomProperties[FetchOrbKey(podiumType)] = orbInfo;
+                        PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue(GameManager.OrbsNeededKey, out object num);
 
                         PhotonNetwork.CurrentRoom.SetCustomProperties(roomProperties);
 
@@ -144,7 +145,9 @@ public class PodiumController : MonoBehaviour
                         {
                             // nobody owns this
                             OrbTypes OrbOwned = (OrbTypes)PhotonNetwork.LocalPlayer.CustomProperties[GameManager.OrbOwnedInLobbyKey];
-                            if (OrbOwned == OrbTypes.None)
+                            int playerOrbCount = ((GameObject)PhotonNetwork.LocalPlayer.TagObject).GetComponent<OrbManager>().orbs.Count;
+                            
+                            if (playerOrbCount < (int)num) //OrbOwned == OrbTypes.None
                             {
                                 // nobody currently "owns" this orb, so present the normal stuff
                                 podiumStatus = OrbStatus.Available;

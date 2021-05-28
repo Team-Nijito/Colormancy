@@ -24,6 +24,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     
     public int PlayersReady { get { return m_playersReady; } private set { m_playersReady = value; } }
     public uint PlayersNeededToReady { get { return m_playersNeededToStartGame; } private set { m_playersNeededToStartGame = value; } }
+    public int OrbsNeededToReady { get { return m_OrbsNeededToStartGame; } private set { m_OrbsNeededToStartGame = value; } }
     public float PaintPercentageNeededToWin { get { return m_paintPercentageNeededToWin; } private set { m_paintPercentageNeededToWin = value; } }
 
     // Room custom properties
@@ -36,6 +37,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     public const string BrownOrbKey = "BrownLoanedToPhotonID";
     public const string QuicksilverOrbKey = "QuicksilverLoanedToPhotonID";
     public const string IndigoOrbKey = "IndigoLoanedToPhotonID";
+    public const string OrbsNeededKey = "OrbsNeededToPhotonID";
 
     // Player custom properties
     public const string OrbOwnedInLobbyKey = "OrbOwned";
@@ -73,6 +75,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     [MyBox.ConditionalField(nameof(m_levelType), true, LevelTypes.Level)]
     [SerializeField]
     private uint m_playersNeededToStartGame = 5;
+    
+    [MyBox.ConditionalField(nameof(m_levelType), true, LevelTypes.Level)]
+    [SerializeField]
+    private int m_OrbsNeededToStartGame = 2;
 
     [MyBox.ConditionalField(nameof(m_levelType), true, LevelTypes.Level)]
     [SerializeField]
@@ -176,7 +182,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
                         {VioletOrbKey, array2size},
                         {BrownOrbKey, array2size},
                         {QuicksilverOrbKey, array2size},
-                        {IndigoOrbKey, array2size}
+                        {IndigoOrbKey, array2size},
+                        {OrbsNeededKey, m_OrbsNeededToStartGame}
                     };
 
                     PhotonNetwork.CurrentRoom.SetCustomProperties(properties);
@@ -763,7 +770,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     {
         if (!(m_levelType == LevelTypes.Level))
         {
-            // Synchronize the number of players ready across all clients
+            // Synchronize the number of players ready across all clients, and number of orbs needed
             if (stream.IsWriting)
             {
                 stream.SendNext(m_playersReady);

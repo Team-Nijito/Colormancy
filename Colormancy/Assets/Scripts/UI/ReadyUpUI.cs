@@ -61,7 +61,8 @@ public class ReadyUpUI : MonoBehaviour
 
     private IEnumerator TellPlayerTheyNeedAtleastOneOrb()
     {
-        m_readyButtonText.text = "You need at least one orb!";
+        PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue(GameManager.OrbsNeededKey, out object num);
+        m_readyButtonText.text = "You need at least " + (int)num + " orbs!";
         m_readyButtonText.fontSize = 12f; // magic small number that allows the text to be displayed
 
         yield return new WaitForSecondsRealtime(m_displayNeedOrbMessageSeconds);
@@ -85,7 +86,8 @@ public class ReadyUpUI : MonoBehaviour
         {
             if (m_doWeCareThatYouHaveOrbs)
             {
-                if (OrbManager.orbHistory.Count > 0)
+                PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue(GameManager.OrbsNeededKey, out object num);
+                if (OrbManager.orbHistory.Count > ((int)num -1))
                 {
                     m_readyButtonText.text = "Ready!";
                     m_readyButtonImg.color = Color.green;
