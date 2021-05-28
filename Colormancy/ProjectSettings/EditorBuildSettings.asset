@@ -38,4 +38,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Narrative Scenes/God Scene 1.unity
     guid: 3dcdf1cd16c43ce48b68536ea8246ee8
+  - enabled: 1
+    path: Assets/Scenes/Whitebox Levels/Whitebox Level 1.unity
+    guid: d494aadc750022046b05f82a0541024e
+  - enabled: 1
+    path: Assets/Scenes/Whitebox Levels/Whitebox Level 2.unity
+    guid: cee800fbaf2b7c341849d8abd12e5412
   m_configObjects: {}

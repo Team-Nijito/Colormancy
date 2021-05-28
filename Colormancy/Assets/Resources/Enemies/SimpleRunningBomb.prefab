@@ -30304,7 +30304,7 @@ GameObject:
   - component: {fileID: 9186146974418002400}
   - component: {fileID: 9186146974418002401}
   m_Layer: 10
-  m_Name: RunningBomb
+  m_Name: SimpleRunningBomb
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -30370,8 +30370,8 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.05
-  m_Speed: 15
-  m_Acceleration: 50
+  m_Speed: 3
+  m_Acceleration: 10
   avoidancePriority: 50
   m_AngularSpeed: 999
   m_StoppingDistance: 3
@@ -30460,7 +30460,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SetAnims: 1
-  m_speed: 30
+  m_speed: 4
   m_wanderTime:
     minTime: 2
     maxTime: 5

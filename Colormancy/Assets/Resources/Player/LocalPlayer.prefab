@@ -395,7 +395,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_paintColor: {r: 0.37201852, g: 0.7359005, b: 0.8301887, a: 0}
-  m_attackSpeed: 0.7
+  m_attackSpeed: 0.25
 --- !u!114 &8921435665619611767
 MonoBehaviour:
   m_ObjectHideFlags: 0

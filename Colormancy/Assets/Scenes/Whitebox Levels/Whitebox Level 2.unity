@@ -3702,6 +3702,11 @@ PrefabInstance:
       objectReference: {fileID: 966424049}
     - target: {fileID: 7917960859537667781, guid: a2874b7c33b663f47add06323276b963,
         type: 3}
+      propertyPath: m_levelType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7917960859537667781, guid: a2874b7c33b663f47add06323276b963,
+        type: 3}
       propertyPath: m_playerPrefab
       value: 
       objectReference: {fileID: 5820395927475117105, guid: 7f1c285412074014d837633f8e97020d,
@@ -13789,9 +13794,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 354df758b0cc5974c8caad95c5342edb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  debug: 0
   orbValues:
-  - m_name: 
+  - element: 0
     m_OrbColor: {r: 0, g: 0, b: 0, a: 0}
+    m_PaintRadius: 0
     m_GreaterEffectDamage:
       m_Level1: 0
       m_Level2: 0
@@ -13809,11 +13816,13 @@ MonoBehaviour:
       m_Level1: 0
       m_Level2: 0
       m_Level3: 0
-    m_SpellEffectMod: 0
+    m_ShapeEffectMod: 0
     m_CooldownMod: 0
     m_ShapeManaMod: 0
-  - m_name: 
+    m_Level: 0
+  - element: 0
     m_OrbColor: {r: 0, g: 0, b: 0, a: 0}
+    m_PaintRadius: 0
     m_GreaterEffectDamage:
       m_Level1: 0
       m_Level2: 0
@@ -13831,11 +13840,13 @@ MonoBehaviour:
       m_Level1: 0
       m_Level2: 0
       m_Level3: 0
-    m_SpellEffectMod: 0
+    m_ShapeEffectMod: 0
     m_CooldownMod: 0
     m_ShapeManaMod: 0
-  - m_name: 
+    m_Level: 0
+  - element: 0
     m_OrbColor: {r: 0, g: 0, b: 0, a: 0}
+    m_PaintRadius: 0
     m_GreaterEffectDamage:
       m_Level1: 0
       m_Level2: 0
@@ -13853,11 +13864,13 @@ MonoBehaviour:
       m_Level1: 0
       m_Level2: 0
       m_Level3: 0
-    m_SpellEffectMod: 0
+    m_ShapeEffectMod: 0
     m_CooldownMod: 0
     m_ShapeManaMod: 0
-  - m_name: 
+    m_Level: 0
+  - element: 0
     m_OrbColor: {r: 0, g: 0, b: 0, a: 0}
+    m_PaintRadius: 0
     m_GreaterEffectDamage:
       m_Level1: 0
       m_Level2: 0
@@ -13875,11 +13888,13 @@ MonoBehaviour:
       m_Level1: 0
       m_Level2: 0
       m_Level3: 0
-    m_SpellEffectMod: 0
+    m_ShapeEffectMod: 0
     m_CooldownMod: 0
     m_ShapeManaMod: 0
-  - m_name: 
+    m_Level: 0
+  - element: 0
     m_OrbColor: {r: 0, g: 0, b: 0, a: 0}
+    m_PaintRadius: 0
     m_GreaterEffectDamage:
       m_Level1: 0
       m_Level2: 0
@@ -13897,11 +13912,13 @@ MonoBehaviour:
       m_Level1: 0
       m_Level2: 0
       m_Level3: 0
-    m_SpellEffectMod: 0
+    m_ShapeEffectMod: 0
     m_CooldownMod: 0
     m_ShapeManaMod: 0
-  - m_name: 
+    m_Level: 0
+  - element: 0
     m_OrbColor: {r: 0, g: 0, b: 0, a: 0}
+    m_PaintRadius: 0
     m_GreaterEffectDamage:
       m_Level1: 0
       m_Level2: 0
@@ -13919,11 +13936,13 @@ MonoBehaviour:
       m_Level1: 0
       m_Level2: 0
       m_Level3: 0
-    m_SpellEffectMod: 0
+    m_ShapeEffectMod: 0
     m_CooldownMod: 0
     m_ShapeManaMod: 0
-  - m_name: 
+    m_Level: 0
+  - element: 0
     m_OrbColor: {r: 0, g: 0, b: 0, a: 0}
+    m_PaintRadius: 0
     m_GreaterEffectDamage:
       m_Level1: 0
       m_Level2: 0
@@ -13941,11 +13960,13 @@ MonoBehaviour:
       m_Level1: 0
       m_Level2: 0
       m_Level3: 0
-    m_SpellEffectMod: 0
+    m_ShapeEffectMod: 0
     m_CooldownMod: 0
     m_ShapeManaMod: 0
-  - m_name: 
+    m_Level: 0
+  - element: 0
     m_OrbColor: {r: 0, g: 0, b: 0, a: 0}
+    m_PaintRadius: 0
     m_GreaterEffectDamage:
       m_Level1: 0
       m_Level2: 0
@@ -13963,11 +13984,13 @@ MonoBehaviour:
       m_Level1: 0
       m_Level2: 0
       m_Level3: 0
-    m_SpellEffectMod: 0
+    m_ShapeEffectMod: 0
     m_CooldownMod: 0
     m_ShapeManaMod: 0
-  - m_name: 
+    m_Level: 0
+  - element: 0
     m_OrbColor: {r: 0, g: 0, b: 0, a: 0}
+    m_PaintRadius: 0
     m_GreaterEffectDamage:
       m_Level1: 0
       m_Level2: 0
@@ -13985,9 +14008,10 @@ MonoBehaviour:
       m_Level1: 0
       m_Level2: 0
       m_Level3: 0
-    m_SpellEffectMod: 0
+    m_ShapeEffectMod: 0
     m_CooldownMod: 0
     m_ShapeManaMod: 0
+    m_Level: 0
 --- !u!4 &1600910156
 Transform:
   m_ObjectHideFlags: 0
