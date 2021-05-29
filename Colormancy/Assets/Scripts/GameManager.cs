@@ -23,7 +23,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     public bool IsLevel { get { return !(m_levelType == LevelTypes.Lobby || m_levelType == LevelTypes.Narrative);  } }
     
     public int PlayersReady { get { return m_playersReady; } private set { m_playersReady = value; } }
-    public uint PlayersNeededToReady { get { return m_playersNeededToStartGame; } private set { m_playersNeededToStartGame = value; } }
+    // num players needed to be ready can be fetched via PhotonNetwork.CurrentRoom.PlayerCount
     public int OrbsNeededToReady { get { return m_OrbsNeededToStartGame; } private set { m_OrbsNeededToStartGame = value; } }
     public float PaintPercentageNeededToWin { get { return m_paintPercentageNeededToWin; } private set { m_paintPercentageNeededToWin = value; } }
 
@@ -40,7 +40,15 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     public const string OrbsNeededKey = "OrbsNeededToPhotonID";
 
     // Player custom properties
-    public const string OrbOwnedInLobbyKey = "OrbOwned";
+
+    //) lobby or narrative levels
+    public const string IsPlayerReady = "Ready";
+
+    //) lobby levels
+    public const string OrbOwnedInLobbyKey1 = "Orb1Owned";
+    public const string OrbOwnedInLobbyKey2 = "Orb2Owned";
+
+    //) "level"-type levels
     public const string PlayerAliveKey = "IsPlayerAlive";
 
     // Name of scenes
@@ -71,10 +79,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     private LevelTypes m_levelType = LevelTypes.None;
 
     private int m_playersReady = 0;
-
-    [MyBox.ConditionalField(nameof(m_levelType), true, LevelTypes.Level)]
-    [SerializeField]
-    private uint m_playersNeededToStartGame = 5;
     
     [MyBox.ConditionalField(nameof(m_levelType), true, LevelTypes.Level)]
     [SerializeField]
@@ -157,7 +161,20 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         {
             m_cameraPrefab = Resources.Load<GameObject>("Main Camera"); // load the camera resource before we might need it
 
-            if (SceneManager.GetActiveScene().name == LobbySceneName)
+            if (m_levelType == LevelTypes.Narrative)
+            {
+                // always setup a custom properties for all player
+                PhotonHashtable properties = new PhotonHashtable
+                {
+                    {IsPlayerReady, false }
+                };
+
+                // This keep tracks of whether a player is ready or not
+                // so that if the player was ready, and left, it would
+                // decrement the amount of players ready
+                PhotonNetwork.LocalPlayer.SetCustomProperties(properties);
+            }
+            else if (m_levelType == LevelTypes.Lobby)
             {
                 // Initalize the Room's custom properties once for the starting level
                 // be sure to clear these properties when moving to the first level
@@ -192,8 +209,12 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
                 // always setup a custom properties for all player
                 properties = new PhotonHashtable
                 {
-                    {OrbOwnedInLobbyKey, PodiumController.OrbTypes.None}
+                    {OrbOwnedInLobbyKey1, PodiumController.OrbTypes.None},
+                    {OrbOwnedInLobbyKey2, PodiumController.OrbTypes.None},
+                    {IsPlayerReady, false }
                 };
+
+                // please don't let there be another orb type owned, this is somewhat tedious to scale (2 is tedious enough)
 
                 PhotonNetwork.LocalPlayer.SetCustomProperties(properties);
                 // these custom properties will be mutated whenver a player picks up a lobby orb / return a lobby orb
@@ -308,7 +329,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
             if (!(m_levelType == LevelTypes.Level))
             {
                 // check if all players are ready
-                if (!m_isLoadingNewScene && m_playersReady >= m_playersNeededToStartGame)
+                if (!m_isLoadingNewScene && m_playersReady >= PhotonNetwork.CurrentRoom.PlayerCount)
                 {
                     LoadLevel(m_levelAfterReadyUp);
                 }
@@ -496,7 +517,17 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
             // fetch, alter, then set player custom properties
             PhotonHashtable playerProperties = PhotonNetwork.LocalPlayer.CustomProperties;
-            playerProperties[OrbOwnedInLobbyKey] = PodiumController.FetchOrbType(orbKey);
+
+            // Check if the orb is empty, if it is set it, otherwise set it to the second key
+            if ((PodiumController.OrbTypes)playerProperties[OrbOwnedInLobbyKey1] == PodiumController.OrbTypes.None)
+            {
+                playerProperties[OrbOwnedInLobbyKey1] = PodiumController.FetchOrbType(orbKey);
+            }
+            else
+            {
+                playerProperties[OrbOwnedInLobbyKey2] = PodiumController.FetchOrbType(orbKey);
+            }
+            
             PhotonNetwork.LocalPlayer.SetCustomProperties(playerProperties);
 
             CloseWindow();
@@ -541,24 +572,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     {
         OrbManager.orbHistory.Clear(); // don't retain memory of spells after leaving game
 
-        if (SceneManager.GetActiveScene().name == LobbySceneName)
-        {
-            // why would a bozo claim an orb and then leave, you're making me do this stupid edge case
-            PodiumController.OrbTypes orbOwned = (PodiumController.OrbTypes)PhotonNetwork.LocalPlayer.CustomProperties[OrbOwnedInLobbyKey];
-            if (orbOwned != PodiumController.OrbTypes.None)
-            {
-                // we must return this back to the source
-                PhotonHashtable roomProperties = PhotonNetwork.CurrentRoom.CustomProperties;
-                string key = PodiumController.FetchOrbKey(orbOwned);
-                roomProperties[key] = new int[] { -1, -1 }; // nobody should own the orb anymore
-
-                PhotonNetwork.CurrentRoom.SetCustomProperties(roomProperties);
-
-                roomProperties = new PhotonHashtable();
-                PhotonNetwork.LocalPlayer.SetCustomProperties(roomProperties); // clear the character's properties
-            }
-        }
-
+        // Leave the room and disconnect
         PhotonNetwork.LeaveRoom();
         PhotonNetwork.Disconnect();
     }
@@ -628,7 +642,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
             playerOrbManager.RemoveSpellOrb(currentOrbType, true);
 
             // Update custom properties
-            string orbKey = FetchOrbKey(currentOrbType.getElement());
+            string orbKey = FetchOrbKey(currentOrbType.getElement()); // for the room
+            PodiumController.OrbTypes orbType = PodiumController.FetchOrbType(orbKey);
 
             // fetch, alter, then set room custom properties
             PhotonHashtable roomProperties = PhotonNetwork.CurrentRoom.CustomProperties;
@@ -638,7 +653,19 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
             // fetch, alter, then set player custom properties
             PhotonHashtable playerProperties = PhotonNetwork.LocalPlayer.CustomProperties;
-            playerProperties[OrbOwnedInLobbyKey] = PodiumController.OrbTypes.None;
+
+            // Check if the first slot is holding the the orb, if it is, clear it
+            // otherwise clear the second slot
+            
+            if ((PodiumController.OrbTypes)playerProperties[OrbOwnedInLobbyKey1] == orbType)
+            {
+                playerProperties[OrbOwnedInLobbyKey1] = PodiumController.OrbTypes.None;
+            }
+            else
+            {
+                playerProperties[OrbOwnedInLobbyKey2] = PodiumController.OrbTypes.None;
+            }
+
             PhotonNetwork.LocalPlayer.SetCustomProperties(playerProperties);
 
             CloseWindowVisually();
@@ -671,6 +698,13 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     public void RPCReadyUp()
     {
         photonView.RPC("ReadyUp", RpcTarget.All);
+        if (PhotonNetwork.InRoom && PhotonNetwork.LocalPlayer.IsLocal)
+        {
+            // update the custom property for local player (they're ready)
+            PhotonHashtable localPlayerProperties = PhotonNetwork.LocalPlayer.CustomProperties;
+            localPlayerProperties[IsPlayerReady] = true;
+            PhotonNetwork.LocalPlayer.SetCustomProperties(localPlayerProperties);
+        }
     }
 
     /// <summary>
@@ -679,6 +713,13 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     public void RPCUnready()
     {
         photonView.RPC("UnReady", RpcTarget.All);
+        if (PhotonNetwork.InRoom && PhotonNetwork.LocalPlayer.IsLocal)
+        {
+            // update the custom property for local player (they're no longer ready)
+            PhotonHashtable localPlayerProperties = PhotonNetwork.LocalPlayer.CustomProperties;
+            localPlayerProperties[IsPlayerReady] = false;
+            PhotonNetwork.LocalPlayer.SetCustomProperties(localPlayerProperties);
+        }
     }
 
     public void SetFullImage()
@@ -759,12 +800,45 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
     public override void OnLeftRoom()
     {
-        SceneManager.LoadScene(0);
+        SceneManager.LoadScene("Lobby"); // load the lobby scene
     }
 
-    #endregion
+    public override void OnPlayerLeftRoom(Player otherPlayer)
+    {
+        // If the player leave the room, do room cleanup stuff (e.x. if they left the room with a loaned orb from the lobby, return that orb)
+        if ((TypeOfLevel == LevelTypes.Lobby || TypeOfLevel == LevelTypes.Narrative) && PhotonNetwork.IsMasterClient)
+        {
+            // decrement num of players ready if player that left had readied up
+            bool isPlayerReadiedUp = (bool)otherPlayer.CustomProperties[IsPlayerReady];
+            if (isPlayerReadiedUp)
+            {
+                RPCUnready();
+            }
+        }
 
-    #region Photon functions
+        if (TypeOfLevel == LevelTypes.Lobby && PhotonNetwork.IsMasterClient)
+        {
+            // why would a bozo claim an orb and then leave, you're making me do this stupid edge case
+            string[] orbOwnedKeys = new string[2] { OrbOwnedInLobbyKey1, OrbOwnedInLobbyKey2 };
+
+            PhotonHashtable roomProperties = PhotonNetwork.CurrentRoom.CustomProperties;
+
+            foreach (string orbKey in orbOwnedKeys)
+            {
+                PodiumController.OrbTypes orbOwned = (PodiumController.OrbTypes)otherPlayer.CustomProperties[orbKey];
+                if (orbOwned != PodiumController.OrbTypes.None)
+                {
+                    // we must return this back to the source  
+                    string key = PodiumController.FetchOrbKey(orbOwned);
+                    roomProperties[key] = new int[] { -1, -1 }; // nobody should own the orb anymore
+                }
+            }
+
+            PhotonNetwork.CurrentRoom.SetCustomProperties(roomProperties);
+            PhotonHashtable emptyProperties = new PhotonHashtable();
+            otherPlayer.SetCustomProperties(emptyProperties); // clear the character's properties
+        }
+    }
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
