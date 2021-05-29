@@ -41,7 +41,8 @@ public class RedOrb : Orb
 
     public override void CastLesserEffect(GameObject hit, float spellEffectMod, float[] data)
     {
-        
+        StatusEffectScript status = hit.GetComponent<StatusEffectScript>();
+        status.RPCApplyStatus(StatusEffect.StatusType.AutoAttackIncreasedSpeed, OrbValueManager.getLesserEffectDuration(m_OrbElement, m_Level), 0, 50);
     }
 
     public override void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, Transform t, Vector3 clickedPosition)

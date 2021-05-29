@@ -210,6 +210,13 @@ public class StatusEffectScript : MonoBehaviourPun
                         newStatusEffect = new SpellIncreasedDamage(m_statusEffects, type, duration, source, value);
 
                     break;
+                case StatusEffect.StatusType.AutoAttackIncreasedSpeed:
+                    if (m_isPlayer)
+                        newStatusEffect = new AutoAttackIncreasedSpeed(m_statusEffects, type, duration, source, value, m_playerAttack);
+                    else
+                        throw new System.Exception("Cannot currently apply SpellIncreasedDamage on players.");
+
+                    break;
             }
         }
     }
@@ -245,6 +252,9 @@ public class StatusEffectScript : MonoBehaviourPun
     [PunRPC]
     private void ClearAllStatusEffects()
     {
+        foreach (StatusEffect s in m_statusEffects)
+            s.Stop();
+
         m_statusEffects.Clear();
     }
 
@@ -254,12 +264,20 @@ public class StatusEffectScript : MonoBehaviourPun
         if (source != null)
         {
             StatusEffect statusEffect = m_statusEffects.Find(s => (s.GetStatusType() == type && s.StatusSource.Equals(source)));
-            m_statusEffects.Remove(statusEffect);
+            if (statusEffect != null)
+            {
+                statusEffect.Stop();
+                m_statusEffects.Remove(statusEffect);
+            }
         }
         else
         {
             StatusEffect statusEffect = m_statusEffects.Find(s => (s.GetStatusType() == type));
-            m_statusEffects.Remove(statusEffect);
+            if (statusEffect != null)
+            {
+                statusEffect.Stop();
+                m_statusEffects.Remove(statusEffect);
+            }
         }
     }
 

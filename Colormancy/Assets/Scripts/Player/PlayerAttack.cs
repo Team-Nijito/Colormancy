@@ -102,7 +102,8 @@ public class PlayerAttack : MonoBehaviourPun
         {
             return;
         }
-        m_currentCooldown = m_attackSpeed;
+        m_currentCooldown = m_attackSpeed / m_attackSpeedMultiplier;
+        print(m_attackSpeedMultiplier);
 
         // If you use PhotonNetwork.Instantiate, any player who joins will witness a lot of projectiles being spawned in
         // so that the newly joined player's scene will be updated as the other player's scene (lookup photon object pooling)
