@@ -145,10 +145,13 @@ public class GreenSpellSpawnerController : MonoBehaviour
 
             foreach (GameObject g in entitiesEntered)
             {
-                if (g.CompareTag("Enemy"))
-                    greaterCast(g, spellEffectMod, null);
-                else if (g.CompareTag("Player"))
-                    lesserCast(g, 1, null);
+                if (g)
+                {
+                    if (g.CompareTag("Enemy"))
+                        greaterCast(g, spellEffectMod, null);
+                    else if (g.CompareTag("Player"))
+                        lesserCast(g, 1, null);
+                }
             }
         }
     }

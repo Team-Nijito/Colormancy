@@ -67,9 +67,20 @@ public class OrbManager : MonoBehaviourPun
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
-            if (Physics.Raycast(ray, out hit, 100f, 1 << PaintingManager.paintingMask)) { }
+            if (Physics.Raycast(ray, out hit, 100f, 1 << PaintingManager.paintingMask)) {
+                photonView.RPC("TryCastSpell", RpcTarget.All, hit.point);
+            }
+            else
+            {
+                Vector3 planeCenter = transform.position;
+                Vector3 planeNormal = Vector3.up;
 
-            photonView.RPC("TryCastSpell", RpcTarget.All, hit.point);
+                float t = Vector3.Dot((planeCenter - ray.origin), planeNormal) / Vector3.Dot(ray.direction, planeNormal);
+
+                photonView.RPC("TryCastSpell", RpcTarget.All, ray.origin + ray.direction * t);
+            }
+
+            
         }
     }
 
@@ -129,7 +140,6 @@ public class OrbManager : MonoBehaviourPun
     [PunRPC]
     void ReduceAllCooldowns(float percentReduce)
     {
-        print("Reduce cooldowns.");
         if (percentReduce <= 0)
         {
             throw new ArgumentException(string.Format("{0} is a positive percentage, and thus should be greater than zero", percentReduce), "percentReduce");
