@@ -28,7 +28,8 @@ public class YellowOrb : Orb
 
     public override void CastLesserEffect(GameObject hit, float spellEffectMod, float[] data)
     {
-        throw new System.NotImplementedException();
+        PhotonView photonView = PhotonView.Get(hit);
+        photonView.RPC("Heal", RpcTarget.All, OrbValueManager.getLesserEffectValue(m_OrbElement, m_Level));
     }
 
     public override void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, Transform t, Vector3 clickedPosition)
