@@ -15,7 +15,11 @@ public abstract class BossAI : StateMachine
     public StatusEffectScript StatusEffect { get; protected set; }
     //public PhotonView PhotonView { get; protected set; }
     #endregion
-        
+
+    GameManager gm;
+
+    bool markedDeath = false;
+
     #region Public Methods
 
     /// <summary>
@@ -23,6 +27,24 @@ public abstract class BossAI : StateMachine
     /// </summary>
     ///
     //Maybe make into RPC?
+    public void Start()
+    {
+        //Don't do anything if not master
+        if (!PhotonNetwork.IsMasterClient)
+            return;
+        gm = FindObjectOfType<GameManager>();
+        gm.RPCAddEnemy();
+    }
+
+    public void Update()
+    {
+        if (GetCurrentHealth() <= 0f && !markedDeath && PhotonNetwork.IsMasterClient)
+        {
+            gm.RPCRemoveEnemy();
+            markedDeath = true;
+        }
+    }
+
     public bool SetTarget(GameObject target)
     {
         if (target == null) return false;
@@ -57,6 +79,11 @@ public abstract class BossAI : StateMachine
     public bool InRangeOfTarget(float range)
     {
         return DistanceToTarget() <= range;
+    }
+
+    public float GetCurrentHealth()
+    {
+        return GetComponent<HealthScript>().GetEffectiveHealth();
     }
     #endregion
 

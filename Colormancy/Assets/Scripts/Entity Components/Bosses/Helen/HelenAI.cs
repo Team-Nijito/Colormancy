@@ -31,8 +31,9 @@ public class HelenAI : BossAI
     }
 
     // Start is called before the first frame update
-    void Start()
+    new void Start()
     {
+        base.Start();
         if (PhotonNetwork.IsMasterClient)
         {
             Animator = GetComponent<Animator>();
@@ -44,8 +45,11 @@ public class HelenAI : BossAI
     }
 
     // Update is called once per frame
-    void Update()
+    new void Update()
     {
+        base.Update();
+        if (GetCurrentHealth() <= 0)
+            return;
         if (!PhotonNetwork.IsMasterClient) return;
         if (Target == null)
         {
