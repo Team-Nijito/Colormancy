@@ -167,6 +167,13 @@ public class LobbyNetworkManager : MonoBehaviourPunCallbacks
             return;
         }
 
+        // If not ready, don't create a room
+        if (!PhotonNetwork.InLobby || !PhotonNetwork.IsConnectedAndReady)
+        {
+            ButtonErrorWrapper(m_createRoomButton, "Not ready to create room yet.");
+            return;
+        }
+
         string roomName = m_roomNameInput.text;
 
         if (string.IsNullOrEmpty(roomName))

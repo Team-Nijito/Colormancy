@@ -39,7 +39,7 @@ public class DetectHitKnockback : DetectHit
             StatusEffectScript statEffectScript = other.gameObject.GetComponent<StatusEffectScript>();
             if (m_whatForce == ForceType.Knockback && other.gameObject)
             {
-                statEffectScript.RPCApplyForce(Time.deltaTime * 1.5f, "Knockback", (other.gameObject.transform.position - transform.position + Vector3.up).normalized,
+                statEffectScript.RPCApplyForce(Time.deltaTime * 1.5f, "Knockback", (other.gameObject.transform.position - transform.position).normalized,
                                                 m_force);
             }
             else if (m_whatForce == ForceType.Suck && other.gameObject)
@@ -62,7 +62,7 @@ public class DetectHitKnockback : DetectHit
             StatusEffectScript statEffectScript = other.gameObject.GetComponent<StatusEffectScript>();
             if (m_whatForce == ForceType.Knockback && other.gameObject)
             {
-                statEffectScript.RPCApplyForce(Time.deltaTime * 1.5f, "Knockback", (other.gameObject.transform.position - transform.position + Vector3.up).normalized,
+                statEffectScript.RPCApplyForce(Time.deltaTime * 1.5f, "Knockback", (other.gameObject.transform.position - transform.position).normalized,
                                                 m_force * Time.deltaTime);
             }
             else if (m_whatForce == ForceType.Suck && other.gameObject)

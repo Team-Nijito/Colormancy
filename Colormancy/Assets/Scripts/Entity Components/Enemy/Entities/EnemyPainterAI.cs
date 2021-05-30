@@ -16,8 +16,8 @@ public class EnemyPainterAI : EnemyChaserAI
 
     protected override void Start()
     {
-        base.Start();
         m_enemPaintAbility = GetComponent<EnemyPaintAbility>();
+        base.Start();
     }
 
     #endregion
