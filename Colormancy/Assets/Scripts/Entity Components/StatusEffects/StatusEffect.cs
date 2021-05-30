@@ -32,7 +32,8 @@ public abstract class StatusEffect
         Stun,
         AutoAttackIncreasedDamage,
         AttackLessDamage,
-        SpellIncreasedDamage
+        SpellIncreasedDamage,
+        AutoAttackIncreasedSpeed
     }
 
     protected List<StatusEffect> m_parentList; // the list the status effect is apart of, we need this reference so

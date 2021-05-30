@@ -24,7 +24,9 @@ public class ReadyUpUI : MonoBehaviour
 
     private bool m_isPlayerReady = false;
 
-    private int m_currentPlayersReady = -1; // just store this so we don't have to constantly update text
+    // just store these two variables so we don't have to constantly update display text
+    private int m_currentPlayersReady = -1;
+    private int m_numberPlayersInRoom = -1;
 
     private float m_displayNeedOrbMessageSeconds = 3f;
     private float m_oldButtonTextSize;
@@ -48,10 +50,15 @@ public class ReadyUpUI : MonoBehaviour
 
     private void Update()
     {
-        if (m_currentPlayersReady != m_gmScript.PlayersReady)
+        if (PhotonNetwork.InRoom)
         {
-            m_currentPlayersReady = m_gmScript.PlayersReady;
-            m_readyStateText.text = $"{m_gmScript.PlayersReady}/{m_gmScript.PlayersNeededToReady} ready";
+            if (m_currentPlayersReady != m_gmScript.PlayersReady || m_numberPlayersInRoom != PhotonNetwork.CurrentRoom.PlayerCount)
+            {
+                m_currentPlayersReady = m_gmScript.PlayersReady;
+                m_numberPlayersInRoom = PhotonNetwork.CurrentRoom.PlayerCount;
+
+                m_readyStateText.text = $"{m_gmScript.PlayersReady}/{m_numberPlayersInRoom} ready";
+            }
         }
     }
 

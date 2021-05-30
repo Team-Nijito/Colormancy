@@ -511,12 +511,16 @@ public class EnemyMovement : MonoBehaviourPun, IPunObservable
     public void StopMovingAndDontChangeAnimation()
     {
         if (!m_canInvokeMovementFunctions) return;
-        // Stop the agent from moving
-        if (m_navMeshAgent.isOnNavMesh && IsPositionOnNavMesh(transform.position, out _))
+
+        if (m_navMeshAgent)
         {
-            MoveToPosition(transform.position); // set destination to current destination so it wont keep moving
+            // Stop the agent from moving
+            if (m_navMeshAgent.isOnNavMesh && IsPositionOnNavMesh(transform.position, out _))
+            {
+                MoveToPosition(transform.position); // set destination to current destination so it wont keep moving
+            }
+            m_navMeshAgent.velocity = Vector3.zero;
         }
-        m_navMeshAgent.velocity = Vector3.zero;
     }
 
     /// <summary>

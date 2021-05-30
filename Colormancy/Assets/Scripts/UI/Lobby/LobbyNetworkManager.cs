@@ -69,16 +69,6 @@ public class LobbyNetworkManager : MonoBehaviourPunCallbacks
 
     #region Photon callbacks
 
-    public override void OnCreatedRoom()
-    {
-        Debug.Log("Created a room successfully.");
-    }
-
-    public override void OnCreateRoomFailed(short returnCode, string message)
-    {
-        Debug.Log("Didn't create a room, see error: " + message);
-    }
-
     public override void OnConnectedToMaster()
     {
         m_statusFieldText.text = "Connected to master server";
@@ -297,9 +287,12 @@ public class LobbyNetworkManager : MonoBehaviourPunCallbacks
     /// </summary>
     private void Connect()
     {
-        PhotonNetwork.ConnectUsingSettings();
-        PhotonNetwork.GameVersion = gameVersion;
-        PhotonNetwork.AutomaticallySyncScene = true; // important
+        if (!PhotonNetwork.IsConnectedAndReady)
+        {
+            PhotonNetwork.ConnectUsingSettings();
+            PhotonNetwork.GameVersion = gameVersion;
+            PhotonNetwork.AutomaticallySyncScene = true; // important
+        }
     }
 
     /// <summary>
