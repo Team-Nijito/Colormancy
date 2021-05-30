@@ -48,20 +48,13 @@ public class PlayerMouse : MonoBehaviourPunCallbacks
                     PlayerFacingMouse(mousePosition);
                 }
 
-                if (m_data.collider.gameObject) // && !m_data.collider.gameObject.CompareTag("Player")) // prevent friendly fire
+                if (m_animator && m_paScript.isAttackReady())
                 {
-                    if (m_animator && m_paScript.isAttackReady())
-                    {
-                        // Trigger attack animation 
-                        photonView.RPC("TriggerPlayerAttackAnim", RpcTarget.All);
-                    }
-
-                    // currently unimplemented
-                    photonView.RPC("ShootPaintball", RpcTarget.All, false, mousePosition);
-
-                    //print(m_data.collider.name);
-                    //DebugClickDamage(m_basicClickDamage);
+                    // Trigger attack animation 
+                    photonView.RPC("TriggerPlayerAttackAnim", RpcTarget.All);
                 }
+
+                photonView.RPC("ShootPaintball", RpcTarget.All, false, mousePosition);
             }
         }
     }
@@ -86,26 +79,36 @@ public class PlayerMouse : MonoBehaviourPunCallbacks
 
     public Vector3 GetMouseWorldPosition(string focusTag = "", int depth = 200)
     {
+        /// THIS IS NO LONGER IMPLEMENTED THE SAME WAY
         // Shoots a ray from the camera through the position of the mouse, and returns a Vector3
         // if this ray collides with any collider, otherwise returns Vector3.zero
 
+        //Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        //RaycastHit hitData;
+        //if (focusTag == "")
+        //{
+        //    if (Physics.Raycast(ray, out hitData, depth, ~m_layersToIgnore))
+        //    {
+        //        m_data = hitData;
+        //        return hitData.point;
+        //    }
+        //    return Vector3.zero;
+        //}
+        //if (Physics.Raycast(ray, out hitData, depth) && hitData.transform.CompareTag(focusTag))
+        //{
+        //    m_data = hitData;
+        //    return hitData.point;
+        //}
+        //return Vector3.zero;
+
+        // NOW IS IMPLEMENTED BASED ON FLAT PLANE GENERATED FROM USER POSITION
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hitData;
-        if (focusTag == "")
-        {
-            if (Physics.Raycast(ray, out hitData, depth, ~m_layersToIgnore))
-            {
-                m_data = hitData;
-                return hitData.point;
-            }
-            return Vector3.zero;
-        }
-        if (Physics.Raycast(ray, out hitData, depth) && hitData.transform.CompareTag(focusTag))
-        {
-            m_data = hitData;
-            return hitData.point;
-        }
-        return Vector3.zero;
+        Vector3 planeCenter = transform.position;
+        Vector3 planeNormal = Vector3.up;
+
+        float t = Vector3.Dot((planeCenter - ray.origin), planeNormal) / Vector3.Dot(ray.direction, planeNormal);
+
+        return ray.origin + ray.direction * t;
     }
 
     public void PlayerFacingMouse(Vector3 mousePos)
