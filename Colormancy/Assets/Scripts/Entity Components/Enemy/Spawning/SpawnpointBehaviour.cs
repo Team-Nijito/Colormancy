@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class SpawnpointBehaviour : MonoBehaviour, IPunObservable
+public class SpawnpointBehaviour : MonoBehaviourPun
 {
     #region Accessors (C# properties)
 
@@ -31,7 +31,7 @@ public class SpawnpointBehaviour : MonoBehaviour, IPunObservable
     private bool m_isCurrentlySpawningEnemy = false;
 
     // Spawn delay and GUI
-    private float m_timeUntilSpawnOriginal = 0f; 
+    private float m_timeUntilSpawnOriginal = -1; 
     private float m_timeUntilSpawn = 0f; // count down to zero
 
     private float m_timeUntilUpdateDisplay = 0f; // we don't need to update every frame
@@ -75,6 +75,10 @@ public class SpawnpointBehaviour : MonoBehaviour, IPunObservable
 
         if (m_timeUntilSpawn > 0f)
         {
+            if (!m_radialSpawnTimer.gameObject.activeInHierarchy)
+            {
+                m_radialPanel.gameObject.SetActive(true);
+            }
             m_timeUntilSpawn -= Time.deltaTime;
             m_displayText.text = m_timeUntilSpawn.ToString("f1"); // keep only 1 decimal
             m_radialSpawnTimer.fillAmount = m_timeUntilSpawn / m_timeUntilSpawnOriginal;
@@ -97,10 +101,9 @@ public class SpawnpointBehaviour : MonoBehaviour, IPunObservable
     private IEnumerator DelaySpawn(GameObject parentFolder, string nameEntityToSpawn, float delayBeforeSpawn)
     {
         m_isCurrentlySpawningEnemy = true;
-        m_timeUntilSpawn = delayBeforeSpawn;
-        m_timeUntilSpawnOriginal = delayBeforeSpawn;
+        photonView.RPC("SyncTimeSpawn", RpcTarget.All, delayBeforeSpawn);
+        PhotonNetwork.SendAllOutgoingCommands(); // send the RPC immediately
 
-        m_radialPanel.gameObject.SetActive(true);
         m_timeUntilUpdateDisplay = 0f;
 
         string enemyName = "Enemies/";
@@ -139,6 +142,17 @@ public class SpawnpointBehaviour : MonoBehaviour, IPunObservable
         }
     }
 
+    /// <summary>
+    /// (PunRPC) Sync the timeUntilSpawn and timeUntilSpawnOriginal
+    /// </summary>
+    /// <param name="delayBeforeSpawn"></param>
+    [PunRPC]
+    private void SyncTimeSpawn(float delayBeforeSpawn)
+    {
+        m_timeUntilSpawn = delayBeforeSpawn;
+        m_timeUntilSpawnOriginal = delayBeforeSpawn;
+    }
+
     #endregion
 
     #region Public functions
@@ -153,23 +167,6 @@ public class SpawnpointBehaviour : MonoBehaviour, IPunObservable
     {
         // simply returns true if the spawnedEntity got off the spawn, aka m_spawnedEntity is null
         return !m_spawnedEntity;
-    }
-
-    #endregion
-
-    #region Photon functions
-
-    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-    {
-        // Synchronize the time before spawning for each client.
-        if (stream.IsWriting)
-        {
-            stream.SendNext(m_timeUntilSpawn);
-        }
-        else
-        {
-            m_timeUntilSpawn = (float)stream.ReceiveNext();
-        }
     }
 
     #endregion

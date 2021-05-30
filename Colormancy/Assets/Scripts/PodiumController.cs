@@ -147,7 +147,6 @@ public class PodiumController : MonoBehaviour
                             //OrbTypes OrbOwned = (OrbTypes)PhotonNetwork.LocalPlayer.CustomProperties[GameManager.OrbOwnedInLobbyKey];
 
                             int playerOrbCount = ((GameObject)PhotonNetwork.LocalPlayer.TagObject).GetComponent<OrbManager>().orbs.Count;
-                            Debug.Log(playerOrbCount);
                             
                             if (playerOrbCount < (int)num) //OrbOwned == OrbTypes.None
                             {
