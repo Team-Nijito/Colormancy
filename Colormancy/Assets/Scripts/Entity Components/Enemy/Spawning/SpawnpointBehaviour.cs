@@ -2,6 +2,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
+using MyBox;
 
 public class SpawnpointBehaviour : MonoBehaviourPun
 {
@@ -14,19 +15,32 @@ public class SpawnpointBehaviour : MonoBehaviourPun
 
     #region Private fields
 
+    [Separator("Custom spawn time for this spawnpoint")]
+    [SerializeField]
+    private bool m_hasUniqueSpawntime = false; // use this to indicate that we want to set the spawn time for this spawnpoint
+
+    [ConditionalField(nameof(m_hasUniqueSpawntime))]
+    [SerializeField]
+    private float m_timeToSpawnEnemy = 3f;
+
+    [Tooltip("Add a random delay to the spawn time, starting from 0 to the value in this property (inclusive)")]
+    [SerializeField]
+    private float m_addRandomDelay = 2f; // add a random delay to the spawnTime Range(0->m_addRandomDelay) inclusive
+
+    [Separator("Custom enemies for this spawnpoint")]
+    [SerializeField]
+    private bool m_spawnCustomEnemy = false; // if true, select an enemy to spawn from the list of enemies in m_enemiesToSpawn
+
+    [SerializeField]
+    private GameObject[] m_enemiesToSpawn;
+
+    [Separator("Misc. components")]
     [SerializeField]
     private GameObject m_spawnPointTrigger; // the trigger for the spawn, spawn the entity in the middle of this trigger 
 
     private GameObject m_spawnedEntity; 
 
     private float m_spawnpointRadius;
-
-    [SerializeField]
-    private bool m_spawnCustomEnemy = false;
-
-    [SerializeField]
-    [MyBox.ConditionalField(nameof(m_spawnCustomEnemy))]
-    private GameObject m_enemyToSpawn;
 
     private bool m_isCurrentlySpawningEnemy = false;
 
@@ -108,9 +122,16 @@ public class SpawnpointBehaviour : MonoBehaviourPun
 
         string enemyName = "Enemies/";
 
-        if (m_spawnCustomEnemy && m_enemyToSpawn)
+        if (m_spawnCustomEnemy && m_enemiesToSpawn.Length > 0)
         {
-            enemyName += m_enemyToSpawn.name;
+            if (m_enemiesToSpawn.Length == 0)
+            {
+                enemyName += m_enemiesToSpawn[0].name; // choose the only enemy
+            }
+            else
+            {
+                enemyName += m_enemiesToSpawn[Random.Range(0, m_enemiesToSpawn.Length)].name; // choose a random enemy
+            }
         }
         else
         {
@@ -160,7 +181,16 @@ public class SpawnpointBehaviour : MonoBehaviourPun
     // public wrapper for spawning the enemy, invoke the coroutine
     public void HandleSpawning(GameObject parentFolder, string nameEntityToSpawn, float delayBeforeSpawn)
     {
-        StartCoroutine(DelaySpawn(parentFolder, nameEntityToSpawn, delayBeforeSpawn));
+        float delayTime = delayBeforeSpawn;
+
+        if (m_hasUniqueSpawntime)
+        {
+            // use the m_timeToSpawnEnemy (this spawnpoint's property) instead of delayBeforeSpawn (which is given by the EnemyManager)
+            delayTime = m_timeToSpawnEnemy;
+        }
+
+        delayTime += Random.Range(0, m_addRandomDelay); // add a random delay so that spawn times may be different
+        StartCoroutine(DelaySpawn(parentFolder, nameEntityToSpawn, delayTime));
     }
 
     public bool IsSpawnSafe()

@@ -95,9 +95,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 37075586232b6b7438256eb937148780, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_spawnPointTrigger: {fileID: 3651905936969089952}
+  m_hasUniqueSpawntime: 0
+  m_timeToSpawnEnemy: 4
   m_spawnCustomEnemy: 0
-  m_enemyToSpawn: {fileID: 0}
+  m_enemiesToSpawn: []
+  m_spawnPointTrigger: {fileID: 3651905936969089952}
   m_radialSpawnTimer: {fileID: 8703910995413647880}
   m_radialPanel: {fileID: 520495785972499183}
   m_displayText: {fileID: 9220224733268258875}
@@ -119,8 +121,7 @@ MonoBehaviour:
   observableSearch: 2
   Synchronization: 3
   OwnershipTransfer: 0
-  ObservedComponents:
-  - {fileID: 3651905936326184988}
+  ObservedComponents: []
   viewIdField: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
