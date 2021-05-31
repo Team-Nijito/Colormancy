@@ -7769,6 +7769,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1858970735588863968, guid: f3c0e5b18270531468bb1ff4a5ba57e5,
         type: 3}
+      propertyPath: m_enemySpawnPointsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1858970735588863968, guid: f3c0e5b18270531468bb1ff4a5ba57e5,
+        type: 3}
       propertyPath: m_spawnpoints.Array.size
       value: 4
       objectReference: {fileID: 0}
@@ -7801,19 +7806,19 @@ PrefabInstance:
         type: 3}
       propertyPath: m_enemyEntities.Array.data[0]
       value: 
-      objectReference: {fileID: 3708072817193241043, guid: db134691f7f7f1342848aeaa422600d4,
+      objectReference: {fileID: 6031526756423788185, guid: 9a22b1d0b5670444b8ecb51b4d15e086,
         type: 3}
     - target: {fileID: 1858970735588863968, guid: f3c0e5b18270531468bb1ff4a5ba57e5,
         type: 3}
       propertyPath: m_enemyEntities.Array.data[1]
       value: 
-      objectReference: {fileID: 852322663527957340, guid: 93ef9cf809333ea4fab41f7c43ce1bca,
+      objectReference: {fileID: 3708072817193241043, guid: db134691f7f7f1342848aeaa422600d4,
         type: 3}
     - target: {fileID: 1858970735588863968, guid: f3c0e5b18270531468bb1ff4a5ba57e5,
         type: 3}
       propertyPath: m_enemyEntities.Array.data[2]
       value: 
-      objectReference: {fileID: 6031526756423788185, guid: 9a22b1d0b5670444b8ecb51b4d15e086,
+      objectReference: {fileID: 852322663527957340, guid: 93ef9cf809333ea4fab41f7c43ce1bca,
         type: 3}
     - target: {fileID: 1858970735588863968, guid: f3c0e5b18270531468bb1ff4a5ba57e5,
         type: 3}
@@ -7888,6 +7893,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f3c0e5b18270531468bb1ff4a5ba57e5, type: 3}
+--- !u!114 &193287001 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1858970735588863968, guid: f3c0e5b18270531468bb1ff4a5ba57e5,
+    type: 3}
+  m_PrefabInstance: {fileID: 193287000}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56b517ce9a04af04592b83ae801a5b5f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &194952145 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4837329652793204, guid: 88498815dea432045b6eaa9875ec268a,
@@ -44104,6 +44121,16 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7917960859537667781, guid: a2874b7c33b663f47add06323276b963,
         type: 3}
+      propertyPath: m_enemManager
+      value: 
+      objectReference: {fileID: 193287001}
+    - target: {fileID: 7917960859537667781, guid: a2874b7c33b663f47add06323276b963,
+        type: 3}
+      propertyPath: m_paintManager
+      value: 
+      objectReference: {fileID: 4357036748024657861}
+    - target: {fileID: 7917960859537667781, guid: a2874b7c33b663f47add06323276b963,
+        type: 3}
       propertyPath: m_playerPrefab
       value: 
       objectReference: {fileID: 5820395927475117105, guid: 0581afa7c6d1af948a396e0436033cfa,
@@ -44115,9 +44142,27 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7917960859537667781, guid: a2874b7c33b663f47add06323276b963,
         type: 3}
+      propertyPath: m_enemyManagerObject
+      value: 
+      objectReference: {fileID: 1858970735588863969, guid: f3c0e5b18270531468bb1ff4a5ba57e5,
+        type: 3}
+    - target: {fileID: 7917960859537667781, guid: a2874b7c33b663f47add06323276b963,
+        type: 3}
       propertyPath: m_paintPercentageToWin
       value: 0.1
       objectReference: {fileID: 0}
+    - target: {fileID: 7917960859537667781, guid: a2874b7c33b663f47add06323276b963,
+        type: 3}
+      propertyPath: m_orbValueManagerObject
+      value: 
+      objectReference: {fileID: 655265155732083151, guid: cacc8b6a92ff8c54693eb64c39ea293c,
+        type: 3}
+    - target: {fileID: 7917960859537667781, guid: a2874b7c33b663f47add06323276b963,
+        type: 3}
+      propertyPath: m_paintingManagerObject
+      value: 
+      objectReference: {fileID: 4357036746896951994, guid: 5b3942a94b38acd47a7c03b7a5f8d0e5,
+        type: 3}
     - target: {fileID: 7917960859537667781, guid: a2874b7c33b663f47add06323276b963,
         type: 3}
       propertyPath: m_paintPercentageNeededToWin
@@ -91489,6 +91534,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5b3942a94b38acd47a7c03b7a5f8d0e5, type: 3}
+--- !u!114 &4357036748024657861 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4357036746896951995, guid: 5b3942a94b38acd47a7c03b7a5f8d0e5,
+    type: 3}
+  m_PrefabInstance: {fileID: 4357036748024657860}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8d9ed3b9438915845b54968aa6c2fead, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &6256116256656319332
 PrefabInstance:
   m_ObjectHideFlags: 0

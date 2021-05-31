@@ -161,7 +161,7 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
 
                 // player respawns as spectate camera
                 photonView.RPC("RespawnPlayerAsGhost", PhotonNetwork.LocalPlayer);
-                photonView.RPC("RemovePlayer", RpcTarget.MasterClient);
+                photonView.RPC("RemovePlayer", PhotonNetwork.LocalPlayer);
             }
         }
         else
@@ -391,12 +391,12 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     }
 
     /// <summary>
-    /// (PunRPC) Send this RPC call to the master client if you want to destroy this particular player gameObject.
+    /// (PunRPC) Send this RPC call to the ownwer of the player if you want to destroy this particular player gameObject.
     /// </summary>
     [PunRPC]
     public void RemovePlayer()
     {
-        if (PhotonNetwork.IsMasterClient && gameObject)
+        if (gameObject && photonView.IsMine)
         {
             PhotonNetwork.Destroy(gameObject);
         }

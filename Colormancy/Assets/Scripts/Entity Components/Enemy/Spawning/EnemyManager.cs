@@ -14,14 +14,20 @@ public class EnemyManager : MonoBehaviourPun
     #region Private Fields
 
     [SerializeField]
+    private bool m_enemySpawnPointsActive = false;
+
+    // conditional field not compatable with arrays
+    [SerializeField]
     private GameObject[] m_spawnpoints;
 
     [SerializeField]
     private GameObject[] m_enemyEntities;
 
+    [MyBox.ConditionalField(nameof(m_enemySpawnPointsActive), false)]
     [SerializeField]
     private GameObject m_enemyFolder; // the folder the enemies will be organized under
 
+    [MyBox.ConditionalField(nameof(m_enemySpawnPointsActive), false)]
     [SerializeField]
     private byte m_desiredEnemiesOnField = 7; // how many enemies are on the field at the time
 
@@ -33,7 +39,7 @@ public class EnemyManager : MonoBehaviourPun
 
     private void Update()
     {
-        if (PhotonNetwork.IsMasterClient)
+        if (m_enemySpawnPointsActive && PhotonNetwork.IsMasterClient)
         {
             // currently have problem for spawning in more enemies for each player
             if (m_numEnemiesOnField < m_desiredEnemiesOnField)

@@ -97,18 +97,10 @@ public class OrbManager : MonoBehaviourPun
 
     public void RemoveSpellOrb(Orb orb, bool removeFromOrbHistory = false)
     {
-        Orb elementToRemove = null;
-        foreach (Orb searchOrb in orbs)
-        {
-            if (searchOrb.getElement() == orb.getElement())
-            {
-                elementToRemove = searchOrb;
-            }
-        }
-        orbs.Remove(elementToRemove);
+        RemoveOrbFromList(orbs, orb);
         if (removeFromOrbHistory)
         {
-            orbHistory.Remove(orb); // sync across scenes
+            RemoveOrbFromList(orbHistory, orb); // sync across scenes
         }
         if (uIController)
             uIController.RemoveOrb(orb);
@@ -214,6 +206,24 @@ public class OrbManager : MonoBehaviourPun
                     throw new NotImplementedException("Didn't implement adding " + o.getElement() + " yet");
             }
         }
+    }
+
+    /// <summary>
+    /// Helper function (original code orb removal snippet written by Branden, and translated into helper function by William)
+    /// </summary>
+    /// <param name="orbList">The list of orbs to search and permute</param>
+    /// <param name="markedOrb">The orb to remove</param>
+    private void RemoveOrbFromList(List<Orb> orbList, Orb markedOrb)
+    {
+        Orb elementToRemove = null;
+        foreach (Orb searchOrb in orbList)
+        {
+            if (searchOrb.getElement() == markedOrb.getElement())
+            {
+                elementToRemove = searchOrb;
+            }
+        }
+        orbList.Remove(elementToRemove);
     }
 
     /// <summary>

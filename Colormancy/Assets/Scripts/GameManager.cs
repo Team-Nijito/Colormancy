@@ -26,6 +26,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     // num players needed to be ready can be fetched via PhotonNetwork.CurrentRoom.PlayerCount
     public int OrbsNeededToReady { get { return m_OrbsNeededToStartGame; } private set { m_OrbsNeededToStartGame = value; } }
     public float PaintPercentageNeededToWin { get { return m_paintPercentageNeededToWin; } private set { m_paintPercentageNeededToWin = value; } }
+    public float CurrentPaintPercentage { get { return m_paintProgress; } private set { m_paintProgress = value; } }
 
     // Room custom properties
     public const string RedOrbKey = "RedLoanedToPhotonID";
@@ -101,6 +102,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     [SerializeField]
     private float m_paintPercentageNeededToWin = 0.75f;
 
+    private float m_paintProgress = 0f;
+
     // Confiscate player orbs var
     private bool resetPlayerOrbs = false; // this flag tells us whenever a player lost and returns to the lobby, confiscate their orbs!
 
@@ -134,12 +137,14 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     #region Components
 
     [SerializeField]
-    private EnemyManager m_enemManager;
+    private GameObject m_enemyManagerObject;
+    [SerializeField]
+    private GameObject m_paintingManagerObject;
+    [SerializeField]
+    private GameObject m_orbValueManagerObject;
 
-    [SerializeField]
-    private GameObject paintingManagerObject;
-    [SerializeField]
-    private GameObject orbValueManagerObject;
+    private EnemyManager m_enemManager;
+    private PaintingManager m_paintManager;
 
     #endregion
 
@@ -230,10 +235,36 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
             }
 
             // Add in Painting Manager and Orb Value Manager classes manually
+            GameObject cacheObj;
+
             if (!GameObject.Find("OrbValueManager"))
-                Instantiate(orbValueManagerObject);
-            if (!GameObject.Find("PaintingManager"))
-                Instantiate(paintingManagerObject);
+            {
+                Instantiate(m_orbValueManagerObject);
+            }
+            
+            // Add painting manager and enemy manager if it is a normal level
+            if (m_levelType == LevelTypes.Level)
+            {
+                if (!(cacheObj = GameObject.Find("PaintingManager")))
+                {
+                    GameObject obj = Instantiate(m_paintingManagerObject);
+                    m_paintManager = obj.GetComponent<PaintingManager>();
+                }
+                else
+                {
+                    m_paintManager = cacheObj.GetComponent<PaintingManager>();
+                }
+
+                if (!(cacheObj = GameObject.Find("EnemyManager")))
+                {
+                    GameObject obj = Instantiate(m_enemyManagerObject);
+                    m_enemManager = obj.GetComponent<EnemyManager>();
+                }
+                else
+                {
+                    m_enemManager = cacheObj.GetComponent<EnemyManager>();
+                }
+            }
 
             if (PlayerController.LocalPlayerInstance == null)
             {
@@ -326,7 +357,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
         if (PhotonNetwork.IsMasterClient)
         {
-            if (!(m_levelType == LevelTypes.Level))
+            m_paintProgress = PaintingManager.paintingProgress();
+
+            if (m_levelType == LevelTypes.Lobby || m_levelType == LevelTypes.Narrative)
             {
                 // check if all players are ready
                 if (!m_isLoadingNewScene && m_playersReady >= PhotonNetwork.CurrentRoom.PlayerCount)
@@ -334,9 +367,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
                     LoadLevel(m_levelAfterReadyUp);
                 }
             }
-            else
+            else if (m_levelType == LevelTypes.Level)
             {
-                if (!m_isLoadingNewScene && PaintingManager.paintingProgress() > m_paintPercentageNeededToWin)
+                if (!m_isLoadingNewScene && m_paintProgress > m_paintPercentageNeededToWin)
                 {
                     LoadLevel(m_levelAfterBeatingStage);
                 }
@@ -842,7 +875,42 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
-        if (!(m_levelType == LevelTypes.Level))
+        if (m_levelType == LevelTypes.Level)
+        {
+            if (stream.IsWriting)
+            {
+                //print("sending | num enemies: " + m_enemManager.CurrentNumberEnemiesInLevel + " | paint prog:" + m_paintProgress);
+                if (m_enemManager)
+                {
+                    // Synchronize the number of enemies in a level
+                    stream.SendNext(m_enemManager.CurrentNumberEnemiesInLevel);
+                }
+                if (m_paintManager)
+                {
+                    // Synchronize the paint percentage in a level
+                    stream.SendNext(m_paintProgress);
+                }
+            }
+            else
+            {
+                //string recieveString = "";
+                if (m_enemManager)
+                {
+                    byte test = (byte)stream.ReceiveNext();
+                    //recieveString += "num enemies on field: " + test;
+                    m_enemManager.SetNumEnemiesOnField(test);
+                }
+                if (m_paintManager)
+                {
+                    // master client won't need to recieve paintProgress (they are the authority for that variable)
+                    float test2 = (float)stream.ReceiveNext();
+                    //recieveString += "paint progress: " + test2;
+                    m_paintProgress = test2;
+                }
+                //print(recieveString);
+            }
+        }
+        else if (m_levelType == LevelTypes.Lobby || m_levelType == LevelTypes.Narrative)
         {
             // Synchronize the number of players ready across all clients, and number of orbs needed
             if (stream.IsWriting)
@@ -852,22 +920,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
             else
             {
                 m_playersReady = (int)stream.ReceiveNext();
-            }
-        }
-        else
-        {
-            // Synchronize the number of enemies across all clients
-            if (m_enemManager)
-            {
-                // If enemManager doesn't exist, don't sync anything.
-                if (stream.IsWriting)
-                {
-                    stream.SendNext(m_enemManager.CurrentNumberEnemiesInLevel);
-                }
-                else
-                {
-                    m_enemManager.SetNumEnemiesOnField((byte)stream.ReceiveNext());
-                }
             }
         }
     }

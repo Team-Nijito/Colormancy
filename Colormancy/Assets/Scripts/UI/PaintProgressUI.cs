@@ -47,7 +47,7 @@ public class PaintProgressUI : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
-        m_paintFillBar.fillAmount = PaintingManager.paintingProgress() / m_gmScript.PaintPercentageNeededToWin;
+        m_paintFillBar.fillAmount = m_gmScript.CurrentPaintPercentage / m_gmScript.PaintPercentageNeededToWin;
         m_brush.position = new Vector2(m_brushInitialXPosition + m_brushTravelDistance * m_paintFillBar.fillAmount, m_brush.position.y);
     }
 

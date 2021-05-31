@@ -76,7 +76,7 @@ public class PodiumController : MonoBehaviour
             }
         }
 
-        if (indicatorSprite.enabled)
+        if (indicatorSprite.enabled && Camera.main)
         {
             interactIndicator.transform.LookAt(Camera.main.transform.position, Vector3.up);
         }
