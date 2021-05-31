@@ -27,8 +27,10 @@ public class OrangeOrb : Orb
 
     public override void CastLesserEffect(GameObject hit, float spellEffectMod, float[] data)
     {
-        PhotonView photonView = PhotonView.Get(hit);
-        photonView.RPC("ReduceAllCooldowns", RpcTarget.All, OrbValueManager.getLesserEffectValue(m_OrbElement, m_Level));
+        // PhotonView photonView = PhotonView.Get(hit);
+
+        // right now assume that all cooldowns are reduced by base 30f * modifiers ...
+        // photonView.RPC("ReduceAllCooldowns", RpcTarget.All, orbLevel * 30f * spellEffectMod);
     }
 
     public override void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, Transform t, Vector3 clickedPosition)
