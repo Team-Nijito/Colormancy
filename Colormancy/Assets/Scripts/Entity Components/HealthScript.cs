@@ -196,7 +196,8 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     private void EnemyCleanup()
     {
         EnemyChaserAI controllerScript = GetComponent<EnemyChaserAI>(); // works for all AI b/c all AI scripts derive from EnemyChaserAI
-        controllerScript.StopAllTasks(); // stop all ongoing status effects, then disable any fellow scripts
+        if (controllerScript)
+            controllerScript.StopAllTasks(); // stop all ongoing status effects, then disable any fellow scripts
 
         // disable health bar and name
         m_healthBar.gameObject.SetActive(false);

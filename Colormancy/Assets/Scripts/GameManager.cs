@@ -15,7 +15,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         None,
         Level,
         Lobby,
-        Narrative
+        Narrative,
+        BossLevel
     }
 
     // C# properties for accessing the private variables
@@ -84,6 +85,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     [MyBox.ConditionalField(nameof(m_levelType), true, LevelTypes.Level)]
     [SerializeField]
     private int m_OrbsNeededToStartGame = 2;
+
+    [MyBox.ConditionalField(nameof(m_levelType), false, LevelTypes.BossLevel)]
+    //[SerializeField]
+    private int enemiesRemaining = 0;
 
     [MyBox.ConditionalField(nameof(m_levelType), true, LevelTypes.Level)]
     [SerializeField]
@@ -357,8 +362,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
         if (PhotonNetwork.IsMasterClient)
         {
-            m_paintProgress = PaintingManager.paintingProgress();
-
             if (m_levelType == LevelTypes.Lobby || m_levelType == LevelTypes.Narrative)
             {
                 // check if all players are ready
@@ -367,11 +370,24 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
                     LoadLevel(m_levelAfterReadyUp);
                 }
             }
-            else if (m_levelType == LevelTypes.Level)
+            else if (m_levelType != LevelTypes.None)
             {
-                if (!m_isLoadingNewScene && m_paintProgress > m_paintPercentageNeededToWin)
+                if (m_levelType == LevelTypes.Level)
+                {            
+                    m_paintProgress = PaintingManager.paintingProgress();
+
+                    if (!m_isLoadingNewScene && m_paintProgress > m_paintPercentageNeededToWin)
+                    {
+                        LoadLevel(m_levelAfterBeatingStage);
+                    }
+                }
+                //Boss win condition
+                if (m_levelType == LevelTypes.BossLevel)
                 {
-                    LoadLevel(m_levelAfterBeatingStage);
+                    if (!m_isLoadingNewScene && enemiesRemaining <= 0)
+                    {
+                        LoadLevel(m_levelAfterBeatingStage);
+                    }
                 }
                 if (!m_isLoadingNewScene)
                 {
@@ -479,6 +495,18 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     private void UnReady()
     {
         m_playersReady--;
+    }
+
+    [PunRPC]
+    private void AddEnemy()
+    {
+        enemiesRemaining += 1;
+    }
+
+    [PunRPC]
+    private void RemoveEnemy()
+    {
+        enemiesRemaining -= 1;
     }
 
     /// <summary>
@@ -753,6 +781,16 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
             localPlayerProperties[IsPlayerReady] = false;
             PhotonNetwork.LocalPlayer.SetCustomProperties(localPlayerProperties);
         }
+    }
+
+    public void RPCAddEnemy()
+    {
+        photonView.RPC("AddEnemy", RpcTarget.All);
+    }
+
+    public void RPCRemoveEnemy()
+    {
+        photonView.RPC("RemoveEnemy", RpcTarget.All);
     }
 
     public void SetFullImage()

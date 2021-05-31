@@ -572,7 +572,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Running bomb
+  m_Text: Exploding Bot
 --- !u!114 &3356567029375608488
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -30300,7 +30300,7 @@ GameObject:
   - component: {fileID: 9186146974418002399}
   - component: {fileID: 9186146974418002396}
   - component: {fileID: 9186146974418002397}
-  - component: {fileID: 3367534671117938449}
+  - component: {fileID: 2511674023403950583}
   - component: {fileID: 9186146974418002400}
   - component: {fileID: 9186146974418002401}
   m_Layer: 10
@@ -30468,7 +30468,7 @@ MonoBehaviour:
     minTime: 2
     maxTime: 5
   m_wanderRadius: 10
-  m_mainAIScript: {fileID: 3367534671117938449}
+  m_mainAIScript: {fileID: 2511674023403950583}
   m_enemTargeting: {fileID: 9186146974418002396}
   m_enemView: {fileID: 9186146974418002401}
 --- !u!114 &9186146974418002396
@@ -30508,7 +30508,7 @@ MonoBehaviour:
   - m_hitBoxObject: {fileID: 391437254489052083}
     m_hitBoxScript: {fileID: 3556493431472730857}
   m_numPlayersCanHitInOneAttack: 4
---- !u!114 &3367534671117938449
+--- !u!114 &2511674023403950583
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -30517,7 +30517,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 9186146974418002411}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 160241c880f2c914faa06d6b6bd9fe19, type: 3}
+  m_Script: {fileID: 11500000, guid: 8f629c2d439edbb42be61d0d48cd500d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &9186146974418002400

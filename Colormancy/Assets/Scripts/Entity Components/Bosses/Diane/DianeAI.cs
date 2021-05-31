@@ -31,8 +31,9 @@ public class DianeAI : BossAI
         Slash, Chase, FocusFire, Hamstring
     }
     // Start is called before the first frame update
-    void Start()
+    new void Start()
     {
+        base.Start();
         Animator = GetComponent<Animator>();
         EnemyHitbox = GetComponent<EnemyHitbox>();
         MeshAgent = GetComponent<NavMeshAgent>();
@@ -41,8 +42,11 @@ public class DianeAI : BossAI
     }
 
     // Update is called once per frame
-    void Update()
-    { 
+    new void Update()
+    {
+        base.Update();
+        if (GetCurrentHealth() <= 0)
+            return;
         if (Target == null)
         {
             GameObject target = GetTarget();
