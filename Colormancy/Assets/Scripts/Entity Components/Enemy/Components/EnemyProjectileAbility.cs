@@ -79,7 +79,6 @@ public class EnemyProjectileAbility : MonoBehaviourPun
     public void RPCAddDamageMultiplier(float percent)
     {
         photonView.RPC("AddDamageMultiplier", RpcTarget.All, percent);
-        print(percent);
     }
 
     #endregion

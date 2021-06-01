@@ -1,4 +1,5 @@
-﻿using Photon.Pun;
+﻿using MyBox;
+using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -61,14 +62,14 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
     #region Private Fields
 
-    // General variables
+    [Separator("Player properties")]
+    [Tooltip("If playerSpawnpoint is unassigned, spawn using these default coordinates")]
+    [SerializeField]
+    private Vector3 m_defaultSpawn = new Vector3(-8, 1.5f, 4);
+
     [Tooltip("Players will spawn on these location(s)")]
     [SerializeField]
     private GameObject[] m_playerSpawnpoints;
-
-    [Tooltip("If playerSpawnpoint is unassigned, spawn using these default coordinates")]
-    [SerializeField]
-    private Vector3 m_defaultSpawn = new Vector3(0, 3, 0);
 
     [Tooltip("The prefab to use for representing the player")]
     [SerializeField]
@@ -76,31 +77,30 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
     private uint m_currentSpawnIndex = 0; // index of the current spawn to spawn the player, used if m_playerSpawnpoints exists
 
-    // Ready up variables
+    [Separator("General level properties")]
     [SerializeField]
     private LevelTypes m_levelType = LevelTypes.None;
 
+    private bool m_isLoadingNewScene = false;
+
+    [Separator("Lobby level properties")]
     private int m_playersReady = 0;
-    
-    [MyBox.ConditionalField(nameof(m_levelType), true, LevelTypes.Level)]
+
     [SerializeField]
     private int m_OrbsNeededToStartGame = 2;
 
-    [MyBox.ConditionalField(nameof(m_levelType), false, LevelTypes.BossLevel)]
-    //[SerializeField]
-    private int enemiesRemaining = 0;
+    private GameObject m_cameraPrefab; // Instantiate a camera prefab once a player returns back from a level
 
-    [MyBox.ConditionalField(nameof(m_levelType), true, LevelTypes.Level)]
+    // Confiscate player orbs var
+    private bool resetPlayerOrbs = false; // this flag tells us whenever a player lost and returns to the lobby, confiscate their orbs!
+
+    [Separator("Lobby / narrative level properties")]
     [SerializeField]
     private string m_levelAfterReadyUp = OfficeLv1Name;
 
-    private GameObject m_cameraPrefab; // Instantiate a camera prefab once a player returns back from a level
-
-    [MyBox.ConditionalField(nameof(m_levelType), false, LevelTypes.Level)]
+    [Separator("Normal gameplay level properties")]
     [SerializeField]
     private string m_levelAfterBeatingStage = WinSceneName;
-
-    private bool m_isLoadingNewScene = false;
 
     // Painting variables
     [Range(0, 1)]
@@ -109,13 +109,15 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
     private float m_paintProgress = 0f;
 
-    // Confiscate player orbs var
-    private bool resetPlayerOrbs = false; // this flag tells us whenever a player lost and returns to the lobby, confiscate their orbs!
+    [Separator("Boss level properties")]
+    [SerializeField]
+    private int enemiesRemaining = 0;
 
     #endregion
 
     #region Dialogue system fields
 
+    [Separator("Dialogue GUI properties")]
     public GameObject popUpBox;
 
     Animator animator;
@@ -141,6 +143,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
     #region Components
 
+    [Separator("References to other components")]
     [SerializeField]
     private GameObject m_enemyManagerObject;
     [SerializeField]
@@ -555,6 +558,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
             // Set the character's speed depending on the level
             player.GetComponent<PlayerMovement>().SetSpeedDependingOnLevel(newLevelGameManager.IsLevel);
         }
+
+        m_paintProgress = 0f; // reset paint progress
     }
 
     #endregion

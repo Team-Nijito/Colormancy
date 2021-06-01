@@ -10,29 +10,29 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 05886787e1cd1184f9bd299a96b62dee, type: 3}
-  m_Name: RedOrbValues
+  m_Name: IndigoOrbValues
   m_EditorClassIdentifier: 
-  element: 0
-  m_OrbColor: {r: 1, g: 0, b: 0, a: 0}
-  m_PaintRadius: 6
+  element: 8
+  m_OrbColor: {r: 0.50352496, g: 0.14297791, b: 0.5943396, a: 0}
+  m_PaintRadius: 3
   m_GreaterEffectDamage:
     m_Level1: 20
     m_Level2: 40
     m_Level3: 60
   m_GreaterEffectPercentile: 50
   m_GreaterEffectDuration:
-    m_Level1: 2
-    m_Level2: 2.5
+    m_Level1: 1
+    m_Level2: 2
     m_Level3: 3
   m_LesserEffectValue:
-    m_Level1: 20
-    m_Level2: 40
-    m_Level3: 60
+    m_Level1: 0
+    m_Level2: 0
+    m_Level3: 0
   m_LesserEffectDuration:
     m_Level1: 0
     m_Level2: 0
     m_Level3: 0
-  m_ShapeEffectMod: 1.5
-  m_CooldownMod: 0.7
-  m_ShapeManaMod: 0.8
+  m_ShapeEffectMod: 1
+  m_CooldownMod: 1.4
+  m_ShapeManaMod: 1.2
   m_Level: 1
