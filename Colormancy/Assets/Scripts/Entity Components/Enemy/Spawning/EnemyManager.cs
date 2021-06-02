@@ -1,9 +1,9 @@
 ﻿using Photon.Pun;
-using System.Collections;
+using Photon.Realtime;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyManager : MonoBehaviourPun
+public class EnemyManager : MonoBehaviourPunCallbacks
 {
     #region Accessors (c# Properties)
     
@@ -27,8 +27,9 @@ public class EnemyManager : MonoBehaviourPun
     [SerializeField]
     private GameObject m_enemyFolder; // the folder the enemies will be organized under
 
-    [MyBox.ConditionalField(nameof(m_enemySpawnPointsActive), false)]
     [SerializeField]
+    private byte m_enemiesPerPlayer = 8; // 8 enemies per player, if there are 4 players, there'd be 32 enemies
+
     private byte m_desiredEnemiesOnField = 7; // how many enemies are on the field at the time
 
     private byte m_numEnemiesOnField = 0;
@@ -36,6 +37,11 @@ public class EnemyManager : MonoBehaviourPun
     #endregion
 
     #region Monobehaviour callbacks
+
+    private void Start()
+    {
+        UpdateDesiredEnemiesInRoom();
+    }
 
     private void Update()
     {
@@ -52,6 +58,11 @@ public class EnemyManager : MonoBehaviourPun
                 TrySpawnEnemy(4f); 
             }
         }
+
+        //if (m_enemySpawnPointsActive)
+        //{
+        //    print("Max enemies on field " + m_desiredEnemiesOnField);
+        //}
     }
 
     #endregion
@@ -102,6 +113,17 @@ public class EnemyManager : MonoBehaviourPun
         return m_enemyEntities[Random.Range(0, m_enemyEntities.Length)];
     }
 
+    /// <summary>
+    /// Invoked when the scene starts, when a player join or leaves, so that the desired enemies on the field would be updated.
+    /// If there are 20 enemies (for 2 players), and a player leaves, those extra 10 enemies will still be on the field,
+    /// but after they are slain, there should only be 10 enemies on the field.
+    /// </summary>
+    /// <returns></returns>
+    private void UpdateDesiredEnemiesInRoom()
+    {
+        m_desiredEnemiesOnField = (byte)(PhotonNetwork.CurrentRoom.PlayerCount * m_enemiesPerPlayer);
+    }
+
     #endregion
 
     #region Public functions
@@ -127,6 +149,20 @@ public class EnemyManager : MonoBehaviourPun
     public void SetNumEnemiesOnField(byte numEnemies)
     {
         m_numEnemiesOnField = numEnemies;
+    }
+
+    #endregion
+
+    #region Photon functions
+
+    public override void OnPlayerEnteredRoom(Player newPlayer)
+    {
+        UpdateDesiredEnemiesInRoom();
+    }
+
+    public override void OnPlayerLeftRoom(Player otherPlayer)
+    {
+        UpdateDesiredEnemiesInRoom();
     }
 
     #endregion

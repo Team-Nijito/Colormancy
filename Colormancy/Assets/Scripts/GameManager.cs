@@ -922,7 +922,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         {
             if (stream.IsWriting)
             {
-                //print("sending | num enemies: " + m_enemManager.CurrentNumberEnemiesInLevel + " | paint prog:" + m_paintProgress);
+                //print("sending | num enemies: " + m_enemManager.CurrentNumberEnemiesInLevel); // + " | paint prog:" + m_paintProgress);
                 if (m_enemManager)
                 {
                     // Synchronize the number of enemies in a level
