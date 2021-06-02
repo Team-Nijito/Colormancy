@@ -13,13 +13,13 @@ MonoBehaviour:
   m_Name: YellowOrbValues
   m_EditorClassIdentifier: 
   element: 2
-  m_OrbColor: {r: 1, g: 0.8792537, b: 0, a: 0}
-  m_PaintRadius: 2.5
+  m_OrbColor: {r: 0.9843138, g: 0.7372549, b: 0.015686275, a: 0}
+  m_PaintRadius: 2.12
   m_GreaterEffectDamage:
     m_Level1: 20
     m_Level2: 40
     m_Level3: 60
-  m_GreaterEffectPercentile: 50
+  m_GreaterEffectPercentile: 80
   m_GreaterEffectDuration:
     m_Level1: 3
     m_Level2: 4
@@ -29,9 +29,9 @@ MonoBehaviour:
     m_Level2: 25
     m_Level3: 35
   m_LesserEffectDuration:
-    m_Level1: 1
-    m_Level2: 2
-    m_Level3: 3
+    m_Level1: 0
+    m_Level2: 0
+    m_Level3: 0
   m_ShapeEffectMod: 1.25
   m_CooldownMod: 1.3
   m_ShapeManaMod: 0.9

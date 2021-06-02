@@ -13,13 +13,13 @@ MonoBehaviour:
   m_Name: GreenOrbValues
   m_EditorClassIdentifier: 
   element: 3
-  m_OrbColor: {r: 0.18405126, g: 0.8301887, b: 0.25659966, a: 0}
-  m_PaintRadius: 3
+  m_OrbColor: {r: 0.21960786, g: 0.46274513, b: 0.1137255, a: 0}
+  m_PaintRadius: 1.78
   m_GreaterEffectDamage:
     m_Level1: 20
     m_Level2: 40
     m_Level3: 60
-  m_GreaterEffectPercentile: 50
+  m_GreaterEffectPercentile: 80
   m_GreaterEffectDuration:
     m_Level1: 3
     m_Level2: 4
@@ -32,7 +32,7 @@ MonoBehaviour:
     m_Level1: 10
     m_Level2: 10
     m_Level3: 10
-  m_ShapeEffectMod: 0.18
+  m_ShapeEffectMod: 1
   m_CooldownMod: 2.2
   m_ShapeManaMod: 1.1
   m_Level: 1

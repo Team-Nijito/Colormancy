@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: OrangeOrbValues
   m_EditorClassIdentifier: 
   element: 1
-  m_OrbColor: {r: 1, g: 0.44879463, b: 0, a: 0}
-  m_PaintRadius: 2.5
+  m_OrbColor: {r: 1, g: 0.427451, b: 0.003921569, a: 1}
+  m_PaintRadius: 1.97
   m_GreaterEffectDamage:
     m_Level1: 20
     m_Level2: 40

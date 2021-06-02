@@ -13,13 +13,13 @@ MonoBehaviour:
   m_Name: BrownOrbValues
   m_EditorClassIdentifier: 
   element: 6
-  m_OrbColor: {r: 0.6509434, g: 0.34224257, b: 0.16887684, a: 0}
-  m_PaintRadius: 6
+  m_OrbColor: {r: 0.49803925, g: 0.37647063, b: 0, a: 0}
+  m_PaintRadius: 5.99
   m_GreaterEffectDamage:
     m_Level1: 20
     m_Level2: 40
     m_Level3: 60
-  m_GreaterEffectPercentile: 50
+  m_GreaterEffectPercentile: 60
   m_GreaterEffectDuration:
     m_Level1: 1
     m_Level2: 1.5
