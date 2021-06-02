@@ -209,6 +209,7 @@ public class StatusEffectScript : MonoBehaviourPun
                     else
                         newStatusEffect = new SpellIncreasedDamage(m_statusEffects, type, duration, source, value);
 
+                    m_statusEffects.Add(newStatusEffect);
                     break;
                 case StatusEffect.StatusType.AutoAttackIncreasedSpeed:
                     if (m_isPlayer)
@@ -216,6 +217,7 @@ public class StatusEffectScript : MonoBehaviourPun
                     else
                         throw new System.Exception("Cannot currently apply SpellIncreasedDamage on players.");
 
+                    m_statusEffects.Add(newStatusEffect);
                     break;
             }
         }
