@@ -343,7 +343,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_ignoreTurnRadius: 1
-  m_basicClickDamage: 5
+  m_basicClickDamage: 2.5
   m_basicClickManaConsumption: 0
   m_layersToIgnore:
     serializedVersion: 2

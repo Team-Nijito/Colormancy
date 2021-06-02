@@ -43,7 +43,8 @@ public class IndigoOrb : Orb
             sphereController.lesserCast = lesserEffectMethod;
             sphereController.spellEffectMod = OrbValueManager.getShapeEffectMod(m_OrbElement);
 
-            if ((i % 2 == 1 && m_Level == 2) || (i % 4 != 0 && m_Level == 1))
+            if ((i % 2 == 1 && m_Level == 2) /*|| (i % 4 != 0 && m_Level == 1)*/)
+          
                 GameObject.Destroy(g.transform.GetChild(i).gameObject);
         }
 

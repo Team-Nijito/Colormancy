@@ -17,7 +17,7 @@ public class OrbValueScriptableObject : ScriptableObject
 
     public Orb.Element element;
     public Color m_OrbColor;
-    [Range(0, 10)]
+    [Range(0, 20)]
     public float m_PaintRadius;
     public LeveledValues m_GreaterEffectDamage;
     public float m_GreaterEffectPercentile;

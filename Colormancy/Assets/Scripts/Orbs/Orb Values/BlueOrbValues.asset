@@ -32,7 +32,7 @@ MonoBehaviour:
     m_Level1: 0
     m_Level2: 0
     m_Level3: 0
-  m_ShapeEffectMod: 1.1
+  m_ShapeEffectMod: 0.9
   m_CooldownMod: 0.8
   m_ShapeManaMod: 1.8
   m_Level: 1

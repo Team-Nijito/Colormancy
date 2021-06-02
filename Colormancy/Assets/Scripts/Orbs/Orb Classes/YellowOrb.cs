@@ -45,7 +45,7 @@ public class YellowOrb : Orb
 
         for (int i = 0; i < 3; i++)
         {
-            if (i - m_Level >= 0)
+            if (i - (m_Level + 1) >= 0)
                 GameObject.Destroy(g.transform.GetChild(i).gameObject);
         }
     }

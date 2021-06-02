@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   element: 0
   m_OrbColor: {r: 1, g: 0, b: 0, a: 0}
-  m_PaintRadius: 7.25
+  m_PaintRadius: 6.25
   m_GreaterEffectDamage:
     m_Level1: 20
     m_Level2: 40
@@ -32,7 +32,7 @@ MonoBehaviour:
     m_Level1: 0
     m_Level2: 0
     m_Level3: 0
-  m_ShapeEffectMod: 1.5
+  m_ShapeEffectMod: 1
   m_CooldownMod: 0.7
   m_ShapeManaMod: 0.8
   m_Level: 1
