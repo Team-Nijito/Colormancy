@@ -219,6 +219,7 @@ public class StatusEffectScript : MonoBehaviourPun
 
                     m_statusEffects.Add(newStatusEffect);
                     break;
+
             }
         }
     }

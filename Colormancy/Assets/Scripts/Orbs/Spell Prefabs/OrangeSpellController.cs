@@ -55,7 +55,7 @@ public class OrangeSpellController : MonoBehaviour
 
         PaintingManager.PaintSphere(OrbValueManager.getColor(element), collision.GetContact(0).point, paintRadius * 3);
 
-        Collider[] sphereCollisions = Physics.OverlapSphere(collision.GetContact(0).point, paintRadius * 3);
+        Collider[] sphereCollisions = Physics.OverlapSphere(collision.GetContact(0).point, paintRadius * 3, (1 << 10) | (1 << 9));
         foreach (Collider c in sphereCollisions)
         {
             if (c.gameObject.CompareTag("Enemy"))
