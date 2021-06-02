@@ -5,27 +5,19 @@ public class PlayerMouse : MonoBehaviourPunCallbacks
 {
     // Handles the behavior of mouse reticle, and turning the player (towards the mouse)
 
-    public float m_ignoreTurnRadius = 1f;
-
+    [Tooltip("If you click within this radius from the player, the player will not turn to attack.")]
     [SerializeField]
-    private float m_basicClickDamage = 20f;
-    [SerializeField]
-    private float m_basicClickManaConsumption = 3f;
-
-    [SerializeField]
-    private LayerMask m_layersToIgnore;
+    private float m_ignoreTurnRadius = 1f; // this prevents the player from glitching out if you click on the player directly
 
     private GameObject m_playerCharacter;
 
     private PlayerMovement m_pmScript;
     private PlayerAttack m_paScript;
-    private ManaScript m_mScript;
-    private RaycastHit m_data;
+    //private RaycastHit m_data;
     private Animator m_animator;
 
     private void Start()
     {
-        m_mScript = GetComponent<ManaScript>();
         m_pmScript = GetComponent<PlayerMovement>();
         m_paScript = GetComponent<PlayerAttack>();
         m_animator = GetComponentInChildren<Animator>();
@@ -35,11 +27,11 @@ public class PlayerMouse : MonoBehaviourPunCallbacks
     // Update is called once per frame
     void Update()
     {
-        Vector3 mousePosition = GetMouseWorldPosition();
-
         if (photonView.IsMine && PhotonNetwork.IsConnected)
         {
-            if (Input.GetMouseButtonDown(0) && m_pmScript.CanMove)
+            Vector3 mousePosition = GetMouseWorldPosition();
+
+            if (Input.GetMouseButton(0) && m_pmScript.CanMove)
             {
                 // paintball attack
                 if ((new Vector3(mousePosition.x, 0, mousePosition.z) - new Vector3(transform.position.x, 0, transform.position.z)).magnitude > m_ignoreTurnRadius)
@@ -52,28 +44,9 @@ public class PlayerMouse : MonoBehaviourPunCallbacks
                 {
                     // Trigger attack animation 
                     photonView.RPC("TriggerPlayerAttackAnim", RpcTarget.All);
+                    photonView.RPC("ShootPaintball", RpcTarget.All, false, mousePosition);
                 }
-
-                photonView.RPC("ShootPaintball", RpcTarget.All, false, mousePosition);
             }
-        }
-    }
-
-    private void DebugClickDamage(float damage)
-    {
-        // the collider is attached to an enemy IF
-        // 1) the current gameObject the collider is attached to has a healthscript
-        // 2) the current gameObject is a child (or descendent) of any gameObject that has a healthscript
-        HealthScript hscript = m_data.collider.gameObject.GetComponent<HealthScript>();
-        hscript = hscript == null ? m_data.collider.gameObject.GetComponentInParent<HealthScript>() : hscript;
-
-        // test: each attack consumes 10 mana
-        if (hscript && m_mScript.GetEffectiveMana() >= m_basicClickManaConsumption)
-        {
-            m_mScript.ConsumeMana(m_basicClickManaConsumption);
-            //hscript.TakeDamage(damage);
-            PhotonView photonView = PhotonView.Get(m_data.transform.gameObject);
-            photonView.RPC("TakeDamage", RpcTarget.All, (float)m_basicClickDamage);
         }
     }
 

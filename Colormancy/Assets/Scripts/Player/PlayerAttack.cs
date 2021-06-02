@@ -7,33 +7,28 @@ public class PlayerAttack : MonoBehaviourPun
     /// outdated component, will probably be replaced with an autoattack script
     /// </summary>
 
+
+
+    #region Private variables
+
     //public Rigidbody m_paintball;
     public Color m_paintColor;
     [SerializeField]
     private float m_attackSpeed = .7f;
     private float m_attackSpeedMultiplier = 1f;
 
+    [SerializeField]
     private float m_attackDamage = 10f;
+    [SerializeField]
     private float m_attackMultiplier = 1f;
-
-    //[SerializeField]
-    //private float m_paintballSpawnHeight = 3f;
-    //[SerializeField]
-    //private float m_paintballSpawnDistanceFromPlayer = 2f;
-    //[SerializeField]
-    //private float m_paintballForce = 10f;
-    //[SerializeField]
-    //private float m_paintballDespawnTime = 3f;
-    //[SerializeField]
-    //private float m_numBeamProjectiles = 4;
-    //[SerializeField]
-    //private float m_beamSpread = .5f;
 
     private float m_currentCooldown;
     private GameObject m_playerCharacter;
     private PlayerMouse m_pmouseScript;
 
-    private Color[] m_niceColors;
+    #endregion
+
+    #region Monobehaviour callbacks
 
     private void Start()
     {
@@ -41,14 +36,6 @@ public class PlayerAttack : MonoBehaviourPun
         m_pmouseScript = GetComponent<PlayerMouse>();
 
         m_currentCooldown = 0;
-
-        // these are the colors in the game (red -> quicksilver)
-        //m_niceColors = new Color[] { Color.red, Color.yellow, new Color(255, 109, 0), 
-        //                            Color.green, Color.blue, new Color(166,77,121),
-        //                            new Color(126, 96, 0), new Color(159, 197, 233),  
-        //                            new Color(159,197,233)};
-
-        m_niceColors = new Color[] { Color.red, Color.blue };
 
         Color ranColor = Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
         photonView.RPC("SetMyColor", RpcTarget.All, new Vector3(ranColor.r, ranColor.g, ranColor.b));
@@ -60,6 +47,23 @@ public class PlayerAttack : MonoBehaviourPun
         {
             m_currentCooldown -= Time.deltaTime;
         }
+    }
+
+    #endregion
+
+    #region Functions
+    
+    /// <summary>
+    /// Sets attack multiplier, but percentage based.
+    /// </summary>
+    public void AddAttackMultiplier(float multiplier)
+    {
+        m_attackMultiplier += multiplier / 100f;
+    }
+
+    public void AddAttackSpeedMultplier(float multiplier)
+    {
+        m_attackSpeedMultiplier += multiplier / 100f;
     }
 
     /// <summary>
@@ -79,19 +83,6 @@ public class PlayerAttack : MonoBehaviourPun
     {
         // random color for testing
         m_paintColor = new Color(inputColor.x, inputColor.y, inputColor.z);
-    }
-
-    /// <summary>
-    /// Sets attack multiplier, but percentage based.
-    /// </summary>
-    public void AddAttackMultiplier(float multiplier)
-    {
-        m_attackMultiplier += multiplier / 100f;
-    }
-
-    public void AddAttackSpeedMultplier(float multiplier)
-    {
-        m_attackSpeedMultiplier += multiplier / 100f;
     }
 
     [PunRPC]
@@ -125,10 +116,12 @@ public class PlayerAttack : MonoBehaviourPun
         Quaternion characterRotation = m_playerCharacter.transform.rotation;
 
         // do attack here (instantiate, add velocity, etc...)
-        GameObject g = GameObject.Instantiate(Resources.Load("AutoAttackProjectile"), characterPosition + Vector3.up, characterRotation) as GameObject;
+        GameObject g = Instantiate(Resources.Load("AutoAttackProjectile"), characterPosition + Vector3.up, characterRotation) as GameObject;
         AutoAttackProjectileController controller = g.GetComponent<AutoAttackProjectileController>();
         controller.playerColor = m_paintColor;
         controller.attackDamage = m_attackDamage;
         controller.attackMultiplier = m_attackMultiplier;
     }
+
+    #endregion
 }
