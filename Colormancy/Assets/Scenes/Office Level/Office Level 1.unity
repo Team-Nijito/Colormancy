@@ -7916,6 +7916,11 @@ PrefabInstance:
       objectReference: {fileID: 647651796}
     - target: {fileID: 1858970735588863968, guid: f3c0e5b18270531468bb1ff4a5ba57e5,
         type: 3}
+      propertyPath: m_enemiesPerPlayer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 1858970735588863968, guid: f3c0e5b18270531468bb1ff4a5ba57e5,
+        type: 3}
       propertyPath: m_desiredEnemiesOnField
       value: 20
       objectReference: {fileID: 0}
