@@ -156,24 +156,24 @@ public class GreenSpellSpawnerController : MonoBehaviour
         }
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter(Collider collider)
     {
-        if (collision.gameObject.CompareTag("Enemy") || collision.gameObject.tag.Equals("Player"))
+        if (collider.gameObject.CompareTag("Enemy") || collider.gameObject.tag.Equals("Player"))
         {
-            if (!entitiesEntered.Contains(collision.gameObject))
+            if (!entitiesEntered.Contains(collider.gameObject))
             {
-                entitiesEntered.Add(collision.gameObject);
+                entitiesEntered.Add(collider.gameObject);
             }
         }
     }
 
-    private void OnCollisionExit(Collision collision)
+    private void OnTriggerExit(Collider collider)
     {
-        if (collision.gameObject.CompareTag("Enemy") || collision.gameObject.tag.Equals("Player"))
+        if (collider.gameObject.CompareTag("Enemy") || collider.gameObject.tag.Equals("Player"))
         {
-            if (entitiesEntered.Contains(collision.gameObject))
+            if (entitiesEntered.Contains(collider.gameObject))
             {
-                entitiesEntered.Remove(collision.gameObject);
+                entitiesEntered.Remove(collider.gameObject);
             }
         }
     }

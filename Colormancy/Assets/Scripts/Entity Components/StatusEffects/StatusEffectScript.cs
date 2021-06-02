@@ -17,6 +17,7 @@ public class StatusEffectScript : MonoBehaviourPun
     private bool m_isPlayer = false;
 
     private float m_cumulativeDamage = 0;
+    private float m_cumulativeMana = 0;
 
     #endregion
 
@@ -28,6 +29,7 @@ public class StatusEffectScript : MonoBehaviourPun
     private PlayerMovement m_playerMovement;
     private CharacterController m_controller;
     private PlayerAttack m_playerAttack;
+    private ManaScript m_mana;
 
     // AI components
     private EnemyHitbox m_enemHitbox;
@@ -57,6 +59,14 @@ public class StatusEffectScript : MonoBehaviourPun
             {
                 // apply damage if there is any damage from status effects
                 photonView.RPC("TakeDamage", RpcTarget.All, m_cumulativeDamage);
+            }
+            if (m_cumulativeDamage < 0)
+            {
+                photonView.RPC("Heal", RpcTarget.All, -m_cumulativeDamage);
+            }
+            if (m_cumulativeMana > 0)
+            {
+                photonView.RPC("RecoverMana", RpcTarget.All, m_cumulativeMana);
             }
         }
     }
@@ -126,6 +136,7 @@ public class StatusEffectScript : MonoBehaviourPun
     private void LoopThroughStatusEffects()
     {
         m_cumulativeDamage = 0;
+        m_cumulativeMana = 0;
 
         // copying is inefficient, but is necessary in order to avoid the possibility
         // of the list being altered during the loop
@@ -142,6 +153,15 @@ public class StatusEffectScript : MonoBehaviourPun
                 // UPDATE: now works with tick intervals
                 DamageOverTime DoT = (DamageOverTime)effect;
                 m_cumulativeDamage += DoT.Damage;
+            }
+            if (effect.StatusEffectType == StatusEffect.StatusType.Rejuvenation)
+            {
+                // if the StatusType is DamageOverTime, then
+                // add this damage this DoT incurs per tick to the cumulative damage per tick
+                // UPDATE: now works with tick intervals
+                Rejuvenation rej = (Rejuvenation)effect;
+                m_cumulativeDamage -= rej.Damage;
+                m_cumulativeMana += rej.Mana;
             }
         }
     }
@@ -215,11 +235,18 @@ public class StatusEffectScript : MonoBehaviourPun
                     if (m_isPlayer)
                         newStatusEffect = new AutoAttackIncreasedSpeed(m_statusEffects, type, duration, source, value, m_playerAttack);
                     else
-                        throw new System.Exception("Cannot currently apply SpellIncreasedDamage on players.");
+                        throw new System.Exception("Cannot currently apply AutoAttackIncreasedSpeed on enemies.");
 
                     m_statusEffects.Add(newStatusEffect);
                     break;
+                case StatusEffect.StatusType.Rejuvenation:
+                    if (m_isPlayer)
+                        newStatusEffect = new Rejuvenation(m_statusEffects, type, duration, source, value, secondsPerTick, m_health, m_mana);
+                    else
+                        throw new System.Exception("Cannot currently apply Rejuvenation on enemies.");
 
+                    m_statusEffects.Add(newStatusEffect);
+                    break;
             }
         }
     }
@@ -354,6 +381,7 @@ public class StatusEffectScript : MonoBehaviourPun
                 m_isPlayer = true;
                 m_playerMovement = GetComponent<PlayerMovement>();
                 m_playerAttack = GetComponent<PlayerAttack>();
+                m_mana = GetComponent<ManaScript>();
             }
             else
             {
