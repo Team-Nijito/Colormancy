@@ -14,13 +14,16 @@ public class Rejuvenation : StatusEffect
     #region Accessors (c# Properties)
 
     public float Damage { get { return m_currentDamage; } protected set { m_currentDamage = value; } }
+    public float Mana { get { return m_currentMana; } protected set { m_currentMana = value; } }
 
     #endregion
 
     #region Variables
 
     protected float m_currentDamage;
+    protected float m_currentMana;
     protected float m_damage;
+    protected float m_mana;
     protected float m_secondsPerTick;
 
     protected float m_tickTime;
@@ -29,33 +32,26 @@ public class Rejuvenation : StatusEffect
 
     #region Functions
 
-    public Rejuvenation(List<StatusEffect> parentList, StatusType type, float duration, string source, float value, float secondsPerTick)
+    public Rejuvenation(List<StatusEffect> parentList, StatusType type, float duration, string source, float value, float secondsPerTick, HealthScript health, ManaScript mana)
         : base(parentList, type, duration, source)
     {
-        m_damage = value;
+        m_damage = health.GetMaxEffectiveHealth() * value / 100;
+        m_mana = mana.GetMaxEffectiveMana() * value / 100;
         m_secondsPerTick = secondsPerTick;
     }
 
     public override void DoStatusEffect()
     {
-        // Actually don't do anything
-        // I intend for a function in StatusEffectScript to calculate the cumulative damage per tick
-        // (assuming that there are multiple DoT status effects on one entity)
-        // and then to send that damage through the network.
-        // I don't think it's necessary to send each damage source per tick through the network anyways
-        // since the end result will basically be the same.
-
-        // UPDATE: now works on a fixed interval set by the constructor.
-        // The current damage is updated if the time goes over said interval.
-
         if (m_tickTime > m_secondsPerTick)
         {
             m_currentDamage = m_damage;
+            m_currentMana = m_mana;
             m_tickTime -= m_secondsPerTick;
         }
         else
         {
             m_currentDamage = 0;
+            m_currentMana = 0;
         }
 
         m_tickTime += Time.deltaTime;
