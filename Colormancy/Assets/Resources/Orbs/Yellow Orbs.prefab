@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 852709482061136775}
   - component: {fileID: 852709482061136772}
   - component: {fileID: 852709482061136773}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: Orb 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -89,7 +89,7 @@ SphereCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 852709482061136771}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.75
@@ -166,7 +166,7 @@ GameObject:
   - component: {fileID: 852709482318644057}
   - component: {fileID: 852709482318644056}
   - component: {fileID: 3525512770331781792}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: Yellow Orbs
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -302,7 +302,7 @@ GameObject:
   - component: {fileID: 852709483024857161}
   - component: {fileID: 852709483024857158}
   - component: {fileID: 852709483024857159}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: Orb 3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -378,7 +378,7 @@ SphereCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 852709483024857157}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.75
@@ -457,7 +457,7 @@ GameObject:
   - component: {fileID: 852709483522200703}
   - component: {fileID: 852709483522200700}
   - component: {fileID: 852709483522200640}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: Orb 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -533,7 +533,7 @@ SphereCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 852709483522200701}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.75
