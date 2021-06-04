@@ -29,8 +29,11 @@ public class SpellManager : MonoBehaviourPun
 
         public void Cast(Transform t, Vector3 clickedPosition)
         {
+            StatusEffectScript status = t.gameObject.GetComponent<StatusEffectScript>();
+            status = t.gameObject.GetComponent<StatusEffectScript>();
+
             // exception for quicksilver
-            if(orbs[0].getElement() == Orb.Element.Wind)
+            if (orbs[0].getElement() == Orb.Element.Wind)
             {
                 GameObject storm = Instantiate(Resources.Load("Orbs/QuickSilver Storm"), t.position, t.rotation) as GameObject;
                 QuickSilverStormController g = storm.GetComponent<QuickSilverStormController>();
@@ -39,9 +42,10 @@ public class SpellManager : MonoBehaviourPun
             // exception for red
             if(orbs[2].getElement() != Orb.Element.Wrath)
             {
-                StatusEffectScript status = t.gameObject.GetComponent<StatusEffectScript>();
                 status.RPCClearStatusEffect(StatusEffect.StatusType.AutoAttackIncreasedSpeed);
             }
+
+            status.RPCClearStatusEffect(StatusEffect.StatusType.ManaRegeneration);
 
             orbs[2].CastShape(orbs[0].CastGreaterEffect, orbs[1].CastLesserEffect, t, clickedPosition);
         }
