@@ -17,7 +17,6 @@ public class SpellManager : MonoBehaviourPun
 
         Orb[] orbs;
 
-
         public Spell(Orb[] _orbs)
         {
             orbs = _orbs;
@@ -78,6 +77,13 @@ public class SpellManager : MonoBehaviourPun
         if (photonView.IsMine && PhotonNetwork.IsConnected)
         {
             FirstOrb = orb;
+
+            if (FirstOrb != null)
+            {
+                FirstOrb.RevertHeldEffect(gameObject);
+            }
+            FirstOrb = orb;
+            FirstOrb.AddHeldEffect(gameObject);
 
             uiController.AddOrb(orb);
         }

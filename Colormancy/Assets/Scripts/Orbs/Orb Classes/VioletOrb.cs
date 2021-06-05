@@ -13,6 +13,16 @@ public class VioletOrb : Orb
         m_UIPrefab = (GameObject)Resources.Load("Orbs/VioletOrbUI");
     }
 
+    public override void AddHeldEffect(GameObject player)
+    {
+
+    }
+
+    public override void RevertHeldEffect(GameObject player)
+    {
+
+    }
+
     public override void CastGreaterEffect(GameObject hit, float spellEffectMod, float[] data)
     {
         float dmgMultiplier = 1;
