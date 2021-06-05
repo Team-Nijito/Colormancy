@@ -22,6 +22,22 @@ public class PlayerAttack : MonoBehaviourPun
     [SerializeField]
     private float m_attackMultiplier = 1f;
 
+    private bool m_poisonedAttack = false;
+    private float m_poisonedAttackDuration = 0;
+
+    //[SerializeField]
+    //private float m_paintballSpawnHeight = 3f;
+    //[SerializeField]
+    //private float m_paintballSpawnDistanceFromPlayer = 2f;
+    //[SerializeField]
+    //private float m_paintballForce = 10f;
+    //[SerializeField]
+    //private float m_paintballDespawnTime = 3f;
+    //[SerializeField]
+    //private float m_numBeamProjectiles = 4;
+    //[SerializeField]
+    //private float m_beamSpread = .5f;
+
     private float m_currentCooldown;
     private GameObject m_playerCharacter;
     private PlayerMouse m_pmouseScript;
@@ -85,6 +101,25 @@ public class PlayerAttack : MonoBehaviourPun
         m_paintColor = new Color(inputColor.x, inputColor.y, inputColor.z);
     }
 
+    /// <summary>
+    /// Sets attack multiplier, but percentage based.
+    /// </summary>
+    public void AddAttackMultiplier(float multiplier)
+    {
+        m_attackMultiplier += multiplier / 100f;
+    }
+
+    public void AddAttackSpeedMultplier(float multiplier)
+    {
+        m_attackSpeedMultiplier += multiplier / 100f;
+    }
+
+    public void SetPoisonedAttack(bool isPoisoned, float duration)
+    {
+        m_poisonedAttack = isPoisoned;
+        m_poisonedAttackDuration = duration;
+    }
+
     [PunRPC]
     public void ShootPaintball(bool beam, Vector3 mousePos)
     {
@@ -121,6 +156,8 @@ public class PlayerAttack : MonoBehaviourPun
         controller.playerColor = m_paintColor;
         controller.attackDamage = m_attackDamage;
         controller.attackMultiplier = m_attackMultiplier;
+        controller.poisonedAttack = m_poisonedAttack;
+        controller.poisonedAttackDuration = m_poisonedAttackDuration;
     }
 
     #endregion

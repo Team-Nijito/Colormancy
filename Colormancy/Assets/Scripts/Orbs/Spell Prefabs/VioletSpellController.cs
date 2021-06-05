@@ -34,13 +34,11 @@ public class VioletSpellController : MonoBehaviour
             Destroy(gameObject);
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter(Collider collider)
     {
-        if (collision.gameObject.CompareTag("Enemy"))
-        {
-            greaterCast(collision.gameObject, spellEffectMod, null);
-        }
-        else if (collision.gameObject.CompareTag("Player"))
-            lesserCast(collision.gameObject, spellEffectMod, null);
+        if (collider.gameObject.CompareTag("Enemy"))
+            greaterCast(collider.gameObject, spellEffectMod, null);
+        else if (collider.gameObject.CompareTag("Player"))
+            lesserCast(collider.gameObject, spellEffectMod, null);
     }
 }

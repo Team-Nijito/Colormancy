@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 757533296344135952}
   - component: {fileID: 757533296344135955}
   - component: {fileID: 7701551136608990440}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: Violet Cloud
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -90,7 +90,7 @@ BoxCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 450963960197432388}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
   m_Size: {x: 4.7762365, y: 1.566947, z: 3.714734}
@@ -107,11 +107,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cacccd8d3c4beed409f2c708b30699cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  greaterCastAmt: 0
-  lesserCastAmt: 0
+  spellEffectMod: 0
   lifetime: 3
-  spherePaintRadius: 8
-  paintColor: {r: 0.37680262, g: 0.040850844, b: 0.509434, a: 0}
   debug: 0
 --- !u!54 &7701551136608990440
 Rigidbody:

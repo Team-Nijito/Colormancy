@@ -83,11 +83,11 @@ public class BrownSpellController : MonoBehaviour
         }
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter(Collider collider)
     {
-        if (collision.gameObject.tag.Equals("Enemy"))
-            greaterCast(collision.gameObject, spellEffectMod, null);
-        else if (collision.gameObject.tag.Equals("Player"))
-            lesserCast(collision.gameObject, spellEffectMod, null);
+        if (collider.gameObject.tag.Equals("Enemy"))
+            greaterCast(collider.gameObject, spellEffectMod, null);
+        else if (collider.gameObject.tag.Equals("Player"))
+            lesserCast(collider.gameObject, spellEffectMod, null);
     }
 }

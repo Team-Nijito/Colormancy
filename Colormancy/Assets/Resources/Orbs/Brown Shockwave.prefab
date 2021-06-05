@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1442922399315108214}
   - component: {fileID: 1442922399315108200}
   - component: {fileID: 1442922399315108215}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: Rocks
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4766,7 +4766,7 @@ GameObject:
   - component: {fileID: 1442922397831603985}
   - component: {fileID: -9161229224219600502}
   - component: {fileID: 4635843020049002027}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: Brown Shockwave
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4802,8 +4802,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3df6373974972e946ad8100a5277c3cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  greaterCastAmt: 0
-  lesserCastAmt: 0
   spellEffectMod: 0
   ImpactLerp:
     serializedVersion: 2
@@ -4863,8 +4861,6 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   lifetime: 1
-  spherePaintRadius: 10
-  paintColor: {r: 0.3018868, g: 0.13030869, b: 0, a: 0}
   debug: 0
   startAnimation: 0
 --- !u!136 &-9161229224219600502
@@ -4875,7 +4871,7 @@ CapsuleCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1785434909946404452}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   m_Radius: 0
   m_Height: 5
@@ -4908,7 +4904,7 @@ GameObject:
   - component: {fileID: 1935349026192491107}
   - component: {fileID: 7333061657925761786}
   - component: {fileID: 7631000349054187097}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: Wave
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4987,7 +4983,7 @@ GameObject:
   - component: {fileID: 5763898010465338311}
   - component: {fileID: 754379087168515864}
   - component: {fileID: 2601482634334001195}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: Impact
   m_TagString: Untagged
   m_Icon: {fileID: 0}

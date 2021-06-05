@@ -34,6 +34,9 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     [SerializeField]
     private float m_baseHealth = 100f;
 
+    [SerializeField]
+    private float m_shieldHealth = 0f;
+
     // % of damage we're blocking
     [SerializeField]
     [Range(0f, 100f)]
@@ -297,6 +300,15 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     public float GetArmorPercentage() { return m_armorPercentage; }
 
     [PunRPC]
+    public void AddShield(float shieldHealth)
+    {
+        if (shieldHealth < 0)
+            throw new ArgumentException(string.Format("{0} shouldn't be a negative number", shieldHealth), "shieldHealth");
+        
+        m_shieldHealth += shieldHealth;
+    }
+
+    [PunRPC]
     public void AlterArmorValue(float armorPercent)
     {
         // replaces the armorPercentage with new value
@@ -387,7 +399,16 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
             throw new ArgumentException(string.Format("{0} should be greater than zero", damageValue), "damageValue");
         if (photonView.IsMine)
         {
-            m_effectiveHealth -= (damageValue - (m_armorPercentage / 100 * damageValue));
+            if (m_isPlayer)
+            {
+                StatusEffectScript status = GetComponent<StatusEffectScript>();
+                status.RPCClearStatusEffect(StatusEffect.StatusType.MovementIncreaseSpeed);
+            }
+
+            if (m_shieldHealth == 0)
+                m_effectiveHealth -= (damageValue - (m_armorPercentage / 100 * damageValue));
+            else
+                m_shieldHealth = Mathf.Max(m_shieldHealth - damageValue, 0);
         }
     }
 
