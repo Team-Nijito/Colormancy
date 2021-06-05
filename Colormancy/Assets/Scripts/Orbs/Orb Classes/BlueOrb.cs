@@ -12,6 +12,16 @@ public class BlueOrb : Orb
         m_UIPrefab = (GameObject)Resources.Load("Orbs/BlueOrbUI");
     }
 
+    public override void AddHeldEffect(GameObject player)
+    {
+
+    }
+
+    public override void RevertHeldEffect(GameObject player)
+    {
+
+    }
+
     public override void CastGreaterEffect(GameObject hit, float spellEffectMod, float[] data)
     {
         float dmgMultiplier = 1;

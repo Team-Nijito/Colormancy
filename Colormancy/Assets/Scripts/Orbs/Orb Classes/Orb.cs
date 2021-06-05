@@ -45,4 +45,6 @@ public abstract class Orb
     public abstract void CastGreaterEffect(GameObject hit, float spellEffectMod, float[] data);
     //Will have to do something different and send over server for this one since most are for allies
     public abstract void CastLesserEffect(GameObject hit, float spellEffectMod, float[] data);
+    public abstract void RevertHeldEffect(GameObject player);
+    public abstract void AddHeldEffect(GameObject player);
 }
