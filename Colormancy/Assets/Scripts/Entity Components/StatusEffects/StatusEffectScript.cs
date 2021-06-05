@@ -254,6 +254,14 @@ public class StatusEffectScript : MonoBehaviourPun
 
                     m_statusEffects.Add(newStatusEffect);
                     break;
+                case StatusEffect.StatusType.AutoAttackPoison:
+                    if (m_isPlayer)
+                        newStatusEffect = new AutoAttackPoison(m_statusEffects, type, duration, source, m_playerAttack);
+                    else
+                        throw new System.Exception("Cannot currently apply AutoAttackPoison on enemies.");
+
+                    m_statusEffects.Add(newStatusEffect);
+                    break;
             }
         }
     }

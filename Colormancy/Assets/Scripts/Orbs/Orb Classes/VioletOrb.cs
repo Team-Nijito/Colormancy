@@ -27,7 +27,8 @@ public class VioletOrb : Orb
 
     public override void CastLesserEffect(GameObject hit, float spellEffectMod, float[] data)
     {
-        throw new System.NotImplementedException();
+        StatusEffectScript status = hit.GetComponent<StatusEffectScript>();
+        status.RPCApplyStatus(StatusEffect.StatusType.AutoAttackPoison, OrbValueManager.getLesserEffectDuration(m_OrbElement, m_Level));
     }
 
     public override void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, Transform t, Vector3 clickedPosition)
