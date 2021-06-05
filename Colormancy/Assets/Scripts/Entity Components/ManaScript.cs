@@ -75,6 +75,7 @@ public class ManaScript : MonoBehaviour, IPunObservable
 
     public float GetMaxEffectiveMana() { return m_maxEffectiveMana; }
     public float GetEffectiveMana() { return m_effectiveMana; }
+    public float GetManaRegen() { return m_regenManaPercentage; }
 
     [PunRPC]
     public void RecoverMana(float value)
