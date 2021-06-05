@@ -101,19 +101,6 @@ public class PlayerAttack : MonoBehaviourPun
         m_paintColor = new Color(inputColor.x, inputColor.y, inputColor.z);
     }
 
-    /// <summary>
-    /// Sets attack multiplier, but percentage based.
-    /// </summary>
-    public void AddAttackMultiplier(float multiplier)
-    {
-        m_attackMultiplier += multiplier / 100f;
-    }
-
-    public void AddAttackSpeedMultplier(float multiplier)
-    {
-        m_attackSpeedMultiplier += multiplier / 100f;
-    }
-
     public void SetPoisonedAttack(bool isPoisoned, float duration)
     {
         m_poisonedAttack = isPoisoned;
