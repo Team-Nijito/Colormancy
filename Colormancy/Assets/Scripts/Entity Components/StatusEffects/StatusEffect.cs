@@ -36,7 +36,8 @@ public abstract class StatusEffect
         AutoAttackIncreasedSpeed,
         Rejuvenation,
         ManaRegeneration,
-        AutoAttackPoison
+        AutoAttackPoison,
+        MovementIncreaseSpeed
     }
 
     protected List<StatusEffect> m_parentList; // the list the status effect is apart of, we need this reference so

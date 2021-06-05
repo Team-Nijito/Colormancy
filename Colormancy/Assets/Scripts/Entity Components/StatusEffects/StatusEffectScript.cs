@@ -262,6 +262,14 @@ public class StatusEffectScript : MonoBehaviourPun
 
                     m_statusEffects.Add(newStatusEffect);
                     break;
+                case StatusEffect.StatusType.MovementIncreaseSpeed:
+                    if (m_isPlayer)
+                        newStatusEffect = new MovementIncreaseSpeed(m_statusEffects, type, duration, source, value, m_playerMovement);
+                    else
+                        throw new System.Exception("Cannot currently apply MovementIncreaseSpeed on enemies.");
+
+                    m_statusEffects.Add(newStatusEffect);
+                    break;
             }
         }
     }

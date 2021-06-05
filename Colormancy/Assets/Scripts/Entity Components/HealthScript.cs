@@ -396,6 +396,12 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
             throw new ArgumentException(string.Format("{0} should be greater than zero", damageValue), "damageValue");
         if (photonView.IsMine)
         {
+            if (m_isPlayer)
+            {
+                StatusEffectScript status = GetComponent<StatusEffectScript>();
+                status.RPCClearStatusEffect(StatusEffect.StatusType.MovementIncreaseSpeed);
+            }
+
             if (m_shieldHealth == 0)
                 m_effectiveHealth -= (damageValue - (m_armorPercentage / 100 * damageValue));
             else
