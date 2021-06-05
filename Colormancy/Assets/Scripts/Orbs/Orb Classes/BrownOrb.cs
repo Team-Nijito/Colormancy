@@ -28,7 +28,10 @@ public class BrownOrb : Orb
 
     public override void CastLesserEffect(GameObject hit, float spellEffectMod, float[] data)
     {
-        throw new System.NotImplementedException();
+        HealthScript health = hit.GetComponent<HealthScript>();
+
+        PhotonView photonView = PhotonView.Get(hit);
+        photonView.RPC("AddShield", RpcTarget.All, OrbValueManager.getLesserEffectValue(m_OrbElement, m_Level) / 100f * health.GetMaxEffectiveHealth());
     }
 
     public override void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, Transform t, Vector3 clickedPosition)
