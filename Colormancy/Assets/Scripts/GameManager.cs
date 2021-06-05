@@ -117,8 +117,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
     #region Dialogue system fields
 
-    [Separator("Dialogue GUI properties")]
+    [Separator("GUI references")]
     public GameObject popUpBox;
+
+    private Button m_leaveButton; // the reference to the leave button in canvas
 
     Animator animator;
     TMPro.TMP_Text popUpFullText;
@@ -332,6 +334,13 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         }
 
         SetPopUpVariables();
+
+        // Find reference to the leave button in Canvas
+        GameObject canvas;
+        if (canvas = GameObject.Find("Canvas"))
+        {
+            m_leaveButton = canvas.transform.Find("LevelUI").transform.Find("TopPanel").transform.Find("LeaveButton").GetComponent<Button>();
+        }
     }
 
     private void Update()
@@ -654,6 +663,12 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         if (!m_isLoadingNewScene)
         {
             m_isLoadingNewScene = true;
+
+            // disable leave button (this will mess things if players decide to leave during this period)
+            if (m_leaveButton)
+            {
+                m_leaveButton.interactable = false;
+            }
 
             PhotonNetwork.LoadLevel(nameOfScene);        
         }

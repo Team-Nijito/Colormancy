@@ -30430,6 +30430,7 @@ MonoBehaviour:
   m_username: {fileID: 3356567029375608491}
   m_gameManager: {fileID: 0}
   m_baseHealth: 30
+  m_shieldHealth: 0
   m_armorPercentage: 0
   m_isRegenHealth: 0
   m_regenHealthPercentage: 1

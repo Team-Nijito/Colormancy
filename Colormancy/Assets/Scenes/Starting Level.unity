@@ -18592,6 +18592,16 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: CloseWindow
       objectReference: {fileID: 0}
+    - target: {fileID: 5467777076085632748, guid: d05c85390a1d52741b0c2d0b6fc10377,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1800434377}
+    - target: {fileID: 5467777076085632748, guid: d05c85390a1d52741b0c2d0b6fc10377,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: LeaveRoom
+      objectReference: {fileID: 0}
     - target: {fileID: 5723581458983218348, guid: d05c85390a1d52741b0c2d0b6fc10377,
         type: 3}
       propertyPath: m_Name

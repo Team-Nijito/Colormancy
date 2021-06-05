@@ -61865,6 +61865,16 @@ PrefabInstance:
       propertyPath: m_textInfo.characterCount
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5467777076085632748, guid: d05c85390a1d52741b0c2d0b6fc10377,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1816186849}
+    - target: {fileID: 5467777076085632748, guid: d05c85390a1d52741b0c2d0b6fc10377,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: LeaveRoom
+      objectReference: {fileID: 0}
     - target: {fileID: 5723581458983218348, guid: d05c85390a1d52741b0c2d0b6fc10377,
         type: 3}
       propertyPath: m_Name
@@ -78461,6 +78471,18 @@ PrefabInstance:
       objectReference: {fileID: 1543153881}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a2874b7c33b663f47add06323276b963, type: 3}
+--- !u!114 &1816186849 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7917960859537667781, guid: a2874b7c33b663f47add06323276b963,
+    type: 3}
+  m_PrefabInstance: {fileID: 1816186848}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb2c5d223d05c594aa301b88e90de702, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1819598094
 PrefabInstance:
   m_ObjectHideFlags: 0
