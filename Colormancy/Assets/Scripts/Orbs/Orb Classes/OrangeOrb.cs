@@ -14,12 +14,20 @@ public class OrangeOrb : Orb
 
     public override void AddHeldEffect(GameObject player)
     {
+        SpellManager spell = player.GetComponent<SpellManager>();
+        spell.AddCooldownMultiplier(-OrbValueManager.getHoldIncreaseValue(m_OrbElement));
 
+        HealthScript health = player.GetComponent<HealthScript>();
+        health.AlterArmorValueAdditive(-OrbValueManager.getHoldDecreaseValue(m_OrbElement));
     }
 
     public override void RevertHeldEffect(GameObject player)
     {
+        SpellManager spell = player.GetComponent<SpellManager>();
+        spell.AddCooldownMultiplier(OrbValueManager.getHoldDecreaseValue(m_OrbElement));
 
+        HealthScript health = player.GetComponent<HealthScript>();
+        health.AlterArmorValueAdditive(OrbValueManager.getHoldDecreaseValue(m_OrbElement));
     }
 
     public override void CastGreaterEffect(GameObject hit, float spellEffectMod, float[] data)

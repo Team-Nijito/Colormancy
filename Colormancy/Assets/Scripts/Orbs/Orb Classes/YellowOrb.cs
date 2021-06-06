@@ -15,7 +15,7 @@ public class YellowOrb : Orb
 
     public override void AddHeldEffect(GameObject player)
     {
-
+        StatusEffectScript status
     }
 
     public override void RevertHeldEffect(GameObject player)

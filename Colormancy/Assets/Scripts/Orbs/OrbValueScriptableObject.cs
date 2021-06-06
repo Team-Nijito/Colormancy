@@ -29,4 +29,6 @@ public class OrbValueScriptableObject : ScriptableObject
     public float m_ShapeManaMod;
     [Range(1, 3)]
     public int m_Level;
+    public float m_HoldIncreaseValue;
+    public float m_HoldDecreaseValue;
 }

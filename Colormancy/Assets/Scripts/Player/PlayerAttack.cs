@@ -92,7 +92,7 @@ public class PlayerAttack : MonoBehaviourPun
         m_attackMultiplier += multiplier / 100f;
     }
 
-    public void AddAttackSpeedMultplier(float multiplier)
+    public void AddAttackSpeedMultiplier(float multiplier)
     {
         m_attackSpeedMultiplier += multiplier / 100f;
     }

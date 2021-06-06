@@ -17,11 +17,11 @@ public class SpellManager : MonoBehaviourPun
 
         Orb[] orbs;
 
-        public Spell(Orb[] _orbs)
+        public Spell(Orb[] _orbs, float cooldownMultiplier)
         {
             orbs = _orbs;
             
-            SpellCooldown = BASE_COOLDOWN * OrbValueManager.getCooldownMod(orbs[2].getElement());
+            SpellCooldown = BASE_COOLDOWN * OrbValueManager.getCooldownMod(orbs[2].getElement()) * cooldownMultiplier;
             SpellManaCost = BASE_SPELL_MANA * OrbValueManager.getShapeManaMod(orbs[2].getElement());
             OrbTuple = (orbs[0].GetType(), orbs[1].GetType(), orbs[2].GetType());
         }
@@ -72,12 +72,20 @@ public class SpellManager : MonoBehaviourPun
 
     public Orb FirstOrb { get; private set; }
 
+    private float m_cooldownMultiplier = 1f;
+    
+    public void AddCooldownMultiplier(float percentage)
+    {
+        if (m_cooldownMultiplier + percentage <= 0)
+            return;
+
+        m_cooldownMultiplier += percentage;
+    }
+
     public Spell AddOrb(Orb orb)
     {
         if (photonView.IsMine && PhotonNetwork.IsConnected)
         {
-            FirstOrb = orb;
-
             if (FirstOrb != null)
             {
                 FirstOrb.RevertHeldEffect(gameObject);
@@ -115,7 +123,7 @@ public class SpellManager : MonoBehaviourPun
             Orb[] spellOrbs = new Orb[] { currentSpellOrbs[currentSpellOrbs.Count - 1], currentSpellOrbs[currentSpellOrbs.Count - 2], currentSpellOrbs[currentSpellOrbs.Count - 3] };
 
             //Create and return new spell from orbs
-            spell = new Spell(spellOrbs);
+            spell = new Spell(spellOrbs, m_cooldownMultiplier);
             return true;
         }
         else

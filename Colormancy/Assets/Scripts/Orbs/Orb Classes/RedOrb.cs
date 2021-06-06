@@ -15,12 +15,20 @@ public class RedOrb : Orb
 
     public override void AddHeldEffect(GameObject player)
     {
+        PlayerAttack attack = player.GetComponent<PlayerAttack>();
+        attack.AddAttackSpeedMultiplier(OrbValueManager.getHoldIncreaseValue(m_OrbElement));
 
+        SpellManager spell = player.GetComponent<SpellManager>();
+        spell.AddCooldownMultiplier(OrbValueManager.getHoldDecreaseValue(m_OrbElement));
     }
 
     public override void RevertHeldEffect(GameObject player)
     {
+        PlayerAttack attack = player.GetComponent<PlayerAttack>();
+        attack.AddAttackSpeedMultiplier(-OrbValueManager.getHoldIncreaseValue(m_OrbElement));
 
+        SpellManager spell = player.GetComponent<SpellManager>();
+        spell.AddCooldownMultiplier(-OrbValueManager.getHoldDecreaseValue(m_OrbElement));
     }
 
     public override void CastGreaterEffect(GameObject hit, float spellEffectMod, float[] data)
