@@ -19,16 +19,11 @@ public class VioletSpellSphereController : MonoBehaviour
         Rigidbody rb = GetComponent<Rigidbody>();
 
         Vector3 direction = new Vector3(endPosition.x - transform.position.x, 0, endPosition.z - transform.position.z);
-        float dx = direction.magnitude;
-        float dy = maxHeight - endPosition.y;
 
-        Vector3 yComponent = Vector3.up * Mathf.Sqrt(-2f * -9.81f * (maxHeight - transform.position.y));
+        Vector3 yComponent = Vector3.up;
+        Vector3 xComponent = direction.normalized;
 
-        float tx1 = -yComponent.y / -9.81f;
-        float tx2 = Mathf.Sqrt(2 * -dy / -9.81f);
-        Vector3 xComponent = direction.normalized * (dx / (tx1 + tx2));
-
-        rb.velocity = xComponent + yComponent;
+        rb.velocity = (xComponent + yComponent) * 5; // placeholder value until implementation
     }
 
     private void Update()
