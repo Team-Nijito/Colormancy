@@ -13,16 +13,18 @@ public class SpellManager : MonoBehaviourPun
 
         float SpellCooldown;
         float SpellManaCost;
+        float SpellDmgMultiplier;
         (System.Type, System.Type, System.Type) OrbTuple;
 
         Orb[] orbs;
 
-        public Spell(Orb[] _orbs, float cooldownMultiplier)
+        public Spell(Orb[] _orbs, float cooldownMultiplier, float damageMultiplier)
         {
             orbs = _orbs;
             
             SpellCooldown = BASE_COOLDOWN * OrbValueManager.getCooldownMod(orbs[2].getElement()) * cooldownMultiplier;
             SpellManaCost = BASE_SPELL_MANA * OrbValueManager.getShapeManaMod(orbs[2].getElement());
+            SpellDmgMultiplier = damageMultiplier;
             OrbTuple = (orbs[0].GetType(), orbs[1].GetType(), orbs[2].GetType());
         }
 
@@ -45,8 +47,9 @@ public class SpellManager : MonoBehaviourPun
             }
 
             status.RPCClearStatusEffect(StatusEffect.StatusType.ManaRegeneration);
+            status.RPCClearStatusEffect(StatusEffect.StatusType.AmplifySpell);
 
-            orbs[2].CastShape(orbs[0].CastGreaterEffect, orbs[1].CastLesserEffect, t, clickedPosition);
+            orbs[2].CastShape(orbs[0].CastGreaterEffect, orbs[1].CastLesserEffect, t, clickedPosition, SpellDmgMultiplier);
         }
 
         public float GetSpellCooldown()
@@ -73,13 +76,22 @@ public class SpellManager : MonoBehaviourPun
     public Orb FirstOrb { get; private set; }
 
     private float m_cooldownMultiplier = 1f;
+    private float m_damageMultiplier = 1f;
     
     public void AddCooldownMultiplier(float percentage)
     {
-        if (m_cooldownMultiplier + percentage <= 0)
+        if (m_cooldownMultiplier + percentage / 100 <= 0)
             return;
 
-        m_cooldownMultiplier += percentage;
+        m_cooldownMultiplier += percentage / 100;
+    }
+
+    public void AddDamageMultiplier(float percentage)
+    {
+        if (m_damageMultiplier + percentage / 100 <= 0)
+            return;
+
+        m_damageMultiplier += percentage / 100;
     }
 
     public Spell AddOrb(Orb orb)
@@ -123,7 +135,7 @@ public class SpellManager : MonoBehaviourPun
             Orb[] spellOrbs = new Orb[] { currentSpellOrbs[currentSpellOrbs.Count - 1], currentSpellOrbs[currentSpellOrbs.Count - 2], currentSpellOrbs[currentSpellOrbs.Count - 3] };
 
             //Create and return new spell from orbs
-            spell = new Spell(spellOrbs, m_cooldownMultiplier);
+            spell = new Spell(spellOrbs, m_cooldownMultiplier, m_damageMultiplier);
             return true;
         }
         else

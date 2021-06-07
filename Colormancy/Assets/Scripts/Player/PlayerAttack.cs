@@ -17,6 +17,7 @@ public class PlayerAttack : MonoBehaviourPun
     private float m_attackMultiplier = 1f;
 
     private bool m_poisonedAttack = false;
+    private float m_poisonedAttackDamage = 0;
     private float m_poisonedAttackDuration = 0;
 
     //[SerializeField]
@@ -97,9 +98,10 @@ public class PlayerAttack : MonoBehaviourPun
         m_attackSpeedMultiplier += multiplier / 100f;
     }
 
-    public void SetPoisonedAttack(bool isPoisoned, float duration)
+    public void SetPoisonedAttack(bool isPoisoned, float damage, float duration)
     {
         m_poisonedAttack = isPoisoned;
+        m_poisonedAttackDamage = damage;
         m_poisonedAttackDuration = duration;
     }
 
@@ -140,6 +142,7 @@ public class PlayerAttack : MonoBehaviourPun
         controller.attackDamage = m_attackDamage;
         controller.attackMultiplier = m_attackMultiplier;
         controller.poisonedAttack = m_poisonedAttack;
+        controller.poisonedAttackDamage = m_poisonedAttackDamage;
         controller.poisonedAttackDuration = m_poisonedAttackDuration;
     }
 }

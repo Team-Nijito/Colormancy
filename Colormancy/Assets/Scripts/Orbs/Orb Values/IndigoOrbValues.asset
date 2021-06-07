@@ -25,9 +25,9 @@ MonoBehaviour:
     m_Level2: 2
     m_Level3: 3
   m_LesserEffectValue:
-    m_Level1: 1.2
-    m_Level2: 1.4
-    m_Level3: 1.5
+    m_Level1: 30
+    m_Level2: 40
+    m_Level3: 50
   m_LesserEffectDuration:
     m_Level1: 0
     m_Level2: 0
@@ -36,3 +36,5 @@ MonoBehaviour:
   m_CooldownMod: 1.4
   m_ShapeManaMod: 1.2
   m_Level: 0
+  m_HoldIncreaseValue: 50
+  m_HoldDecreaseValue: 20

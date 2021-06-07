@@ -49,7 +49,7 @@ public class OrangeOrb : Orb
         photonView.RPC("ReduceAllCooldowns", RpcTarget.All, OrbValueManager.getLesserEffectValue(m_OrbElement, m_Level));
     }
 
-    public override void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, Transform t, Vector3 clickedPosition)
+    public override void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, Transform t, Vector3 clickedPosition, float spellDamageMultiplier)
     {
         // get the wizard rotation
         Transform wizard = t.GetChild(0);
@@ -62,7 +62,7 @@ public class OrangeOrb : Orb
 
         spellController.greaterCast = greaterEffectMethod;
         spellController.lesserCast = lesserEffectMethod;
-        spellController.spellEffectMod = OrbValueManager.getShapeEffectMod(m_OrbElement);
+        spellController.spellEffectMod = OrbValueManager.getShapeEffectMod(m_OrbElement) * spellDamageMultiplier;
     }
 
     public static object Deserialize(byte[] data)

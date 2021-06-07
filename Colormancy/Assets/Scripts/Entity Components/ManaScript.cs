@@ -91,6 +91,17 @@ public class ManaScript : MonoBehaviour, IPunObservable
     }
 
     [PunRPC]
+    public void ChangeManaRegeneration(bool increase, float percentage)
+    {
+        float ratio = (100 + percentage) / 100;
+
+        if (increase)
+            m_regenManaPercentage *= ratio;
+        else
+            m_regenManaPercentage /= ratio;
+    }
+
+    [PunRPC]
     public void ConsumeMana(float value)
     {
         // damage formula

@@ -63,7 +63,7 @@ public class RedOrb : Orb
         status.RPCApplyStatus(StatusEffect.StatusType.AutoAttackIncreasedSpeed, OrbValueManager.getLesserEffectDuration(m_OrbElement, m_Level), 0, 50);
     }
 
-    public override void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, Transform t, Vector3 clickedPosition)
+    public override void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, Transform t, Vector3 clickedPosition, float spellDamageMultiplier)
     {
         Transform wizard = t.GetChild(0);
 
@@ -75,7 +75,7 @@ public class RedOrb : Orb
 
         spellController.greaterCast = greaterEffectMethod;
         spellController.lesserCast = lesserEffectMethod;
-        spellController.spellEffectMod = OrbValueManager.getShapeEffectMod(m_OrbElement);
+        spellController.spellEffectMod = OrbValueManager.getShapeEffectMod(m_OrbElement) * spellDamageMultiplier;
 
         spellController.endPosition = clickedPosition + Vector3.up * 1.6f;
         spellController.playerTransform = t;
