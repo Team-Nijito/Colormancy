@@ -36,3 +36,5 @@ MonoBehaviour:
   m_CooldownMod: 0.6
   m_ShapeManaMod: 0.85
   m_Level: 1
+  m_HoldIncreaseValue: 100
+  m_HoldDecreaseValue: 20

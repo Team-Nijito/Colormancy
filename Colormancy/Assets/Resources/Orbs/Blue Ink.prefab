@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 7684320979166435152}
   - component: {fileID: 6213449562181368822}
   - component: {fileID: 8815784603813654845}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: Blue Ink
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -95,7 +95,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lifetime: 3
   spherePaintRadius: 2
-  paintColor: {r: 0.050980397, g: 0.21568629, b: 0.6313726, a: 0}
   debug: 0
 --- !u!65 &8815784603813654845
 BoxCollider:
@@ -105,8 +104,8 @@ BoxCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8188895730143049349}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 2.904789, y: 0.507066, z: 2.721666}
-  m_Center: {x: 0.06526679, y: 0, z: -0.046578288}
+  m_Size: {x: 2.904789, y: 0.87197685, z: 2.721666}
+  m_Center: {x: 0.06526685, y: 0.18245542, z: -0.046578288}

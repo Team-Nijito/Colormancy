@@ -13,24 +13,28 @@ public class SpellManager : MonoBehaviourPun
 
         float SpellCooldown;
         float SpellManaCost;
+        float SpellDmgMultiplier;
         (System.Type, System.Type, System.Type) OrbTuple;
 
         Orb[] orbs;
 
-
-        public Spell(Orb[] _orbs)
+        public Spell(Orb[] _orbs, float cooldownMultiplier, float damageMultiplier)
         {
             orbs = _orbs;
             
-            SpellCooldown = BASE_COOLDOWN * OrbValueManager.getCooldownMod(orbs[2].getElement());
+            SpellCooldown = BASE_COOLDOWN * OrbValueManager.getCooldownMod(orbs[2].getElement()) * cooldownMultiplier;
             SpellManaCost = BASE_SPELL_MANA * OrbValueManager.getShapeManaMod(orbs[2].getElement());
+            SpellDmgMultiplier = damageMultiplier;
             OrbTuple = (orbs[0].GetType(), orbs[1].GetType(), orbs[2].GetType());
         }
 
         public void Cast(Transform t, Vector3 clickedPosition)
         {
+            StatusEffectScript status = t.gameObject.GetComponent<StatusEffectScript>();
+            status = t.gameObject.GetComponent<StatusEffectScript>();
+
             // exception for quicksilver
-            if(orbs[0].getElement() == Orb.Element.Wind)
+            if (orbs[0].getElement() == Orb.Element.Wind)
             {
                 GameObject storm = Instantiate(Resources.Load("Orbs/QuickSilver Storm"), t.position, t.rotation) as GameObject;
                 QuickSilverStormController g = storm.GetComponent<QuickSilverStormController>();
@@ -39,11 +43,13 @@ public class SpellManager : MonoBehaviourPun
             // exception for red
             if(orbs[2].getElement() != Orb.Element.Wrath)
             {
-                StatusEffectScript status = t.gameObject.GetComponent<StatusEffectScript>();
                 status.RPCClearStatusEffect(StatusEffect.StatusType.AutoAttackIncreasedSpeed);
             }
 
-            orbs[2].CastShape(orbs[0].CastGreaterEffect, orbs[1].CastLesserEffect, t, clickedPosition);
+            status.RPCClearStatusEffect(StatusEffect.StatusType.ManaRegeneration);
+            status.RPCClearStatusEffect(StatusEffect.StatusType.AmplifySpell);
+
+            orbs[2].CastShape(orbs[0].CastGreaterEffect, orbs[1].CastLesserEffect, t, clickedPosition, SpellDmgMultiplier);
         }
 
         public float GetSpellCooldown()
@@ -69,11 +75,35 @@ public class SpellManager : MonoBehaviourPun
 
     public Orb FirstOrb { get; private set; }
 
+    private float m_cooldownMultiplier = 1f;
+    private float m_damageMultiplier = 1f;
+    
+    public void AddCooldownMultiplier(float percentage)
+    {
+        if (m_cooldownMultiplier + percentage / 100 <= 0)
+            return;
+
+        m_cooldownMultiplier += percentage / 100;
+    }
+
+    public void AddDamageMultiplier(float percentage)
+    {
+        if (m_damageMultiplier + percentage / 100 <= 0)
+            return;
+
+        m_damageMultiplier += percentage / 100;
+    }
+
     public Spell AddOrb(Orb orb)
     {
         if (photonView.IsMine && PhotonNetwork.IsConnected)
         {
+            if (FirstOrb != null)
+            {
+                FirstOrb.RevertHeldEffect(gameObject);
+            }
             FirstOrb = orb;
+            FirstOrb.AddHeldEffect(gameObject);
 
             uiController.AddOrb(orb);
         }
@@ -105,7 +135,7 @@ public class SpellManager : MonoBehaviourPun
             Orb[] spellOrbs = new Orb[] { currentSpellOrbs[currentSpellOrbs.Count - 1], currentSpellOrbs[currentSpellOrbs.Count - 2], currentSpellOrbs[currentSpellOrbs.Count - 3] };
 
             //Create and return new spell from orbs
-            spell = new Spell(spellOrbs);
+            spell = new Spell(spellOrbs, m_cooldownMultiplier, m_damageMultiplier);
             return true;
         }
         else

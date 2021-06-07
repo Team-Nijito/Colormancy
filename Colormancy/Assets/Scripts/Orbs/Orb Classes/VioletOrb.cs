@@ -13,6 +13,18 @@ public class VioletOrb : Orb
         m_UIPrefab = (GameObject)Resources.Load("Orbs/VioletOrbUI");
     }
 
+    public override void AddHeldEffect(GameObject player)
+    {
+        PlayerAttack attack = player.GetComponent<PlayerAttack>();
+        attack.SetPoisonedAttack(true, OrbValueManager.getHoldIncreaseValue(m_OrbElement), 5);
+    }
+
+    public override void RevertHeldEffect(GameObject player)
+    {
+        PlayerAttack attack = player.GetComponent<PlayerAttack>();
+        attack.SetPoisonedAttack(false, 0, 0);
+    }
+
     public override void CastGreaterEffect(GameObject hit, float spellEffectMod, float[] data)
     {
         float dmgMultiplier = 1;
@@ -27,10 +39,11 @@ public class VioletOrb : Orb
 
     public override void CastLesserEffect(GameObject hit, float spellEffectMod, float[] data)
     {
-        throw new System.NotImplementedException();
+        StatusEffectScript status = hit.GetComponent<StatusEffectScript>();
+        status.RPCApplyStatus(StatusEffect.StatusType.AutoAttackPoison, OrbValueManager.getLesserEffectDuration(m_OrbElement, m_Level));
     }
 
-    public override void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, Transform t, Vector3 clickedPosition)
+    public override void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, Transform t, Vector3 clickedPosition, float spellDamageMultiplier)
     {
         Vector3 direction = clickedPosition - t.position;
 
@@ -39,7 +52,7 @@ public class VioletOrb : Orb
 
         spellController.greaterCast = greaterEffectMethod;
         spellController.lesserCast = lesserEffectMethod;
-        spellController.spellEffectMod = OrbValueManager.getShapeEffectMod(m_OrbElement);
+        spellController.spellEffectMod = OrbValueManager.getShapeEffectMod(m_OrbElement) * spellDamageMultiplier;
 
         spellController.endPosition = clickedPosition;
     }

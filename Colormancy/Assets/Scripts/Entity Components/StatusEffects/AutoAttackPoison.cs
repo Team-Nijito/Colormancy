@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class AutoAttackIncreasedSpeed : StatusEffect
+public class AutoAttackPoison : StatusEffect
 {
     /// <summary>
     /// The blind status effect blinds players by making a black screen appear and players cannot see their environment.
@@ -34,14 +34,14 @@ public class AutoAttackIncreasedSpeed : StatusEffect
 
     #region Functions
 
-    public AutoAttackIncreasedSpeed(List<StatusEffect> parentList, StatusType type, float duration, string source, float value, PlayerAttack playerAttack)
+    public AutoAttackPoison(List<StatusEffect> parentList, StatusType type, float duration, string source, PlayerAttack playerAttack)
                  : base(parentList, type, duration, source)
     {
         m_isPlayer = true;
 
-        m_increaseValue = value;
+        m_duration = duration;
         m_playerAttack = playerAttack;
-        m_playerAttack.AddAttackSpeedMultiplier(m_increaseValue);
+        m_playerAttack.SetPoisonedAttack(true, OrbValueManager.getShapeEffectMod(Orb.Element.Poison) * OrbValueManager.getGreaterEffectDamage(Orb.Element.Poison, 1), m_duration);
     }
 
     /// <summary>
@@ -54,13 +54,8 @@ public class AutoAttackIncreasedSpeed : StatusEffect
     /// </summary>
     public override void Stop()
     {
-        m_playerAttack.AddAttackSpeedMultiplier(-m_increaseValue);
+        m_playerAttack.SetPoisonedAttack(false, 0, 0);
         base.Stop();
-    }
-
-    public override void Update()
-    {
-        // do nothing
     }
 
     #endregion

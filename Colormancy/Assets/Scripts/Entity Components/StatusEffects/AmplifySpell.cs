@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class AutoAttackIncreasedSpeed : StatusEffect
+public class AmplifySpell : StatusEffect
 {
     /// <summary>
     /// The blind status effect blinds players by making a black screen appear and players cannot see their environment.
@@ -21,27 +21,28 @@ public class AutoAttackIncreasedSpeed : StatusEffect
 
     #region Player variables
 
-    protected GameObject m_blindPanel;
+    protected SpellManager m_spellManager;
 
     #endregion
 
     #region variables
 
     protected PlayerAttack m_playerAttack;
-    protected float m_increaseValue;
+    public float m_increaseValue;
 
     #endregion
 
     #region Functions
 
-    public AutoAttackIncreasedSpeed(List<StatusEffect> parentList, StatusType type, float duration, string source, float value, PlayerAttack playerAttack)
+    public AmplifySpell(List<StatusEffect> parentList, StatusType type, float duration, string source, float value, SpellManager spellManager)
                  : base(parentList, type, duration, source)
     {
         m_isPlayer = true;
 
         m_increaseValue = value;
-        m_playerAttack = playerAttack;
-        m_playerAttack.AddAttackSpeedMultiplier(m_increaseValue);
+
+        m_spellManager = spellManager;
+        m_spellManager.AddDamageMultiplier(m_increaseValue);
     }
 
     /// <summary>
@@ -49,18 +50,16 @@ public class AutoAttackIncreasedSpeed : StatusEffect
     /// </summary>
     public override void DoStatusEffect() { }
 
+    public override void Update() { }
+
     /// <summary>
     /// Remove this StatusEffect from a list of status effects, and reverts the blind.
     /// </summary>
     public override void Stop()
     {
-        m_playerAttack.AddAttackSpeedMultiplier(-m_increaseValue);
-        base.Stop();
-    }
+        m_spellManager.AddDamageMultiplier(-m_increaseValue);
 
-    public override void Update()
-    {
-        // do nothing
+        base.Stop();
     }
 
     #endregion

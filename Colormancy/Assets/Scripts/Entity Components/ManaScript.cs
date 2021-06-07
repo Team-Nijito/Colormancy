@@ -75,6 +75,7 @@ public class ManaScript : MonoBehaviour, IPunObservable
 
     public float GetMaxEffectiveMana() { return m_maxEffectiveMana; }
     public float GetEffectiveMana() { return m_effectiveMana; }
+    public float GetManaRegen() { return m_regenManaPercentage; }
 
     [PunRPC]
     public void RecoverMana(float value)
@@ -87,6 +88,17 @@ public class ManaScript : MonoBehaviour, IPunObservable
             throw new ArgumentException(string.Format("{0} should be greater than zero", value), "value");
         }
         m_effectiveMana = m_effectiveMana > m_maxEffectiveMana ? m_maxEffectiveMana : m_effectiveMana + value;
+    }
+
+    [PunRPC]
+    public void ChangeManaRegeneration(bool increase, float percentage)
+    {
+        float ratio = (100 + percentage) / 100;
+
+        if (increase)
+            m_regenManaPercentage *= ratio;
+        else
+            m_regenManaPercentage /= ratio;
     }
 
     [PunRPC]

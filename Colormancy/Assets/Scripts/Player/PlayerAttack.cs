@@ -26,6 +26,10 @@ public class PlayerAttack : MonoBehaviourPun
     private GameObject m_playerCharacter;
     private PlayerMouse m_pmouseScript;
 
+    bool m_poisonedAttack;
+    float m_poisonedAttackDamage;
+    float m_poisonedAttackDuration;
+
     #endregion
 
     #region Monobehaviour callbacks
@@ -49,23 +53,6 @@ public class PlayerAttack : MonoBehaviourPun
         }
     }
 
-    #endregion
-
-    #region Functions
-    
-    /// <summary>
-    /// Sets attack multiplier, but percentage based.
-    /// </summary>
-    public void AddAttackMultiplier(float multiplier)
-    {
-        m_attackMultiplier += multiplier / 100f;
-    }
-
-    public void AddAttackSpeedMultplier(float multiplier)
-    {
-        m_attackSpeedMultiplier += multiplier / 100f;
-    }
-
     /// <summary>
     /// This function is mainly used to communicate to the player animation if an attack is ready or not, and if it is, then trigger the anim.
     /// </summary>
@@ -83,6 +70,26 @@ public class PlayerAttack : MonoBehaviourPun
     {
         // random color for testing
         m_paintColor = new Color(inputColor.x, inputColor.y, inputColor.z);
+    }
+
+    /// <summary>
+    /// Sets attack multiplier, but percentage based.
+    /// </summary>
+    public void AddAttackMultiplier(float multiplier)
+    {
+        m_attackMultiplier += multiplier / 100f;
+    }
+
+    public void AddAttackSpeedMultiplier(float multiplier)
+    {
+        m_attackSpeedMultiplier += multiplier / 100f;
+    }
+
+    public void SetPoisonedAttack(bool isPoisoned, float damage, float duration)
+    {
+        m_poisonedAttack = isPoisoned;
+        m_poisonedAttackDamage = damage;
+        m_poisonedAttackDuration = duration;
     }
 
     [PunRPC]
@@ -121,6 +128,9 @@ public class PlayerAttack : MonoBehaviourPun
         controller.playerColor = m_paintColor;
         controller.attackDamage = m_attackDamage;
         controller.attackMultiplier = m_attackMultiplier;
+        controller.poisonedAttack = m_poisonedAttack;
+        controller.poisonedAttackDamage = m_poisonedAttackDamage;
+        controller.poisonedAttackDuration = m_poisonedAttackDuration;
     }
 
     #endregion

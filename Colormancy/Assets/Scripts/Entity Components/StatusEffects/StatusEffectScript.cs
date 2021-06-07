@@ -148,20 +148,19 @@ public class StatusEffectScript : MonoBehaviourPun
 
             if (effect.StatusEffectType == StatusEffect.StatusType.DamageOverTime)
             {
-                // if the StatusType is DamageOverTime, then
-                // add this damage this DoT incurs per tick to the cumulative damage per tick
-                // UPDATE: now works with tick intervals
                 DamageOverTime DoT = (DamageOverTime)effect;
                 m_cumulativeDamage += DoT.Damage;
             }
             if (effect.StatusEffectType == StatusEffect.StatusType.Rejuvenation)
             {
-                // if the StatusType is DamageOverTime, then
-                // add this damage this DoT incurs per tick to the cumulative damage per tick
-                // UPDATE: now works with tick intervals
                 Rejuvenation rej = (Rejuvenation)effect;
                 m_cumulativeDamage -= rej.Damage;
                 m_cumulativeMana += rej.Mana;
+            }
+            if (effect.StatusEffectType == StatusEffect.StatusType.ManaRegeneration)
+            {
+                ManaRegeneration manaReg = (ManaRegeneration)effect;
+                m_cumulativeMana += manaReg.Mana * Time.deltaTime;
             }
         }
     }
@@ -244,6 +243,30 @@ public class StatusEffectScript : MonoBehaviourPun
                         newStatusEffect = new Rejuvenation(m_statusEffects, type, duration, source, value, secondsPerTick, m_health, m_mana);
                     else
                         throw new System.Exception("Cannot currently apply Rejuvenation on enemies.");
+
+                    m_statusEffects.Add(newStatusEffect);
+                    break;
+                case StatusEffect.StatusType.ManaRegeneration:
+                    if (m_isPlayer)
+                        newStatusEffect = new ManaRegeneration(m_statusEffects, type, duration, source, value, m_mana);
+                    else
+                        throw new System.Exception("Cannot currently apply ManaRegeneration on enemies.");
+
+                    m_statusEffects.Add(newStatusEffect);
+                    break;
+                case StatusEffect.StatusType.AutoAttackPoison:
+                    if (m_isPlayer)
+                        newStatusEffect = new AutoAttackPoison(m_statusEffects, type, duration, source, m_playerAttack);
+                    else
+                        throw new System.Exception("Cannot currently apply AutoAttackPoison on enemies.");
+
+                    m_statusEffects.Add(newStatusEffect);
+                    break;
+                case StatusEffect.StatusType.MovementIncreaseSpeed:
+                    if (m_isPlayer)
+                        newStatusEffect = new MovementIncreaseSpeed(m_statusEffects, type, duration, source, value, m_playerMovement);
+                    else
+                        throw new System.Exception("Cannot currently apply MovementIncreaseSpeed on enemies.");
 
                     m_statusEffects.Add(newStatusEffect);
                     break;

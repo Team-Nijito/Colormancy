@@ -12,6 +12,24 @@ public class OrangeOrb : Orb
         m_UIPrefab = (GameObject)Resources.Load("Orbs/OrangeOrbUI");
     }
 
+    public override void AddHeldEffect(GameObject player)
+    {
+        SpellManager spell = player.GetComponent<SpellManager>();
+        spell.AddCooldownMultiplier(-OrbValueManager.getHoldIncreaseValue(m_OrbElement));
+
+        HealthScript health = player.GetComponent<HealthScript>();
+        health.AlterArmorValueAdditive(-OrbValueManager.getHoldDecreaseValue(m_OrbElement));
+    }
+
+    public override void RevertHeldEffect(GameObject player)
+    {
+        SpellManager spell = player.GetComponent<SpellManager>();
+        spell.AddCooldownMultiplier(OrbValueManager.getHoldDecreaseValue(m_OrbElement));
+
+        HealthScript health = player.GetComponent<HealthScript>();
+        health.AlterArmorValueAdditive(OrbValueManager.getHoldDecreaseValue(m_OrbElement));
+    }
+
     public override void CastGreaterEffect(GameObject hit, float spellEffectMod, float[] data)
     {
         float dmgMultiplier = 1;
@@ -31,7 +49,7 @@ public class OrangeOrb : Orb
         photonView.RPC("ReduceAllCooldowns", RpcTarget.All, OrbValueManager.getLesserEffectValue(m_OrbElement, m_Level));
     }
 
-    public override void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, Transform t, Vector3 clickedPosition)
+    public override void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, Transform t, Vector3 clickedPosition, float spellDamageMultiplier)
     {
         // get the wizard rotation
         Transform wizard = t.GetChild(0);
@@ -44,7 +62,7 @@ public class OrangeOrb : Orb
 
         spellController.greaterCast = greaterEffectMethod;
         spellController.lesserCast = lesserEffectMethod;
-        spellController.spellEffectMod = OrbValueManager.getShapeEffectMod(m_OrbElement);
+        spellController.spellEffectMod = OrbValueManager.getShapeEffectMod(m_OrbElement) * spellDamageMultiplier;
     }
 
     public static object Deserialize(byte[] data)

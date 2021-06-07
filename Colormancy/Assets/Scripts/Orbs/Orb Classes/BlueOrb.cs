@@ -12,6 +12,24 @@ public class BlueOrb : Orb
         m_UIPrefab = (GameObject)Resources.Load("Orbs/BlueOrbUI");
     }
 
+    public override void AddHeldEffect(GameObject player)
+    {
+        PhotonView photonView = player.GetPhotonView();
+        photonView.RPC("ChangeManaRegeneration", RpcTarget.All, true, OrbValueManager.getHoldIncreaseValue(m_OrbElement));
+
+        SpellManager spell = player.GetComponent<SpellManager>();
+        spell.AddDamageMultiplier(-OrbValueManager.getHoldDecreaseValue(m_OrbElement));
+    }
+
+    public override void RevertHeldEffect(GameObject player)
+    {
+        PhotonView photonView = player.GetPhotonView();
+        photonView.RPC("ChangeManaRegeneration", RpcTarget.All, false, OrbValueManager.getHoldIncreaseValue(m_OrbElement));
+
+        SpellManager spell = player.GetComponent<SpellManager>();
+        spell.AddDamageMultiplier(OrbValueManager.getHoldDecreaseValue(m_OrbElement));
+    }
+
     public override void CastGreaterEffect(GameObject hit, float spellEffectMod, float[] data)
     {
         float dmgMultiplier = 1;
@@ -27,18 +45,18 @@ public class BlueOrb : Orb
 
     public override void CastLesserEffect(GameObject hit, float spellEffectMod, float[] data)
     {
-        PhotonView photonView = hit.GetPhotonView();
-        // photonView.RPC("ManaRegeneration", RpcTarget.All, OrbValueManager.getLesserEffectValue(m_OrbElement, m_Level));
+        StatusEffectScript status = hit.GetComponent<StatusEffectScript>();
+        status.RPCApplyStatus(StatusEffect.StatusType.ManaRegeneration, 0, 0, OrbValueManager.getLesserEffectValue(m_OrbElement, m_Level));
     }
 
-    public override void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, Transform t, Vector3 clickedPosition)
+    public override void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, Transform t, Vector3 clickedPosition, float spellDamageMultiplier)
     {
         GameObject g = GameObject.Instantiate(Resources.Load("Orbs/Blue Puddle Spawner"), t.position, t.rotation) as GameObject;
         BlueSpellSpawnerController spellController = g.GetComponent<BlueSpellSpawnerController>();
 
         spellController.greaterCast = greaterEffectMethod;
         spellController.lesserCast = lesserEffectMethod;
-        spellController.spellEffectMod = OrbValueManager.getShapeEffectMod(m_OrbElement);
+        spellController.spellEffectMod = OrbValueManager.getShapeEffectMod(m_OrbElement) * spellDamageMultiplier;
 
         spellController.playerTransform = t;
     }

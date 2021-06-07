@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1791146730809640878}
   - component: {fileID: 3988511364736666334}
   - component: {fileID: 4826031847823737912}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: Bolt
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -92,7 +92,7 @@ GameObject:
   - component: {fileID: 7931388508879284469}
   - component: {fileID: -7284652041016407744}
   - component: {fileID: 524532843658940769}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: QuickSilver Bolt
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -125,7 +125,7 @@ CapsuleCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7120360346188010913}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   m_Radius: 0
   m_Height: 9
@@ -143,8 +143,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f9d267cfd5fffef47921c23ca2390983, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  greaterCastAmt: 0
-  lesserCastAmt: 0
   spellEffectMod: 0
   BoltDisplacementSpeed:
     serializedVersion: 2
@@ -372,8 +370,6 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   lifetime: 1
-  spherePaintRadius: 5
-  paintColor: {r: 0.6037736, g: 0.6037736, b: 0.6037736, a: 0}
   debug: 1
   startAnimation: 0
 --- !u!108 &-7284652041016407744
@@ -464,7 +460,7 @@ GameObject:
   - component: {fileID: 4534132082078166301}
   - component: {fileID: 7678308031232189679}
   - component: {fileID: 2300112124187492994}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: Floor Wave
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -543,7 +539,7 @@ GameObject:
   - component: {fileID: 7931388509410359322}
   - component: {fileID: 7931388509410359327}
   - component: {fileID: 7931388509410359324}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: Contact
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -622,7 +618,7 @@ GameObject:
   - component: {fileID: 7931388510144041886}
   - component: {fileID: 7931388510144041824}
   - component: {fileID: 7931388510144041825}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: Sparks
   m_TagString: Untagged
   m_Icon: {fileID: 0}

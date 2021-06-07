@@ -13,6 +13,24 @@ public class BrownOrb : Orb
         m_UIPrefab = (GameObject)Resources.Load("Orbs/BrownOrbUI");
     }
 
+    public override void AddHeldEffect(GameObject player)
+    {
+        HealthScript health = player.GetComponent<HealthScript>();
+        health.AlterArmorValue(OrbValueManager.getHoldIncreaseValue(m_OrbElement));
+
+        ManaScript mana = player.GetComponent<ManaScript>();
+        mana.ChangeManaRegeneration(false, -OrbValueManager.getHoldDecreaseValue(m_OrbElement));
+    }
+
+    public override void RevertHeldEffect(GameObject player)
+    {
+        HealthScript health = player.GetComponent<HealthScript>();
+        health.AlterArmorValue(-OrbValueManager.getHoldIncreaseValue(m_OrbElement));
+
+        ManaScript mana = player.GetComponent<ManaScript>();
+        mana.ChangeManaRegeneration(true, OrbValueManager.getHoldDecreaseValue(m_OrbElement));
+    }
+
     public override void CastGreaterEffect(GameObject hit, float spellEffectMod, float[] data)
     {
         float dmgMultiplier = 1;
@@ -28,17 +46,20 @@ public class BrownOrb : Orb
 
     public override void CastLesserEffect(GameObject hit, float spellEffectMod, float[] data)
     {
-        throw new System.NotImplementedException();
+        HealthScript health = hit.GetComponent<HealthScript>();
+
+        PhotonView photonView = PhotonView.Get(hit);
+        photonView.RPC("AddShield", RpcTarget.All, OrbValueManager.getLesserEffectValue(m_OrbElement, m_Level) / 100f * health.GetMaxEffectiveHealth());
     }
 
-    public override void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, Transform t, Vector3 clickedPosition)
+    public override void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, Transform t, Vector3 clickedPosition, float spellDamageMultiplier)
     {
         GameObject g = GameObject.Instantiate(Resources.Load("Orbs/Brown Shockwave"), t.position + Vector3.up * 0.03f, t.rotation) as GameObject;
         BrownSpellController spellController = g.GetComponent<BrownSpellController>();
 
         spellController.greaterCast = greaterEffectMethod;
         spellController.lesserCast = lesserEffectMethod;
-        spellController.spellEffectMod = OrbValueManager.getShapeEffectMod(m_OrbElement);
+        spellController.spellEffectMod = OrbValueManager.getShapeEffectMod(m_OrbElement) * spellDamageMultiplier;
     }
 
     public static object Deserialize(byte[] data)

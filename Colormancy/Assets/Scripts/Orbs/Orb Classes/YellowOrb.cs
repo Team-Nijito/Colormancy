@@ -13,6 +13,24 @@ public class YellowOrb : Orb
         m_UIPrefab = (GameObject) Resources.Load("Orbs/YellowOrbUI");
     }
 
+    public override void AddHeldEffect(GameObject player)
+    {
+        PhotonView photonView = PhotonView.Get(player);
+        photonView.RPC("SetRegenHealth", RpcTarget.All, true, (float)OrbValueManager.getHoldIncreaseValue(m_OrbElement));
+
+        PlayerAttack attack = player.GetComponent<PlayerAttack>();
+        attack.AddAttackMultiplier(-OrbValueManager.getHoldDecreaseValue(m_OrbElement));
+    }
+
+    public override void RevertHeldEffect(GameObject player)
+    {
+        PhotonView photonView = PhotonView.Get(player);
+        photonView.RPC("SetRegenHealth", RpcTarget.All, false, 0f);
+
+        PlayerAttack attack = player.GetComponent<PlayerAttack>();
+        attack.AddAttackMultiplier(OrbValueManager.getHoldDecreaseValue(m_OrbElement));
+    }
+
     public override void CastGreaterEffect(GameObject hit, float spellEffectMod, float[] data)
     {
         float dmgMultiplier = 1;
@@ -32,14 +50,14 @@ public class YellowOrb : Orb
         photonView.RPC("Heal", RpcTarget.All, OrbValueManager.getLesserEffectValue(m_OrbElement, m_Level));
     }
 
-    public override void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, Transform t, Vector3 clickedPosition)
+    public override void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, Transform t, Vector3 clickedPosition, float spellDamageMultiplier)
     {
         GameObject g = GameObject.Instantiate(Resources.Load("Orbs/Yellow Orbs"), t.position, t.rotation) as GameObject;
         YellowSpellController spellController = g.GetComponent<YellowSpellController>();
 
         spellController.greaterCast = greaterEffectMethod;
         spellController.lesserCast = lesserEffectMethod;
-        spellController.spellEffectMod = OrbValueManager.getShapeEffectMod(m_OrbElement);
+        spellController.spellEffectMod = OrbValueManager.getShapeEffectMod(m_OrbElement) * spellDamageMultiplier;
 
         spellController.playerTransform = t;
 
