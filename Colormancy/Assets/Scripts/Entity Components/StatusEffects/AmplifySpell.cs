@@ -21,7 +21,7 @@ public class AmplifySpell : StatusEffect
 
     #region Player variables
 
-    protected GameObject m_blindPanel;
+    protected SpellManager m_spellManager;
 
     #endregion
 
@@ -34,12 +34,15 @@ public class AmplifySpell : StatusEffect
 
     #region Functions
 
-    public AmplifySpell(List<StatusEffect> parentList, StatusType type, float duration, string source, float value)
+    public AmplifySpell(List<StatusEffect> parentList, StatusType type, float duration, string source, float value, SpellManager spellManager)
                  : base(parentList, type, duration, source)
     {
         m_isPlayer = true;
 
         m_increaseValue = value;
+
+        m_spellManager = spellManager;
+        m_spellManager.AddDamageMultiplier(m_increaseValue);
     }
 
     /// <summary>
@@ -47,11 +50,15 @@ public class AmplifySpell : StatusEffect
     /// </summary>
     public override void DoStatusEffect() { }
 
+    public override void Update() { }
+
     /// <summary>
     /// Remove this StatusEffect from a list of status effects, and reverts the blind.
     /// </summary>
     public override void Stop()
     {
+        m_spellManager.AddDamageMultiplier(-m_increaseValue);
+
         base.Stop();
     }
 

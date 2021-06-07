@@ -63,6 +63,13 @@ public class OrbValueManager : MonoBehaviour
     {
         return s_instance.debug == true ? s_instance.orbValues.Find(x => x.element == element).m_Level : level;
     }
-
+    public static float getHoldIncreaseValue(Orb.Element element)
+    {
+        return s_instance.orbValues.Find(x => x.element == element).m_HoldIncreaseValue;
+    }
+    public static float getHoldDecreaseValue(Orb.Element element)
+    {
+        return s_instance.orbValues.Find(x => x.element == element).m_HoldDecreaseValue;
+    }
     #endregion
 }

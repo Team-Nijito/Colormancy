@@ -41,7 +41,7 @@ public class AutoAttackIncreasedSpeed : StatusEffect
 
         m_increaseValue = value;
         m_playerAttack = playerAttack;
-        m_playerAttack.AddAttackSpeedMultplier(m_increaseValue);
+        m_playerAttack.AddAttackSpeedMultiplier(m_increaseValue);
     }
 
     /// <summary>
@@ -54,7 +54,7 @@ public class AutoAttackIncreasedSpeed : StatusEffect
     /// </summary>
     public override void Stop()
     {
-        m_playerAttack.AddAttackSpeedMultplier(-m_increaseValue);
+        m_playerAttack.AddAttackSpeedMultiplier(-m_increaseValue);
         base.Stop();
     }
 

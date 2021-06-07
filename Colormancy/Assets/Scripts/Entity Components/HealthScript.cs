@@ -45,6 +45,8 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     [SerializeField]
     private bool m_isRegenHealth = false;
 
+    private float m_healthMultiplier = 1f;
+
     [MyBox.ConditionalField("m_isRegenHealth", false)]
     [SerializeField]
     [Range(0f, 100f)]
@@ -298,6 +300,26 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     public float GetMaxEffectiveHealth() { return m_maxEffectiveHealth; }
     public float GetEffectiveHealth() { return m_effectiveHealth; }
     public float GetArmorPercentage() { return m_armorPercentage; }
+
+    [PunRPC]
+    public void SetRegenHealth(bool regen, float percentage)
+    {
+        m_isRegenHealth = regen;
+        m_regenHealthPercentage = percentage;
+    }
+
+    [PunRPC]
+    public void IncreaseHealth(float percentage)
+    {
+        if (m_healthMultiplier + (percentage / 100) <= 0)
+            throw new ArgumentException(string.Format("{0} shouldn't completely decrease", percentage), "percentage");
+
+        m_healthMultiplier += percentage / 100;
+
+        float healthRatio = m_effectiveHealth / m_maxEffectiveHealth;
+        m_maxEffectiveHealth = m_baseHealth * m_healthMultiplier;
+        m_effectiveHealth = healthRatio * m_maxEffectiveHealth;
+    }
 
     [PunRPC]
     public void AddShield(float shieldHealth)

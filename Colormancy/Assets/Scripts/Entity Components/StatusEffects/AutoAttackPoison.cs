@@ -41,7 +41,7 @@ public class AutoAttackPoison : StatusEffect
 
         m_duration = duration;
         m_playerAttack = playerAttack;
-        m_playerAttack.SetPoisonedAttack(true, m_duration);
+        m_playerAttack.SetPoisonedAttack(true, OrbValueManager.getShapeEffectMod(Orb.Element.Poison) * OrbValueManager.getGreaterEffectDamage(Orb.Element.Poison, 1), m_duration);
     }
 
     /// <summary>
@@ -54,7 +54,7 @@ public class AutoAttackPoison : StatusEffect
     /// </summary>
     public override void Stop()
     {
-        m_playerAttack.SetPoisonedAttack(false, 0);
+        m_playerAttack.SetPoisonedAttack(false, 0, 0);
         base.Stop();
     }
 

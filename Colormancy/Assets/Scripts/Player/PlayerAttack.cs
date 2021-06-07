@@ -22,25 +22,13 @@ public class PlayerAttack : MonoBehaviourPun
     [SerializeField]
     private float m_attackMultiplier = 1f;
 
-    private bool m_poisonedAttack = false;
-    private float m_poisonedAttackDuration = 0;
-
-    //[SerializeField]
-    //private float m_paintballSpawnHeight = 3f;
-    //[SerializeField]
-    //private float m_paintballSpawnDistanceFromPlayer = 2f;
-    //[SerializeField]
-    //private float m_paintballForce = 10f;
-    //[SerializeField]
-    //private float m_paintballDespawnTime = 3f;
-    //[SerializeField]
-    //private float m_numBeamProjectiles = 4;
-    //[SerializeField]
-    //private float m_beamSpread = .5f;
-
     private float m_currentCooldown;
     private GameObject m_playerCharacter;
     private PlayerMouse m_pmouseScript;
+
+    bool m_poisonedAttack;
+    float m_poisonedAttackDamage;
+    float m_poisonedAttackDuration;
 
     #endregion
 
@@ -65,23 +53,6 @@ public class PlayerAttack : MonoBehaviourPun
         }
     }
 
-    #endregion
-
-    #region Functions
-    
-    /// <summary>
-    /// Sets attack multiplier, but percentage based.
-    /// </summary>
-    public void AddAttackMultiplier(float multiplier)
-    {
-        m_attackMultiplier += multiplier / 100f;
-    }
-
-    public void AddAttackSpeedMultplier(float multiplier)
-    {
-        m_attackSpeedMultiplier += multiplier / 100f;
-    }
-
     /// <summary>
     /// This function is mainly used to communicate to the player animation if an attack is ready or not, and if it is, then trigger the anim.
     /// </summary>
@@ -101,9 +72,23 @@ public class PlayerAttack : MonoBehaviourPun
         m_paintColor = new Color(inputColor.x, inputColor.y, inputColor.z);
     }
 
-    public void SetPoisonedAttack(bool isPoisoned, float duration)
+    /// <summary>
+    /// Sets attack multiplier, but percentage based.
+    /// </summary>
+    public void AddAttackMultiplier(float multiplier)
+    {
+        m_attackMultiplier += multiplier / 100f;
+    }
+
+    public void AddAttackSpeedMultiplier(float multiplier)
+    {
+        m_attackSpeedMultiplier += multiplier / 100f;
+    }
+
+    public void SetPoisonedAttack(bool isPoisoned, float damage, float duration)
     {
         m_poisonedAttack = isPoisoned;
+        m_poisonedAttackDamage = damage;
         m_poisonedAttackDuration = duration;
     }
 
@@ -144,6 +129,7 @@ public class PlayerAttack : MonoBehaviourPun
         controller.attackDamage = m_attackDamage;
         controller.attackMultiplier = m_attackMultiplier;
         controller.poisonedAttack = m_poisonedAttack;
+        controller.poisonedAttackDamage = m_poisonedAttackDamage;
         controller.poisonedAttackDuration = m_poisonedAttackDuration;
     }
 
