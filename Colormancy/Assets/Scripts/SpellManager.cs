@@ -62,6 +62,40 @@ public class SpellManager : MonoBehaviourPun
             return SpellManaCost;
         }
 
+        public void PreviewSpell(Transform playerTransform, Vector3 mouseLocation)
+        {
+            GameObject preview = GameObject.FindGameObjectWithTag("SpellPreview");
+            string previewFilePath = "Orbs/Previews/";
+            mouseLocation += Vector3.up * 0.1f;
+
+            switch (orbs[2].getElement())
+            {
+                case Orb.Element.Wrath:
+                    if (!preview)
+                        preview = Instantiate(Resources.Load(previewFilePath + "CirclePreview"), mouseLocation, playerTransform.rotation) as GameObject;
+
+                    // repeat assignment in case object already exists
+                    preview.transform.position = mouseLocation;
+                    break;
+                case Orb.Element.Fire:
+                    break;
+                case Orb.Element.Light:
+                    break;
+                case Orb.Element.Nature:
+                    break;
+                case Orb.Element.Water:
+                    break;
+                case Orb.Element.Poison:
+                    break;
+                case Orb.Element.Earth:
+                    break;
+                case Orb.Element.Wind:
+                    break;
+                case Orb.Element.Darkness:
+                    break;
+            }
+        }
+
         public (System.Type, System.Type, System.Type) GetOrbTuple()
         {
             return OrbTuple;
