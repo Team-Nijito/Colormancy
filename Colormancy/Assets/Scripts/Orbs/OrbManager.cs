@@ -63,24 +63,48 @@ public class OrbManager : MonoBehaviourPun
             }
         }
 
-        if (Input.GetMouseButtonDown(1) && playerMoveScript.CanMove)
+        if (Input.GetMouseButton(1) && playerMoveScript.CanMove)
         {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
-            if (Physics.Raycast(ray, out hit, 100f, 1 << PaintingManager.paintingMask)) {
-                photonView.RPC("TryCastSpell", RpcTarget.All, hit.point);
-            }
-            else
+            if (currentSpell.GetOrbTuple().Item3 != null)
             {
-                Vector3 planeCenter = transform.position;
-                Vector3 planeNormal = Vector3.up;
-
-                float t = Vector3.Dot((planeCenter - ray.origin), planeNormal) / Vector3.Dot(ray.direction, planeNormal);
-
-                photonView.RPC("TryCastSpell", RpcTarget.All, ray.origin + ray.direction * t);
+                if (spellCooldowns.ContainsKey(currentSpell.GetOrbTuple()))
+                {
+                    if (spellCooldowns[currentSpell.GetOrbTuple()].Item1 <= Time.time)
+                    {
+                        currentSpell.PreviewSpell(transform, GetMouseLocation());
+                    }
+                }
+                else
+                {
+                    currentSpell.PreviewSpell(transform, GetMouseLocation());
+                }
+                 
             }
+        }
 
-            
+        if (Input.GetMouseButtonUp(1) && playerMoveScript.CanMove)
+        {
+            Destroy(GameObject.FindGameObjectWithTag("SpellPreview"));
+            photonView.RPC("TryCastSpell", RpcTarget.All, GetMouseLocation());
+        }
+    }
+
+    private Vector3 GetMouseLocation()
+    {
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+        if (Physics.Raycast(ray, out hit, 100f, 1 << PaintingManager.paintingMask | 1))
+        {
+            return hit.point;
+        }
+        else
+        {
+            Vector3 planeCenter = transform.position - Vector3.up * 0.4f;
+            Vector3 planeNormal = Vector3.up;
+
+            float t = Vector3.Dot((planeCenter - ray.origin), planeNormal) / Vector3.Dot(ray.direction, planeNormal);
+
+            return ray.origin + ray.direction * t;
         }
     }
 

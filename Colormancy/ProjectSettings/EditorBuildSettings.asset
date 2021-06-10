@@ -47,4 +47,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Boss Test Level/Boss Test Scene.unity
     guid: 7d61b182f170b254191520c1885c9b87
+  - enabled: 1
+    path: Assets/Scenes/Narrative Scenes/God Scene 2.unity
+    guid: 20eedc37b31497e42943d4918d90af8e
   m_configObjects: {}
