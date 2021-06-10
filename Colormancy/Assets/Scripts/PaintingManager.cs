@@ -110,7 +110,7 @@ public class PaintingManager : MonoBehaviour
                     vertexColor.b = Mathf.Lerp(paintColor.b, colors[k].b, colorLerp);
 
                     // check if painted
-                    if (vertexColor.a == 0)
+                    if (vertexColor.a != 0)
                         paintedVertices++;
 
                     // use bitmask for lerp
@@ -161,13 +161,14 @@ public class PaintingManager : MonoBehaviour
                     vertexColor.g = Mathf.Lerp(paintColor.g, colors[k].g, colorLerp);
                     vertexColor.b = Mathf.Lerp(paintColor.b, colors[k].b, colorLerp);
 
-                    // check if repainted
-                    if (vertexColor.a != 0)
-                        paintedVertices--;
+                    bool colored = vertexColor.a > 0;
 
                     // use bitmask for lerp
                     vertexColor.a = Mathf.Clamp(colors[k].a - (1 - l), 0, 1);
 
+                    // check if repainted
+                    if (vertexColor.a == 0 && colored)
+                        paintedVertices--;
 
                     colors[k] = vertexColor;
                 }

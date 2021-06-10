@@ -7,8 +7,11 @@ using UnityEngine.AI;
 
 public class DianeAI : BossAI
 {
+    //Controls if there are debug messages when changing states amongst other prints
+    public bool DebugMode = true;
+
+    //Ability variables
     public float SlashRange = 2f;
-    
     public float SlashCooldown = 5f;
     public float HamstringCooldown = 15f;
     public float FocusFireCooldown = 30f;
@@ -23,20 +26,27 @@ public class DianeAI : BossAI
     [HideInInspector]
     public float currentIdleCooldown = 0f;
 
-
-    // Start is called before the first frame update
-    void Start()
+    public enum States
     {
+        Slash, Chase, FocusFire, Hamstring
+    }
+    // Start is called before the first frame update
+    new void Start()
+    {
+        base.Start();
         Animator = GetComponent<Animator>();
         EnemyHitbox = GetComponent<EnemyHitbox>();
         MeshAgent = GetComponent<NavMeshAgent>();
         StatusEffect = GetComponent<StatusEffectScript>();
-        SetState(new DianeChase(this));
+        photonView.RPC("SetDianeState", Photon.Pun.RpcTarget.AllViaServer, States.Chase);
     }
 
     // Update is called once per frame
-    void Update()
-    { 
+    new void Update()
+    {
+        base.Update();
+        if (GetCurrentHealth() <= 0)
+            return;
         if (Target == null)
         {
             GameObject target = GetTarget();
@@ -75,5 +85,29 @@ public class DianeAI : BossAI
         }
 
         return targetPlayer;
+    }
+
+    [PunRPC]
+    public void SetDianeState(States state)
+    {
+        if (photonView.IsMine)
+        {
+            if (state == States.Slash)
+            {
+                SetState(new DianeSlash(this));
+            }
+            else if (state == States.Chase)
+            {
+                SetState(new DianeChase(this));
+            }
+            else if (state == States.FocusFire)
+            {
+                SetState(new DianeFocusFire(this));
+            }
+            else if (state == States.Hamstring)
+            {
+                SetState(new DianeHamstring(this));
+            }
+        }
     }
 }

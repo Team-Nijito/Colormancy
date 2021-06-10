@@ -16,6 +16,14 @@ public class AutoAttackProjectileController : MonoBehaviour
 
     [Space]
 
+    public float attackDamage;
+    public float attackMultiplier;
+    public bool poisonedAttack;
+    public float poisonedAttackDamage;
+    public float poisonedAttackDuration;
+
+    [Space]
+
     [SerializeField]
     private bool debug;
 
@@ -53,8 +61,15 @@ public class AutoAttackProjectileController : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Enemy"))
         {
+            StatusEffectScript status = collision.gameObject.GetComponent<StatusEffectScript>();
+            if (status.StatusExists(StatusEffect.StatusType.AutoAttackIncreasedDamage))
+                attackMultiplier += 0.5f;
+
             PhotonView photonView = PhotonView.Get(collision.gameObject);
-            photonView.RPC("TakeDamage", RpcTarget.All, 10f);
+            photonView.RPC("TakeDamage", RpcTarget.All, attackDamage * attackMultiplier);
+
+            if (poisonedAttack)
+                status.RPCApplyStatus(StatusEffect.StatusType.DamageOverTime, poisonedAttackDuration, 1, poisonedAttackDamage);
         }
             
         if (!collision.gameObject.CompareTag("Player"))

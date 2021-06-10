@@ -13,8 +13,30 @@ public class RedOrb : Orb
         m_UIPrefab = (GameObject)Resources.Load("Orbs/RedOrbUI");
     }
 
+    public override void AddHeldEffect(GameObject player)
+    {
+        PlayerAttack attack = player.GetComponent<PlayerAttack>();
+        attack.AddAttackSpeedMultiplier(OrbValueManager.getHoldIncreaseValue(m_OrbElement));
+
+        SpellManager spell = player.GetComponent<SpellManager>();
+        spell.AddCooldownMultiplier(OrbValueManager.getHoldDecreaseValue(m_OrbElement));
+    }
+
+    public override void RevertHeldEffect(GameObject player)
+    {
+        PlayerAttack attack = player.GetComponent<PlayerAttack>();
+        attack.AddAttackSpeedMultiplier(-OrbValueManager.getHoldIncreaseValue(m_OrbElement));
+
+        SpellManager spell = player.GetComponent<SpellManager>();
+        spell.AddCooldownMultiplier(-OrbValueManager.getHoldDecreaseValue(m_OrbElement));
+    }
+
     public override void CastGreaterEffect(GameObject hit, float spellEffectMod, float[] data)
     {
+        float dmgMultiplier = 1;
+        if (hit.GetComponent<StatusEffectScript>().StatusExists(StatusEffect.StatusType.SpellIncreasedDamage))
+            dmgMultiplier += OrbValueManager.getGreaterEffectPercentile(Element.Water) / 100f;
+
         float vector_x = 0;
         float vector_y = 0;
         float vector_z = 0;
@@ -27,20 +49,21 @@ public class RedOrb : Orb
         Vector3 launchVector = new Vector3(vector_x, vector_y, vector_z);
 
         PhotonView photonView = PhotonView.Get(hit);
-        photonView.RPC("TakeDamage", RpcTarget.All, OrbValueManager.getGreaterEffectDamage(m_OrbElement, m_Level) * spellEffectMod);
+        photonView.RPC("TakeDamage", RpcTarget.All, OrbValueManager.getGreaterEffectDamage(m_OrbElement, m_Level) * spellEffectMod * dmgMultiplier);
 
         float orbDuration = OrbValueManager.getGreaterEffectDuration(m_OrbElement, m_Level);
         StatusEffectScript status = hit.GetComponent<StatusEffectScript>();
-        status.RPCApplyStun(orbDuration); // decoupled stun from force, now you need to call stun separately
-        status.RPCApplyForce("Knockback", orbDuration, launchVector + Vector3.up, 40f);
+        status.RPCApplyStatus(StatusEffect.StatusType.Stun, OrbValueManager.getGreaterEffectDuration(m_OrbElement, m_Level));
+        status.RPCApplyForce(orbDuration, "red_orb", launchVector + Vector3.up, 40f);
     }
 
     public override void CastLesserEffect(GameObject hit, float spellEffectMod, float[] data)
     {
-        throw new System.NotImplementedException();
+        StatusEffectScript status = hit.GetComponent<StatusEffectScript>();
+        status.RPCApplyStatus(StatusEffect.StatusType.AutoAttackIncreasedSpeed, OrbValueManager.getLesserEffectDuration(m_OrbElement, m_Level), 0, 50);
     }
 
-    public override void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, Transform t, Vector3 clickedPosition)
+    public override void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, Transform t, Vector3 clickedPosition, float spellDamageMultiplier)
     {
         Transform wizard = t.GetChild(0);
 
@@ -52,7 +75,7 @@ public class RedOrb : Orb
 
         spellController.greaterCast = greaterEffectMethod;
         spellController.lesserCast = lesserEffectMethod;
-        spellController.spellEffectMod = OrbValueManager.getShapeEffectMod(m_OrbElement);
+        spellController.spellEffectMod = OrbValueManager.getShapeEffectMod(m_OrbElement) * spellDamageMultiplier;
 
         spellController.endPosition = clickedPosition + Vector3.up * 1.6f;
         spellController.playerTransform = t;

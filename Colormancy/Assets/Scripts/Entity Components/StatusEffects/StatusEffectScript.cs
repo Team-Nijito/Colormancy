@@ -17,6 +17,7 @@ public class StatusEffectScript : MonoBehaviourPun
     private bool m_isPlayer = false;
 
     private float m_cumulativeDamage = 0;
+    private float m_cumulativeMana = 0;
 
     #endregion
 
@@ -27,8 +28,12 @@ public class StatusEffectScript : MonoBehaviourPun
     // Player components
     private PlayerMovement m_playerMovement;
     private CharacterController m_controller;
+    private PlayerAttack m_playerAttack;
+    private ManaScript m_mana;
 
     // AI components
+    private EnemyHitbox m_enemHitbox;
+    private EnemyProjectileAbility m_enemProjectile;
     private EnemyMovement m_enemMovement;
     private EnemyTargeting m_enemTargetting;
     private NavMeshAgent m_enemNavMeshAgent;
@@ -55,6 +60,14 @@ public class StatusEffectScript : MonoBehaviourPun
                 // apply damage if there is any damage from status effects
                 photonView.RPC("TakeDamage", RpcTarget.All, m_cumulativeDamage);
             }
+            if (m_cumulativeDamage < 0)
+            {
+                photonView.RPC("Heal", RpcTarget.All, -m_cumulativeDamage);
+            }
+            if (m_cumulativeMana > 0)
+            {
+                photonView.RPC("RecoverMana", RpcTarget.All, m_cumulativeMana);
+            }
         }
     }
 
@@ -66,41 +79,43 @@ public class StatusEffectScript : MonoBehaviourPun
     /// Loop through each status effect to see if the new status effect we're trying to add already exists
     /// If it does, then increment the time.
     /// </summary>
-    /// <param name="name">Name of status effect we're trying to add</param>
+    /// <param name="type">Type of status effect we're trying to add</param>
+    /// <param name="source">Source of status effect we're trying to add</param>
     /// <param name="duration">The increase in duration (if status effect already exists)</param>
     /// <returns>Does the status effect already exist in m_statusEffects?</returns>
-    private bool CheckStatusEffectExist(string name, float duration)
+    private bool CheckStatusEffectExist(StatusEffect.StatusType type, string source, float duration)
     {
         // First search the list to see if status effect exists
         foreach (StatusEffect effect in m_statusEffects)
         {
-            if (effect.StatusName == name)
+            if (effect.StatusEffectType == type)
             {
-                if (effect.StatusEffectType == StatusEffect.StatusType.Slowdown || effect.StatusEffectType == StatusEffect.StatusType.Stun)
+                if (source != null && effect.StatusSource != null)
                 {
-                    // reset duration, DO NOT STACK SLOW DURATION TIMES
-                    effect.SetDuration(duration);
+                    if (effect.StatusEffectType == StatusEffect.StatusType.Slowdown || effect.StatusEffectType == StatusEffect.StatusType.Stun)
+                    {
+                        // reset duration, DO NOT STACK SLOW DURATION TIMES
+                        effect.SetDuration(duration);
+                    }
+                    else
+                    {
+                        effect.IncreaseDuration(duration);
+                    }
+                    return true;
                 }
-                else
-                {
-                    effect.IncreaseDuration(duration);
-                }
-                return true;
             }
         }
         return false;
     }
-    
+
     /// <summary>
-    /// Overloaded variant of CheckStatusEffectExist intended for appending new forces to the only force status
     /// (only one force status effect may exist in the list at one time, any new force names will essentially be ignored)
     /// </summary>
-    /// <param name="name">Name of the force</param>
     /// <param name="duration">Additional duration of the force</param>
     /// <param name="dir">New force direction (to be combined with the existing force(s))</param>
     /// <param name="force">Magnitude for the force direction</param>
     /// <returns></returns>
-    private bool CheckStatusEffectExist(string name, float duration, Vector3 dir, float force)
+    private bool CheckForceExist(float duration, Vector3 dir, float force)
     {
         // First search the list to see if status effect exists
         foreach (StatusEffect effect in m_statusEffects)
@@ -121,6 +136,7 @@ public class StatusEffectScript : MonoBehaviourPun
     private void LoopThroughStatusEffects()
     {
         m_cumulativeDamage = 0;
+        m_cumulativeMana = 0;
 
         // copying is inefficient, but is necessary in order to avoid the possibility
         // of the list being altered during the loop
@@ -128,22 +144,23 @@ public class StatusEffectScript : MonoBehaviourPun
 
         foreach (StatusEffect effect in copyList)
         {
-            effect.Tick();
+            effect.Update();
 
             if (effect.StatusEffectType == StatusEffect.StatusType.DamageOverTime)
             {
-                // if the StatusType is DamageOverTime, then
-                // add this damage this DoT incurs per tick to the cumulative damage per tick
                 DamageOverTime DoT = (DamageOverTime)effect;
-
-                if (DoT.IsPercentDamage)
-                {
-                    m_cumulativeDamage += (DoT.DamagePerSecond / 100) * m_health.MaxEffectiveHealth * Time.deltaTime;
-                }
-                else
-                {
-                    m_cumulativeDamage += DoT.DamagePerSecond * Time.deltaTime;
-                }
+                m_cumulativeDamage += DoT.Damage;
+            }
+            if (effect.StatusEffectType == StatusEffect.StatusType.Rejuvenation)
+            {
+                Rejuvenation rej = (Rejuvenation)effect;
+                m_cumulativeDamage -= rej.Damage;
+                m_cumulativeMana += rej.Mana;
+            }
+            if (effect.StatusEffectType == StatusEffect.StatusType.ManaRegeneration)
+            {
+                ManaRegeneration manaReg = (ManaRegeneration)effect;
+                m_cumulativeMana += manaReg.Mana * Time.deltaTime;
             }
         }
     }
@@ -151,30 +168,108 @@ public class StatusEffectScript : MonoBehaviourPun
     #endregion
 
     #region RPC Calls
-
-    /// <summary>
-    /// (PunRPC) Apply a stun effect if it doesn't already exist on this player, otherwise
-    /// reset the duration of the stun effect (doesn't stack stun effects)
-    /// </summary>
     [PunRPC]
-    private void ApplyBlind(float duration)
+    private void ApplyStatus(StatusEffect.StatusType type, float duration, float secondsPerTick, float value, string source)
     {
-        if (!CheckStatusEffectExist("Blind", duration))
+        if (!CheckStatusEffectExist(type, source, duration))
         {
-            // Now make a new DamageOverTime class and insert to StatusEffect list
-            if (m_isPlayer)
-            {
-                Blind newBlind = new Blind(m_statusEffects, "Blind", StatusEffect.StatusType.Stun,
-                                       duration, m_playerMovement.BlindPanel);
+            StatusEffect newStatusEffect;
 
-                m_statusEffects.Add(newBlind);
-            }
-            else
+            switch (type)
             {
-                Blind newBlind = new Blind(m_statusEffects, "Blind", StatusEffect.StatusType.Stun,
-                                       duration, m_enemMovement, m_enemTargetting);
+                case StatusEffect.StatusType.Blind:
+                    if (m_isPlayer)
+                        newStatusEffect = new Blind(m_statusEffects, type, duration, source, m_playerMovement.BlindPanel);
+                    else
+                        newStatusEffect = new Blind(m_statusEffects, type, duration, source, m_enemMovement, m_enemTargetting);
 
-                m_statusEffects.Add(newBlind);
+                    m_statusEffects.Add(newStatusEffect);
+                    break;
+                case StatusEffect.StatusType.DamageOverTime:
+                    newStatusEffect = new DamageOverTime(m_statusEffects, type, duration, source, value, secondsPerTick);
+
+                    m_statusEffects.Add(newStatusEffect);
+                    break;
+                case StatusEffect.StatusType.Slowdown:
+                    if (m_isPlayer)
+                        newStatusEffect = new Slow(m_statusEffects, type, duration, source, value, m_playerMovement);
+                    else
+                        newStatusEffect = new Slow(m_statusEffects, type, duration, source, value, m_enemMovement);
+
+                    m_statusEffects.Add(newStatusEffect);
+                    break;
+                case StatusEffect.StatusType.Stun:
+                    if (m_isPlayer)
+                        newStatusEffect = new Stun(m_statusEffects, type, duration, source, m_playerMovement);
+                    else
+                        newStatusEffect = new Stun(m_statusEffects, type, duration, source, m_enemMovement);
+
+                    m_statusEffects.Add(newStatusEffect);
+                    break;
+                case StatusEffect.StatusType.AutoAttackIncreasedDamage:
+                    if (m_isPlayer)
+                        throw new System.Exception("Cannot currently apply AutoAttackIncreasedDamage on players.");
+                    else
+                        newStatusEffect = new AutoAttackIncreasedDamage(m_statusEffects, type, duration, source, value, m_playerAttack);
+
+                    m_statusEffects.Add(newStatusEffect);
+                    break;
+                case StatusEffect.StatusType.AttackLessDamage:
+                    if (m_isPlayer)
+                        throw new System.Exception("Cannot currently apply AttackLessDamage on players.");
+                    else
+                        newStatusEffect = new AttackLessDamage(m_statusEffects, type, duration, source, value, m_enemHitbox, m_enemProjectile);
+
+                    m_statusEffects.Add(newStatusEffect);
+                    break;
+                case StatusEffect.StatusType.SpellIncreasedDamage:
+                    if (m_isPlayer)
+                        throw new System.Exception("Cannot currently apply SpellIncreasedDamage on players.");
+                    else
+                        newStatusEffect = new SpellIncreasedDamage(m_statusEffects, type, duration, source, value);
+
+                    m_statusEffects.Add(newStatusEffect);
+                    break;
+                case StatusEffect.StatusType.AutoAttackIncreasedSpeed:
+                    if (m_isPlayer)
+                        newStatusEffect = new AutoAttackIncreasedSpeed(m_statusEffects, type, duration, source, value, m_playerAttack);
+                    else
+                        throw new System.Exception("Cannot currently apply AutoAttackIncreasedSpeed on enemies.");
+
+                    m_statusEffects.Add(newStatusEffect);
+                    break;
+                case StatusEffect.StatusType.Rejuvenation:
+                    if (m_isPlayer)
+                        newStatusEffect = new Rejuvenation(m_statusEffects, type, duration, source, value, secondsPerTick, m_health, m_mana);
+                    else
+                        throw new System.Exception("Cannot currently apply Rejuvenation on enemies.");
+
+                    m_statusEffects.Add(newStatusEffect);
+                    break;
+                case StatusEffect.StatusType.ManaRegeneration:
+                    if (m_isPlayer)
+                        newStatusEffect = new ManaRegeneration(m_statusEffects, type, duration, source, value, m_mana);
+                    else
+                        throw new System.Exception("Cannot currently apply ManaRegeneration on enemies.");
+
+                    m_statusEffects.Add(newStatusEffect);
+                    break;
+                case StatusEffect.StatusType.AutoAttackPoison:
+                    if (m_isPlayer)
+                        newStatusEffect = new AutoAttackPoison(m_statusEffects, type, duration, source, m_playerAttack);
+                    else
+                        throw new System.Exception("Cannot currently apply AutoAttackPoison on enemies.");
+
+                    m_statusEffects.Add(newStatusEffect);
+                    break;
+                case StatusEffect.StatusType.MovementIncreaseSpeed:
+                    if (m_isPlayer)
+                        newStatusEffect = new MovementIncreaseSpeed(m_statusEffects, type, duration, source, value, m_playerMovement);
+                    else
+                        throw new System.Exception("Cannot currently apply MovementIncreaseSpeed on enemies.");
+
+                    m_statusEffects.Add(newStatusEffect);
+                    break;
             }
         }
     }
@@ -184,96 +279,57 @@ public class StatusEffectScript : MonoBehaviourPun
     /// increase the duration of the effect.
     /// </summary>
     [PunRPC]
-    private void ApplyForceEffect(string name, float duration, Vector3 dir, float force)
+    private void ApplyForce(float duration, string source, Vector3 dir, float force)
     {
-        if (!CheckStatusEffectExist(name, duration, dir, force))
+        if (!CheckForceExist(duration, dir, force))
         {
             if (m_isPlayer)
             {
                 // Now make a new Force class and insert to StatusEffect list
-                Force newForce = new Force(m_statusEffects, name, StatusEffect.StatusType.Force,
-                                           duration, dir, force, m_controller);
+                Force newForce = new Force(m_statusEffects, StatusEffect.StatusType.Force,
+                                           duration, source, dir, force, m_controller);
 
                 m_statusEffects.Add(newForce);
             }
             else
             {
                 // Now make a new Force class and insert to StatusEffect list
-                Force newForce = new Force(m_statusEffects, name, StatusEffect.StatusType.Force,
-                                           duration, dir, force, m_enemMovement, gameObject.transform);
+                Force newForce = new Force(m_statusEffects, StatusEffect.StatusType.Force,
+                                           duration, source, dir, force, m_enemMovement, gameObject.transform);
 
                 m_statusEffects.Add(newForce);
             }
         }
     }
 
-    /// <summary>
-    /// (PunRPC) Apply a damage over time effect if it doesn't already exist on this player, otherwise
-    /// increase the duration of the effect
-    /// </summary>
     [PunRPC]
-    private void ApplyOrStackDoTEffect(string name, float duration, float dmg, bool isPercentDmg)
+    private void ClearAllStatusEffects()
     {
-        if (!CheckStatusEffectExist(name, duration))
-        {
-            // Now make a new DamageOverTime class and insert to StatusEffect list
-            DamageOverTime newDot = new DamageOverTime(m_statusEffects, name, StatusEffect.StatusType.DamageOverTime,
-                                                       duration, dmg, isPercentDmg);
+        foreach (StatusEffect s in m_statusEffects)
+            s.Stop();
 
-            m_statusEffects.Add(newDot);
-        }
+        m_statusEffects.Clear();
     }
 
-    /// <summary>
-    /// (PunRPC) Apply a slowdown effect if it doesn't already exist on this player, otherwise
-    /// reset the duration of the slow effect with the same name (doesn't stack slow effects)
-    /// </summary>
     [PunRPC]
-    private void ApplySlowdown(string name, float percentReduction, float duration)
+    private void ClearStatusEffect(StatusEffect.StatusType type, string source)
     {
-        if (!CheckStatusEffectExist(name, duration))
+        if (source != null)
         {
-            // Now make a new DamageOverTime class and insert to StatusEffect list
-            if (m_isPlayer)
+            StatusEffect statusEffect = m_statusEffects.Find(s => (s.GetStatusType() == type && s.StatusSource.Equals(source)));
+            if (statusEffect != null)
             {
-                Slow newSlow = new Slow(m_statusEffects, name, StatusEffect.StatusType.Slowdown,
-                                       duration, percentReduction, m_playerMovement);
-
-                m_statusEffects.Add(newSlow);
-            }
-            else
-            {
-                Slow newSlow = new Slow(m_statusEffects, name, StatusEffect.StatusType.Slowdown,
-                                       duration, percentReduction, m_enemMovement);
-
-                m_statusEffects.Add(newSlow);
+                statusEffect.Stop();
+                m_statusEffects.Remove(statusEffect);
             }
         }
-    }
-
-    /// <summary>
-    /// (PunRPC) Apply a stun effect if it doesn't already exist on this player, otherwise
-    /// reset the duration of the stun effect (doesn't stack stun effects)
-    /// </summary>
-    [PunRPC]
-    private void ApplyStun(float duration)
-    {
-        if (!CheckStatusEffectExist("Stun", duration))
+        else
         {
-            // Now make a new DamageOverTime class and insert to StatusEffect list
-            if (m_isPlayer)
+            StatusEffect statusEffect = m_statusEffects.Find(s => (s.GetStatusType() == type));
+            if (statusEffect != null)
             {
-                Stun newStun = new Stun(m_statusEffects, "Stun", StatusEffect.StatusType.Stun,
-                                       duration, m_playerMovement);
-
-                m_statusEffects.Add(newStun);
-            }
-            else
-            {
-                Stun newStun = new Stun(m_statusEffects, "Stun", StatusEffect.StatusType.Stun,
-                                       duration, m_enemMovement);
-
-                m_statusEffects.Add(newStun);
+                statusEffect.Stop();
+                m_statusEffects.Remove(statusEffect);
             }
         }
     }
@@ -281,23 +337,17 @@ public class StatusEffectScript : MonoBehaviourPun
     #endregion
 
     #region Public functions
-
-    //public void RPCApplyStatus(StatusEffect.StatusType status, float duration, float damage, )
-
     /// <summary>
-    /// Blind a characters. If it's an AI, they will panic and will not be able to target players.
+    /// Overarching function to apply statuses
     /// </summary>
-    /// <param name="duration">How long the stun will last.</param>
-    public void RPCApplyBlind(float duration)
+    /// <param name="status">Status effect being applied.</param>
+    /// <param name="duration">How long the status will last.</param>
+    /// <param name="secondsPerTick">Only applies to fixed interval statuses such as DoT.</param>
+    /// <param name="value">Value of the status being applied. Different depending on what the status is.</param>
+    /// <param name="source">Source of the status.</param>
+    public void RPCApplyStatus(StatusEffect.StatusType type, float duration = 0, float secondsPerTick = 0, float value = 0, string source = null)
     {
-        if (m_isPlayer)
-        {
-            photonView.RPC("ApplyBlind", photonView.Owner, duration);
-        }
-        else
-        {
-            photonView.RPC("ApplyBlind", PhotonNetwork.MasterClient, duration);
-        }
+        photonView.RPC("ApplyStatus", m_isPlayer == true ? photonView.Owner : PhotonNetwork.MasterClient, type, duration, secondsPerTick, value, source);
     }
 
     /// <summary>
@@ -305,78 +355,37 @@ public class StatusEffectScript : MonoBehaviourPun
     /// </summary>
     /// <param name="dir">The direction of the force.</param>
     /// <param name="force">The magnitude of the force.</param>
-    public void RPCApplyForce(string name, float duration, Vector3 dir, float force)
+    public void RPCApplyForce(float duration, string source, Vector3 dir, float force)
     {
         // disable stun, leave it to other class
-
-        if (m_isPlayer)
-        {
-            photonView.RPC("ApplyForceEffect", photonView.Owner, name, duration, dir, force);
-        }
-        else
-        {
-            photonView.RPC("ApplyForceEffect", PhotonNetwork.MasterClient, name, duration, dir, force);
-        }
-    }
-
-    /// <summary>
-    /// Apply or stack damage over time to a character.
-    /// </summary>
-    /// <param name="isPercentDmg">Is a damage is percent value instead of a flat number?</param>
-    /// <param name="dmg">Damage done every second.</param>
-    /// <param name="duration">How long the damage over time lasts</param>
-    /// <param name="name">Name of this damage over time </param>
-    public void RPCApplyOrStackDoT(bool isPercentDmg, float dmg, float duration, string name)
-    {
-        if (m_isPlayer)
-        {
-            photonView.RPC("ApplyOrStackDoTEffect", photonView.Owner, name, duration, dmg, isPercentDmg);
-        }
-        else
-        {
-            photonView.RPC("ApplyOrStackDoTEffect", PhotonNetwork.MasterClient, name, duration, dmg, isPercentDmg);
-        }
-    }
-
-    /// <summary>
-    /// Apply a slowdown to this character for a duration, then changes the character's speed to its speed before the slowdown. Stackable.
-    /// </summary>
-    /// <param name="percentReduction">Range(0,100f). What percentage will we reduce the character's speed by? 50%?</param>
-    /// <param name="duration">How long the slowdown will last.</param>
-    public void RPCApplySlowdown(string name, float percentReduction, float duration)
-    {
-        if (m_isPlayer)
-        {
-            photonView.RPC("ApplySlowdown", photonView.Owner, name, percentReduction, duration);
-        }
-        else
-        {
-            photonView.RPC("ApplySlowdown", PhotonNetwork.MasterClient, name, percentReduction, duration);
-        }
-    }
-
-    /// <summary>
-    /// Stuns a character and prevent them from moving.
-    /// </summary>
-    /// <param name="duration">How long the stun will last.</param>
-    public void RPCApplyStun(float duration)
-    {
-        if (m_isPlayer)
-        {
-            photonView.RPC("ApplyStun", photonView.Owner, duration);
-        }
-        else
-        {
-            photonView.RPC("ApplyStun", PhotonNetwork.MasterClient, duration);
-        }
+        photonView.RPC("ApplyForce", m_isPlayer == true ? photonView.Owner : PhotonNetwork.MasterClient, duration, source, dir, force);
     }
 
     /// <summary>
     /// Clear all ongoing status effects.
     /// </summary>
-    public void ClearStatusEffects()
+    public void RPCClearAllStatusEffects()
     {
-        m_statusEffects.Clear();
+        photonView.RPC("ClearAllStatusEffects", m_isPlayer == true ? photonView.Owner : PhotonNetwork.MasterClient);
+    }
+
+    /// <summary>
+    /// Clear a specific status effect.
+    /// </summary>
+    public void RPCClearStatusEffect(StatusEffect.StatusType type, string source = null)
+    {
+        photonView.RPC("ClearStatusEffect", m_isPlayer == true ? photonView.Owner : PhotonNetwork.MasterClient, type, source);
+    }
+
+    /// <summary>
+    /// Separate function for finding existence of status
+    /// </summary>
+    public bool StatusExists(StatusEffect.StatusType type, string source = null)
+    {
+        if (source != null)
+            return m_statusEffects.Find(s => (s.GetStatusType() == type && s.StatusSource.Equals(source))) != null;
+        else
+            return m_statusEffects.Find(s => (s.GetStatusType() == type)) != null;
     }
 
     /// <summary>
@@ -394,10 +403,14 @@ public class StatusEffectScript : MonoBehaviourPun
                 // This is a player entity
                 m_isPlayer = true;
                 m_playerMovement = GetComponent<PlayerMovement>();
+                m_playerAttack = GetComponent<PlayerAttack>();
+                m_mana = GetComponent<ManaScript>();
             }
             else
             {
                 // This an AI entity
+                m_enemHitbox = GetComponent<EnemyHitbox>();
+                m_enemProjectile = GetComponent<EnemyProjectileAbility>();
                 m_enemMovement = GetComponent<EnemyMovement>();
                 m_enemTargetting = GetComponent<EnemyTargeting>();
                 m_enemNavMeshAgent = GetComponent<NavMeshAgent>();

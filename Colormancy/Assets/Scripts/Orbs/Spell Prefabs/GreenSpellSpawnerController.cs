@@ -27,12 +27,14 @@ public class GreenSpellSpawnerController : MonoBehaviour
     private int ticksPerIteration;
     private int currentTick;
     private bool spawnVine;
+    private List<GameObject> entitiesEntered;
 
     [Space]
 
     private float startTime;
     [SerializeField]
     private float lifetime;
+    private float currentTime;
 
     [Space]
 
@@ -50,6 +52,8 @@ public class GreenSpellSpawnerController : MonoBehaviour
         spawnVine = true;
 
         raycastOrigin = transform.position + Vector3.up;
+
+        entitiesEntered = new List<GameObject>();
     }
 
     // Update is called once per frame
@@ -131,11 +135,46 @@ public class GreenSpellSpawnerController : MonoBehaviour
         }
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private void Update()
     {
-        if (collision.gameObject.tag.Equals("Enemy"))
-            greaterCast(collision.gameObject, spellEffectMod, null);
-        else if (collision.gameObject.tag.Equals("Player"))
-            lesserCast(collision.gameObject, spellEffectMod, null);
+        currentTime += Time.deltaTime;
+
+        if (currentTime > 0.5f)
+        {
+            currentTime -= 0.5f;
+
+            foreach (GameObject g in entitiesEntered)
+            {
+                if (g)
+                {
+                    if (g.CompareTag("Enemy"))
+                        greaterCast(g, spellEffectMod, null);
+                    else if (g.CompareTag("Player"))
+                        lesserCast(g, 1, null);
+                }
+            }
+        }
+    }
+
+    private void OnTriggerEnter(Collider collider)
+    {
+        if (collider.gameObject.CompareTag("Enemy") || collider.gameObject.tag.Equals("Player"))
+        {
+            if (!entitiesEntered.Contains(collider.gameObject))
+            {
+                entitiesEntered.Add(collider.gameObject);
+            }
+        }
+    }
+
+    private void OnTriggerExit(Collider collider)
+    {
+        if (collider.gameObject.CompareTag("Enemy") || collider.gameObject.tag.Equals("Player"))
+        {
+            if (entitiesEntered.Contains(collider.gameObject))
+            {
+                entitiesEntered.Remove(collider.gameObject);
+            }
+        }
     }
 }

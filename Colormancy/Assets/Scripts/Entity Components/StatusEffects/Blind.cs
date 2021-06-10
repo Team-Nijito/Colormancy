@@ -40,8 +40,8 @@ public class Blind : StatusEffect
 
     #region Functions
 
-    public Blind(List<StatusEffect> parentList, string name, StatusType type, float duration, GameObject blindPanel)
-                 : base(parentList, name, type, duration)
+    public Blind(List<StatusEffect> parentList, StatusType type, float duration, string source, GameObject blindPanel)
+                 : base(parentList, type, duration, source)
     {
         m_isPlayer = true;
         m_blindPanel = blindPanel;
@@ -49,9 +49,9 @@ public class Blind : StatusEffect
         m_blindPanel.SetActive(true);
     }
 
-    public Blind(List<StatusEffect> parentList, string name, StatusType type, float duration, 
+    public Blind(List<StatusEffect> parentList, StatusType type, float duration, string source,
                  EnemyMovement enemMove, EnemyTargeting enemyTargeting)
-                 : base(parentList, name, type, duration)
+                 : base(parentList, type, duration, source)
     {
         m_isPlayer = false;
 
@@ -118,7 +118,7 @@ public class Blind : StatusEffect
     /// <summary>
     /// Decrease the duration by Time.deltaTime. If duration is zero, invoke Stop.
     /// </summary>
-    public override void Tick()
+    public override void Update()
     {
         m_duration -= Time.deltaTime;
         if (m_duration <= 0)

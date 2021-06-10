@@ -13,20 +13,37 @@ public class VioletOrb : Orb
         m_UIPrefab = (GameObject)Resources.Load("Orbs/VioletOrbUI");
     }
 
+    public override void AddHeldEffect(GameObject player)
+    {
+        PlayerAttack attack = player.GetComponent<PlayerAttack>();
+        attack.SetPoisonedAttack(true, OrbValueManager.getHoldIncreaseValue(m_OrbElement), 5);
+    }
+
+    public override void RevertHeldEffect(GameObject player)
+    {
+        PlayerAttack attack = player.GetComponent<PlayerAttack>();
+        attack.SetPoisonedAttack(false, 0, 0);
+    }
+
     public override void CastGreaterEffect(GameObject hit, float spellEffectMod, float[] data)
     {
+        float dmgMultiplier = 1;
+        if (hit.GetComponent<StatusEffectScript>().StatusExists(StatusEffect.StatusType.SpellIncreasedDamage))
+            dmgMultiplier += OrbValueManager.getGreaterEffectPercentile(Element.Water) / 100f;
+
         StatusEffectScript status = hit.GetComponent<StatusEffectScript>();
-        // currently stacks, should not
-        status.RPCApplyOrStackDoT(true, OrbValueManager.getGreaterEffectDamage(m_OrbElement, m_Level) * spellEffectMod, OrbValueManager.getGreaterEffectDuration(m_OrbElement, m_Level), "Poison");
-        //status.RPCApplySlowdown("Slow", 10, orbLevel * 2 + 3);
+        
+        status.RPCApplyStatus(StatusEffect.StatusType.DamageOverTime, OrbValueManager.getGreaterEffectDuration(m_OrbElement, m_Level), 1, OrbValueManager.getGreaterEffectDamage(m_OrbElement, m_Level) * spellEffectMod * dmgMultiplier);
+        status.RPCApplyStatus(StatusEffect.StatusType.Slowdown, OrbValueManager.getGreaterEffectDuration(m_OrbElement, m_Level), 0, OrbValueManager.getGreaterEffectPercentile(m_OrbElement), "violet_orb");
     }
 
     public override void CastLesserEffect(GameObject hit, float spellEffectMod, float[] data)
     {
-        throw new System.NotImplementedException();
+        StatusEffectScript status = hit.GetComponent<StatusEffectScript>();
+        status.RPCApplyStatus(StatusEffect.StatusType.AutoAttackPoison, OrbValueManager.getLesserEffectDuration(m_OrbElement, m_Level));
     }
 
-    public override void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, Transform t, Vector3 clickedPosition)
+    public override void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, Transform t, Vector3 clickedPosition, float spellDamageMultiplier)
     {
         Vector3 direction = clickedPosition - t.position;
 
@@ -35,7 +52,7 @@ public class VioletOrb : Orb
 
         spellController.greaterCast = greaterEffectMethod;
         spellController.lesserCast = lesserEffectMethod;
-        spellController.spellEffectMod = OrbValueManager.getShapeEffectMod(m_OrbElement);
+        spellController.spellEffectMod = OrbValueManager.getShapeEffectMod(m_OrbElement) * spellDamageMultiplier;
 
         spellController.endPosition = clickedPosition;
     }

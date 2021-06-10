@@ -75,12 +75,6 @@ public class EnemyTargeting : MonoBehaviourPun
 
     #region MonoBehaviour callbacks
 
-    protected void Awake()
-    {
-        // This code chunk in Awake() is called here instead of Start so that you won't have to endure 1-2 extra second(s) of loading when 
-        // booting up a level for the first time
-    }
-
     // Start is called before the first frame update
     protected void Start()
     {

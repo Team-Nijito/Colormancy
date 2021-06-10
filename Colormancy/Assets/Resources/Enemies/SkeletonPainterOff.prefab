@@ -712,12 +712,12 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.025
-  m_Speed: 5
+  m_Speed: 4
   m_Acceleration: 50
   avoidancePriority: 50
   m_AngularSpeed: 999
   m_StoppingDistance: 3
-  m_AutoTraverseOffMeshLink: 1
+  m_AutoTraverseOffMeshLink: 0
   m_AutoBraking: 0
   m_AutoRepath: 1
   m_Height: 0.11
@@ -771,7 +771,8 @@ MonoBehaviour:
   m_healthBar: {fileID: 6031526755138765554}
   m_username: {fileID: 6031526755773922767}
   m_gameManager: {fileID: 0}
-  m_baseHealth: 100
+  m_baseHealth: 40
+  m_shieldHealth: 0
   m_armorPercentage: 0
   m_isRegenHealth: 0
   m_regenHealthPercentage: 1

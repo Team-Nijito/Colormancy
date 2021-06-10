@@ -60,32 +60,23 @@ public class BlueSpellSpawnerController : MonoBehaviour
         currentTime += Time.deltaTime;
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter(Collider collider)
     {
-        if (collision.gameObject.CompareTag("Enemy"))
+        if (collider.gameObject.CompareTag("Enemy"))
         {
-            if (!entitiesEntered.Contains(collision.gameObject))
+            if (!entitiesEntered.Contains(collider.gameObject))
             {
-                entitiesEntered.Add(collision.gameObject);
-                greaterCast(collision.gameObject, spellEffectMod, null);
+                entitiesEntered.Add(collider.gameObject);
+                greaterCast(collider.gameObject, spellEffectMod, null);
             }
         }
-        else if (collision.gameObject.CompareTag("Player"))
+        else if (collider.gameObject.CompareTag("Player"))
         {
-            lesserCast(collision.gameObject, spellEffectMod, null);
-        }
-    }
-
-    private void OnCollisionExit(Collision collision)
-    {
-        if (collision.gameObject.CompareTag("Enemy"))
-        {
-            if (!entitiesEntered.Contains(collision.gameObject))
-                entitiesEntered.Remove(collision.gameObject);
-        }
-        else if (collision.gameObject.CompareTag("Player"))
-        {
-            
+            if (!entitiesEntered.Contains(collider.gameObject))
+            {
+                entitiesEntered.Add(collider.gameObject);
+                lesserCast(collider.gameObject, spellEffectMod, null);
+            }
         }
     }
 }

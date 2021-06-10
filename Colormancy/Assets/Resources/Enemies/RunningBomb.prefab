@@ -83,6 +83,7 @@ MonoBehaviour:
   m_parentGameObject: {fileID: 9186146974418002411}
   m_isProjectile: 0
   m_damage: 50
+  m_onlyDoDamageOnce: 1
   m_applyForce: 1
   m_whatForce: 1
   m_force: 30
@@ -30370,8 +30371,8 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.05
-  m_Speed: 15
-  m_Acceleration: 50
+  m_Speed: 3
+  m_Acceleration: 10
   avoidancePriority: 50
   m_AngularSpeed: 999
   m_StoppingDistance: 3
@@ -30429,7 +30430,8 @@ MonoBehaviour:
   m_healthBar: {fileID: 3356567029179261710}
   m_username: {fileID: 3356567029375608491}
   m_gameManager: {fileID: 0}
-  m_baseHealth: 20
+  m_baseHealth: 30
+  m_shieldHealth: 0
   m_armorPercentage: 0
   m_isRegenHealth: 0
   m_regenHealthPercentage: 1
@@ -30460,7 +30462,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SetAnims: 1
-  m_speed: 36
+  m_speed: 4
   m_wanderTime:
     minTime: 2
     maxTime: 5

@@ -12,23 +12,44 @@ public class OrangeOrb : Orb
         m_UIPrefab = (GameObject)Resources.Load("Orbs/OrangeOrbUI");
     }
 
+    public override void AddHeldEffect(GameObject player)
+    {
+        SpellManager spell = player.GetComponent<SpellManager>();
+        spell.AddCooldownMultiplier(-OrbValueManager.getHoldIncreaseValue(m_OrbElement));
+
+        HealthScript health = player.GetComponent<HealthScript>();
+        health.AlterArmorValueAdditive(-OrbValueManager.getHoldDecreaseValue(m_OrbElement));
+    }
+
+    public override void RevertHeldEffect(GameObject player)
+    {
+        SpellManager spell = player.GetComponent<SpellManager>();
+        spell.AddCooldownMultiplier(OrbValueManager.getHoldDecreaseValue(m_OrbElement));
+
+        HealthScript health = player.GetComponent<HealthScript>();
+        health.AlterArmorValueAdditive(OrbValueManager.getHoldDecreaseValue(m_OrbElement));
+    }
+
     public override void CastGreaterEffect(GameObject hit, float spellEffectMod, float[] data)
     {
+        float dmgMultiplier = 1;
+        if (hit.GetComponent<StatusEffectScript>().StatusExists(StatusEffect.StatusType.SpellIncreasedDamage))
+            dmgMultiplier += OrbValueManager.getGreaterEffectPercentile(Element.Water) / 100f;
+
         PhotonView photonView = PhotonView.Get(hit);
-        photonView.RPC("TakeDamage", RpcTarget.All, OrbValueManager.getGreaterEffectDamage(m_OrbElement, m_Level) * spellEffectMod);
-        // temporary until autoattack increase is implemented
-        // photonView.RPC("AlterArmorValueAdditive", RpcTarget.All, -20f * spellEffectMod, 3f);
+        photonView.RPC("TakeDamage", RpcTarget.All, OrbValueManager.getGreaterEffectDamage(m_OrbElement, m_Level) * spellEffectMod * dmgMultiplier);
+
+        StatusEffectScript status = hit.GetComponent<StatusEffectScript>();
+        status.RPCApplyStatus(StatusEffect.StatusType.AutoAttackIncreasedDamage, OrbValueManager.getGreaterEffectDuration(m_OrbElement, m_Level), 0, 20);
     }
 
     public override void CastLesserEffect(GameObject hit, float spellEffectMod, float[] data)
     {
-        // PhotonView photonView = PhotonView.Get(hit);
-
-        // right now assume that all cooldowns are reduced by base 30f * modifiers ...
-        // photonView.RPC("ReduceAllCooldowns", RpcTarget.All, orbLevel * 30f * spellEffectMod);
+        PhotonView photonView = PhotonView.Get(hit);
+        photonView.RPC("ReduceAllCooldowns", RpcTarget.All, OrbValueManager.getLesserEffectValue(m_OrbElement, m_Level));
     }
 
-    public override void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, Transform t, Vector3 clickedPosition)
+    public override void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, Transform t, Vector3 clickedPosition, float spellDamageMultiplier)
     {
         // get the wizard rotation
         Transform wizard = t.GetChild(0);
@@ -41,7 +62,7 @@ public class OrangeOrb : Orb
 
         spellController.greaterCast = greaterEffectMethod;
         spellController.lesserCast = lesserEffectMethod;
-        spellController.spellEffectMod = OrbValueManager.getShapeEffectMod(m_OrbElement);
+        spellController.spellEffectMod = OrbValueManager.getShapeEffectMod(m_OrbElement) * spellDamageMultiplier;
     }
 
     public static object Deserialize(byte[] data)

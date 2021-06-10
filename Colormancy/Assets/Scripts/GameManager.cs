@@ -1,4 +1,5 @@
-﻿using Photon.Pun;
+﻿using MyBox;
+using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -7,58 +8,27 @@ using PhotonHashtable = ExitGames.Client.Photon.Hashtable; // to use with Photon
 
 public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 {
-    #region Private Fields
+    #region Public fields
 
-    // General variables
-    [Tooltip("Players will spawn on these location(s)")]
-    [SerializeField]
-    private GameObject[] m_playerSpawnpoints;
+    // Don't leave the m_levelType as None, set it to a value as soon as possible (when making new scenes)
+    public enum LevelTypes
+    {
+        None,
+        Level,
+        Lobby,
+        Narrative,
+        BossLevel
+    }
 
-    [Tooltip("If playerSpawnpoint is unassigned, spawn using these default coordinates")]
-    [SerializeField]
-    private Vector3 m_defaultSpawn = new Vector3(0, 3, 0);
-
-    [Tooltip("The prefab to use for representing the player")]
-    [SerializeField]
-    private GameObject m_playerPrefab;
-
-    private uint m_currentSpawnIndex = 0; // index of the current spawn to spawn the player, used if m_playerSpawnpoints exists
-
-    // Ready up variables
-
-    public bool IsLevel { get { return m_isLevel; } private set { m_isLevel = value; } }
-    [SerializeField]
-    private bool m_isLevel = true;
-
+    // C# properties for accessing the private variables
+    public LevelTypes TypeOfLevel { get { return m_levelType; } private set { m_levelType = value; } }
+    public bool IsLevel { get { return !(m_levelType == LevelTypes.Lobby || m_levelType == LevelTypes.Narrative);  } }
+    
     public int PlayersReady { get { return m_playersReady; } private set { m_playersReady = value; } }
-    public uint PlayersNeededToReady { get { return m_playersNeededToStartGame; } private set { m_playersNeededToStartGame = value; } }
-
-    private int m_playersReady = 0;
-
-    [MyBox.ConditionalField("m_isLevel", true)]
-    [SerializeField]
-    private uint m_playersNeededToStartGame = 5;
-
-    [MyBox.ConditionalField("m_isLevel", true)]
-    [SerializeField]
-    private string m_levelAfterLobbyLevel = OfficeLv1Name;
-
-    [MyBox.ConditionalField("m_isLevel", true)]
-    [SerializeField]
-    private GameObject m_cameraPrefab;
-
-    [MyBox.ConditionalField("m_isLevel")]
-    [SerializeField]
-    private string m_levelAfterBeatingStage = WinSceneName;
-
-    private const string m_lobbyLevel = "Starting Level";
-    private bool m_isLoadingNewScene = false;
-
-    // Painting variables
+    // num players needed to be ready can be fetched via PhotonNetwork.CurrentRoom.PlayerCount
+    public int OrbsNeededToReady { get { return m_OrbsNeededToStartGame; } private set { m_OrbsNeededToStartGame = value; } }
     public float PaintPercentageNeededToWin { get { return m_paintPercentageNeededToWin; } private set { m_paintPercentageNeededToWin = value; } }
-    [Range(0, 1)]
-    [SerializeField]
-    private float m_paintPercentageNeededToWin = 0.75f;
+    public float CurrentPaintPercentage { get { return m_paintProgress; } private set { m_paintProgress = value; } }
 
     // Room custom properties
     public const string RedOrbKey = "RedLoanedToPhotonID";
@@ -70,23 +40,87 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     public const string BrownOrbKey = "BrownLoanedToPhotonID";
     public const string QuicksilverOrbKey = "QuicksilverLoanedToPhotonID";
     public const string IndigoOrbKey = "IndigoLoanedToPhotonID";
+    public const string OrbsNeededKey = "OrbsNeededToPhotonID";
 
     // Player custom properties
-    public const string OrbOwnedInLobbyKey = "OrbOwned";
-    public const string PlayerAliveKey = "IsPlayerAlive";
 
-    private bool resetPlayerOrbs = false; // this flag tells us whenever a player lost and returns to the lobby, confiscate their orbs!
+    //) lobby or narrative levels
+    public const string IsPlayerReady = "Ready";
+
+    //) lobby levels
+    public const string OrbOwnedInLobbyKey1 = "Orb1Owned";
+    public const string OrbOwnedInLobbyKey2 = "Orb2Owned";
+
+    //) "level"-type levels
+    public const string PlayerAliveKey = "IsPlayerAlive";
 
     // Name of scenes
     public const string LobbySceneName = "Starting Level";
     public const string WinSceneName = "YouWinScene";
     public const string OfficeLv1Name = "Office Level 1";
+    #endregion
+
+    #region Private Fields
+
+    [Separator("Player properties")]
+    [Tooltip("If playerSpawnpoint is unassigned, spawn using these default coordinates")]
+    [SerializeField]
+    private Vector3 m_defaultSpawn = new Vector3(-8, 1.5f, 4);
+
+    [Tooltip("Players will spawn on these location(s)")]
+    [SerializeField]
+    private GameObject[] m_playerSpawnpoints;
+
+    [Tooltip("The prefab to use for representing the player")]
+    [SerializeField]
+    private GameObject m_playerPrefab;
+
+    private uint m_currentSpawnIndex = 0; // index of the current spawn to spawn the player, used if m_playerSpawnpoints exists
+
+    [Separator("General level properties")]
+    [SerializeField]
+    private LevelTypes m_levelType = LevelTypes.None;
+
+    private bool m_isLoadingNewScene = false;
+
+    [Separator("Lobby level properties")]
+    private int m_playersReady = 0;
+
+    [SerializeField]
+    private int m_OrbsNeededToStartGame = 2;
+
+    private GameObject m_cameraPrefab; // Instantiate a camera prefab once a player returns back from a level
+
+    // Confiscate player orbs var
+    private bool resetPlayerOrbs = false; // this flag tells us whenever a player lost and returns to the lobby, confiscate their orbs!
+
+    [Separator("Lobby / narrative level properties")]
+    [SerializeField]
+    private string m_levelAfterReadyUp = OfficeLv1Name;
+
+    [Separator("Normal gameplay level properties")]
+    [SerializeField]
+    private string m_levelAfterBeatingStage = WinSceneName;
+
+    // Painting variables
+    [Range(0, 1)]
+    [SerializeField]
+    private float m_paintPercentageNeededToWin = 0.75f;
+
+    private float m_paintProgress = 0f;
+
+    [Separator("Boss level properties")]
+    [SerializeField]
+    private int enemiesRemaining = 0;
 
     #endregion
 
     #region Dialogue system fields
 
+    [Separator("GUI references")]
     public GameObject popUpBox;
+
+    private Button m_leaveButton; // the reference to the leave button in canvas
 
     Animator animator;
     TMPro.TMP_Text popUpFullText;
@@ -111,13 +145,16 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
     #region Components
 
+    [Separator("References to other components")]
     [SerializeField]
-    private EnemyManager m_enemManager;
+    private GameObject m_enemyManagerObject;
+    [SerializeField]
+    private GameObject m_paintingManagerObject;
+    [SerializeField]
+    private GameObject m_orbValueManagerObject;
 
-    [SerializeField]
-    private GameObject paintingManagerObject;
-    [SerializeField]
-    private GameObject orbValueManagerObject;
+    private EnemyManager m_enemManager;
+    private PaintingManager m_paintManager;
 
     #endregion
 
@@ -127,7 +164,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     {
         if ((SceneManager.GetActiveScene().name == WinSceneName) || !PhotonNetwork.InRoom)
         {
-            // don't do anything
+            // don't run the rest of the start statement, return immediately
             return;
         }
 
@@ -137,7 +174,22 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         }
         else
         {
-            if (SceneManager.GetActiveScene().name == LobbySceneName)
+            m_cameraPrefab = Resources.Load<GameObject>("Main Camera"); // load the camera resource before we might need it
+
+            if (m_levelType == LevelTypes.Narrative)
+            {
+                // always setup a custom properties for all player
+                PhotonHashtable properties = new PhotonHashtable
+                {
+                    {IsPlayerReady, false }
+                };
+
+                // This keep tracks of whether a player is ready or not
+                // so that if the player was ready, and left, it would
+                // decrement the amount of players ready
+                PhotonNetwork.LocalPlayer.SetCustomProperties(properties);
+            }
+            else if (m_levelType == LevelTypes.Lobby)
             {
                 // Initalize the Room's custom properties once for the starting level
                 // be sure to clear these properties when moving to the first level
@@ -162,7 +214,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
                         {VioletOrbKey, array2size},
                         {BrownOrbKey, array2size},
                         {QuicksilverOrbKey, array2size},
-                        {IndigoOrbKey, array2size}
+                        {IndigoOrbKey, array2size},
+                        {OrbsNeededKey, m_OrbsNeededToStartGame}
                     };
 
                     PhotonNetwork.CurrentRoom.SetCustomProperties(properties);
@@ -171,13 +224,17 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
                 // always setup a custom properties for all player
                 properties = new PhotonHashtable
                 {
-                    {OrbOwnedInLobbyKey, PodiumController.OrbTypes.None}
+                    {OrbOwnedInLobbyKey1, PodiumController.OrbTypes.None},
+                    {OrbOwnedInLobbyKey2, PodiumController.OrbTypes.None},
+                    {IsPlayerReady, false }
                 };
+
+                // please don't let there be another orb type owned, this is somewhat tedious to scale (2 is tedious enough)
 
                 PhotonNetwork.LocalPlayer.SetCustomProperties(properties);
                 // these custom properties will be mutated whenver a player picks up a lobby orb / return a lobby orb
             }
-            else if (m_isLevel)
+            else if (m_levelType == LevelTypes.Level)
             {
                 // Keep track of whether a player is still alive or not
                 PhotonHashtable properties = new PhotonHashtable
@@ -188,10 +245,36 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
             }
 
             // Add in Painting Manager and Orb Value Manager classes manually
+            GameObject cacheObj;
+
             if (!GameObject.Find("OrbValueManager"))
-                Instantiate(orbValueManagerObject);
-            if (!GameObject.Find("PaintingManager"))
-                Instantiate(paintingManagerObject);
+            {
+                Instantiate(m_orbValueManagerObject);
+            }
+            
+            // Add painting manager and enemy manager if it is a normal level
+            if (m_levelType == LevelTypes.Level)
+            {
+                if (!(cacheObj = GameObject.Find("PaintingManager")))
+                {
+                    GameObject obj = Instantiate(m_paintingManagerObject);
+                    m_paintManager = obj.GetComponent<PaintingManager>();
+                }
+                else
+                {
+                    m_paintManager = cacheObj.GetComponent<PaintingManager>();
+                }
+
+                if (!(cacheObj = GameObject.Find("EnemyManager")))
+                {
+                    GameObject obj = Instantiate(m_enemyManagerObject);
+                    m_enemManager = obj.GetComponent<EnemyManager>();
+                }
+                else
+                {
+                    m_enemManager = cacheObj.GetComponent<EnemyManager>();
+                }
+            }
 
             if (PlayerController.LocalPlayerInstance == null)
             {
@@ -206,8 +289,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
                     // This portion of the code is reached whenever HealthScript.LocalPlayerInstance exists
                     // meaning we're loading a new scene (player is Don't Destroy on load)
 
-                    GameObject playerObject;
-                    if (!m_isLevel && (playerObject = PhotonNetwork.LocalPlayer.TagObject as GameObject) != null)
+                    GameObject playerObject = PhotonNetwork.LocalPlayer.TagObject as GameObject;
+
+                    if (!(m_levelType==LevelTypes.Level) && playerObject)
                     {
                         object playerAliveProperty;
                         bool spawnNewPlayerInstance = false;
@@ -250,12 +334,19 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         }
 
         SetPopUpVariables();
+
+        // Find reference to the leave button in Canvas
+        GameObject canvas;
+        if (canvas = GameObject.Find("Canvas"))
+        {
+            m_leaveButton = canvas.transform.Find("LevelUI").transform.Find("TopPanel").transform.Find("LeaveButton").GetComponent<Button>();
+        }
     }
 
     private void Update()
     {
-        // confiscate player orbs for all players
-        if (!m_isLevel && !resetPlayerOrbs)
+        // Only confiscate player orbs for all players if players have just returned from a level and are all dead
+        if (SceneManager.GetActiveScene().name == LobbySceneName && !resetPlayerOrbs)
         {
             resetPlayerOrbs = true;
 
@@ -263,29 +354,52 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
             if (playerObj)
             {
-                playerObj.GetComponent<OrbManager>().ResetOrbs();
+                object playerAliveProperty;
+
+                if (PhotonNetwork.LocalPlayer.CustomProperties.TryGetValue(PlayerAliveKey, out playerAliveProperty))
+                {
+                    if (!(bool)playerAliveProperty)
+                    {
+                        // the player is dead, remove all of their orbs
+                        playerObj.GetComponent<OrbManager>().ResetOrbs();
+                    }
+                }
             }
             else
             {
+                // playerObj not ready to check yet
                 resetPlayerOrbs = false;
             }
         }
 
         if (PhotonNetwork.IsMasterClient)
         {
-            if (!m_isLevel)
+            if (m_levelType == LevelTypes.Lobby || m_levelType == LevelTypes.Narrative)
             {
                 // check if all players are ready
-                if (!m_isLoadingNewScene && m_playersReady >= m_playersNeededToStartGame)
+                if (!m_isLoadingNewScene && m_playersReady >= PhotonNetwork.CurrentRoom.PlayerCount)
                 {
-                    LoadLevel(m_levelAfterLobbyLevel);
+                    LoadLevel(m_levelAfterReadyUp);
                 }
             }
-            else
+            else if (m_levelType != LevelTypes.None)
             {
-                if (!m_isLoadingNewScene && PaintingManager.paintingProgress() > m_paintPercentageNeededToWin)
+                if (m_levelType == LevelTypes.Level)
+                {            
+                    m_paintProgress = PaintingManager.paintingProgress();
+
+                    if (!m_isLoadingNewScene && m_paintProgress > m_paintPercentageNeededToWin)
+                    {
+                        LoadLevel(m_levelAfterBeatingStage);
+                    }
+                }
+                //Boss win condition
+                if (m_levelType == LevelTypes.BossLevel)
                 {
-                    LoadLevel(m_levelAfterBeatingStage);
+                    if (!m_isLoadingNewScene && enemiesRemaining <= 0)
+                    {
+                        LoadLevel(m_levelAfterBeatingStage);
+                    }
                 }
                 if (!m_isLoadingNewScene)
                 {
@@ -310,7 +424,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
                     if (!isAnyPlayerAlive)
                     {
-                        LoadLevel(m_lobbyLevel);
+                        LoadLevel(LobbySceneName);
                     }
                 }
             }
@@ -395,6 +509,18 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         m_playersReady--;
     }
 
+    [PunRPC]
+    private void AddEnemy()
+    {
+        enemiesRemaining += 1;
+    }
+
+    [PunRPC]
+    private void RemoveEnemy()
+    {
+        enemiesRemaining -= 1;
+    }
+
     /// <summary>
     /// Clean up everything as we load the character into the new level.
     /// </summary>
@@ -416,6 +542,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     private void TransitionPlayerToNewRoom()
     {
         PhotonView playerView = PhotonView.Get(HealthScript.LocalPlayerInstance);
+        GameManager newLevelGameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
 
         TidyUpBeforeStartingNewLevel();
 
@@ -436,7 +563,12 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
             // Reset their spell GUI reference
             player.GetComponent<OrbManager>().Initialization();
+
+            // Set the character's speed depending on the level
+            player.GetComponent<PlayerMovement>().SetSpeedDependingOnLevel(newLevelGameManager.IsLevel);
         }
+
+        m_paintProgress = 0f; // reset paint progress
     }
 
     #endregion
@@ -460,7 +592,17 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
             // fetch, alter, then set player custom properties
             PhotonHashtable playerProperties = PhotonNetwork.LocalPlayer.CustomProperties;
-            playerProperties[OrbOwnedInLobbyKey] = PodiumController.FetchOrbType(orbKey);
+
+            // Check if the orb is empty, if it is set it, otherwise set it to the second key
+            if ((PodiumController.OrbTypes)playerProperties[OrbOwnedInLobbyKey1] == PodiumController.OrbTypes.None)
+            {
+                playerProperties[OrbOwnedInLobbyKey1] = PodiumController.FetchOrbType(orbKey);
+            }
+            else
+            {
+                playerProperties[OrbOwnedInLobbyKey2] = PodiumController.FetchOrbType(orbKey);
+            }
+            
             PhotonNetwork.LocalPlayer.SetCustomProperties(playerProperties);
 
             CloseWindow();
@@ -481,7 +623,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     public void CloseWindow()
     {
         CloseWindowVisually();
-        currentPodium.CloseWindow();
+        if (currentPodium)
+            currentPodium.CloseWindow();
     }
 
     public void CloseWindowVisually()
@@ -504,25 +647,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     {
         OrbManager.orbHistory.Clear(); // don't retain memory of spells after leaving game
 
-        if (SceneManager.GetActiveScene().name == LobbySceneName)
-        {
-            // why would a bozo claim an orb and then leave, you're making me do this stupid edge case
-            PodiumController.OrbTypes orbOwned = (PodiumController.OrbTypes)PhotonNetwork.LocalPlayer.CustomProperties[OrbOwnedInLobbyKey];
-            if (orbOwned != PodiumController.OrbTypes.None)
-            {
-                // we must return this back to the source
-                PhotonHashtable roomProperties = PhotonNetwork.CurrentRoom.CustomProperties;
-                string key = PodiumController.FetchOrbKey(orbOwned);
-                roomProperties[key] = new int[] { -1, -1 }; // nobody should own the orb anymore
-
-                PhotonNetwork.CurrentRoom.SetCustomProperties(roomProperties);
-
-                roomProperties = new PhotonHashtable();
-                PhotonNetwork.LocalPlayer.SetCustomProperties(roomProperties); // clear the character's properties
-            }
-        }
-
+        // Leave the room and disconnect
         PhotonNetwork.LeaveRoom();
+        PhotonNetwork.Disconnect();
     }
 
     /// <summary>
@@ -535,6 +662,12 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         if (!m_isLoadingNewScene)
         {
             m_isLoadingNewScene = true;
+
+            // disable leave button (this will mess things if players decide to leave during this period)
+            if (m_leaveButton)
+            {
+                m_leaveButton.interactable = false;
+            }
 
             PhotonNetwork.LoadLevel(nameOfScene);        
         }
@@ -590,7 +723,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
             playerOrbManager.RemoveSpellOrb(currentOrbType, true);
 
             // Update custom properties
-            string orbKey = FetchOrbKey(currentOrbType.getElement());
+            string orbKey = FetchOrbKey(currentOrbType.getElement()); // for the room
+            PodiumController.OrbTypes orbType = PodiumController.FetchOrbType(orbKey);
 
             // fetch, alter, then set room custom properties
             PhotonHashtable roomProperties = PhotonNetwork.CurrentRoom.CustomProperties;
@@ -600,7 +734,19 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
             // fetch, alter, then set player custom properties
             PhotonHashtable playerProperties = PhotonNetwork.LocalPlayer.CustomProperties;
-            playerProperties[OrbOwnedInLobbyKey] = PodiumController.OrbTypes.None;
+
+            // Check if the first slot is holding the the orb, if it is, clear it
+            // otherwise clear the second slot
+            
+            if ((PodiumController.OrbTypes)playerProperties[OrbOwnedInLobbyKey1] == orbType)
+            {
+                playerProperties[OrbOwnedInLobbyKey1] = PodiumController.OrbTypes.None;
+            }
+            else
+            {
+                playerProperties[OrbOwnedInLobbyKey2] = PodiumController.OrbTypes.None;
+            }
+
             PhotonNetwork.LocalPlayer.SetCustomProperties(playerProperties);
 
             CloseWindowVisually();
@@ -633,6 +779,13 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     public void RPCReadyUp()
     {
         photonView.RPC("ReadyUp", RpcTarget.All);
+        if (PhotonNetwork.InRoom && PhotonNetwork.LocalPlayer.IsLocal)
+        {
+            // update the custom property for local player (they're ready)
+            PhotonHashtable localPlayerProperties = PhotonNetwork.LocalPlayer.CustomProperties;
+            localPlayerProperties[IsPlayerReady] = true;
+            PhotonNetwork.LocalPlayer.SetCustomProperties(localPlayerProperties);
+        }
     }
 
     /// <summary>
@@ -641,6 +794,23 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     public void RPCUnready()
     {
         photonView.RPC("UnReady", RpcTarget.All);
+        if (PhotonNetwork.InRoom && PhotonNetwork.LocalPlayer.IsLocal)
+        {
+            // update the custom property for local player (they're no longer ready)
+            PhotonHashtable localPlayerProperties = PhotonNetwork.LocalPlayer.CustomProperties;
+            localPlayerProperties[IsPlayerReady] = false;
+            PhotonNetwork.LocalPlayer.SetCustomProperties(localPlayerProperties);
+        }
+    }
+
+    public void RPCAddEnemy()
+    {
+        photonView.RPC("AddEnemy", RpcTarget.All);
+    }
+
+    public void RPCRemoveEnemy()
+    {
+        photonView.RPC("RemoveEnemy", RpcTarget.All);
     }
 
     public void SetFullImage()
@@ -721,18 +891,86 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
     public override void OnLeftRoom()
     {
-        SceneManager.LoadScene(0);
+        SceneManager.LoadScene("Lobby"); // load the lobby scene
     }
 
-    #endregion
+    public override void OnPlayerLeftRoom(Player otherPlayer)
+    {
+        // If the player leave the room, do room cleanup stuff (e.x. if they left the room with a loaned orb from the lobby, return that orb)
+        if ((TypeOfLevel == LevelTypes.Lobby || TypeOfLevel == LevelTypes.Narrative) && PhotonNetwork.IsMasterClient)
+        {
+            // decrement num of players ready if player that left had readied up
+            bool isPlayerReadiedUp = (bool)otherPlayer.CustomProperties[IsPlayerReady];
+            if (isPlayerReadiedUp)
+            {
+                RPCUnready();
+            }
+        }
 
-    #region Photon functions
+        if (TypeOfLevel == LevelTypes.Lobby && PhotonNetwork.IsMasterClient)
+        {
+            // why would a bozo claim an orb and then leave, you're making me do this stupid edge case
+            string[] orbOwnedKeys = new string[2] { OrbOwnedInLobbyKey1, OrbOwnedInLobbyKey2 };
+
+            PhotonHashtable roomProperties = PhotonNetwork.CurrentRoom.CustomProperties;
+
+            foreach (string orbKey in orbOwnedKeys)
+            {
+                PodiumController.OrbTypes orbOwned = (PodiumController.OrbTypes)otherPlayer.CustomProperties[orbKey];
+                if (orbOwned != PodiumController.OrbTypes.None)
+                {
+                    // we must return this back to the source  
+                    string key = PodiumController.FetchOrbKey(orbOwned);
+                    roomProperties[key] = new int[] { -1, -1 }; // nobody should own the orb anymore
+                }
+            }
+
+            PhotonNetwork.CurrentRoom.SetCustomProperties(roomProperties);
+            PhotonHashtable emptyProperties = new PhotonHashtable();
+            otherPlayer.SetCustomProperties(emptyProperties); // clear the character's properties
+        }
+    }
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
-        if (!m_isLevel)
+        if (m_levelType == LevelTypes.Level)
         {
-            // Synchronize the number of players ready across all clients
+            if (stream.IsWriting)
+            {
+                //print("sending | num enemies: " + m_enemManager.CurrentNumberEnemiesInLevel); // + " | paint prog:" + m_paintProgress);
+                if (m_enemManager)
+                {
+                    // Synchronize the number of enemies in a level
+                    stream.SendNext(m_enemManager.CurrentNumberEnemiesInLevel);
+                }
+                if (m_paintManager)
+                {
+                    // Synchronize the paint percentage in a level
+                    stream.SendNext(m_paintProgress);
+                }
+            }
+            else
+            {
+                //string recieveString = "";
+                if (m_enemManager)
+                {
+                    byte test = (byte)stream.ReceiveNext();
+                    //recieveString += "num enemies on field: " + test;
+                    m_enemManager.SetNumEnemiesOnField(test);
+                }
+                if (m_paintManager)
+                {
+                    // master client won't need to recieve paintProgress (they are the authority for that variable)
+                    float test2 = (float)stream.ReceiveNext();
+                    //recieveString += "paint progress: " + test2;
+                    m_paintProgress = test2;
+                }
+                //print(recieveString);
+            }
+        }
+        else if (m_levelType == LevelTypes.Lobby || m_levelType == LevelTypes.Narrative)
+        {
+            // Synchronize the number of players ready across all clients, and number of orbs needed
             if (stream.IsWriting)
             {
                 stream.SendNext(m_playersReady);
@@ -740,22 +978,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
             else
             {
                 m_playersReady = (int)stream.ReceiveNext();
-            }
-        }
-        else
-        {
-            // Synchronize the number of enemies across all clients
-            if (m_enemManager)
-            {
-                // If enemManager doesn't exist, don't sync anything.
-                if (stream.IsWriting)
-                {
-                    stream.SendNext(m_enemManager.CurrentNumberEnemiesInLevel);
-                }
-                else
-                {
-                    m_enemManager.SetNumEnemiesOnField((byte)stream.ReceiveNext());
-                }
             }
         }
     }

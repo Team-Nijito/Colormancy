@@ -910,7 +910,7 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.05
-  m_Speed: 5
+  m_Speed: 4
   m_Acceleration: 50
   avoidancePriority: 50
   m_AngularSpeed: 999
@@ -969,11 +969,12 @@ MonoBehaviour:
   m_healthBar: {fileID: 4908208702333263939}
   m_username: {fileID: 4908208700896485246}
   m_gameManager: {fileID: 0}
-  m_baseHealth: 100
+  m_baseHealth: 40
   m_armorPercentage: 0
   m_isRegenHealth: 0
   m_regenHealthPercentage: 1
   m_timeUntilDestroy: 3
+  m_playAnimationOnDeathIfAttacking: 1
 --- !u!114 &-2888889355772402136
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -998,6 +999,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7fc410d693ecca6418b2d06f11383381, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  SetAnims: 1
   m_speed: 5
   m_wanderTime:
     minTime: 3

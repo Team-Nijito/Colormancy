@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
 
 class HelenShunpo : State
 {
@@ -12,26 +13,35 @@ class HelenShunpo : State
 
     public override IEnumerator Start()
     {
-        Debug.Log("Shunpo State");
-        m_HelenAI.photonView.RPC("SetAnimationBool", Photon.Pun.RpcTarget.All, "Shunpo", true);
-        Debug.Log("WAiting");
-        m_HelenAI.StartCoroutine(WaitTime(1f));
-        m_HelenAI.MeshAgent.Warp(m_HelenAI.Target.transform.position + (-m_HelenAI.Target.transform.forward * 2));
-        m_HelenAI.Movement.FaceTarget(m_HelenAI.DirectionToTarget());
-        m_HelenAI.photonView.RPC("SetAnimationTrigger", Photon.Pun.RpcTarget.All, "Shank");
-        m_HelenAI.SetState(new HelenChase(BossAI));
+        if (PhotonNetwork.IsMasterClient)
+        {
+            if (m_HelenAI.DebugMode)
+                Debug.Log("Start Shunpo State");
+
+            m_HelenAI.photonView.RPC("SetAnimationBool", Photon.Pun.RpcTarget.All, "Shunpo", true);
+            m_HelenAI.StartCoroutine(WaitTime(.25f));
+        }
         return base.Start();
     }
 
     public override IEnumerator Stop()
     {
-        m_HelenAI.currentIdleCooldown = 0f;
-        m_HelenAI.photonView.RPC("SetAnimationBool", Photon.Pun.RpcTarget.All, "Shunpo", false);
+        if (PhotonNetwork.IsMasterClient)
+        {
+            if (m_HelenAI.DebugMode)
+                Debug.Log("Stop Shunpo State");
+
+            m_HelenAI.photonView.RPC("SetAnimationBool", Photon.Pun.RpcTarget.All, "Shunpo", false);
+        }
         return base.Stop();
     }
 
     IEnumerator WaitTime(float seconds)
     {
         yield return new WaitForSeconds(seconds);
+        m_HelenAI.MeshAgent.Warp(m_HelenAI.Target.transform.position + (-m_HelenAI.Target.transform.forward * 2));
+        m_HelenAI.Movement.FaceTarget(m_HelenAI.DirectionToTarget());
+        m_HelenAI.photonView.RPC("SetAnimationTrigger", Photon.Pun.RpcTarget.All, "Shank");
+        m_HelenAI.photonView.RPC("SetHelenState", Photon.Pun.RpcTarget.AllViaServer, HelenAI.States.Chase);
     }
 }

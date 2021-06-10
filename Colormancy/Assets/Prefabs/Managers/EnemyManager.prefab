@@ -43,10 +43,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 56b517ce9a04af04592b83ae801a5b5f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_enemySpawnPointsActive: 0
   m_spawnpoints: []
   m_enemyEntities:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 5161377573530120741, guid: 95c3956dbb9cb204d92c762539c1fb1c, type: 3}
+  - {fileID: 7868359989750648, guid: f36a4665d8fd5de4b933cb78fbe55bc7, type: 3}
+  - {fileID: 4908208701605069864, guid: 6932730b140931244ab5aa48cc5c3fbf, type: 3}
+  - {fileID: 9186146974418002411, guid: 7b2d9bc4fe4f6e74ca8897f9475f5ffb, type: 3}
   m_enemyFolder: {fileID: 0}
   m_desiredEnemiesOnField: 7

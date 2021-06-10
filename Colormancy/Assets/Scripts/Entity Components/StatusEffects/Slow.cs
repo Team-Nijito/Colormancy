@@ -47,9 +47,9 @@ public class Slow : StatusEffect
 
     #region Functions
 
-    public Slow(List<StatusEffect> parentList, string name, StatusType type, float duration, 
+    public Slow(List<StatusEffect> parentList, StatusType type, float duration, string source,
                 float percentSpdReduction, PlayerMovement playerMove)
-                 : base(parentList, name, type, duration)
+                 : base(parentList, type, duration, source)
     {
         // Slow effect for players
         m_isPlayer = true;
@@ -63,9 +63,9 @@ public class Slow : StatusEffect
         m_playerMoveScript.AlterRunSpeed(m_playerMoveScript.RunSpeed * m_percent);
     }
 
-    public Slow(List<StatusEffect> parentList, string name, StatusType type, float duration,
+    public Slow(List<StatusEffect> parentList, StatusType type, float duration, string source,
                 float percentSpdReduction, EnemyMovement enemyMovement)
-                 : base(parentList, name, type, duration)
+                 : base(parentList, type, duration, source)
     {
         // Slow effect for AI entities
         m_isPlayer = false;
@@ -108,7 +108,7 @@ public class Slow : StatusEffect
     /// <summary>
     /// Decrease the duration by Time.deltaTime. If duration is zero, invoke Stop.
     /// </summary>
-    public override void Tick()
+    public override void Update()
     {
         m_duration -= Time.deltaTime;
         if (m_duration <= 0)

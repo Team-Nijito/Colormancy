@@ -49,9 +49,9 @@ public class Force : StatusEffect
 
     #region Functions
 
-    public Force(List<StatusEffect> parentList, string name, StatusType type, float duration, Vector3 direction, 
+    public Force(List<StatusEffect> parentList, StatusType type, float duration, string source, Vector3 direction, 
                  float forcePower, CharacterController playerController)
-                 : base(parentList, name, type, duration)
+                 : base(parentList, type, duration, source)
     {
         // force upon player constructor
         m_isPlayer = true;
@@ -62,9 +62,9 @@ public class Force : StatusEffect
         AppendForce(direction, forcePower);
     }
 
-    public Force(List<StatusEffect> parentList, string name, StatusType type, float duration, Vector3 direction, 
+    public Force(List<StatusEffect> parentList, StatusType type, float duration, string source, Vector3 direction, 
                  float forcePower, EnemyMovement enemMoveScript, Transform enemTransform)
-                 : base(parentList, name, type, duration)
+                 : base(parentList, type, duration, source)
     {
         // force upon AI entity constructor
         m_isPlayer = false;

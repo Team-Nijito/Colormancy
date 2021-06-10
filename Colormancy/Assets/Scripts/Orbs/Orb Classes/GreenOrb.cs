@@ -13,18 +13,48 @@ public class GreenOrb : Orb
         m_UIPrefab = (GameObject)Resources.Load("Orbs/GreenOrbUI");
     }
 
+    public override void AddHeldEffect(GameObject player)
+    {
+        PhotonView photonView = PhotonView.Get(player);
+        photonView.RPC("IncreaseHealth", RpcTarget.All, OrbValueManager.getHoldIncreaseValue(m_OrbElement));
+
+        PlayerMovement move = player.GetComponent<PlayerMovement>();
+        float percent = ((100 - OrbValueManager.getHoldDecreaseValue(m_OrbElement)) / 100);
+        move.AlterWalkSpeed(move.WalkSpeed * percent);
+        move.AlterRunSpeed(move.RunSpeed * percent);
+    }
+
+    public override void RevertHeldEffect(GameObject player)
+    {
+        PhotonView photonView = PhotonView.Get(player);
+        photonView.RPC("IncreaseHealth", RpcTarget.All, -OrbValueManager.getHoldIncreaseValue(m_OrbElement));
+
+        PlayerMovement move = player.GetComponent<PlayerMovement>();
+        float percent = ((100 - OrbValueManager.getHoldDecreaseValue(m_OrbElement)) / 100);
+        move.AlterWalkSpeed(move.WalkSpeed / percent);
+        move.AlterRunSpeed(move.RunSpeed / percent);
+    }
+
     public override void CastGreaterEffect(GameObject hit, float spellEffectMod, float[] data)
     {
+        float dmgMultiplier = 1;
+        if (hit.GetComponent<StatusEffectScript>().StatusExists(StatusEffect.StatusType.SpellIncreasedDamage))
+            dmgMultiplier += OrbValueManager.getGreaterEffectPercentile(Element.Water) / 100f;
+
         PhotonView photonView = PhotonView.Get(hit);
-        photonView.RPC("TakeDamage", RpcTarget.All, OrbValueManager.getGreaterEffectDamage(m_OrbElement, m_Level) * spellEffectMod);
+        photonView.RPC("TakeDamage", RpcTarget.All, OrbValueManager.getGreaterEffectDamage(m_OrbElement, m_Level) * spellEffectMod * dmgMultiplier);
+
+        StatusEffectScript script = hit.GetComponent<StatusEffectScript>();
+        script.RPCApplyStatus(StatusEffect.StatusType.Slowdown, OrbValueManager.getGreaterEffectDuration(m_OrbElement, m_Level), 0, 80, "green_orb");
     }
 
     public override void CastLesserEffect(GameObject hit, float spellEffectMod, float[] data)
     {
-        throw new System.NotImplementedException();
+        StatusEffectScript status = hit.GetComponent<StatusEffectScript>();
+        status.RPCApplyStatus(StatusEffect.StatusType.Rejuvenation, OrbValueManager.getLesserEffectDuration(m_OrbElement, m_Level), 1, OrbValueManager.getLesserEffectValue(m_OrbElement, m_Level), "green_orb");
     }
 
-    public override void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, Transform t, Vector3 clickedPosition)
+    public override void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, Transform t, Vector3 clickedPosition, float spellDamageMultiplier)
     {
         Transform wizard = t.GetChild(0);
 
@@ -36,7 +66,7 @@ public class GreenOrb : Orb
 
         spellController.greaterCast = greaterEffectMethod;
         spellController.lesserCast = lesserEffectMethod;
-        spellController.spellEffectMod = OrbValueManager.getShapeEffectMod(m_OrbElement);
+        spellController.spellEffectMod = OrbValueManager.getShapeEffectMod(m_OrbElement) * spellDamageMultiplier;
     }
 
     public static object Deserialize(byte[] data)

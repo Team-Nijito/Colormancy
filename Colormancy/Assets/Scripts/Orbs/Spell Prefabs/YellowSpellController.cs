@@ -69,15 +69,15 @@ public class YellowSpellController : MonoBehaviour
             tick = 0;
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter(Collider collider)
     {
-        if (collision.gameObject.CompareTag("Enemy"))
+        if (collider.gameObject.CompareTag("Enemy"))
         {
-            greaterCast(collision.gameObject, spellEffectMod, null);
+            greaterCast(collider.gameObject, spellEffectMod, null);
         }
-        else if (collision.gameObject.CompareTag("Player"))
+        else if (collider.gameObject.CompareTag("Player"))
         {
-            lesserCast(collision.gameObject, spellEffectMod, null);
+            lesserCast(collider.gameObject, spellEffectMod, null);
         }
     }
 }

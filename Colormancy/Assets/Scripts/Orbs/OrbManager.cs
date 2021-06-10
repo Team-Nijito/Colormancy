@@ -63,13 +63,48 @@ public class OrbManager : MonoBehaviourPun
             }
         }
 
-        if (Input.GetMouseButtonDown(1) && playerMoveScript.CanMove)
+        if (Input.GetMouseButton(1) && playerMoveScript.CanMove)
         {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
-            if (Physics.Raycast(ray, out hit, 100f, 1 << PaintingManager.paintingMask)) { }
+            if (currentSpell.GetOrbTuple().Item3 != null)
+            {
+                if (spellCooldowns.ContainsKey(currentSpell.GetOrbTuple()))
+                {
+                    if (spellCooldowns[currentSpell.GetOrbTuple()].Item1 <= Time.time)
+                    {
+                        currentSpell.PreviewSpell(transform, GetMouseLocation());
+                    }
+                }
+                else
+                {
+                    currentSpell.PreviewSpell(transform, GetMouseLocation());
+                }
+                 
+            }
+        }
 
-            photonView.RPC("TryCastSpell", RpcTarget.All, hit.point);
+        if (Input.GetMouseButtonUp(1) && playerMoveScript.CanMove)
+        {
+            Destroy(GameObject.FindGameObjectWithTag("SpellPreview"));
+            photonView.RPC("TryCastSpell", RpcTarget.All, GetMouseLocation());
+        }
+    }
+
+    private Vector3 GetMouseLocation()
+    {
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+        if (Physics.Raycast(ray, out hit, 100f, 1 << PaintingManager.paintingMask | 1))
+        {
+            return hit.point;
+        }
+        else
+        {
+            Vector3 planeCenter = transform.position - Vector3.up * 0.4f;
+            Vector3 planeNormal = Vector3.up;
+
+            float t = Vector3.Dot((planeCenter - ray.origin), planeNormal) / Vector3.Dot(ray.direction, planeNormal);
+
+            return ray.origin + ray.direction * t;
         }
     }
 
@@ -86,10 +121,10 @@ public class OrbManager : MonoBehaviourPun
 
     public void RemoveSpellOrb(Orb orb, bool removeFromOrbHistory = false)
     {
-        orbs.Remove(orb);
+        RemoveOrbFromList(orbs, orb);
         if (removeFromOrbHistory)
         {
-            orbHistory.Remove(orb); // sync across scenes
+            RemoveOrbFromList(orbHistory, orb); // sync across scenes
         }
         if (uIController)
             uIController.RemoveOrb(orb);
@@ -129,7 +164,6 @@ public class OrbManager : MonoBehaviourPun
     [PunRPC]
     void ReduceAllCooldowns(float percentReduce)
     {
-        print("Reduce cooldowns.");
         if (percentReduce <= 0)
         {
             throw new ArgumentException(string.Format("{0} is a positive percentage, and thus should be greater than zero", percentReduce), "percentReduce");
@@ -196,6 +230,24 @@ public class OrbManager : MonoBehaviourPun
                     throw new NotImplementedException("Didn't implement adding " + o.getElement() + " yet");
             }
         }
+    }
+
+    /// <summary>
+    /// Helper function (original code orb removal snippet written by Branden, and translated into helper function by William)
+    /// </summary>
+    /// <param name="orbList">The list of orbs to search and permute</param>
+    /// <param name="markedOrb">The orb to remove</param>
+    private void RemoveOrbFromList(List<Orb> orbList, Orb markedOrb)
+    {
+        Orb elementToRemove = null;
+        foreach (Orb searchOrb in orbList)
+        {
+            if (searchOrb.getElement() == markedOrb.getElement())
+            {
+                elementToRemove = searchOrb;
+            }
+        }
+        orbList.Remove(elementToRemove);
     }
 
     /// <summary>

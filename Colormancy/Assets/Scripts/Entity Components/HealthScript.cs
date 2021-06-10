@@ -34,6 +34,9 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     [SerializeField]
     private float m_baseHealth = 100f;
 
+    [SerializeField]
+    private float m_shieldHealth = 0f;
+
     // % of damage we're blocking
     [SerializeField]
     [Range(0f, 100f)]
@@ -41,6 +44,8 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
 
     [SerializeField]
     private bool m_isRegenHealth = false;
+
+    private float m_healthMultiplier = 1f;
 
     [MyBox.ConditionalField("m_isRegenHealth", false)]
     [SerializeField]
@@ -161,7 +166,7 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
 
                 // player respawns as spectate camera
                 photonView.RPC("RespawnPlayerAsGhost", PhotonNetwork.LocalPlayer);
-                photonView.RPC("RemovePlayer", RpcTarget.MasterClient);
+                photonView.RPC("RemovePlayer", PhotonNetwork.LocalPlayer);
             }
         }
         else
@@ -196,7 +201,8 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     private void EnemyCleanup()
     {
         EnemyChaserAI controllerScript = GetComponent<EnemyChaserAI>(); // works for all AI b/c all AI scripts derive from EnemyChaserAI
-        controllerScript.StopAllTasks(); // stop all ongoing status effects, then disable any fellow scripts
+        if (controllerScript)
+            controllerScript.StopAllTasks(); // stop all ongoing status effects, then disable any fellow scripts
 
         // disable health bar and name
         m_healthBar.gameObject.SetActive(false);
@@ -255,7 +261,9 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
         PhotonNetwork.Destroy(transform.gameObject);
 
         // Notify the Enemy Manager that an enemy has died
-        GameObject.Find("EnemyManager").GetComponent<EnemyManager>().EnemyHasDied();
+        GameObject manager = GameObject.Find("EnemyManager");
+        if (manager)
+            manager.GetComponent<EnemyManager>().EnemyHasDied();
     }
 
     // The healthbar gui faces the main camera (if it exists)
@@ -292,6 +300,35 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     public float GetMaxEffectiveHealth() { return m_maxEffectiveHealth; }
     public float GetEffectiveHealth() { return m_effectiveHealth; }
     public float GetArmorPercentage() { return m_armorPercentage; }
+
+    [PunRPC]
+    public void SetRegenHealth(bool regen, float percentage)
+    {
+        m_isRegenHealth = regen;
+        m_regenHealthPercentage = percentage;
+    }
+
+    [PunRPC]
+    public void IncreaseHealth(float percentage)
+    {
+        if (m_healthMultiplier + (percentage / 100) <= 0)
+            throw new ArgumentException(string.Format("{0} shouldn't completely decrease", percentage), "percentage");
+
+        m_healthMultiplier += percentage / 100;
+
+        float healthRatio = m_effectiveHealth / m_maxEffectiveHealth;
+        m_maxEffectiveHealth = m_baseHealth * m_healthMultiplier;
+        m_effectiveHealth = healthRatio * m_maxEffectiveHealth;
+    }
+
+    [PunRPC]
+    public void AddShield(float shieldHealth)
+    {
+        if (shieldHealth < 0)
+            throw new ArgumentException(string.Format("{0} shouldn't be a negative number", shieldHealth), "shieldHealth");
+        
+        m_shieldHealth += shieldHealth;
+    }
 
     [PunRPC]
     public void AlterArmorValue(float armorPercent)
@@ -384,17 +421,26 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
             throw new ArgumentException(string.Format("{0} should be greater than zero", damageValue), "damageValue");
         if (photonView.IsMine)
         {
-            m_effectiveHealth -= (damageValue - (m_armorPercentage / 100 * damageValue));
+            if (m_isPlayer)
+            {
+                StatusEffectScript status = GetComponent<StatusEffectScript>();
+                status.RPCClearStatusEffect(StatusEffect.StatusType.MovementIncreaseSpeed);
+            }
+
+            if (m_shieldHealth == 0)
+                m_effectiveHealth -= (damageValue - (m_armorPercentage / 100 * damageValue));
+            else
+                m_shieldHealth = Mathf.Max(m_shieldHealth - damageValue, 0);
         }
     }
 
     /// <summary>
-    /// (PunRPC) Send this RPC call to the master client if you want to destroy this particular player gameObject.
+    /// (PunRPC) Send this RPC call to the ownwer of the player if you want to destroy this particular player gameObject.
     /// </summary>
     [PunRPC]
     public void RemovePlayer()
     {
-        if (PhotonNetwork.IsMasterClient && gameObject)
+        if (gameObject && photonView.IsMine)
         {
             PhotonNetwork.Destroy(gameObject);
         }
@@ -413,7 +459,7 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
         // if we have a status effect component, then stop any onging status effects
         if (m_statusEffectScript)
         {
-            m_statusEffectScript.ClearStatusEffects();
+            m_statusEffectScript.RPCClearAllStatusEffects();
         }
 
         if (!m_gameManager)

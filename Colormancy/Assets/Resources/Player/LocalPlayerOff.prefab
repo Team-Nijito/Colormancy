@@ -306,8 +306,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70b785f2b2d1f554b8f1d03e9c2dad07, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_walkSpeed: 18
-  m_runSpeed: 20
+  m_baseWalkSpeed: 8
+  m_baseRunSpeed: 15
   m_character: {fileID: 8719925113848596262}
 --- !u!114 &5820395927475117109
 MonoBehaviour:
@@ -343,11 +343,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_ignoreTurnRadius: 1
-  m_basicClickDamage: 5
-  m_basicClickManaConsumption: 3
-  m_layersToIgnore:
-    serializedVersion: 2
-    m_Bits: 0
 --- !u!114 &5820395927475117115
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -365,6 +360,7 @@ MonoBehaviour:
   m_username: {fileID: 2672177483625422240}
   m_gameManager: {fileID: 0}
   m_baseHealth: 100
+  m_shieldHealth: 0
   m_armorPercentage: 0
   m_isRegenHealth: 1
   m_regenHealthPercentage: 0.5
@@ -395,7 +391,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_paintColor: {r: 0.37201852, g: 0.7359005, b: 0.8301887, a: 0}
-  m_paintballCooldown: 0.7
+  m_attackSpeed: 0.7
+  m_attackDamage: 5
+  m_attackMultiplier: 1
 --- !u!114 &8921435665619611767
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -778,7 +776,7 @@ RectTransform:
   m_GameObject: {fileID: 5820395928792804825}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.8, y: 0.8, z: 0.8}
   m_Children:
   - {fileID: 5820395927547718610}
   m_Father: {fileID: 5820395927475117108}
@@ -2534,7 +2532,7 @@ Transform:
   m_GameObject: {fileID: 8719925113848596262}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: -1, z: 0}
-  m_LocalScale: {x: 0.8, y: 0.8, z: 0.8}
+  m_LocalScale: {x: 0.7, y: 0.7, z: 0.7}
   m_Children:
   - {fileID: 8719925113848568530}
   - {fileID: 8088243446852111749}

@@ -6,8 +6,11 @@ using UnityEngine.AI;
 
 public class HelenAI : BossAI
 {
-    public float ShankRange = 2f;
 
+    //Controls if there are debug messages when changing states amongst other prints
+    public bool DebugMode = true;
+
+    public float ShankRange = 3f;
     public float ShankCooldown = 5f;
     public float ShunpoCooldown = 15f;
     public float HunterOfHeadsCooldown = 45f;
@@ -22,20 +25,32 @@ public class HelenAI : BossAI
     [HideInInspector]
     public float currentIdleCooldown = 0f;
 
-    // Start is called before the first frame update
-    void Start()
+    public enum States
     {
-        print("Start");
-        Animator = GetComponent<Animator>();
-        EnemyHitbox = GetComponent<EnemyHitbox>();
-        MeshAgent = GetComponent<NavMeshAgent>();
-        StatusEffect = GetComponent<StatusEffectScript>();
-        SetState(new HelenChase(this));
+        Shank, Chase, Shunpo
+    }
+
+    // Start is called before the first frame update
+    new void Start()
+    {
+        base.Start();
+        if (PhotonNetwork.IsMasterClient)
+        {
+            Animator = GetComponent<Animator>();
+            EnemyHitbox = GetComponent<EnemyHitbox>();
+            MeshAgent = GetComponent<NavMeshAgent>();
+            StatusEffect = GetComponent<StatusEffectScript>();
+            photonView.RPC("SetHelenState", Photon.Pun.RpcTarget.AllViaServer, HelenAI.States.Chase);
+        }
     }
 
     // Update is called once per frame
-    void Update()
+    new void Update()
     {
+        base.Update();
+        if (GetCurrentHealth() <= 0)
+            return;
+        if (!PhotonNetwork.IsMasterClient) return;
         if (Target == null)
         {
             GameObject target = GetTarget();
@@ -72,5 +87,23 @@ public class HelenAI : BossAI
         }
 
         return targetPlayer;
+    }
+
+    [PunRPC]
+    public void SetHelenState(States state)
+    {
+        if (photonView.IsMine)
+        {
+            if (state == States.Shank)
+            {
+                SetState(new HelenShank(this));
+            } else if (state == States.Chase)
+            {
+                SetState(new HelenChase(this));
+            } else if (state == States.Shunpo)
+            {
+                SetState(new HelenShunpo(this));
+            }
+        }
     }
 }

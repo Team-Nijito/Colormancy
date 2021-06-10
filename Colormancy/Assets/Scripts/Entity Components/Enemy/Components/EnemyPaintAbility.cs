@@ -60,30 +60,26 @@ public class EnemyPaintAbility : MonoBehaviour
     #region Protected functions
 
     /// <summary>
-    /// A function to paint a trail on the floor as the enemy moves around. Doesn't paint when idling.
+    /// A function to paint a trail on the floor as the enemy moves around. Can paint/unpaint while idling.
     /// Rinse and repeat.
     /// </summary>
     protected IEnumerator PaintOnFloorLoop()
     {
         while (true)
         {
-            if (this && m_enemMovement.IsAgentMoving())
+            if (this)
             {
-                Debug.DrawRay(transform.position, Vector3.down * m_raycastFloorLen, Color.green);
-                if (Physics.Raycast(transform.position, -transform.up, out m_raycastHit, m_raycastFloorLen, m_paintableMask))
-                {
-                    //the ray collided with something, you can interact
-                    // with the hit object now by using hit.collider.gameObject
-                    Vector3 paintPosition = new Vector3(transform.position.x, m_raycastHit.collider.gameObject.transform.position.y, transform.position.z);
+                // by allowing the painter skeleton to paint while idling, we allowed other clients to witness the painting
+                // because the enemies they see are simply synced by position, and not being moved by the movement scripts
+                // tl;dr isMoving will always be false for non master clients
 
-                    if (!m_isUnpainter)
-                    {
-                        PaintingManager.PaintSphere(m_colorToPaint, paintPosition, m_paintRadius);
-                    }
-                    else
-                    {
-                        PaintingManager.UnpaintSphere(paintPosition, m_paintRadius);
-                    }
+                if (m_isUnpainter)
+                {
+                    PaintingManager.UnpaintSphere(transform.position, m_paintRadius);
+                }
+                else
+                {
+                    PaintingManager.PaintSphere(m_colorToPaint, transform.position, m_paintRadius);
                 }
             }
             yield return new WaitForSecondsRealtime(m_paintCooldown);
