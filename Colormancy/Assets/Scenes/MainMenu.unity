@@ -823,6 +823,12 @@ MonoBehaviour:
   m_PixelsPerUnitMultiplier: 1
 --- !u!222 &874545983
 CanvasRenderer:
+  maxPlayersPerRoom: 5
+  controlPanel: {fileID: 331092316}
+  progressLabel: {fileID: 1583163699}
+  sceneNameToLoadIn: Office Level 1
+--- !u!4 &962284967
+Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}

@@ -73,7 +73,7 @@
     {
         m_hpScript.ZeroHealth();
         m_animManager.SetSpeed(0f);
-        m_animManager.ChangeState(EnemyAnimationManager.EnemyState.Attack);
+        //m_animManager.ChangeState(EnemyAnimationManager.EnemyState.Attack);
     }
 
     #endregion

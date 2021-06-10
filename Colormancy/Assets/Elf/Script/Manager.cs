@@ -3,17 +3,13 @@ using System.Collections;
 
 public class Manager : MonoBehaviour {
 
-	public GameObject CameraObj;
-	public Camera camera;
+	public GameObject m_CameraObj;
+	public Camera m_camera;
 
 	public bool left = false;
 	public bool right = false;
 	public bool cameraIn = false;
 	public bool cameraOut = false;
-	// Use this for initialization
-	void Start () {
-	
-	}
 	
 	// Update is called once per frame
 	void Update () {
@@ -27,28 +23,28 @@ public class Manager : MonoBehaviour {
 		}
 		if(left == true)
 		{
-			CameraObj.transform.RotateAround(Vector3.down, Time.deltaTime * 5);
+			m_CameraObj.transform.Rotate(Vector3.down, Time.deltaTime * 5);
 		}
 		if(right == true)
 		{
-			CameraObj.transform.RotateAround(Vector3.up, Time.deltaTime * 5);	
+			m_CameraObj.transform.Rotate(Vector3.up, Time.deltaTime * 5);	
 		}
 		if(cameraIn == true)
 		{
-			if(camera.fieldOfView >= 20)
+			if(m_camera.fieldOfView >= 20)
 			{
-				camera.fieldOfView--;
+				m_camera.fieldOfView--;
 			}
 		}
 		if(cameraOut == true)
 		{
-			if(camera.fieldOfView <= 60)
+			if(m_camera.fieldOfView <= 60)
 			{
-				camera.fieldOfView++;
+				m_camera.fieldOfView++;
 			}
 		}
-	
 	}
+
 	void OnGUI() {
 
 	//	GUI.skin.button.fontSize = 10;
@@ -59,7 +55,7 @@ public class Manager : MonoBehaviour {
 		}
 		if (GUI.Button(new Rect(Screen.width/2 - 50, 450, 100, 50), "Zoom Reset"))
 		{
-			camera.fieldOfView = 40;
+			m_camera.fieldOfView = 40;
 		}
 		if (GUI.RepeatButton(new Rect(Screen.width/2 + 70, 450, 100, 50), "Zoom Out"))
 		{
@@ -72,7 +68,7 @@ public class Manager : MonoBehaviour {
 		}
 		if (GUI.Button(new Rect(Screen.width/2 - 50, 520, 100, 50), "Camera Reset"))
 		{
-			CameraObj.transform.eulerAngles = new Vector3(0,0,0);
+			m_CameraObj.transform.eulerAngles = new Vector3(0,0,0);
 		}
 		if (GUI.RepeatButton(new Rect(Screen.width/2 + 70, 520, 100, 50), "Camera Right"))
 		{

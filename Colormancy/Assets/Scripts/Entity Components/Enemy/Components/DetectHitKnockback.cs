@@ -1,4 +1,6 @@
 ﻿using UnityEngine;
+using Photon.Pun;
+using System.Collections.Generic;
 
 public class DetectHitKnockback : DetectHit
 {
@@ -16,6 +18,9 @@ public class DetectHitKnockback : DetectHit
         Suck,
         Push
     }
+    
+    [SerializeField]
+    private bool m_onlyDoDamageOnce = false; // is this like an explosion attack?
 
     [SerializeField]
     private bool m_applyForce = false;
@@ -27,6 +32,30 @@ public class DetectHitKnockback : DetectHit
     [MyBox.ConditionalField("m_whatForce", true, ForceType.None)]
     [SerializeField]
     private float m_force = 150f;
+
+    private List<int> m_playersHurt = new List<int>();
+
+    #endregion
+
+    #region Private functions
+
+    /// <summary>
+    /// This checks if the player has been slammed with the attack already (presuming that m_onlyDoDamageOnce is true)
+    /// </summary>
+    /// <param name="playerID">The photon player Actor ID.</param>
+    /// <returns>Whether this can hurt you or not</returns>
+    private bool CanThisHurtYou(int playerID)
+    {
+        if (m_playersHurt.FindIndex(x => x == playerID) < 0)
+        {
+            m_playersHurt.Add(playerID);
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
 
     #endregion
 
@@ -52,7 +81,10 @@ public class DetectHitKnockback : DetectHit
             }
         }
 
-        base.OnTriggerEnter(other);
+        if (!m_onlyDoDamageOnce)
+        {
+            base.OnTriggerEnter(other);
+        }
     }
 
     protected override void OnTriggerStay(Collider other)
@@ -75,7 +107,40 @@ public class DetectHitKnockback : DetectHit
             }
         }
 
-        base.OnTriggerStay(other);
+        if (m_onlyDoDamageOnce)
+        {
+            // Apparently if you're not the masterclient, and you get bombed, OnTriggerEnter basically
+            // never gets called, so this is implemented so that players will still get hurt
+            // by bombs once
+            if (other.CompareTag("Player"))
+            {
+                PhotonView playerPhotonView = PhotonView.Get(other.gameObject);
+                if (playerPhotonView && playerPhotonView.IsMine)
+                {
+                    int playerID = playerPhotonView.Controller.ActorNumber;
+
+                    if (m_isProjectile)
+                    {
+                        if (CanThisHurtYou(playerID))
+                        {
+                            playerPhotonView.RPC("TakeDamage", playerPhotonView.Owner, m_damage * m_damageMultiplier);
+                        }
+                    }
+                    else if (m_parentHurtboxScript && m_parentHurtboxScript.IsPlayerValidTarget(playerPhotonView.ViewID))
+                    {
+                        if (CanThisHurtYou(playerID))
+                        {
+                            m_parentHurtboxScript.RPCInsertHurtVictim(playerPhotonView.ViewID);
+                            playerPhotonView.RPC("TakeDamage", playerPhotonView.Owner, m_damage * m_damageMultiplier);
+                        }
+                    }
+                }
+            }
+        }
+        else
+        {
+            base.OnTriggerStay(other);
+        }
     }
 
     #endregion

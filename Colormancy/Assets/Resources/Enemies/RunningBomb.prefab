@@ -83,6 +83,7 @@ MonoBehaviour:
   m_parentGameObject: {fileID: 9186146974418002411}
   m_isProjectile: 0
   m_damage: 50
+  m_onlyDoDamageOnce: 1
   m_applyForce: 1
   m_whatForce: 1
   m_force: 30

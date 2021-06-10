@@ -20,8 +20,8 @@ public class DetectHit : MonoBehaviour
     protected bool m_isProjectile = false;
 
     [SerializeField]
-    private float m_damage = 12f;
-    private float m_damageMultiplier = 1;
+    protected float m_damage = 12f;
+    protected float m_damageMultiplier = 1;
 
     protected EnemyRangedAI m_parentERScript;
     protected EnemyHitbox m_parentHurtboxScript;
@@ -50,6 +50,7 @@ public class DetectHit : MonoBehaviour
 
     protected virtual void OnTriggerEnter(Collider other)
     {
+
         if (other.CompareTag("Player"))
         {
             CheckApplyDamage(other, TriggerType.Enter);
