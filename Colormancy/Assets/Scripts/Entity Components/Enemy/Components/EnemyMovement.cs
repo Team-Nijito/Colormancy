@@ -175,7 +175,24 @@ public class EnemyMovement : MonoBehaviourPun, IPunObservable
             {
                 m_navMeshLastSpeed = m_navMeshAgent.velocity.magnitude / m_navMeshAgent.speed; // constrain to 0 -> 1 for blend tree animation
                 if (SetAnims)
+                {
                     m_animManager.SetSpeed(m_navMeshLastSpeed);
+                }
+            }
+        }
+
+        if (m_navMeshLastSpeed != m_navMeshAgent.speed)
+        {
+            // Always set the speed of the current character
+            // If we're the masterClient, calculate the speed with the velocity from NavMesh
+            // otherwise for other clients, m_navMeshLastSpeed would be updated by OnPhotonSerializeView
+            if (PhotonNetwork.IsMasterClient)
+            {
+                m_navMeshLastSpeed = m_navMeshAgent.velocity.magnitude / m_navMeshAgent.speed; // constrain to 0 -> 1 for blend tree animation
+            }
+            if (SetAnims)
+            {
+                m_animManager.SetSpeed(m_navMeshLastSpeed);
             }
         }
 
@@ -561,12 +578,14 @@ public class EnemyMovement : MonoBehaviourPun, IPunObservable
     // IPunObservable Implementation
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
-        // Syncing both position and rotation
+        // Masterclient syncs both position and rotation, and the current player's direciton
 
         if (stream.IsWriting)
         {
             stream.SendNext(transform.position);
             stream.SendNext(transform.rotation);
+            stream.SendNext(m_directionToPlayer);
+            stream.SendNext(m_navMeshLastSpeed);
         }
         else
         {
@@ -577,6 +596,10 @@ public class EnemyMovement : MonoBehaviourPun, IPunObservable
             m_latestRotation = (Quaternion)stream.ReceiveNext();
             m_positionAtLastUpdate = transform.position;
             m_rotationAtLastUpdate = transform.rotation;
+
+            // Update the direction to the current player
+            m_directionToPlayer = (Vector3)stream.ReceiveNext();
+            m_navMeshLastSpeed = (float)stream.ReceiveNext();
         }
     }
 

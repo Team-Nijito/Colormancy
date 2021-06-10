@@ -387,7 +387,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
                 if (m_levelType == LevelTypes.Level)
                 {            
                     m_paintProgress = PaintingManager.paintingProgress();
-                    print(m_paintProgress);
 
                     if (!m_isLoadingNewScene && m_paintProgress > m_paintPercentageNeededToWin)
                     {
