@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: RedPreviewMaterial
-  m_Shader: {fileID: 4800000, guid: 85dccc7ff4a895f4da8812cbf6575ac8, type: 3}
+  m_Name: CircleArrowsPreviewMaterial
+  m_Shader: {fileID: 4800000, guid: f9985b14874ca544a8d3b582fd98db66, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -40,7 +40,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 5948ed65d1396ec448ee2df1f856198d, type: 3}
+        m_Texture: {fileID: 2800000, guid: 34afd70efa0d4bc44a6d81a12dcd067a, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
@@ -73,5 +73,5 @@ Material:
     - _UVSec: 0
     - _ZWrite: 1
     m_Colors:
-    - _Color: {r: 1, g: 0, b: 0, a: 1}
+    - _Color: {r: 0.5140424, g: 0, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
