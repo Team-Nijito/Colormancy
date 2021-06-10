@@ -141,6 +141,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_parentGameObject: {fileID: 3708072817193241043}
   m_isProjectile: 0
+  m_Slow: 0
+  SlowDuration: 0
+  SlowAmount: 0
   m_damage: 12
 --- !u!1 &3708072816222495909
 GameObject:
@@ -1182,6 +1185,7 @@ MonoBehaviour:
   - m_hitBoxObject: {fileID: 2949777126639195116}
     m_hitBoxScript: {fileID: 3273386063623899028}
   m_numPlayersCanHitInOneAttack: 4
+  Slow: 0
 --- !u!114 &5873226286353684276
 MonoBehaviour:
   m_ObjectHideFlags: 0

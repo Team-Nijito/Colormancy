@@ -18,11 +18,18 @@ public class DianeHamstring : State
         if (m_dianeAI.DebugMode)
             Debug.Log("Start Hamstring State");
 
-        Debug.Log("Hamstring State");
         BossAI.StatusEffect.RPCApplyForce(1f, "Knockback", BossAI.DirectionToTarget(), 25f);
-        m_dianeAI.photonView.RPC("SetDianeState", Photon.Pun.RpcTarget.AllViaServer, DianeAI.States.Chase);
         BossAI.SetAnimationTrigger("Hamstring");
+
+        m_dianeAI.StartCoroutine(StopHamstring());
+
         return base.Start();
+    }
+
+    IEnumerator StopHamstring()
+    {
+        yield return new WaitForSeconds(1.5f);
+        m_dianeAI.photonView.RPC("SetDianeState", Photon.Pun.RpcTarget.AllViaServer, DianeAI.States.Chase);
     }
 
     public override IEnumerator Stop()

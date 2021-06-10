@@ -1,5 +1,6 @@
 ﻿using Photon.Pun;
 using UnityEngine;
+using MyBox;
 
 public class DetectHit : MonoBehaviour
 {
@@ -18,6 +19,11 @@ public class DetectHit : MonoBehaviour
     
     [SerializeField]
     protected bool m_isProjectile = false;
+
+    [SerializeField]
+    protected bool m_Slow = false;
+    [ConditionalField(nameof(m_Slow))] public float SlowDuration;
+    [ConditionalField(nameof(m_Slow))] public float SlowAmount;
 
     [SerializeField]
     protected float m_damage = 12f;
@@ -116,6 +122,11 @@ public class DetectHit : MonoBehaviour
                 m_parentHurtboxScript.RPCInsertHurtVictim(playerPhotonView.ViewID);
                 if (trigType == TriggerType.Enter)
                 {
+                    if (m_Slow) // Apply a slow effect
+                    {
+                        StatusEffectScript script = player.gameObject.GetComponent<StatusEffectScript>();
+                        script.RPCApplyStatus(StatusEffect.StatusType.Slowdown, SlowDuration, 0, SlowAmount, "attack_slow");
+                    }
                     playerPhotonView.RPC("TakeDamage", playerPhotonView.Owner, m_damage * m_damageMultiplier);
                 }
                 else

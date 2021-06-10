@@ -22,7 +22,7 @@ class TimothyLaser : State
         m_EnemyMovement = BossAI.GetComponent<EnemyMovement>();
 
         m_timAI.photonView.RPC("SetAnimationBool", RpcTarget.All, "Channel", true);
-        m_timAI.StartCoroutine(WaitTime(2.5f));
+        m_timAI.StartCoroutine(ChannelLaser());
 
         return base.Start();
     }
@@ -33,18 +33,28 @@ class TimothyLaser : State
         if (m_timAI.DebugMode)
             Debug.Log("Stop Laser State");
 
-        m_timAI.photonView.RPC("SetAnimationBool", RpcTarget.All, "Channel", false);
+        m_timAI.photonView.RPC("SetAnimationBool", RpcTarget.All, "Shoot", false);
 
         return base.Stop();
     }
 
-    IEnumerator WaitTime(float seconds)
+    IEnumerator ChannelLaser()
     {
-        yield return new WaitForSeconds(seconds);
+        yield return new WaitForSeconds(m_timAI.ChannelTime);
 
         m_timAI.Movement.FaceTarget(m_timAI.DirectionToTarget());
         Debug.Log("Shooting");
-        m_timAI.photonView.RPC("SetAnimationTrigger", RpcTarget.All, "Shoot");
+        m_timAI.photonView.RPC("SetAnimationBool", RpcTarget.All, "Channel", false);
+        m_timAI.photonView.RPC("SetAnimationBool", RpcTarget.All, "Shoot", true);
+        m_timAI.LaserObject.SetActive(true);
+
+        m_timAI.StartCoroutine(StopShooting());
+    }
+
+    IEnumerator StopShooting()
+    {
+        yield return new WaitForSeconds(1.85f);
+        m_timAI.LaserObject.SetActive(false);
         m_timAI.photonView.RPC("SetTimothyState", RpcTarget.AllViaServer, TimothyAI.States.Run);
     }
 }

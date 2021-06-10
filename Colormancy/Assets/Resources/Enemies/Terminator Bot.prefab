@@ -755,6 +755,7 @@ MonoBehaviour:
   m_username: {fileID: 5161377574221408627}
   m_gameManager: {fileID: 0}
   m_baseHealth: 15
+  m_shieldHealth: 0
   m_armorPercentage: 0
   m_isRegenHealth: 0
   m_regenHealthPercentage: 1
@@ -833,6 +834,7 @@ MonoBehaviour:
   - m_hitBoxObject: {fileID: 6645883346320435226}
     m_hitBoxScript: {fileID: 6464981389841251426}
   m_numPlayersCanHitInOneAttack: 4
+  Slow: 0
 --- !u!114 &2689978470580284610
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2248,6 +2250,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_parentGameObject: {fileID: 5161377573530120741}
   m_isProjectile: 0
+  m_Slow: 0
+  SlowDuration: 0
+  SlowAmount: 0
   m_damage: 12
 --- !u!1 &6986966598165063199
 GameObject:
