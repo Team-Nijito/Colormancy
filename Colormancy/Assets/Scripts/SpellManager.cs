@@ -67,12 +67,19 @@ public class SpellManager : MonoBehaviourPun
             GameObject preview = GameObject.FindGameObjectWithTag("SpellPreview");
             string previewFilePath = "Orbs/Previews/";
             mouseLocation += Vector3.up * 0.1f;
+            Vector3 mouseDirection = mouseLocation - playerTransform.position;
 
             switch (orbs[2].getElement())
             {
                 case Orb.Element.Wrath:
                     if (!preview)
+                    {
                         preview = Instantiate(Resources.Load(previewFilePath + "CirclePreview"), mouseLocation, playerTransform.rotation) as GameObject;
+                        preview.transform.localScale = Vector3.one * OrbValueManager.getPaintRadius(Orb.Element.Wrath);
+
+                        Renderer previewRenderer = preview.GetComponent<Renderer>();
+                        previewRenderer.material.SetColor("_Color", OrbValueManager.getColor(Orb.Element.Wrath));
+                    }
 
                     // repeat assignment in case object already exists
                     preview.transform.position = mouseLocation;
@@ -82,16 +89,79 @@ public class SpellManager : MonoBehaviourPun
                 case Orb.Element.Light:
                     break;
                 case Orb.Element.Nature:
+                    if (!preview)
+                    {
+                        preview = Instantiate(Resources.Load(previewFilePath + "BoxPreview"), mouseLocation, playerTransform.rotation) as GameObject;
+
+                        Renderer previewRenderer = preview.GetComponent<Renderer>();
+                        previewRenderer.material.SetColor("_Color", OrbValueManager.getColor(Orb.Element.Nature));
+                    }
+
+                    preview.transform.position = playerTransform.GetChild(0).position + new Vector3(mouseDirection.x, 0, mouseDirection.z).normalized * 4 + Vector3.up * 0.1f;
+                    preview.transform.LookAt(preview.transform.position + new Vector3(mouseDirection.x, 0, mouseDirection.z));
                     break;
                 case Orb.Element.Water:
+                    if (!preview)
+                    {
+                        preview = Instantiate(Resources.Load(previewFilePath + "CirclePreview"), mouseLocation, playerTransform.rotation) as GameObject;
+                        preview.transform.localScale = Vector3.one * OrbValueManager.getPaintRadius(Orb.Element.Water);
+
+                        Renderer previewRenderer = preview.GetComponent<Renderer>();
+                        previewRenderer.material.SetColor("_Color", OrbValueManager.getColor(Orb.Element.Water));
+                    }
+
+                    preview.transform.position = playerTransform.position - playerTransform.GetChild(0).forward;
                     break;
                 case Orb.Element.Poison:
+                    if (!preview)
+                    {
+                        preview = Instantiate(Resources.Load(previewFilePath + "CirclePreview"), mouseLocation, playerTransform.rotation) as GameObject;
+                        preview.transform.localScale = Vector3.one * OrbValueManager.getPaintRadius(Orb.Element.Poison);
+
+                        Renderer previewRenderer = preview.GetComponent<Renderer>();
+                        previewRenderer.material.SetColor("_Color", OrbValueManager.getColor(Orb.Element.Poison));
+                    }
+
+                    preview.transform.position = playerTransform.position + mouseDirection.normalized * 7;
                     break;
                 case Orb.Element.Earth:
+                    if (!preview)
+                    {
+                        preview = Instantiate(Resources.Load(previewFilePath + "CirclePreview"), mouseLocation, playerTransform.rotation) as GameObject;
+                        preview.transform.localScale = Vector3.one * OrbValueManager.getPaintRadius(Orb.Element.Earth);
+
+                        Renderer previewRenderer = preview.GetComponent<Renderer>();
+                        previewRenderer.material.SetColor("_Color", OrbValueManager.getColor(Orb.Element.Earth));
+                    }
+
+                    // repeat assignment in case object already exists
+                    preview.transform.position = playerTransform.position + Vector3.up * 0.1f;
                     break;
                 case Orb.Element.Wind:
+                    if (!preview)
+                    {
+                        preview = Instantiate(Resources.Load(previewFilePath + "CirclePreview"), mouseLocation, playerTransform.rotation) as GameObject;
+                        preview.transform.localScale = Vector3.one * OrbValueManager.getPaintRadius(Orb.Element.Wind);
+
+                        Renderer previewRenderer = preview.GetComponent<Renderer>();
+                        previewRenderer.material.SetColor("_Color", OrbValueManager.getColor(Orb.Element.Wind));
+                    }
+
+                    // repeat assignment in case object already exists
+                    preview.transform.position = mouseLocation;
                     break;
                 case Orb.Element.Darkness:
+                    if (!preview)
+                    {
+                        preview = Instantiate(Resources.Load(previewFilePath + "ArrowsPreview"), mouseLocation, playerTransform.rotation) as GameObject;
+                        preview.transform.localScale = Vector3.one * OrbValueManager.getPaintRadius(Orb.Element.Darkness);
+
+                        Renderer previewRenderer = preview.GetComponent<Renderer>();
+                        previewRenderer.material.SetColor("_Color", OrbValueManager.getColor(Orb.Element.Darkness));
+                    }
+
+                    // repeat assignment in case object already exists
+                    preview.transform.position = playerTransform.position + Vector3.up * 0.1f;
                     break;
             }
         }
