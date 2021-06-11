@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: YellowOrbValues
   m_EditorClassIdentifier: 
   element: 2
-  m_OrbColor: {r: 0.9843138, g: 0.7372549, b: 0.015686275, a: 0}
+  m_OrbColor: {r: 0.9843138, g: 0.7372549, b: 0.015686275, a: 1}
   m_PaintRadius: 2.12
   m_GreaterEffectDamage:
     m_Level1: 20
