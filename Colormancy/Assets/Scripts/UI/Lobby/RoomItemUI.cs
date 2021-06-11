@@ -106,6 +106,7 @@ public class RoomItemUI : MonoBehaviourPunCallbacks
     public void OnJoinPressed()
     {
         m_joinButton.interactable = false; // prevent joining the room again when you're already joining the room
+
         PhotonNetwork.JoinRoom(m_roomName.text);
         CheckIfYouHaveJoinedTheRoom();
     }

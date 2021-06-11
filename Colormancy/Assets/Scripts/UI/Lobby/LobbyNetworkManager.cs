@@ -368,9 +368,6 @@ public class LobbyNetworkManager : MonoBehaviourPunCallbacks
         {
             ButtonErrorWrapper(m_joinRoomButton, "Room doesn't exist or it's full");
         }
-
-        AudioScript audioScript = GameObject.FindGameObjectWithTag("SongAudio").GetComponent<AudioScript>();
-        audioScript.PlaySong(AudioScript.SongType.STAGE);
     }
 
     /// <summary>
