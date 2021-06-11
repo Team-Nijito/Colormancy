@@ -109,8 +109,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
     private float m_paintProgress = 0f;
 
-    [Separator("Boss level properties")]
-    [SerializeField]
+    //[Separator("Boss level properties")]
+    //[SerializeField]
     private int enemiesRemaining = 0;
 
     #endregion
@@ -393,6 +393,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
                         LoadLevel(m_levelAfterBeatingStage);
                     }
                 }
+
                 //Boss win condition
                 if (m_levelType == LevelTypes.BossLevel)
                 {

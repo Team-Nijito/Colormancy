@@ -1986,8 +1986,9 @@ MonoBehaviour:
   m_startGameButton: {fileID: 1670582957}
   m_createRoomButton: {fileID: 1165309755}
   m_joinRoomButton: {fileID: 589752572}
+  m_returnMainMenuButton: {fileID: 440082042}
   m_playersMaxPlayersText: {fileID: 1460972723}
-  m_joinButtonText: {fileID: 1053548465}
+  m_joinButtonGUIText: {fileID: 1053548465}
   m_roomListGUI: {fileID: 1687849763}
   m_playerListGUI: {fileID: 1634356248}
   m_changeNameWindow: {fileID: 1466500685}

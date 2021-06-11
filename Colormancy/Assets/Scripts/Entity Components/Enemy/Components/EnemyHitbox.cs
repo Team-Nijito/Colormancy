@@ -41,6 +41,8 @@ public class EnemyHitbox : MonoBehaviourPun
 
     protected int m_hurtVictimArrayIndex = 0; // keep track of first available spot to insert in array
 
+    public bool Slow = false;
+
     #endregion
 
     #region MonoBehaviour callbacks

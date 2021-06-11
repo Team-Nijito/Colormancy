@@ -13,6 +13,7 @@ public class EnemyRunStraightBombAI : EnemyChaserAI
 
     private HealthScript m_hpScript;
     private EnemyMovement m_enemMove;
+    private GameManager gm;
 
     #endregion
 
@@ -22,6 +23,8 @@ public class EnemyRunStraightBombAI : EnemyChaserAI
     {
         m_hpScript = GetComponent<HealthScript>();
         m_enemMove = GetComponent<EnemyMovement>();
+        gm = FindObjectOfType<GameManager>();
+        gm.RPCAddEnemy();
         base.Start();
     }
 

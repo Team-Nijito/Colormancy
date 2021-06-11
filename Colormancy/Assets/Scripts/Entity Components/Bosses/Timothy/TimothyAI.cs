@@ -10,12 +10,15 @@ public class TimothyAI : BossAI
     public float BlastOffRange = 5f;
 
     public float RunDistance = 10f;
-
+    public float ChaseDistance = 15f;
+    public float ChannelTime = 2.5f;
 
     public float LaserCooldown = 10f;
     public float BlastOffCooldown = 20f;
     public float MMarchCooldown = 40f;
     public float IdleCooldown = 5f;
+
+    public GameObject LaserObject;
 
     [HideInInspector]
     public float currentLaserCooldown = 0f;

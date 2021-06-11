@@ -822,7 +822,7 @@ Transform:
   m_GameObject: {fileID: 7526208280804268359}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -4.27, y: 0, z: 0}
-  m_LocalScale: {x: 1.533157, y: 1.533157, z: 1.533157}
+  m_LocalScale: {x: 1.3031834, y: 1.3031834, z: 1.3031834}
   m_Children:
   - {fileID: 7522730891786215733}
   - {fileID: 7522710900166436791}
@@ -932,6 +932,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05f0611bbdd5bc142aa0a58706e7e876, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  DebugMode: 1
   SlashRange: 3
   SlashCooldown: 5
   HamstringCooldown: 15
@@ -958,6 +959,7 @@ MonoBehaviour:
   m_username: {fileID: 7527247312539076479}
   m_gameManager: {fileID: 0}
   m_baseHealth: 1000
+  m_shieldHealth: 0
   m_armorPercentage: 0
   m_isRegenHealth: 0
   m_regenHealthPercentage: 1
@@ -1084,6 +1086,9 @@ MonoBehaviour:
   - Type: 9
     SynchronizeType: 0
     Name: Hamstring
+  - Type: 4
+    SynchronizeType: 0
+    Name: IsDying
   m_SynchronizeLayers:
   - SynchronizeType: 0
     LayerIndex: 0

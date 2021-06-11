@@ -33,13 +33,22 @@ public class TimothyRun : State
         {
             if (BossAI.DistanceToTarget() < m_timAI.RunDistance)
             {
-                m_timAI.photonView.RPC("SetAnimationBool", Photon.Pun.RpcTarget.All, "Run", true);
+                m_timAI.photonView.RPC("SetAnimationBool", RpcTarget.All, "Run", true);
                 Vector3 dirToPlayer = m_timAI.transform.position - m_timAI.Target.transform.position;
                 Vector3 newPos = m_timAI.transform.position + dirToPlayer;
 
                 BossAI.Movement.MoveToPosition(newPos);
                 BossAI.Movement.FaceTarget(dirToPlayer);
-            } else
+            } else if (BossAI.DistanceToTarget() > m_timAI.ChaseDistance)
+            {
+                m_timAI.photonView.RPC("SetAnimationBool", RpcTarget.All, "Run", true);
+                Vector3 dirToPlayer = Vector3.Normalize(m_timAI.Target.transform.position - m_timAI.transform.position);
+                Vector3 newPos = m_timAI.transform.position + (dirToPlayer * 4); // 4 "units" in direction of player
+
+                BossAI.Movement.MoveToPosition(newPos);
+                BossAI.Movement.FaceTarget(dirToPlayer);
+            }
+            else
             {
                 m_timAI.photonView.RPC("SetAnimationBool", Photon.Pun.RpcTarget.All, "Run", false);
             }
