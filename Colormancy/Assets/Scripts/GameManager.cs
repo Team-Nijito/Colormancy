@@ -195,7 +195,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
                 {
                     //Debug.Log("We're in the cutscene!");
                     GameObject playerObject = PhotonNetwork.LocalPlayer.TagObject as GameObject;
-                    playerObject.transform.Find("PlayerCamera").gameObject.SetActive(false); // disable player cam so that cutscene camera works
+                    if (playerObject && playerObject.transform.Find("PlayerCamera"))
+                    {
+                        playerObject.transform.Find("PlayerCamera").gameObject.SetActive(false); // disable player cam so that cutscene camera works
+                    }
                 }
             }
             else if (m_levelType == LevelTypes.Lobby)

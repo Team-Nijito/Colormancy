@@ -451,14 +451,10 @@ public class EnemyMovement : MonoBehaviourPun, IPunObservable
     {
         if (!m_canInvokeMovementFunctions) return;
 
-        // check if the position is on navMesh before we even attempt moving there
-        // (don't check if the character is on a navMesh, that's just another raycast per function call)
+        // don't check if the position is on navMesh before we even attempt moving there (this breaks stuff)
         try
         {
-            if (IsPositionOnNavMesh(pos, out _))
-            {
-                m_navMeshAgent.SetDestination(pos);
-            }
+            m_navMeshAgent.SetDestination(pos);
         }
         catch { }
     }
