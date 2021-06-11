@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class AudioScript : MonoBehaviour
 {
+    private static AudioScript s_instance;
+
     public enum SongType { LOBBY, STAGE, BOSS }
 
     [SerializeField]
@@ -12,6 +14,15 @@ public class AudioScript : MonoBehaviour
     private AudioSource _audioSource;
     private void Awake()
     {
+        if (s_instance != null && s_instance != this)
+        {
+            Destroy(this.gameObject);
+        }
+        else
+        {
+            s_instance = this;
+        }
+
         DontDestroyOnLoad(transform.gameObject);
         _audioSource = GetComponent<AudioSource>();
     }
