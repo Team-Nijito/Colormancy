@@ -262,9 +262,6 @@ public class LobbyNetworkManager : MonoBehaviourPunCallbacks
         m_startGameButton.interactable = false; // disable the start and leave room button to prevent race conditions
         m_leaveRoomButton.interactable = false;
 
-        AudioScript audioScript = GameObject.FindGameObjectWithTag("SongAudio").GetComponent<AudioScript>();
-        audioScript.PlaySong(AudioScript.SongType.STAGE);
-
         PhotonNetwork.LoadLevel(sceneNameToLoadIn);
     }
 
