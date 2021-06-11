@@ -454,7 +454,10 @@ public class EnemyMovement : MonoBehaviourPun, IPunObservable
         // don't check if the position is on navMesh before we even attempt moving there (this breaks stuff)
         try
         {
-            m_navMeshAgent.SetDestination(pos);
+            if (m_navMeshAgent.isOnNavMesh)
+            {
+                m_navMeshAgent.SetDestination(pos);
+            }
         }
         catch { }
     }

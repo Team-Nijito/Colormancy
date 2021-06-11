@@ -195,10 +195,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
                 {
                     //Debug.Log("We're in the cutscene!");
                     GameObject playerObject = PhotonNetwork.LocalPlayer.TagObject as GameObject;
-                    if (playerObject && playerObject.transform.Find("PlayerCamera"))
-                    {
-                        playerObject.transform.Find("PlayerCamera").gameObject.SetActive(false); // disable player cam so that cutscene camera works
-                    }
+                    //if (playerObject && playerObject.transform.Find("PlayerCamera"))
+                    //{
+                    //    playerObject.transform.Find("PlayerCamera").gameObject.SetActive(false); // disable player cam so that cutscene camera works
+                    //}
+                    playerObject.GetComponentInChildren<Camera>().enabled = false; // disable player cam so that cutscene camera works
                 }
             }
             else if (m_levelType == LevelTypes.Lobby)
@@ -303,7 +304,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
                     GameObject playerObject = PhotonNetwork.LocalPlayer.TagObject as GameObject;
 
-                    if (!(m_levelType==LevelTypes.Level) && playerObject)
+                    if (!(m_levelType==LevelTypes.Level || m_levelType==LevelTypes.BossLevel) && playerObject)
                     {
                         object playerAliveProperty;
                         bool spawnNewPlayerInstance = false;
@@ -687,7 +688,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
             {
                 //Debug.Log("We're leaving the cutscene!");
                 GameObject playerObject = PhotonNetwork.LocalPlayer.TagObject as GameObject;
-                playerObject.transform.Find("PlayerCamera").gameObject.SetActive(true); // re-enable camera
+                //playerObject.transform.Find("PlayerCamera").gameObject.SetActive(true); // re-enable camera
+                playerObject.GetComponentInChildren<Camera>().enabled = true; // re-enable camera
             }
 
             PhotonNetwork.LoadLevel(nameOfScene);        
