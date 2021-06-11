@@ -387,6 +387,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_parentGameObject: {fileID: 4244080381214458737}
   m_isProjectile: 0
+  m_Slow: 0
+  SlowDuration: 0
+  SlowAmount: 0
   m_damage: 30
 --- !u!65 &3022827740205514646
 BoxCollider:
@@ -691,7 +694,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a5090fc224d0e6409d1fcc300a919fd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DebugMode: 1
+  DebugMode: 0
   BlastOffRange: 5
   RunDistance: 7
   ChaseDistance: 15
@@ -700,6 +703,7 @@ MonoBehaviour:
   BlastOffCooldown: 20
   MMarchCooldown: 40
   IdleCooldown: 5
+  LaserObject: {fileID: 0}
   currentLaserCooldown: 0
   currentBlastOffCooldown: 0
   currentMMarchCooldown: 0
@@ -755,6 +759,7 @@ MonoBehaviour:
   - m_hitBoxObject: {fileID: 4244080380443011745}
     m_hitBoxScript: {fileID: 4244080380443011744}
   m_numPlayersCanHitInOneAttack: 4
+  Slow: 0
 --- !u!114 &4244080381214458701
 MonoBehaviour:
   m_ObjectHideFlags: 0

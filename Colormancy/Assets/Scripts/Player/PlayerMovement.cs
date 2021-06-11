@@ -102,7 +102,11 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
             if (!m_blindPanel)
             {
                 // ensure that blindPanel is always valid, temp fix for switching between scenes
-                m_blindPanel = GameObject.Find("Canvas").transform.Find("LevelUI").transform.Find("BlindPanel").gameObject;
+                GameObject canvas = GameObject.Find("Canvas");
+                if (canvas)
+                {
+                    m_blindPanel = canvas.transform.Find("LevelUI").transform.Find("BlindPanel").gameObject;
+                }
             }
         }
     }

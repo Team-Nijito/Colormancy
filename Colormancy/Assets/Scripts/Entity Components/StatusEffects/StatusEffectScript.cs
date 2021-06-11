@@ -305,9 +305,11 @@ public class StatusEffectScript : MonoBehaviourPun
     [PunRPC]
     private void ClearAllStatusEffects()
     {
-        foreach (StatusEffect s in m_statusEffects)
+        // make copy with .ToArray() so we don't loop over an array that can be permuted
+        foreach (StatusEffect s in m_statusEffects.ToArray())
+        {
             s.Stop();
-
+        }
         m_statusEffects.Clear();
     }
 

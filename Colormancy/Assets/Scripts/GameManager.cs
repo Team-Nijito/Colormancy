@@ -193,9 +193,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
                 // Checking if we're in the cutscene
                 if (SceneManager.GetActiveScene().name == CutsceneName)
                 {
-                    Debug.Log("We're in the cutscene!");
+                    //Debug.Log("We're in the cutscene!");
                     GameObject playerObject = PhotonNetwork.LocalPlayer.TagObject as GameObject;
-                    playerObject.GetComponentInChildren<Camera>().enabled = false; // disable player cam so that cutscene camera works
+                    playerObject.transform.Find("PlayerCamera").gameObject.SetActive(false); // disable player cam so that cutscene camera works
                 }
             }
             else if (m_levelType == LevelTypes.Lobby)
@@ -243,7 +243,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
                 PhotonNetwork.LocalPlayer.SetCustomProperties(properties);
                 // these custom properties will be mutated whenver a player picks up a lobby orb / return a lobby orb
             }
-            else if (m_levelType == LevelTypes.Level)
+            else if (m_levelType == LevelTypes.Level || m_levelType == LevelTypes.BossLevel)
             {
                 // Keep track of whether a player is still alive or not
                 PhotonHashtable properties = new PhotonHashtable
@@ -396,6 +396,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
                 if (m_levelType == LevelTypes.Level)
                 {            
                     m_paintProgress = PaintingManager.paintingProgress();
+                    //print(m_paintProgress);
 
                     if (!m_isLoadingNewScene && m_paintProgress > m_paintPercentageNeededToWin)
                     {
@@ -681,9 +682,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
             if (SceneManager.GetActiveScene().name == CutsceneName)
             {
-                Debug.Log("We're leaving the cutscene!");
+                //Debug.Log("We're leaving the cutscene!");
                 GameObject playerObject = PhotonNetwork.LocalPlayer.TagObject as GameObject;
-                playerObject.GetComponentInChildren<Camera>().enabled = true; // re-enable camera
+                playerObject.transform.Find("PlayerCamera").gameObject.SetActive(true); // re-enable camera
             }
 
             PhotonNetwork.LoadLevel(nameOfScene);        

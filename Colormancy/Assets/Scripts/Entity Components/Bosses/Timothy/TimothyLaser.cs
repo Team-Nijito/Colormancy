@@ -43,7 +43,8 @@ class TimothyLaser : State
         yield return new WaitForSeconds(m_timAI.ChannelTime);
 
         m_timAI.Movement.FaceTarget(m_timAI.DirectionToTarget());
-        Debug.Log("Shooting");
+        if (m_timAI.DebugMode)
+            Debug.Log("Shooting");
         m_timAI.photonView.RPC("SetAnimationBool", RpcTarget.All, "Channel", false);
         m_timAI.photonView.RPC("SetAnimationBool", RpcTarget.All, "Shoot", true);
         m_timAI.LaserObject.SetActive(true);

@@ -444,18 +444,23 @@ public class EnemyMovement : MonoBehaviourPun, IPunObservable
     }
 
     /// <summary>
-    /// Wrapper function for NavMeshAgent's SetDestination. This should only be called if we know for certain
-    /// that the position is on the level's NavMesh, otherwise errors may occur.
-    /// </summary>
-    /// [PunRPC] temporarily changed this to regular function so that the masterclient would control .SetDestination
+    /// Wrapper function for NavMeshAgent's SetDestination. Changed this to regular function so that the masterclient would control .SetDestination
     /// and not have this be calculated for every clietn
+    /// </summary>
     public void MoveToPosition(Vector3 pos)
     {
         if (!m_canInvokeMovementFunctions) return;
 
-        // don't do the "is position on NavMesh" check here, because if we were to invoke this function via PunRPC
-        // only to realize that the position isn't even valid, we wasted time sending unnecessary data thru the network
-        m_navMeshAgent.SetDestination(pos);
+        // check if the position is on navMesh before we even attempt moving there
+        // (don't check if the character is on a navMesh, that's just another raycast per function call)
+        try
+        {
+            if (IsPositionOnNavMesh(pos, out _))
+            {
+                m_navMeshAgent.SetDestination(pos);
+            }
+        }
+        catch { }
     }
 
     /// <summary>

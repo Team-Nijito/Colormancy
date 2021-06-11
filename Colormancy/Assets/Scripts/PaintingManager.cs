@@ -10,6 +10,8 @@ public class PaintingManager : MonoBehaviour
 
     private void Start()
     {
+        paintedVertices = 0; // reset this every time
+
         // find all paintable gameobjects and set their initial colors
         GameObject [] objects = FindObjectsOfType<GameObject>();
         int count = 0;

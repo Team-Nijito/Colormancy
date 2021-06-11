@@ -59,6 +59,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_parentGameObject: {fileID: 7526208280804268359}
   m_isProjectile: 0
+  m_Slow: 0
+  SlowDuration: 0
+  SlowAmount: 0
   m_damage: 12
 --- !u!1 &7525521344566356551
 GameObject:
@@ -932,7 +935,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05f0611bbdd5bc142aa0a58706e7e876, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DebugMode: 1
+  DebugMode: 0
   SlashRange: 3
   SlashCooldown: 5
   HamstringCooldown: 15
@@ -985,6 +988,7 @@ MonoBehaviour:
   - m_hitBoxObject: {fileID: 9167814959189100248}
     m_hitBoxScript: {fileID: 5069451800193601604}
   m_numPlayersCanHitInOneAttack: 4
+  Slow: 0
 --- !u!114 &7526208280804268369
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2234,6 +2238,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_parentGameObject: {fileID: 7526208280804268359}
   m_isProjectile: 0
+  m_Slow: 0
+  SlowDuration: 0
+  SlowAmount: 0
   m_damage: 30
 --- !u!1 &9167814959189100248
 GameObject:
@@ -2281,6 +2288,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_parentGameObject: {fileID: 7526208280804268359}
   m_isProjectile: 0
+  m_Slow: 0
+  SlowDuration: 0
+  SlowAmount: 0
   m_damage: 20
 --- !u!65 &5760586362144361798
 BoxCollider:
