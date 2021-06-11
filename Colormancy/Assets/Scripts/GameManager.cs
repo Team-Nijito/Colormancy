@@ -58,6 +58,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     public const string LobbySceneName = "Starting Level";
     public const string WinSceneName = "YouWinScene";
     public const string OfficeLv1Name = "Office Level 1";
+    public const string CutsceneName = "Office Boss Cutscene";
     #endregion
 
     #region Private Fields
@@ -188,6 +189,14 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
                 // so that if the player was ready, and left, it would
                 // decrement the amount of players ready
                 PhotonNetwork.LocalPlayer.SetCustomProperties(properties);
+
+                // Checking if we're in the cutscene
+                if (SceneManager.GetActiveScene().name == CutsceneName)
+                {
+                    Debug.Log("We're in the cutscene!");
+                    GameObject playerObject = PhotonNetwork.LocalPlayer.TagObject as GameObject;
+                    playerObject.GetComponentInChildren<Camera>().enabled = false; // disable player cam so that cutscene camera works
+                }
             }
             else if (m_levelType == LevelTypes.Lobby)
             {
@@ -667,6 +676,13 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
             if (m_leaveButton)
             {
                 m_leaveButton.interactable = false;
+            }
+
+            if (SceneManager.GetActiveScene().name == CutsceneName)
+            {
+                Debug.Log("We're leaving the cutscene!");
+                GameObject playerObject = PhotonNetwork.LocalPlayer.TagObject as GameObject;
+                playerObject.GetComponentInChildren<Camera>().enabled = true; // re-enable camera
             }
 
             PhotonNetwork.LoadLevel(nameOfScene);        

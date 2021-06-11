@@ -50,4 +50,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Narrative Scenes/God Scene 2.unity
     guid: 20eedc37b31497e42943d4918d90af8e
+  - enabled: 1
+    path: Assets/Scenes/Narrative Scenes/Office Boss Cutscene.unity
+    guid: a281492cd3009ec449248bb15acac571
   m_configObjects: {}
