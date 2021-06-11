@@ -40,10 +40,11 @@ public class LobbyNetworkManager : MonoBehaviourPunCallbacks
     [SerializeField] private Button m_startGameButton;
     [SerializeField] private Button m_createRoomButton;
     [SerializeField] private Button m_joinRoomButton;
+    [SerializeField] private Button m_returnMainMenuButton;
 
     [Separator("The main windows/UI (to hide and show if needed)")]
     [SerializeField] private GameObject m_playersMaxPlayersText;
-    [SerializeField] private GameObject m_joinButtonText;
+    [SerializeField] private GameObject m_joinButtonGUIText;
     
     [SerializeField] private GameObject m_roomListGUI;
     [SerializeField] private GameObject m_playerListGUI;
@@ -55,12 +56,16 @@ public class LobbyNetworkManager : MonoBehaviourPunCallbacks
     private Coroutine m_createRoomButtonError;
     private Coroutine m_joinRoomButtonError;
 
+    private Color m_buttonWhite;
+    private Color m_buttonRed = Color.red;
+
     #endregion
 
     #region Monobehaviour callbacks
 
     private void Start()
     {
+        m_buttonWhite = m_createRoomButton.GetComponent<Image>().color; // fetch the normal color used by the createRoomButton
         Initialize();
         Connect();
     }
@@ -72,6 +77,15 @@ public class LobbyNetworkManager : MonoBehaviourPunCallbacks
     public override void OnConnectedToMaster()
     {
         m_statusFieldText.text = "Connected to master server";
+        if (!PhotonNetwork.InLobby)
+        {
+            PhotonNetwork.JoinLobby();
+        }
+    }
+
+    public override void OnCreateRoomFailed(short returnCode, string message)
+    {
+        m_statusFieldText.text = "Failed to create room";
         if (!PhotonNetwork.InLobby)
         {
             PhotonNetwork.JoinLobby();
@@ -96,6 +110,8 @@ public class LobbyNetworkManager : MonoBehaviourPunCallbacks
     {
         Room currentRoom = PhotonNetwork.CurrentRoom;
 
+        StopAllCoroutines(); // stop the coroutines for the create room and join room buttons displayed in the lobby
+
         // Set the text values
         m_statusFieldText.text = "Joined " + currentRoom.Name;
         m_currentLocationText.text = "Room: " + currentRoom.Name;
@@ -118,10 +134,6 @@ public class LobbyNetworkManager : MonoBehaviourPunCallbacks
             m_roomCapacityText.text = $"Room capacity: {currentRoom.MaxPlayers} players";
         }
 
-        m_leaveRoomButton.gameObject.SetActive(true);
-        m_startGameButton.gameObject.SetActive(true);
-        m_leaveRoomButton.interactable = true;
-
         // If you are the master client, you can start the game
         if (PhotonNetwork.IsMasterClient)
         {
@@ -129,6 +141,15 @@ public class LobbyNetworkManager : MonoBehaviourPunCallbacks
         }
 
         ShowWindow(false);
+    }
+
+    public override void OnJoinRoomFailed(short returnCode, string message)
+    {
+        m_statusFieldText.text = "Failed to join room";
+        if (!PhotonNetwork.InLobby)
+        {
+            PhotonNetwork.JoinLobby();
+        }
     }
 
     public override void OnLeftRoom()
@@ -142,9 +163,11 @@ public class LobbyNetworkManager : MonoBehaviourPunCallbacks
             m_currentLocationText.text = "Rooms";
         }
 
-        m_leaveRoomButton.gameObject.SetActive(false);
-        m_startGameButton.gameObject.SetActive(false);
-        m_startGameButton.interactable = false;
+        m_createRoomButton.GetComponentInChildren<Text>().text = "Create room";
+        m_createRoomButton.GetComponent<Image>().color = m_buttonWhite;
+
+        m_joinRoomButton.GetComponentInChildren<Text>().text = "Join room";
+        m_joinRoomButton.GetComponent<Image>().color = m_buttonWhite;
 
         ShowWindow(true);
     }
@@ -188,6 +211,8 @@ public class LobbyNetworkManager : MonoBehaviourPunCallbacks
         options.IsVisible = !m_hideRoomFromLobby.isOn;
 
         PhotonNetwork.CreateRoom(roomName, options, TypedLobby.Default);
+
+        StartCoroutine(CheckIfYouHaveCreatedRoom());
     }
 
     public void OnClickJoinRoom()
@@ -204,7 +229,13 @@ public class LobbyNetworkManager : MonoBehaviourPunCallbacks
         // Prevent joining rooms with no name
         if (string.IsNullOrEmpty(roomJoin))
         {
-            ButtonErrorWrapper(m_joinRoomButton, "Invalid room name");
+            ButtonErrorWrapper(m_joinRoomButton, "Room name cannot be empty");
+            return;
+        }
+
+        if (PhotonNetwork.InRoom)
+        {
+            ButtonErrorWrapper(m_joinRoomButton, "You're already in this room!");
             return;
         }
 
@@ -212,10 +243,7 @@ public class LobbyNetworkManager : MonoBehaviourPunCallbacks
         // for why there isn't a check to see if a room exists
         PhotonNetwork.JoinRoom(roomJoin);
 
-        if (!PhotonNetwork.InRoom)
-        {
-            ButtonErrorWrapper(m_joinRoomButton, "Room doesn't exist or it's full");
-        }
+        StartCoroutine(CheckIfYouHaveJoinedTheRoom());
     }
 
     public void OnMainMenuButtonPressed()
@@ -231,6 +259,8 @@ public class LobbyNetworkManager : MonoBehaviourPunCallbacks
 
     public void OnStartGamePressed()
     {
+        m_startGameButton.interactable = false; // disable the start and leave room button to prevent race conditions
+        m_leaveRoomButton.interactable = false; 
         PhotonNetwork.LoadLevel(sceneNameToLoadIn);
     }
 
@@ -249,18 +279,17 @@ public class LobbyNetworkManager : MonoBehaviourPunCallbacks
     {
         buttonToDisplayError.interactable = false;
 
-        Image imageSibling = buttonToDisplayError.gameObject.GetComponent<Image>(); // image component that is the sibling of the button component
+        Image buttonImage = buttonToDisplayError.gameObject.GetComponent<Image>(); // image component that is the sibling of the button component
         Text buttonText = buttonToDisplayError.transform.GetComponentInChildren<Text>();
 
-        Color originalButtonColor = imageSibling.color;
         string originalMessage = buttonText.text;
 
-        imageSibling.color = Color.red;
+        buttonImage.color = m_buttonRed;
         buttonText.text = errorMsg;
 
         yield return new WaitForSecondsRealtime(durationDisplayError);
 
-        imageSibling.color = originalButtonColor;
+        buttonImage.color = m_buttonWhite;
         buttonText.text = originalMessage;
 
         buttonToDisplayError.interactable = true;
@@ -286,6 +315,54 @@ public class LobbyNetworkManager : MonoBehaviourPunCallbacks
                 StopCoroutine(m_joinRoomButtonError);
             }
             m_joinRoomButtonError = StartCoroutine(ButtonError(buttonToDisplayError, errorMsg, durationDisplayError));
+        }
+    }
+
+    /// <summary>
+    /// This is a simple 1 second delay wait and check.
+    /// This makes the create room button non interactable for those two seconds and then makes it interactable again when it's done.
+    /// </summary>
+    private IEnumerator CheckIfYouHaveCreatedRoom()
+    {
+        m_createRoomButton.interactable = false;
+        m_joinRoomButton.interactable = false; // prevent race condition
+        
+        Text buttonText = m_createRoomButton.GetComponentInChildren<Text>();
+        string originalJoinButtonText = buttonText.text;
+        buttonText.text = "Attempting to create room...";
+
+        yield return new WaitForSecondsRealtime(1f);
+        buttonText.text = originalJoinButtonText; // set the text back to the original before invoking the ButtonErrorWrapper
+        m_createRoomButton.interactable = true;
+        m_joinRoomButton.interactable = true;
+
+        if (!PhotonNetwork.InRoom)
+        {
+            ButtonErrorWrapper(m_createRoomButton, "Room name already taken");
+        }
+    }
+
+    /// <summary>
+    /// This is a simple 1 second delay wait and check.
+    /// This makes the join button non interactable for those two seconds and then makes it interactable again when it's done.
+    /// </summary>
+    private IEnumerator CheckIfYouHaveJoinedTheRoom()
+    {
+        m_joinRoomButton.interactable = false;
+        m_createRoomButton.interactable = false; // prevent race condition
+
+        Text buttonText = m_joinRoomButton.GetComponentInChildren<Text>();
+        string originalJoinButtonText = buttonText.text;
+        buttonText.text = "Attempting to join...";
+
+        yield return new WaitForSecondsRealtime(1f);
+        buttonText.text = originalJoinButtonText; // set the text back to the original before invoking the ButtonErrorWrapper
+        m_joinRoomButton.interactable = true; // also make it interactable
+        m_createRoomButton.interactable = true;
+
+        if (!PhotonNetwork.InRoom)
+        {
+            ButtonErrorWrapper(m_joinRoomButton, "Room doesn't exist or it's full");
         }
     }
 
@@ -331,17 +408,26 @@ public class LobbyNetworkManager : MonoBehaviourPunCallbacks
     private void ShowWindow(bool isRoomList)
     {
         m_playersMaxPlayersText.SetActive(isRoomList);
-        m_joinButtonText.SetActive(isRoomList);
+        m_joinButtonGUIText.SetActive(isRoomList);
         m_roomListGUI.SetActive(isRoomList);
 
         m_createGameWindow.SetActive(isRoomList);
         m_changeNameWindow.SetActive(isRoomList);
         m_joinGameWindow.SetActive(isRoomList);
 
+        m_returnMainMenuButton.interactable = isRoomList;
+        m_createRoomButton.interactable = isRoomList;
+        m_joinRoomButton.interactable = isRoomList;
+
         m_roomVisibleText.gameObject.SetActive(!isRoomList);
         m_roomCapacityText.gameObject.SetActive(!isRoomList);
 
         m_playerListGUI.SetActive(!isRoomList);
+
+        m_leaveRoomButton.gameObject.SetActive(!isRoomList);
+        m_startGameButton.gameObject.SetActive(!isRoomList);
+        m_leaveRoomButton.interactable = !isRoomList;
+        m_startGameButton.interactable = !isRoomList && PhotonNetwork.IsMasterClient;
     }
 
     #endregion
@@ -361,6 +447,8 @@ public class LobbyNetworkManager : MonoBehaviourPunCallbacks
     /// </summary>
     public void LeaveRoom()
     {
+        m_startGameButton.interactable = false;
+        m_leaveRoomButton.interactable = false;
         PhotonNetwork.LeaveRoom(true);
     }
 
