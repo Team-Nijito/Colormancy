@@ -46,7 +46,7 @@
 
             fixed4 frag(v2f i) : SV_Target
             {
-                i.uv.x += _Time.x;
+                i.uv.x -= _Time.x / 2;
 
                 // sample the texture
                 fixed4 col = tex2D(_MainTex, i.uv);

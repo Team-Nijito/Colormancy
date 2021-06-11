@@ -22,8 +22,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
     // C# properties for accessing the private variables
     public LevelTypes TypeOfLevel { get { return m_levelType; } private set { m_levelType = value; } }
-    public bool IsLevel { get { return !(m_levelType == LevelTypes.Lobby || m_levelType == LevelTypes.Narrative);  } }
-    
+    public bool IsLevel { get { return !(m_levelType == LevelTypes.Lobby || m_levelType == LevelTypes.Narrative); } }
+
     public int PlayersReady { get { return m_playersReady; } private set { m_playersReady = value; } }
     // num players needed to be ready can be fetched via PhotonNetwork.CurrentRoom.PlayerCount
     public int OrbsNeededToReady { get { return m_OrbsNeededToStartGame; } private set { m_OrbsNeededToStartGame = value; } }
@@ -163,6 +163,12 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
     private void Start()
     {
+        if (SceneManager.GetActiveScene().name == "Office Boss Cutscene" || SceneManager.GetActiveScene().name == "Office Level 3")
+        {
+            AudioScript audioScript = GameObject.FindGameObjectWithTag("SongAudio").GetComponent<AudioScript>();
+            audioScript.PlaySong(AudioScript.SongType.BOSS);
+        }
+
         if ((SceneManager.GetActiveScene().name == WinSceneName) || !PhotonNetwork.InRoom)
         {
             // don't run the rest of the start statement, return immediately
@@ -661,6 +667,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     public void LeaveRoom()
     {
         OrbManager.orbHistory.Clear(); // don't retain memory of spells after leaving game
+
+        AudioScript audioScript = GameObject.FindGameObjectWithTag("SongAudio").GetComponent<AudioScript>();
+        audioScript.PlaySong(AudioScript.SongType.LOBBY);
 
         // Leave the room and disconnect
         PhotonNetwork.LeaveRoom();

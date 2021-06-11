@@ -7,6 +7,7 @@ TagManager:
   - Projectile
   - Enemy
   - SpellPreview
+  - SongAudio
   layers:
   - Default
   - TransparentFX

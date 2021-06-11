@@ -260,7 +260,11 @@ public class LobbyNetworkManager : MonoBehaviourPunCallbacks
     public void OnStartGamePressed()
     {
         m_startGameButton.interactable = false; // disable the start and leave room button to prevent race conditions
-        m_leaveRoomButton.interactable = false; 
+        m_leaveRoomButton.interactable = false;
+
+        AudioScript audioScript = GameObject.FindGameObjectWithTag("SongAudio").GetComponent<AudioScript>();
+        audioScript.PlaySong(AudioScript.SongType.STAGE);
+
         PhotonNetwork.LoadLevel(sceneNameToLoadIn);
     }
 
@@ -364,6 +368,9 @@ public class LobbyNetworkManager : MonoBehaviourPunCallbacks
         {
             ButtonErrorWrapper(m_joinRoomButton, "Room doesn't exist or it's full");
         }
+
+        AudioScript audioScript = GameObject.FindGameObjectWithTag("SongAudio").GetComponent<AudioScript>();
+        audioScript.PlaySong(AudioScript.SongType.STAGE);
     }
 
     /// <summary>
