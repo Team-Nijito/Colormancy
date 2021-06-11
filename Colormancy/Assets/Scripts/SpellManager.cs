@@ -85,8 +85,29 @@ public class SpellManager : MonoBehaviourPun
                     preview.transform.position = mouseLocation;
                     break;
                 case Orb.Element.Fire:
+                    if (!preview)
+                    {
+                        preview = Instantiate(Resources.Load(previewFilePath + "ArrowPreview"), mouseLocation, playerTransform.rotation) as GameObject;
+
+                        Renderer previewRenderer = preview.GetComponent<Renderer>();
+                        previewRenderer.material.SetColor("_Color", OrbValueManager.getColor(Orb.Element.Fire));
+                    }
+
+                    preview.transform.position = playerTransform.GetChild(0).position + new Vector3(mouseDirection.x, 0, mouseDirection.z).normalized * 4 + Vector3.up * 0.1f;
+                    preview.transform.LookAt(preview.transform.position + new Vector3(mouseDirection.x, 0, mouseDirection.z));
+                    preview.transform.Rotate(Vector3.up, -90f);
                     break;
                 case Orb.Element.Light:
+                    if (!preview)
+                    {
+                        preview = Instantiate(Resources.Load(previewFilePath + "CurvedArrowPreview"), mouseLocation, playerTransform.rotation) as GameObject;
+
+                        Renderer previewRenderer = preview.GetComponent<Renderer>();
+                        previewRenderer.material.SetColor("_Color", OrbValueManager.getColor(Orb.Element.Light));
+                    }
+
+                    // repeat assignment in case object already exists
+                    preview.transform.position = playerTransform.position + Vector3.up * 0.1f;
                     break;
                 case Orb.Element.Nature:
                     if (!preview)
