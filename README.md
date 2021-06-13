@@ -13,8 +13,6 @@
 
 Colormancy is a 3D multiplayer action game wherein players play as Chromaturges, powerful magic-wielders who are tasked with bringing the gift of color to worlds which know only gray. These wizards combine colors into an almost limitless variety of powerful spells, which they use to spread color everywhere they go. They are not without opposition, however, as ancient Colorless Ones lurk out in the void, and will not take kindly to the players’ chromatic machinations! 
 
-**_Specification:_**
-
 This is a game project developed for ICS 167 and ICS 168. 
 
 **_Content:_**
