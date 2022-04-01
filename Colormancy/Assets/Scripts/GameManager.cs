@@ -17,7 +17,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         Level,
         Lobby,
         Narrative,
-        BossLevel
+        BossLevel,
+        PVP
     }
 
     // C# properties for accessing the private variables
@@ -53,6 +54,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
     //) "level"-type levels
     public const string PlayerAliveKey = "IsPlayerAlive";
+
+    //) PVP levels
+    public const string PlayerRemaining = "PlayersLeft";
 
     // Name of scenes
     public const string LobbySceneName = "Starting Level";
@@ -169,7 +173,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
             audioScript.PlaySong(AudioScript.SongType.STAGE);
         }
 
-        if (SceneManager.GetActiveScene().name == "Office Boss Cutscene" || SceneManager.GetActiveScene().name == "Office Level 3")
+        if (SceneManager.GetActiveScene().name == "Office Boss Cutscene" || SceneManager.GetActiveScene().name == "Office Level 3" ||
+            SceneManager.GetActiveScene().name == "PlayerPVPScene")
         {
             AudioScript audioScript = GameObject.FindGameObjectWithTag("SongAudio").GetComponent<AudioScript>();
             audioScript.PlaySong(AudioScript.SongType.BOSS);
@@ -259,7 +264,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
                 PhotonNetwork.LocalPlayer.SetCustomProperties(properties);
                 // these custom properties will be mutated whenver a player picks up a lobby orb / return a lobby orb
             }
-            else if (m_levelType == LevelTypes.Level || m_levelType == LevelTypes.BossLevel)
+            else if (m_levelType == LevelTypes.Level || m_levelType == LevelTypes.BossLevel || m_levelType == LevelTypes.PVP)
             {
                 // Keep track of whether a player is still alive or not
                 PhotonHashtable properties = new PhotonHashtable
@@ -267,6 +272,19 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
                     {PlayerAliveKey, true},
                 };
                 PhotonNetwork.LocalPlayer.SetCustomProperties(properties);
+
+                if (m_levelType == LevelTypes.PVP && PhotonNetwork.IsMasterClient)
+                {
+                    // master client needs to keep track of the number of players alive, game will end for last one standing (no ties possible I don't want to handle that edge case)
+
+                    // see the lobby PhotonHashTable thing to see how to keep track of players alive
+                    PhotonHashtable roomProperty = new PhotonHashtable
+                    {
+                        {PlayerRemaining, PhotonNetwork.PlayerList.Length}
+                    };
+
+                    PhotonNetwork.CurrentRoom.SetCustomProperties(roomProperty);
+                }
             }
 
             // Add in Painting Manager and Orb Value Manager classes manually
@@ -316,7 +334,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
                     GameObject playerObject = PhotonNetwork.LocalPlayer.TagObject as GameObject;
 
-                    if (!(m_levelType==LevelTypes.Level || m_levelType==LevelTypes.BossLevel) && playerObject)
+                    if (!(m_levelType==LevelTypes.Level || m_levelType==LevelTypes.BossLevel || m_levelType == LevelTypes.PVP) && playerObject)
                     {
                         object playerAliveProperty;
                         bool spawnNewPlayerInstance = false;
@@ -428,6 +446,39 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
                         LoadLevel(m_levelAfterBeatingStage);
                     }
                 }
+
+                // PVP
+                if (m_levelType == LevelTypes.PVP)
+                {
+                    // Check if there is one player still remaining
+                    PhotonHashtable roomProperty = PhotonNetwork.CurrentRoom.CustomProperties;
+                    object playerRemainingProperty;
+                    if (!m_isLoadingNewScene && roomProperty.TryGetValue(PlayerRemaining, out playerRemainingProperty) && (int)playerRemainingProperty <= 1)
+                    {
+                        // somehow save the name for next stage
+                        string nameOfWinner = "Nobody";
+
+                        foreach (var player in PhotonNetwork.PlayerList)
+                        {
+                            object playerAliveProperty;
+
+                            if (player.CustomProperties.TryGetValue(PlayerAliveKey, out playerAliveProperty))
+                            {
+                                if ((bool)playerAliveProperty)
+                                {
+                                    nameOfWinner = player.NickName; // if this player is still alive, this player is the last remaining
+                                    break;
+                                }
+                            }
+                        }
+
+                        photonView.RPC("ChoosePVPWinner", RpcTarget.All, nameOfWinner);
+
+                        LoadLevel(m_levelAfterBeatingStage);
+                    }
+                }
+
+
                 if (!m_isLoadingNewScene)
                 {
                     bool isAnyPlayerAlive = false;
@@ -667,12 +718,23 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         }
     }
 
+    [PunRPC]
+    public void ChoosePVPWinner(string nameOfWinner)
+    {
+        SceneDataSharer.PVPWinner = nameOfWinner; // update the static var so that the winner of the PVP duel will be correctly displayed in the win scene
+    }
+
     /// <summary>
     /// Invoked by the Canvas button "Leave Room"
     /// </summary>
     public void LeaveRoom()
     {
         OrbManager.orbHistory.Clear(); // don't retain memory of spells after leaving game
+
+        if (TypeOfLevel == LevelTypes.None)
+        {
+            SceneDataSharer.PVPWinner = ""; // reset static vars
+        }
 
         AudioScript audioScript = GameObject.FindGameObjectWithTag("SongAudio").GetComponent<AudioScript>();
         audioScript.PlaySong(AudioScript.SongType.LOBBY);

@@ -4,10 +4,8 @@ using Photon.Pun;
 public class PlayerAttack : MonoBehaviourPun
 {
     /// <summary>
-    /// outdated component, will probably be replaced with an autoattack script
+    /// This is the autoattack script
     /// </summary>
-
-
 
     #region Private variables
 
@@ -26,6 +24,12 @@ public class PlayerAttack : MonoBehaviourPun
     private GameObject m_playerCharacter;
     private PlayerMouse m_pmouseScript;
 
+    [SerializeField]
+    private HealthScript m_playerHealthScript = null;
+    private bool m_isPVPEnabled = false;
+
+    private int m_photonViewID;
+
     bool m_poisonedAttack;
     float m_poisonedAttackDamage;
     float m_poisonedAttackDuration;
@@ -36,6 +40,8 @@ public class PlayerAttack : MonoBehaviourPun
 
     private void Start()
     {
+        m_photonViewID = PhotonView.Get(gameObject).ViewID;
+
         m_playerCharacter = GetComponent<PlayerMovement>().m_character;
         m_pmouseScript = GetComponent<PlayerMouse>();
 
@@ -43,6 +49,8 @@ public class PlayerAttack : MonoBehaviourPun
 
         Color ranColor = Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
         photonView.RPC("SetMyColor", RpcTarget.All, new Vector3(ranColor.r, ranColor.g, ranColor.b));
+
+        m_playerHealthScript.gameManagerUpdated += UpdateGameManager;
     }
 
     private void Update()
@@ -51,6 +59,14 @@ public class PlayerAttack : MonoBehaviourPun
         {
             m_currentCooldown -= Time.deltaTime;
         }
+    }
+
+    /// <summary>
+    /// attach this to an event in HealthScript whenever the GameManager is updated
+    /// </summary>
+    private void UpdateGameManager(GameManager temp)
+    {
+        m_isPVPEnabled = temp.TypeOfLevel == GameManager.LevelTypes.PVP;
     }
 
     /// <summary>
@@ -119,11 +135,11 @@ public class PlayerAttack : MonoBehaviourPun
 
         m_pmouseScript.PlayerFacingMouse(mousePos); // sometimes the player won't turn quick enough
         Vector3 characterPosition = m_playerCharacter.transform.position;
-        Vector3 characterForward = m_playerCharacter.transform.forward;
+        Vector3 characterForward = m_playerCharacter.transform.forward * 2f; // 2 meter in front of player, this is a magic number
         Quaternion characterRotation = m_playerCharacter.transform.rotation;
 
         // do attack here (instantiate, add velocity, etc...)
-        GameObject g = Instantiate(Resources.Load("AutoAttackProjectile"), characterPosition + Vector3.up, characterRotation) as GameObject;
+        GameObject g = Instantiate(Resources.Load("AutoAttackProjectile"), characterPosition + Vector3.up + characterForward, characterRotation) as GameObject;
         AutoAttackProjectileController controller = g.GetComponent<AutoAttackProjectileController>();
         controller.playerColor = m_paintColor;
         controller.attackDamage = m_attackDamage;
@@ -131,6 +147,14 @@ public class PlayerAttack : MonoBehaviourPun
         controller.poisonedAttack = m_poisonedAttack;
         controller.poisonedAttackDamage = m_poisonedAttackDamage;
         controller.poisonedAttackDuration = m_poisonedAttackDuration;
+
+        controller.canAttackOtherPlayer = m_isPVPEnabled; // enable hurting other friendly players
+        controller.shooterID = m_photonViewID;
+
+        if (m_isPVPEnabled)
+        {
+            g.layer = LayerMask.NameToLayer("Default");
+        }
     }
 
     #endregion

@@ -32,6 +32,10 @@ public class OrbManager : MonoBehaviourPun
 
     PlayerMovement playerMoveScript; // need a ref to this component so we can check if we're stunned or not, so we'll prevent casting while stunned
 
+    [SerializeField]
+    private HealthScript m_playerHealthScript = null; // need to ref to this component so we can fetch the GameManager in the scene, and then check if PVP is enabled
+    private bool m_isPVPEnabled = false; // somehow pass this var to the spells?
+
     // Start is called before the first frame update
     void Start()
     {
@@ -283,6 +287,16 @@ public class OrbManager : MonoBehaviourPun
         {
             UpdateOrbsFromPreviousScene();
         }
+
+        m_playerHealthScript.gameManagerUpdated += UpdateGameManager;
+    }
+
+    /// <summary>
+    /// attach this to an event in HealthScript whenever the GameManager is updated
+    /// </summary>
+    private void UpdateGameManager(GameManager temp)
+    {
+        m_isPVPEnabled = temp.TypeOfLevel == GameManager.LevelTypes.PVP;
     }
 
     /// <summary>

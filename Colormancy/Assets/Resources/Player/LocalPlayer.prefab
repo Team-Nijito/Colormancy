@@ -294,6 +294,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 11a8e5837e19c6e44ba6df06a9c31fd5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_playerHealthScript: {fileID: 5820395927475117115}
 --- !u!114 &5820395927475117110
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -394,6 +395,7 @@ MonoBehaviour:
   m_attackSpeed: 0.7
   m_attackDamage: 5
   m_attackMultiplier: 1
+  m_playerHealthScript: {fileID: 5820395927475117115}
 --- !u!114 &8921435665619611767
 MonoBehaviour:
   m_ObjectHideFlags: 0

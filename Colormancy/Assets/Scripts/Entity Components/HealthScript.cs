@@ -6,6 +6,7 @@ using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine.AI;
 using PhotonHashtable = ExitGames.Client.Photon.Hashtable; // to use with Photon's CustomProperties
+using UnityEngine.Events;
 
 [DisallowMultipleComponent]
 public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
@@ -84,12 +85,22 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
 
     #endregion
 
+    #region Regular event and callbacks
+
+    public Action<GameManager> gameManagerUpdated;
+
+    #endregion
+
     #region MonoBehaviourCallback functions
 
     private void Awake()
     {
         // Try to find the GameManager script in the GameManager object in the current scene
         m_gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
+        if (gameManagerUpdated != null)
+        {
+            gameManagerUpdated.Invoke(m_gameManager);
+        }
         m_isPlayer = GetComponent<CharacterController>() != null;
         if (m_isPlayer)
         {
@@ -162,6 +173,11 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
                 {
                     playerProperties[GameManager.PlayerAliveKey] = false;
                     PhotonNetwork.LocalPlayer.SetCustomProperties(playerProperties);
+
+                    if (m_gameManager.TypeOfLevel == GameManager.LevelTypes.PVP)
+                    {
+                        photonView.RPC("PlayerHasDiedInPVP", RpcTarget.MasterClient);
+                    }
                 }
 
                 // player respawns as spectate camera
@@ -403,6 +419,15 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     }
 
     [PunRPC]
+    public void PlayerHasDiedInPVP()
+    {
+        // A player has died in PVP, decrement the number of players remaining
+        PhotonHashtable roomProperty = PhotonNetwork.CurrentRoom.CustomProperties;
+        roomProperty[GameManager.PlayerRemaining] = (int)roomProperty[GameManager.PlayerRemaining] - 1;
+        PhotonNetwork.CurrentRoom.SetCustomProperties(roomProperty);
+    }
+
+    [PunRPC]
     public void TakeDamage(float damageValue)
     {
         // damage formula: health = health - (damage - (damage * armorPercentage))
@@ -466,6 +491,10 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
         {
             // Must find the gameManager because we loaded into the new scene
             m_gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
+            if (gameManagerUpdated != null)
+        {
+            gameManagerUpdated.Invoke(m_gameManager);
+        }
         }
 
         Quaternion spawnRotation = Quaternion.identity;
