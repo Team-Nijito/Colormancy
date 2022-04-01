@@ -390,6 +390,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
                     if (!m_isLoadingNewScene && m_paintProgress > m_paintPercentageNeededToWin)
                     {
+                        //TODO: add in loot acquisition here
                         LoadLevel(m_levelAfterBeatingStage);
                     }
                 }

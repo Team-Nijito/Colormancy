@@ -127,8 +127,7 @@ public class PodiumController : MonoBehaviour
             {
                 if (PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue(FetchOrbKey(podiumType), out object obj))
                 {
-                    int[] orbInfo = (int[])obj; // first element, ID that is perusing orb, second element, ID that has obtained and now owns the orb, third element is number of orbs the player currently has
-
+                    int[] orbInfo = (int[])obj; // first element, ID that is perusing orb, second element, ID that has obtained and now owns the orb, third element is number of orbs the player currently 
                     if (orbInfo[0] == -1)
                     {
                         // nobody is currently browsing the orb
