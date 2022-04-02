@@ -37,10 +37,10 @@ public class EnableFreeCam : MonoBehaviourPunCallbacks
 
     private void Update()
     {
-        if (!m_inFreeCamMode && Input.GetKey(KeyCode.O))
+        if (photonView.IsMine && !m_inFreeCamMode && Input.GetKey(KeyCode.O))
         {
             m_inFreeCamMode = true;
-            HandControlToFreeCam();
+            photonView.RPC("HandControlToFreeCam", PhotonNetwork.LocalPlayer);
         }
     }
 
@@ -90,10 +90,10 @@ public class EnableFreeCam : MonoBehaviourPunCallbacks
         m_inFreeCamMode = false;
     }
 
+    [PunRPC]
     public void HandControlToFreeCam()
     {
-        GameObject freeCam = Instantiate(m_freeCamPrefab);
-        freeCam.transform.position = transform.position;
+        GameObject freeCam = PhotonNetwork.Instantiate("Player/" + m_freeCamPrefab.name, transform.position, Quaternion.identity);
         DontDestroyOnLoad(freeCam);
         freeCam.GetComponent<FreeCam>().SetHumanForm(gameObject);
         photonView.Owner.TagObject = freeCam;

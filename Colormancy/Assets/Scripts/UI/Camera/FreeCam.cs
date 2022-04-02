@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Photon.Pun;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,7 +23,7 @@ using UnityEngine;
 /// 
 /// This script is modified for usage in Photon.
 /// </summary>
-public class FreeCam : MonoBehaviour
+public class FreeCam : MonoBehaviourPunCallbacks
 {
     /// <summary>
     /// Normal speed of camera movement.
@@ -58,11 +59,13 @@ public class FreeCam : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKey(KeyCode.P))
+        if (photonView.IsMine && Input.GetKey(KeyCode.P))
         {
             // switch back to human form
+            //photonView.RPC("HandControlFromFreeCam", PhotonNetwork.LocalPlayer);
+
             humanform.GetComponent<EnableFreeCam>().HandControlFromFreeCam();
-            Destroy(gameObject);
+            PhotonNetwork.Destroy(gameObject);
             return;
         }
 
@@ -134,9 +137,10 @@ public class FreeCam : MonoBehaviour
         }
     }
 
-    void OnDisable()
+    public override void OnDisable()
     {
         StopLooking();
+        base.OnDisable();
     }
 
     public void SetHumanForm(GameObject h)
