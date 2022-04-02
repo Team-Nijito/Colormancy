@@ -31,7 +31,7 @@ public class PopUpGenericButton : MonoBehaviour
                 gameManager.CloseWindow();
                 break;
             default:
-                Debug.LogWarning("Haven't implemented this AcceptMode! (see AcceptButtonHandler.cs line 46)");
+                Debug.LogWarning("Haven't implemented this ButtonMode!");
                 break;
         }
     }
