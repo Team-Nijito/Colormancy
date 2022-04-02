@@ -13,6 +13,12 @@ public class AudioManager : MonoBehaviour
      * Master
      * Effects
      * 
+     * 
+     * Separate features.
+        Make it so modifying stuff for the algorythm does not jeoparsize the DFS traversal.
+        therefore there should be a tricatch...
+        Not focus rn but later.
+     * 
      */
     [System.Serializable]
     public class AudioType
