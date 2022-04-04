@@ -1,8 +1,4 @@
 ﻿using Photon.Pun;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
 
 /// <summary>
@@ -20,6 +16,8 @@ using UnityEngine;
 ///	hold shift		- enable fast movement mode
 ///	right mouse  	- enable free look
 ///	mouse			- free look / rotation
+///	mouse scroll    - scroll up/down to zoom in/out
+/// G + scroll      - adjust FOV, scroll up/down to increase/decrease it
 /// 
 /// This script is modified for usage in Photon.
 /// </summary>
@@ -31,7 +29,7 @@ public class FreeCam : MonoBehaviourPunCallbacks
     public float movementSpeed = 10f;
 
     /// <summary>
-    /// Speed of camera movement when shift is held down,
+    /// Speed of camera movement when shift is held down.
     /// </summary>
     public float fastMovementSpeed = 100f;
 
@@ -46,6 +44,11 @@ public class FreeCam : MonoBehaviourPunCallbacks
     public float zoomSensitivity = 10f;
 
     /// <summary>
+    /// Amount to adjust FOV when using the mouse wheel and holding down G.
+    /// </summary>
+    public float fovSensitivity = 10f;
+
+    /// <summary>
     /// Amount to zoom the camera when using the mouse wheel (fast mode).
     /// </summary>
     public float fastZoomSensitivity = 50f;
@@ -56,6 +59,7 @@ public class FreeCam : MonoBehaviourPunCallbacks
     private bool looking = false;
 
     private GameObject humanform = null;
+    [SerializeField] private Camera freecamObj = null; // camera this script is attached to
 
     void Update()
     {
@@ -123,8 +127,15 @@ public class FreeCam : MonoBehaviourPunCallbacks
         float axis = Input.GetAxis("Mouse ScrollWheel");
         if (axis != 0)
         {
-            var zoomSensitivity = fastMode ? this.fastZoomSensitivity : this.zoomSensitivity;
-            transform.position = transform.position + transform.forward * axis * zoomSensitivity;
+            if (Input.GetKey(KeyCode.G))
+            {
+                freecamObj.fieldOfView += fovSensitivity * axis;
+            }
+            else
+            {
+                var zoomSensitivity = fastMode ? this.fastZoomSensitivity : this.zoomSensitivity;
+                transform.position = transform.position + transform.forward * axis * zoomSensitivity;
+            }
         }
 
         if (Input.GetKeyDown(KeyCode.Mouse1))
