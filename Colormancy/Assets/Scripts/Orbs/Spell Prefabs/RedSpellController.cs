@@ -22,6 +22,9 @@ public class RedSpellController : MonoBehaviour
     public Orb.LesserCast lesserCast;
     public float spellEffectMod;
 
+    public bool PVPEnabled = false;
+    public PhotonView CasterPView = null;
+
     [Space]
 
     private Vector3 startPosition;
@@ -115,7 +118,17 @@ public class RedSpellController : MonoBehaviour
                 }
                 else if (hitCollider.CompareTag("Player"))
                 {
-                    lesserCast(hitCollider.gameObject, spellEffectMod, null);
+                    if (PVPEnabled && PhotonView.Get(hitCollider.gameObject).ViewID != CasterPView.ViewID)
+                    {
+                        Vector3 PlayerToEnemy = (hitCollider.gameObject.transform.position - transform.position).normalized;
+                        float[] vectorData = { PlayerToEnemy.x, PlayerToEnemy.y, PlayerToEnemy.z };
+
+                        greaterCast(hitCollider.gameObject, spellEffectMod, vectorData);
+                    }
+                    else
+                    {
+                        lesserCast(hitCollider.gameObject, spellEffectMod, null);
+                    }
                 }
             }
 

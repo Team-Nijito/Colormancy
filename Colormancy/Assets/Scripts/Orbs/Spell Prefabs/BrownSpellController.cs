@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Photon.Pun;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -22,6 +23,9 @@ public class BrownSpellController : MonoBehaviour
 
     private Material impactMat;
     private Material waveMat;
+
+    public bool PVPEnabled = false;
+    public PhotonView CasterPView = null;
 
     [Space]
 
@@ -88,6 +92,15 @@ public class BrownSpellController : MonoBehaviour
         if (collider.gameObject.tag.Equals("Enemy"))
             greaterCast(collider.gameObject, spellEffectMod, null);
         else if (collider.gameObject.tag.Equals("Player"))
-            lesserCast(collider.gameObject, spellEffectMod, null);
+        {
+            if (PVPEnabled && PhotonView.Get(collider).ViewID != CasterPView.ViewID)
+            {
+                greaterCast(collider.gameObject, spellEffectMod, null);
+            }
+            else
+            {
+                lesserCast(collider.gameObject, spellEffectMod, null);
+            }
+        }
     }
 }

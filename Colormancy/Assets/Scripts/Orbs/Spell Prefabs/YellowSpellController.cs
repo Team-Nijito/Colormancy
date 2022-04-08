@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Photon.Pun;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,6 +9,9 @@ public class YellowSpellController : MonoBehaviour
     public Transform playerTransform;
     private Vector3 fromPlayer;
     private const Orb.Element element = Orb.Element.Light;
+
+    public bool PVPEnabled = false;
+    public PhotonView CasterPView = null;
 
     [SerializeField]
     private AnimationCurve rotationScale;
@@ -77,7 +81,14 @@ public class YellowSpellController : MonoBehaviour
         }
         else if (collider.gameObject.CompareTag("Player"))
         {
-            lesserCast(collider.gameObject, spellEffectMod, null);
+            if (PVPEnabled && PhotonView.Get(collider.gameObject).ViewID != CasterPView.ViewID)
+            {
+                greaterCast(collider.gameObject, spellEffectMod, null);
+            }
+            else
+            {
+                lesserCast(collider.gameObject, spellEffectMod, null);
+            }
         }
     }
 }

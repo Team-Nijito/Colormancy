@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Photon.Pun;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,6 +9,9 @@ public class OrangeSpellController : MonoBehaviour
     public Orb.LesserCast lesserCast;
     public float spellEffectMod;
     private Orb.Element element = Orb.Element.Fire;
+
+    public bool PVPEnabled = false;
+    public PhotonView CasterPView = null;
 
     [Space]
 
@@ -61,7 +65,18 @@ public class OrangeSpellController : MonoBehaviour
             if (c.gameObject.CompareTag("Enemy"))
                 greaterCast(c.gameObject, spellEffectMod, null);
             else if (c.gameObject.CompareTag("Player"))
-                lesserCast(c.gameObject, spellEffectMod, null);
+            {
+                PhotonView p = PhotonView.Get(c.gameObject);
+                
+                if (PVPEnabled && PhotonView.Get(c.gameObject).ViewID != CasterPView.ViewID)
+                {
+                    greaterCast(c.gameObject, spellEffectMod, null);
+                }
+                else
+                {
+                    lesserCast(c.gameObject, spellEffectMod, null);
+                }
+            }
         }
 
         Destroy(gameObject);

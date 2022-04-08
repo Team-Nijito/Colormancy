@@ -310,6 +310,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_baseWalkSpeed: 8
   m_baseRunSpeed: 15
+  m_hpScript: {fileID: 5820395927475117115}
   m_character: {fileID: 8719925113848596262}
 --- !u!114 &5820395927475117109
 MonoBehaviour:
@@ -380,6 +381,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aea2c7aba3e4e6343a67593e4e5823ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_playerHealthScript: {fileID: 5820395927475117115}
 --- !u!114 &6914068583315090777
 MonoBehaviour:
   m_ObjectHideFlags: 0

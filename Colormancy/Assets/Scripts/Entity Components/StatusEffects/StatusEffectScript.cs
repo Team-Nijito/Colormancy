@@ -208,27 +208,38 @@ public class StatusEffectScript : MonoBehaviourPun
                     break;
                 case StatusEffect.StatusType.AutoAttackIncreasedDamage:
                     if (m_isPlayer)
-                        throw new System.Exception("Cannot currently apply AutoAttackIncreasedDamage on players.");
+                    {
+                        // Don't throw exception, just do a warning for now since PVP is now a thing (rework for this spell soon)
+                        Debug.LogWarning("Cannot currently apply AutoAttackIncreasedDamage on players.");
+                    }
                     else
+                    {
                         newStatusEffect = new AutoAttackIncreasedDamage(m_statusEffects, type, duration, source, value, m_playerAttack);
-
-                    m_statusEffects.Add(newStatusEffect);
+                        m_statusEffects.Add(newStatusEffect);
+                    }
+                        
                     break;
                 case StatusEffect.StatusType.AttackLessDamage:
                     if (m_isPlayer)
-                        throw new System.Exception("Cannot currently apply AttackLessDamage on players.");
+                    {
+                        Debug.LogWarning("Cannot currently apply AttackLessDamage on players.");
+                    }   
                     else
+                    {
                         newStatusEffect = new AttackLessDamage(m_statusEffects, type, duration, source, value, m_enemHitbox, m_enemProjectile);
-
-                    m_statusEffects.Add(newStatusEffect);
+                        m_statusEffects.Add(newStatusEffect);
+                    }   
                     break;
                 case StatusEffect.StatusType.SpellIncreasedDamage:
                     if (m_isPlayer)
-                        throw new System.Exception("Cannot currently apply SpellIncreasedDamage on players.");
+                    {
+                        Debug.LogWarning("Cannot currently apply SpellIncreasedDamage on players.");
+                    }  
                     else
+                    {
                         newStatusEffect = new SpellIncreasedDamage(m_statusEffects, type, duration, source, value);
-
-                    m_statusEffects.Add(newStatusEffect);
+                        m_statusEffects.Add(newStatusEffect);
+                    } 
                     break;
                 case StatusEffect.StatusType.AutoAttackIncreasedSpeed:
                     if (m_isPlayer)

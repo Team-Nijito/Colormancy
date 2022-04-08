@@ -60,6 +60,8 @@ public class BrownOrb : Orb
         spellController.greaterCast = greaterEffectMethod;
         spellController.lesserCast = lesserEffectMethod;
         spellController.spellEffectMod = OrbValueManager.getShapeEffectMod(m_OrbElement) * spellDamageMultiplier;
+        spellController.PVPEnabled = getPVPStatus();
+        spellController.CasterPView = getCasterPView();
     }
 
     public static object Deserialize(byte[] data)

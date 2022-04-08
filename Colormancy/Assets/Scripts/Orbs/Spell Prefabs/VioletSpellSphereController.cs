@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Photon.Pun;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,6 +8,9 @@ public class VioletSpellSphereController : MonoBehaviour
     public Orb.GreaterCast greaterCast;
     public Orb.LesserCast lesserCast;
     public float spellEffectMod;
+
+    public bool PVPEnabled = false;
+    public PhotonView CasterPView = null;
 
     [Space]
 
@@ -58,6 +62,10 @@ public class VioletSpellSphereController : MonoBehaviour
         spellController.greaterCast = greaterCast;
         spellController.lesserCast = lesserCast;
         spellController.spellEffectMod = spellEffectMod;
+
+        // Update the PVPStatus and Caster photon view for the cloud
+        spellController.PVPEnabled = PVPEnabled;
+        spellController.CasterPView = CasterPView;
 
         Destroy(gameObject);
     }

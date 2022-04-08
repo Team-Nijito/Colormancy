@@ -86,6 +86,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     [SerializeField]
     private LevelTypes m_levelType = LevelTypes.None;
 
+    public bool IsLoadingNewScene
+    {
+        get { return m_isLoadingNewScene; }
+    }
     private bool m_isLoadingNewScene = false;
 
     [Separator("Lobby level properties")]

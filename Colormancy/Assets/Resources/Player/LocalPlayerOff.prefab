@@ -310,6 +310,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_baseWalkSpeed: 8
   m_baseRunSpeed: 15
+  m_hpScript: {fileID: 5820395927475117115}
   m_character: {fileID: 8719925113848596262}
 --- !u!114 &5820395927475117109
 MonoBehaviour:

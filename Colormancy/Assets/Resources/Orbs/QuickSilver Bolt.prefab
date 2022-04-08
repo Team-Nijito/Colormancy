@@ -94,7 +94,7 @@ GameObject:
   - component: {fileID: 524532843658940769}
   m_Layer: 0
   m_Name: QuickSilver Bolt
-  m_TagString: Untagged
+  m_TagString: Projectile
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -144,6 +144,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spellEffectMod: 0
+  PVPEnabled: 0
+  CasterPView: {fileID: 0}
   BoltDisplacementSpeed:
     serializedVersion: 2
     m_Curve:

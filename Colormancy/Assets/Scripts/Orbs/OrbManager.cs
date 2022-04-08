@@ -34,7 +34,8 @@ public class OrbManager : MonoBehaviourPun
 
     [SerializeField]
     private HealthScript m_playerHealthScript = null; // need to ref to this component so we can fetch the GameManager in the scene, and then check if PVP is enabled
-    private bool m_isPVPEnabled = false; // somehow pass this var to the spells?
+
+    private bool m_PVPEnabled = false;
 
     // Start is called before the first frame update
     void Start()
@@ -114,6 +115,7 @@ public class OrbManager : MonoBehaviourPun
 
     public void AddSpellOrb(Orb orb, bool addToOrbHistory = false)
     {
+        orb.setCasterPView(PhotonView.Get(gameObject));
         orbs.Add(orb);
         if (addToOrbHistory)
         {
@@ -186,7 +188,8 @@ public class OrbManager : MonoBehaviourPun
 
     void CastSpell(Vector3 clickedPosition)
     {
-        currentSpell.Cast(transform, clickedPosition);
+        // Pass in the PVPStatus and our photonView whenever we invoke Cast.
+        currentSpell.Cast(transform, clickedPosition, m_PVPEnabled, photonView);
         spellCooldowns[currentSpell.GetOrbTuple()] = (Time.time + currentSpell.GetSpellCooldown(), currentSpell.GetSpellCooldown());
 
         float cost = currentSpell.GetManaCost();
@@ -296,7 +299,7 @@ public class OrbManager : MonoBehaviourPun
     /// </summary>
     private void UpdateGameManager(GameManager temp)
     {
-        m_isPVPEnabled = temp.TypeOfLevel == GameManager.LevelTypes.PVP;
+        photonView.RPC("SetPVPStatusAndPhotonView", RpcTarget.All, temp.TypeOfLevel == GameManager.LevelTypes.PVP);
     }
 
     /// <summary>
@@ -315,5 +318,21 @@ public class OrbManager : MonoBehaviourPun
 
         orbHistory.Clear();
         orbs.Clear();
+    }
+
+    /// <summary>
+    /// (PunRPC) This sets the PVP status (according to the GM) and photon view of the caster for each orb.
+    /// This needs to be a PunRPC call so that the PVPEnabled bool would be accurately replicated across all clients
+    /// and the spell projectiles's layers would be updated accordingly.
+    /// </summary>
+    [PunRPC]
+    public void SetPVPStatusAndPhotonView(bool PVPEnabled)
+    {
+        //print($"RPC call result for {photonView.name}: {PVPEnabled}: orb count: {orbs.Count}");
+
+        m_PVPEnabled = true;
+
+        // Don't update the orbs for all players, because on client side, the client can only see their own orbs
+        // Not the orbs of others (your orb list and cooldowns are not synced across the server).
     }
 }
