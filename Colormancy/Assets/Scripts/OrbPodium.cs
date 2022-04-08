@@ -4,13 +4,8 @@ using UnityEngine;
 using Photon.Pun;
 using PhotonHashtable = ExitGames.Client.Photon.Hashtable; // to use with Photon's CustomProperties
 
-public class PodiumController : MonoBehaviour
+public class OrbPodium : Podium
 {
-    public GameObject interactIndicator;
-    private SpriteRenderer indicatorSprite;
-
-    [SerializeField]
-    private string[] messages = new string[] { "Test Message 1" };
     [SerializeField]
     private string[] returnMessage = new string[] { "Do you want to return your orb?" }; // the user has the orb, and is at the podium where they retrieved the orb at
     [SerializeField]
@@ -20,112 +15,59 @@ public class PodiumController : MonoBehaviour
     [SerializeField]
     private string[] waitingMessage = new string[] { "Somebody else is currently browsing this orb" }; // somebody else is currently looking at the orb
 
-    [SerializeField]
-    private Sprite[] images;
-
-    private OrbManager playerSpellTest = null;
-
-    public bool InRange { get { return m_inRange; } }
-    private bool m_inRange = false;
-
-    private GameManager manager;
+    private OrbManager m_orbManager = null;
 
     public enum OrbTypes { None, BlueOrb, BrownOrb, GreenOrb, IndigoOrb, OrangeOrb, QuicksilverOrb, RedOrb, VioletOrb, YellowOrb }
-    public enum OrbStatus { Available, OutOfStock, Returnable, Waiting, AlreadyHaveOrb }
 
-    public OrbTypes podiumType;
-    public OrbStatus podiumStatus = OrbStatus.Available;
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        manager = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>();
-        indicatorSprite = interactIndicator.GetComponent<SpriteRenderer>();
-    }
+    public OrbTypes orbType;
 
     // Update is called once per frame
-    void Update()
+    protected override void Update()
     {
         if (Input.GetMouseButtonDown(0) && InRange)
         {
             Orb orb = GetCurrentOrb();
-            if (podiumStatus == OrbStatus.Available)
+            if (podiumStatus == PodiumStatus.Available)
             {
-                manager.PodiumPopUp(messages, images, orb, playerSpellTest, this);
+                manager.PopUpOrb(messages, images, orb, m_orbManager, this);
                 manager.ChangeGUIMode(AcceptButtonHandler.AcceptMode.GiveOrb);
             }
-            else if (podiumStatus == OrbStatus.Waiting)
+            else if (podiumStatus == PodiumStatus.Waiting)
             {
-                manager.PodiumPopUp(waitingMessage, new Sprite[] { }, orb, playerSpellTest, this);
+                manager.PopUpOrb(waitingMessage, new Sprite[] { }, orb, m_orbManager, this);
                 manager.ChangeGUIMode(AcceptButtonHandler.AcceptMode.CloseWindow);
             }
-            else if (podiumStatus == OrbStatus.OutOfStock)
+            else if (podiumStatus == PodiumStatus.OutOfStock)
             {
-                manager.PodiumPopUp(missingMessage, new Sprite[] { }, orb, playerSpellTest, this);
+                manager.PopUpOrb(missingMessage, new Sprite[] { }, orb, m_orbManager, this);
                 manager.ChangeGUIMode(AcceptButtonHandler.AcceptMode.CloseWindow);
             }
-            else if (podiumStatus == OrbStatus.Returnable)
+            else if (podiumStatus == PodiumStatus.Returnable)
             {
-                manager.PodiumPopUp(returnMessage, new Sprite[] { }, orb, playerSpellTest, this);
+                manager.PopUpOrb(returnMessage, new Sprite[] { }, orb, m_orbManager, this);
                 manager.ChangeGUIMode(AcceptButtonHandler.AcceptMode.RemoveOrb);
             }
-            else if (podiumStatus == OrbStatus.AlreadyHaveOrb)
+            else if (podiumStatus == PodiumStatus.AlreadyHaveOrb)
             {
-                manager.PodiumPopUp(maxCapMessage, new Sprite[] { }, orb, playerSpellTest, this);
+                manager.PopUpOrb(maxCapMessage, new Sprite[] { }, orb, m_orbManager, this);
                 manager.ChangeGUIMode(AcceptButtonHandler.AcceptMode.CloseWindow);
             }
         }
 
         if (indicatorSprite.enabled && Camera.main)
         {
-            interactIndicator.transform.LookAt(Camera.main.transform.position, Vector3.up);
+            indicatorSprite.transform.LookAt(Camera.main.transform.position, Vector3.up);
         }
     }
 
-    Orb GetCurrentOrb()
-    {
-        Orb orbType = null;
-        switch(podiumType)
-        {
-            case OrbTypes.BlueOrb:
-                orbType = new BlueOrb();
-                break;
-            case OrbTypes.BrownOrb:
-                orbType = new BrownOrb();
-                break;
-            case OrbTypes.GreenOrb:
-                orbType = new GreenOrb();
-                break;
-            case OrbTypes.QuicksilverOrb:
-                orbType = new QuickSilverOrb();
-                break;
-            case OrbTypes.IndigoOrb:
-                orbType = new IndigoOrb();
-                break;
-            case OrbTypes.OrangeOrb:
-                orbType = new OrangeOrb();
-                break;
-            case OrbTypes.RedOrb:
-                orbType = new RedOrb();
-                break;
-            case OrbTypes.VioletOrb:
-                orbType = new VioletOrb();
-                break;
-            case OrbTypes.YellowOrb:
-                orbType = new YellowOrb();
-                break;
-        }
-        return orbType;
-    }
-
-    private void OnTriggerEnter(Collider other)
+    protected override void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.CompareTag("Player"))
         {
             PhotonView playerView = PhotonView.Get(other.gameObject);
             if (playerView.IsMine)
             {
-                if (PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue(FetchOrbKey(podiumType), out object obj))
+                if (PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue(FetchOrbKey(orbType), out object obj))
                 {
                     int[] orbInfo = (int[])obj; // first element, ID that is perusing orb, second element, ID that has obtained and now owns the orb, third element is number of orbs the player currently 
                     if (orbInfo[0] == -1)
@@ -135,7 +77,7 @@ public class PodiumController : MonoBehaviour
 
                         // update the room properties to show that you're perusing this orb podium
                         PhotonHashtable roomProperties = PhotonNetwork.CurrentRoom.CustomProperties;
-                        roomProperties[FetchOrbKey(podiumType)] = orbInfo;
+                        roomProperties[FetchOrbKey(orbType)] = orbInfo;
                         PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue(GameManager.OrbsNeededKey, out object num);
 
                         PhotonNetwork.CurrentRoom.SetCustomProperties(roomProperties);
@@ -150,47 +92,47 @@ public class PodiumController : MonoBehaviour
                             if (playerOrbCount < (int)num) //OrbOwned == OrbTypes.None
                             {
                                 // nobody currently "owns" this orb, so present the normal stuff
-                                podiumStatus = OrbStatus.Available;
+                                podiumStatus = PodiumStatus.Available;
                             }
                             else
                             {
                                 // you can only have one orb
-                                podiumStatus = OrbStatus.AlreadyHaveOrb;
+                                podiumStatus = PodiumStatus.AlreadyHaveOrb;
                             }
                         }
                         else if (orbInfo[1] == PhotonNetwork.LocalPlayer.ActorNumber)
                         {
                             // you own this, are you returning this?
-                            podiumStatus = OrbStatus.Returnable;
+                            podiumStatus = PodiumStatus.Returnable;
                         }
                         else
                         {
                             // somebody else has this orb
-                            podiumStatus = OrbStatus.OutOfStock;
+                            podiumStatus = PodiumStatus.OutOfStock;
                         }
                     }
                     else
                     {
                         // somebody else is currently looking at the orb
-                        podiumStatus = OrbStatus.Waiting;
+                        podiumStatus = PodiumStatus.Waiting;
                     }
 
-                    m_inRange = true;
+                    InRange = true;
                     indicatorSprite.enabled = true;
-                    playerSpellTest = other.gameObject.GetComponent<OrbManager>();
+                    m_orbManager = other.gameObject.GetComponent<OrbManager>();
                 }
             }
         }
     }
 
-    private void OnTriggerExit(Collider other)
+    protected override void OnTriggerExit(Collider other)
     {
         if (other.gameObject.CompareTag("Player"))
         {
             PhotonView playerView = PhotonView.Get(other.gameObject);
             if (playerView.IsMine)
             {
-                if (PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue(FetchOrbKey(podiumType), out object obj))
+                if (PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue(FetchOrbKey(orbType), out object obj))
                 {
                     int[] orbInfo = (int[])obj; // first element, ID that is perusing orb, second element, ID that has obtained and now owns the orb
 
@@ -201,7 +143,7 @@ public class PodiumController : MonoBehaviour
 
                         // update the room properties to show that you're no longer perusing this orb podium
                         PhotonHashtable roomProperties = PhotonNetwork.CurrentRoom.CustomProperties;
-                        roomProperties[FetchOrbKey(podiumType)] = orbInfo;
+                        roomProperties[FetchOrbKey(orbType)] = orbInfo;
 
                         PhotonNetwork.CurrentRoom.SetCustomProperties(roomProperties);
                     }
@@ -215,11 +157,10 @@ public class PodiumController : MonoBehaviour
     /// <summary>
     /// Invoke this whenever the player has accepted the orb so that they cannot fetch more than one of the same orbs in the lobby.
     /// </summary>
-    public void CloseWindow()
+    public override void CloseWindow()
     {
-        m_inRange = false;
-        indicatorSprite.enabled = false;
-        playerSpellTest = null;
+        base.CloseWindow();
+        m_orbManager = null;
     }
 
     /// <summary>
@@ -284,5 +225,41 @@ public class PodiumController : MonoBehaviour
             default:
                 return OrbTypes.IndigoOrb;
         }
+    }
+
+    Orb GetCurrentOrb()
+    {
+        Orb orbType = null;
+        switch (this.orbType)
+        {
+            case OrbTypes.BlueOrb:
+                orbType = new BlueOrb();
+                break;
+            case OrbTypes.BrownOrb:
+                orbType = new BrownOrb();
+                break;
+            case OrbTypes.GreenOrb:
+                orbType = new GreenOrb();
+                break;
+            case OrbTypes.QuicksilverOrb:
+                orbType = new QuickSilverOrb();
+                break;
+            case OrbTypes.IndigoOrb:
+                orbType = new IndigoOrb();
+                break;
+            case OrbTypes.OrangeOrb:
+                orbType = new OrangeOrb();
+                break;
+            case OrbTypes.RedOrb:
+                orbType = new RedOrb();
+                break;
+            case OrbTypes.VioletOrb:
+                orbType = new VioletOrb();
+                break;
+            case OrbTypes.YellowOrb:
+                orbType = new YellowOrb();
+                break;
+        }
+        return orbType;
     }
 }

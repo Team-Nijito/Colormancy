@@ -136,9 +136,13 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     bool WindowOpen = false;
     bool PodiumMessage = false;
 
-    Orb currentOrbType;
-    PodiumController currentPodium; // keep track of current podium so we can close access to orb after player has obtained it
-    OrbManager playerOrbManager;
+    Orb m_currentOrb;
+    OrbPodium m_orbPodium; // keep track of current podium so we can close access to orb after player has obtained it
+    OrbManager m_playerOrbManager;
+
+    string m_currentItem;
+    ItemPodium m_itemPodium;
+    ItemManager m_playerItemManager;
     int dialoguePage = 0;
 
     #endregion
@@ -224,8 +228,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
                 // always setup a custom properties for all player
                 properties = new PhotonHashtable
                 {
-                    {OrbOwnedInLobbyKey1, PodiumController.OrbTypes.None},
-                    {OrbOwnedInLobbyKey2, PodiumController.OrbTypes.None},
+                    {OrbOwnedInLobbyKey1, OrbPodium.OrbTypes.None},
+                    {OrbOwnedInLobbyKey2, OrbPodium.OrbTypes.None},
                     {IsPlayerReady, false }
                 };
 
@@ -579,12 +583,12 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
     public void AddCurrentOrb()
     {
-        if (currentOrbType != null)
+        if (m_currentOrb != null)
         {
-            playerOrbManager.AddSpellOrb(currentOrbType, true);
+            m_playerOrbManager.AddSpellOrb(m_currentOrb, true);
 
             // Update custom properties
-            string orbKey = FetchOrbKey(currentOrbType.getElement());
+            string orbKey = FetchOrbKey(m_currentOrb.getElement());
 
             // fetch, alter, then set room custom properties
             PhotonHashtable roomProperties = PhotonNetwork.CurrentRoom.CustomProperties;
@@ -596,13 +600,13 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
             PhotonHashtable playerProperties = PhotonNetwork.LocalPlayer.CustomProperties;
 
             // Check if the orb is empty, if it is set it, otherwise set it to the second key
-            if ((PodiumController.OrbTypes)playerProperties[OrbOwnedInLobbyKey1] == PodiumController.OrbTypes.None)
+            if ((OrbPodium.OrbTypes)playerProperties[OrbOwnedInLobbyKey1] == OrbPodium.OrbTypes.None)
             {
-                playerProperties[OrbOwnedInLobbyKey1] = PodiumController.FetchOrbType(orbKey);
+                playerProperties[OrbOwnedInLobbyKey1] = OrbPodium.FetchOrbType(orbKey);
             }
             else
             {
-                playerProperties[OrbOwnedInLobbyKey2] = PodiumController.FetchOrbType(orbKey);
+                playerProperties[OrbOwnedInLobbyKey2] = OrbPodium.FetchOrbType(orbKey);
             }
             
             PhotonNetwork.LocalPlayer.SetCustomProperties(playerProperties);
@@ -611,6 +615,16 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         }
     }
     
+    public void AddCurrentItem()
+    {
+        if (m_currentItem != null)
+        {
+            m_playerItemManager.AddItem(m_currentItem);
+
+            CloseWindow();
+        }
+    }
+
     /// <summary>
     /// Alters the accept button behaviour in the Popupdialogue canvas object 
     /// </summary>
@@ -625,8 +639,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     public void CloseWindow()
     {
         CloseWindowVisually();
-        if (currentPodium)
-            currentPodium.CloseWindow();
+        if (m_orbPodium)
+            m_orbPodium.CloseWindow();
     }
 
     public void CloseWindowVisually()
@@ -635,8 +649,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         {
             animator.SetTrigger("close");
             WindowOpen = false;
-            playerOrbManager = null;
-            currentOrbType = null;
+            m_playerOrbManager = null;
+            m_playerItemManager = null;
+            m_currentOrb = null;
             acceptButton.SetActive(false);
             nextButton.SetActive(true);
         }
@@ -682,13 +697,13 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         SetPage();
     }
 
-    public void PodiumPopUp(string[] messages, Sprite[] images, Orb orbType, OrbManager orbManager, PodiumController orbPodiumScript)
+    public void PopUpOrb(string[] messages, Sprite[] images, Orb orbType, OrbManager orbManager, OrbPodium orbPodiumScript)
     {
         if (!WindowOpen)
         {
-            currentPodium = orbPodiumScript;
-            currentOrbType = orbType;
-            playerOrbManager = orbManager;
+            m_orbPodium = orbPodiumScript;
+            m_currentOrb = orbType;
+            m_playerOrbManager = orbManager;
 
             dialogueMessages = messages;
             dialogueImages = images;
@@ -718,15 +733,35 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         }
     }
 
+    public void PopUpItem(string[] messages, Sprite[] images, string itemName, ItemManager itemManager, ItemPodium itemPodium)
+    {
+        if (!WindowOpen)
+        {
+            m_itemPodium = itemPodium;
+            m_currentItem = itemName;
+            m_playerItemManager = itemManager;
+
+            dialogueMessages = messages;
+            dialogueImages = images;
+            dialoguePage = 0;
+
+            animator.SetTrigger("pop");
+            PodiumMessage = true;
+            WindowOpen = true;
+
+            SetPage();
+        }
+    }
+
     public void RemoveCurrentOrb()
     {
-        if (currentOrbType != null)
+        if (m_currentOrb != null)
         {
-            playerOrbManager.RemoveSpellOrb(currentOrbType, true);
+            m_playerOrbManager.RemoveSpellOrb(m_currentOrb, true);
 
             // Update custom properties
-            string orbKey = FetchOrbKey(currentOrbType.getElement()); // for the room
-            PodiumController.OrbTypes orbType = PodiumController.FetchOrbType(orbKey);
+            string orbKey = FetchOrbKey(m_currentOrb.getElement()); // for the room
+            OrbPodium.OrbTypes orbType = OrbPodium.FetchOrbType(orbKey);
 
             // fetch, alter, then set room custom properties
             PhotonHashtable roomProperties = PhotonNetwork.CurrentRoom.CustomProperties;
@@ -740,19 +775,19 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
             // Check if the first slot is holding the the orb, if it is, clear it
             // otherwise clear the second slot
             
-            if ((PodiumController.OrbTypes)playerProperties[OrbOwnedInLobbyKey1] == orbType)
+            if ((OrbPodium.OrbTypes)playerProperties[OrbOwnedInLobbyKey1] == orbType)
             {
-                playerProperties[OrbOwnedInLobbyKey1] = PodiumController.OrbTypes.None;
+                playerProperties[OrbOwnedInLobbyKey1] = OrbPodium.OrbTypes.None;
             }
             else
             {
-                playerProperties[OrbOwnedInLobbyKey2] = PodiumController.OrbTypes.None;
+                playerProperties[OrbOwnedInLobbyKey2] = OrbPodium.OrbTypes.None;
             }
 
             PhotonNetwork.LocalPlayer.SetCustomProperties(playerProperties);
 
             CloseWindowVisually();
-            currentPodium.CloseWindow();
+            m_orbPodium.CloseWindow();
         }
     }
 
@@ -918,11 +953,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
             foreach (string orbKey in orbOwnedKeys)
             {
-                PodiumController.OrbTypes orbOwned = (PodiumController.OrbTypes)otherPlayer.CustomProperties[orbKey];
-                if (orbOwned != PodiumController.OrbTypes.None)
+                OrbPodium.OrbTypes orbOwned = (OrbPodium.OrbTypes)otherPlayer.CustomProperties[orbKey];
+                if (orbOwned != OrbPodium.OrbTypes.None)
                 {
                     // we must return this back to the source  
-                    string key = PodiumController.FetchOrbKey(orbOwned);
+                    string key = OrbPodium.FetchOrbKey(orbOwned);
                     roomProperties[key] = new int[] { -1, -1 }; // nobody should own the orb anymore
                 }
             }

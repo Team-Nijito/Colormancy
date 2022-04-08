@@ -7,14 +7,13 @@ using UnityEditor;
 
 public class LootSpawner : MonoBehaviour
 {
-    string pathToItems = "GameItems";
+    string pathToItems = "Items";
 
-    MMLootTable<MMLoot<GameObject>, GameObject> lootTable = new MMLootTable<MMLoot<GameObject>, GameObject>();
+    MMLootTable<MMLoot<ItemSO>, ItemSO> lootTable;
 
     // Start is called before the first frame update
     void Start()
     {
-        Debug.Log("Loading Loot...");
         CreateAndFillLootTable();
     }
 
@@ -28,20 +27,19 @@ public class LootSpawner : MonoBehaviour
     {
         if (lootTable == null)
         {
-            var gameItems = Resources.LoadAll<MonoScript>(pathToItems);
-            foreach(var script in gameItems)
+            lootTable = new MMLootTable<MMLoot<ItemSO>, ItemSO>();
+            lootTable.ObjectsToLoot = new List<MMLoot<ItemSO>>();
+
+            ItemSO[] gameItems = Resources.LoadAll<ItemSO>(pathToItems);
+            foreach(ItemSO itemSO in gameItems)
             {
-                MMLoot<GameObject> lootItem = new MMLoot<GameObject>();
-                var i = script.GetClass();
-                GameObject lootObject = new GameObject();
-                lootObject.AddComponent(i);
-                Item item = lootObject.GetComponent<Item>();
-                lootItem.ChancePercentage = item.GetWeight();
-                lootItem.Loot = lootObject;
+                MMLoot<ItemSO> lootItem = new MMLoot<ItemSO>();
+                lootItem.ChancePercentage = itemSO.itemWeight;
+                lootItem.Loot = itemSO;
                 lootTable.ObjectsToLoot.Add(lootItem);
             }
         }
 
-        //Debug.Log(lootTable.GetLoot().Loot.name);
+        Debug.Log($"Filled loot table with {lootTable.ObjectsToLoot.Count} item(s)");
     }
 }

@@ -1,32 +1,43 @@
-﻿using System.Collections;
+﻿using Photon.Pun;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public abstract class Item : MonoBehaviour
 {
-    #region Loot Table Variables
-    protected float itemWeight = 1f; //Used in loot tables initialize everything to base value of 1
+    #region References for items to use, found on player prefab
+    protected PlayerMovement PlayerMovement;
+    protected PlayerAttack PlayerAttack;
+    protected HealthScript PlayerHealth;
+    protected OrbManager PlayerOrbManager;
+    protected PhotonView PlayerPhotonView;
     #endregion
 
-    #region References for items to use, found on player prefab
-    protected PlayerMovement playerMovement;
-    #endregion
+    public ItemManager.ItemTypes ItemType { get; protected set; }
+    public int MaxItemAmount { get; protected set; }
 
     /// <summary>
     /// Initialize protected variables for children to use
     /// Should be used before using any of the abstract functions
     /// </summary>
-    public void Init()
+    public virtual void Init(GameObject playerGO)
     {
-        playerMovement = GetComponent<PlayerMovement>();
+        //Initialize to instant, but when you make a new item make sure to change this if necessary or else the rest won't work
+        ItemType = ItemManager.ItemTypes.Instant;
+        //Initialized to very high, for legendary items make sure to change this when overriding Init
+        MaxItemAmount = 10;
+
+        PlayerMovement = playerGO.GetComponent<PlayerMovement>();
+        PlayerAttack = playerGO.GetComponent<PlayerAttack>();
+        PlayerHealth = playerGO.GetComponent<HealthScript>();
+        PlayerOrbManager = playerGO.GetComponent<OrbManager>();
+        PlayerPhotonView = playerGO.GetPhotonView();
     }
 
-    public float GetWeight()
-    {
-        return itemWeight;
-    }
     #region Abstract Functions
-    public abstract void AddItemEffects();
+    public abstract void AddItemEffects(ItemManager manager);
     public abstract void RemoveItemEffects();
+
+    public virtual float OnHitEffect(float damageValue) { Debug.LogError("This Item does not have an OnHitEffect"); return damageValue; }
     #endregion
 }

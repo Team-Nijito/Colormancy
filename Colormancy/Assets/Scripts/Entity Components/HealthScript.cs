@@ -6,12 +6,19 @@ using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine.AI;
 using PhotonHashtable = ExitGames.Client.Photon.Hashtable; // to use with Photon's CustomProperties
+using UnityEngine.Events;
 
 [DisallowMultipleComponent]
 public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
 {
     // manages the "health" for any object, includes: damage, healing, armor? (damage reduction)
     // only works on gameobjects with a child canvas and UI slider
+
+    #region Public Events
+
+    public UnityEvent OnTakeDamage; 
+
+    #endregion
 
     #region Public variables and accessors (c# properties)
 
@@ -76,6 +83,8 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     #region Components
 
     // misc components
+    //Will be null if HealthScript is not attached to a player
+    private ItemManager m_itemManager;
     private ManaScript m_mScript;
     private StatusEffectScript m_statusEffectScript;
     private EnemyAnimationManager m_animManager;
@@ -93,6 +102,7 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
         m_isPlayer = GetComponent<CharacterController>() != null;
         if (m_isPlayer)
         {
+            m_itemManager = GetComponent<ItemManager>();
             m_mScript = GetComponent<ManaScript>();
             m_camController = GetComponent<Chromaturgy.CameraController>();
 
@@ -137,6 +147,9 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
             // we can access a player's GameObject with: player.TagObject
             photonView.Owner.TagObject = gameObject;
         }
+
+        if (OnTakeDamage == null)
+            OnTakeDamage = new UnityEvent();
     }
 
     // Update is called once per frame
@@ -423,6 +436,8 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
         {
             if (m_isPlayer)
             {
+                damageValue = m_itemManager.OnHit(damageValue);
+
                 StatusEffectScript status = GetComponent<StatusEffectScript>();
                 status.RPCClearStatusEffect(StatusEffect.StatusType.MovementIncreaseSpeed);
             }

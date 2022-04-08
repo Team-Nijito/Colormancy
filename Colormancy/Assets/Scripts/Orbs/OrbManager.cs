@@ -19,6 +19,10 @@ public class OrbManager : MonoBehaviourPun
 
     public List<Orb> orbs = new List<Orb>();
 
+    [SerializeField]
+    [Range(0f, 100f)]
+    float m_spellCooldownModifier = 0f;
+
     SpellManager manager;
     ManaScript mana;
     OrbTrayUIController uIController;
@@ -183,7 +187,7 @@ public class OrbManager : MonoBehaviourPun
     void CastSpell(Vector3 clickedPosition)
     {
         currentSpell.Cast(transform, clickedPosition);
-        spellCooldowns[currentSpell.GetOrbTuple()] = (Time.time + currentSpell.GetSpellCooldown(), currentSpell.GetSpellCooldown());
+        spellCooldowns[currentSpell.GetOrbTuple()] = (Time.time + currentSpell.GetSpellCooldown() * (1f - (m_spellCooldownModifier / 100f)), currentSpell.GetSpellCooldown() * (1f - (m_spellCooldownModifier / 100f)));
 
         float cost = currentSpell.GetManaCost();
         if (cost > 0)
@@ -301,5 +305,19 @@ public class OrbManager : MonoBehaviourPun
 
         orbHistory.Clear();
         orbs.Clear();
+    }
+
+    public void AddSpellCooldownModifier(float deltaAmount)
+    {
+        m_spellCooldownModifier += deltaAmount;
+        m_spellCooldownModifier = Mathf.Clamp(m_spellCooldownModifier, 0f, 100f);
+    }    
+
+    public void SetSpellCooldownModifier(float modifier)
+    {
+        if (modifier >= 0f && modifier <= 100f)
+        {
+            m_spellCooldownModifier = modifier;
+        }
     }
 }
