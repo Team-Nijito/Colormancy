@@ -362,7 +362,7 @@ MonoBehaviour:
   m_healthBar: {fileID: 5820395927547718611}
   m_username: {fileID: 2672177483625422240}
   m_gameManager: {fileID: 0}
-  m_baseHealth: 100
+  m_baseHealth: 500
   m_shieldHealth: 0
   m_armorPercentage: 0
   m_isRegenHealth: 1
@@ -381,7 +381,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aea2c7aba3e4e6343a67593e4e5823ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_playerHealthScript: {fileID: 5820395927475117115}
 --- !u!114 &6914068583315090777
 MonoBehaviour:
   m_ObjectHideFlags: 0
