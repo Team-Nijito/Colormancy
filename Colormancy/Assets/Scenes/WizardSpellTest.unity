@@ -2541,7 +2541,7 @@ MonoBehaviour:
   messages:
   - Test Message 1
   images: []
-  m_item: {fileID: 11400000, guid: 19a684aefbcc5364d930a0b020530080, type: 2}
+  m_item: {fileID: 11400000, guid: 34275690af1b5064c9ff62fd78f8df3a, type: 2}
 --- !u!1 &2063699831
 GameObject:
   m_ObjectHideFlags: 0

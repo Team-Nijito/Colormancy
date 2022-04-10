@@ -21,7 +21,7 @@ public class ItemManager : MonoBehaviourPun
     // Start is called before the first frame update
     void Start()
     {
-        AddItem("C_SplatJacket");
+        photonView.RPC("AddItem", RpcTarget.All, "C_SplatJacket");
     }
 
     // Update is called once per frame
@@ -38,10 +38,14 @@ public class ItemManager : MonoBehaviourPun
 
         if (Input.GetKeyDown(KeyCode.P))
         {
-            photonView.RPC("OnHit", RpcTarget.All, 0f);
+            if (photonView.IsMine)
+            {
+                photonView.RPC("OnHit", RpcTarget.All, 0f);
+            }
         }
     }
 
+    [PunRPC]
     public void AddItem(string itemName)
     {
         if (DebugMode)
