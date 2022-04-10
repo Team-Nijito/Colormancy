@@ -38,7 +38,7 @@ public class ItemManager : MonoBehaviourPun
 
         if (Input.GetKeyDown(KeyCode.P))
         {
-            OnHit(0f);
+            photonView.RPC("OnHit", RpcTarget.All, 0f);
         }
     }
 
@@ -63,6 +63,7 @@ public class ItemManager : MonoBehaviourPun
     /// </summary>
     /// <param name="damageValue">Original damage value</param>
     /// <returns>Modified damage value after item effects</returns>
+    [PunRPC]
     public float OnHit(float damageValue)
     {
         float modifiedDamageValue = damageValue;
