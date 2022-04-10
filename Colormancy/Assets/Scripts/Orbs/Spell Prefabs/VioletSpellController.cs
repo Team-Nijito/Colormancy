@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Photon.Pun;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,6 +9,9 @@ public class VioletSpellController : MonoBehaviour
     public Orb.LesserCast lesserCast;
     public float spellEffectMod;
     private const Orb.Element element = Orb.Element.Poison;
+
+    public bool PVPEnabled = false;
+    public PhotonView CasterPView = null;
 
     [Space]
 
@@ -39,6 +43,15 @@ public class VioletSpellController : MonoBehaviour
         if (collider.gameObject.CompareTag("Enemy"))
             greaterCast(collider.gameObject, spellEffectMod, null);
         else if (collider.gameObject.CompareTag("Player"))
-            lesserCast(collider.gameObject, spellEffectMod, null);
+        {
+            if (PVPEnabled && PhotonView.Get(collider.gameObject).ViewID != CasterPView.ViewID)
+            {
+                greaterCast(collider.gameObject, spellEffectMod, null);
+            }
+            else
+            {
+                lesserCast(collider.gameObject, spellEffectMod, null);
+            }
+        }
     }
 }

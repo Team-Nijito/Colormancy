@@ -48,6 +48,8 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
 
     // Blind
     private GameObject m_blindPanel;
+    [SerializeField] private HealthScript m_hpScript = null;
+    private GameManager m_gm = null;
 
     #endregion
 
@@ -88,8 +90,10 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
         m_blindPanel = GameObject.Find("Canvas").transform.Find("LevelUI").transform.Find("BlindPanel").gameObject;
 
         // Initially set speed depending on what level we join right away (invoked once upon initial instantiation)
-        GameManager levelGM = GameObject.Find("GameManager").GetComponent<GameManager>();
-        SetSpeedDependingOnLevel(levelGM.IsLevel);
+        m_gm = GameObject.Find("GameManager").GetComponent<GameManager>();
+        SetSpeedDependingOnLevel(m_gm.IsLevel);
+
+        m_hpScript.gameManagerUpdated += UpdateGameManager;
     }
 
     // Update is called once per frame
@@ -99,10 +103,16 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
         {
             ProcessPlayerInput();
 
-            if (!m_blindPanel)
+            if (!m_blindPanel && !m_gm.IsLoadingNewScene && (m_gm.TypeOfLevel == GameManager.LevelTypes.Level || m_gm.TypeOfLevel == GameManager.LevelTypes.BossLevel ||
+                m_gm.TypeOfLevel == GameManager.LevelTypes.PVP))
             {
+
                 // ensure that blindPanel is always valid, temp fix for switching between scenes
-                m_blindPanel = GameObject.Find("Canvas").transform.Find("LevelUI").transform.Find("BlindPanel").gameObject;
+                GameObject canvas = GameObject.Find("Canvas");
+                if (canvas)
+                {
+                    m_blindPanel = canvas.transform.Find("LevelUI").transform.Find("BlindPanel").gameObject;
+                }
             }
         }
     }
@@ -216,6 +226,14 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
 
             m_movement = Vector3.zero; // reset movement after finished moving
         }
+    }
+
+    /// <summary>
+    /// attach this to an event in HealthScript whenever the GameManager is updated
+    /// </summary>
+    private void UpdateGameManager(GameManager temp)
+    {
+        m_gm = temp;
     }
 
     #endregion

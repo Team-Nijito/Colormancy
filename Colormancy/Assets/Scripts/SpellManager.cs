@@ -28,17 +28,28 @@ public class SpellManager : MonoBehaviourPun
             OrbTuple = (orbs[0].GetType(), orbs[1].GetType(), orbs[2].GetType());
         }
 
-        public void Cast(Transform t, Vector3 clickedPosition)
+        public void Cast(Transform t, Vector3 clickedPosition, bool PVPEnabled, PhotonView casterView)
         {
             StatusEffectScript status = t.gameObject.GetComponent<StatusEffectScript>();
             status = t.gameObject.GetComponent<StatusEffectScript>();
 
+            // Sync the PVP status and caster photonView
+            orbs[0].setPVPStatus(PVPEnabled);
+            orbs[1].setPVPStatus(PVPEnabled);
+            orbs[2].setPVPStatus(PVPEnabled);
+
+            orbs[0].setCasterPView(casterView);
+            orbs[1].setCasterPView(casterView);
+            orbs[2].setCasterPView(casterView);
+
             // exception for quicksilver
             if (orbs[0].getElement() == Orb.Element.Wind)
             {
-                GameObject storm = Instantiate(Resources.Load("Orbs/QuickSilver Storm"), t.position, t.rotation) as GameObject;
+                GameObject storm = Instantiate(Resources.Load("Orbs/QuickSilver Storm"), clickedPosition, t.rotation) as GameObject;
                 QuickSilverStormController g = storm.GetComponent<QuickSilverStormController>();
                 g.duration = OrbValueManager.getGreaterEffectDuration(Orb.Element.Wind, OrbValueManager.getLevel(Orb.Element.Wind, orbs[0].getLevel()));
+                g.CasterPView = casterView;
+                g.IsPVPEnabled = PVPEnabled;
             }
             // exception for red
             if(orbs[2].getElement() != Orb.Element.Wrath)
@@ -85,8 +96,29 @@ public class SpellManager : MonoBehaviourPun
                     preview.transform.position = mouseLocation;
                     break;
                 case Orb.Element.Fire:
+                    if (!preview)
+                    {
+                        preview = Instantiate(Resources.Load(previewFilePath + "ArrowPreview"), mouseLocation, playerTransform.rotation) as GameObject;
+
+                        Renderer previewRenderer = preview.GetComponent<Renderer>();
+                        previewRenderer.material.SetColor("_Color", OrbValueManager.getColor(Orb.Element.Fire));
+                    }
+
+                    preview.transform.position = playerTransform.GetChild(0).position + new Vector3(mouseDirection.x, 0, mouseDirection.z).normalized * 4 + Vector3.up * 0.1f;
+                    preview.transform.LookAt(preview.transform.position + new Vector3(mouseDirection.x, 0, mouseDirection.z));
+                    preview.transform.Rotate(Vector3.up, -90f);
                     break;
                 case Orb.Element.Light:
+                    if (!preview)
+                    {
+                        preview = Instantiate(Resources.Load(previewFilePath + "CurvedArrowPreview"), mouseLocation, playerTransform.rotation) as GameObject;
+
+                        Renderer previewRenderer = preview.GetComponent<Renderer>();
+                        previewRenderer.material.SetColor("_Color", OrbValueManager.getColor(Orb.Element.Light));
+                    }
+
+                    // repeat assignment in case object already exists
+                    preview.transform.position = playerTransform.position + Vector3.up * 0.1f;
                     break;
                 case Orb.Element.Nature:
                     if (!preview)

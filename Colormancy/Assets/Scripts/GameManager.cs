@@ -17,13 +17,14 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         Level,
         Lobby,
         Narrative,
-        BossLevel
+        BossLevel,
+        PVP
     }
 
     // C# properties for accessing the private variables
     public LevelTypes TypeOfLevel { get { return m_levelType; } private set { m_levelType = value; } }
-    public bool IsLevel { get { return !(m_levelType == LevelTypes.Lobby || m_levelType == LevelTypes.Narrative);  } }
-    
+    public bool IsLevel { get { return !(m_levelType == LevelTypes.Lobby || m_levelType == LevelTypes.Narrative); } }
+
     public int PlayersReady { get { return m_playersReady; } private set { m_playersReady = value; } }
     // num players needed to be ready can be fetched via PhotonNetwork.CurrentRoom.PlayerCount
     public int OrbsNeededToReady { get { return m_OrbsNeededToStartGame; } private set { m_OrbsNeededToStartGame = value; } }
@@ -54,10 +55,14 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     //) "level"-type levels
     public const string PlayerAliveKey = "IsPlayerAlive";
 
+    //) PVP levels
+    public const string PlayerRemaining = "PlayersLeft";
+
     // Name of scenes
     public const string LobbySceneName = "Starting Level";
     public const string WinSceneName = "YouWinScene";
     public const string OfficeLv1Name = "Office Level 1";
+    public const string CutsceneName = "Office Boss Cutscene";
     #endregion
 
     #region Private Fields
@@ -81,6 +86,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     [SerializeField]
     private LevelTypes m_levelType = LevelTypes.None;
 
+    public bool IsLoadingNewScene
+    {
+        get { return m_isLoadingNewScene; }
+    }
     private bool m_isLoadingNewScene = false;
 
     [Separator("Lobby level properties")]
@@ -166,6 +175,19 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
     private void Start()
     {
+        if (SceneManager.GetActiveScene().name == "Office Level 1" || SceneManager.GetActiveScene().name == "Office Level 2")
+        {
+            AudioScript audioScript = GameObject.FindGameObjectWithTag("SongAudio").GetComponent<AudioScript>();
+            audioScript.PlaySong(AudioScript.SongType.STAGE);
+        }
+
+        if (SceneManager.GetActiveScene().name == "Office Boss Cutscene" || SceneManager.GetActiveScene().name == "Office Level 3" ||
+            SceneManager.GetActiveScene().name == "PlayerPVPScene")
+        {
+            AudioScript audioScript = GameObject.FindGameObjectWithTag("SongAudio").GetComponent<AudioScript>();
+            audioScript.PlaySong(AudioScript.SongType.BOSS);
+        }
+
         if ((SceneManager.GetActiveScene().name == WinSceneName) || !PhotonNetwork.InRoom)
         {
             // don't run the rest of the start statement, return immediately
@@ -192,6 +214,18 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
                 // so that if the player was ready, and left, it would
                 // decrement the amount of players ready
                 PhotonNetwork.LocalPlayer.SetCustomProperties(properties);
+
+                // Checking if we're in the cutscene
+                if (SceneManager.GetActiveScene().name == CutsceneName)
+                {
+                    //Debug.Log("We're in the cutscene!");
+                    GameObject playerObject = PhotonNetwork.LocalPlayer.TagObject as GameObject;
+                    //if (playerObject && playerObject.transform.Find("PlayerCamera"))
+                    //{
+                    //    playerObject.transform.Find("PlayerCamera").gameObject.SetActive(false); // disable player cam so that cutscene camera works
+                    //}
+                    playerObject.GetComponentInChildren<Camera>().enabled = false; // disable player cam so that cutscene camera works
+                }
             }
             else if (m_levelType == LevelTypes.Lobby)
             {
@@ -238,7 +272,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
                 PhotonNetwork.LocalPlayer.SetCustomProperties(properties);
                 // these custom properties will be mutated whenver a player picks up a lobby orb / return a lobby orb
             }
-            else if (m_levelType == LevelTypes.Level)
+            else if (m_levelType == LevelTypes.Level || m_levelType == LevelTypes.BossLevel || m_levelType == LevelTypes.PVP)
             {
                 // Keep track of whether a player is still alive or not
                 PhotonHashtable properties = new PhotonHashtable
@@ -246,6 +280,19 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
                     {PlayerAliveKey, true},
                 };
                 PhotonNetwork.LocalPlayer.SetCustomProperties(properties);
+
+                if (m_levelType == LevelTypes.PVP && PhotonNetwork.IsMasterClient)
+                {
+                    // master client needs to keep track of the number of players alive, game will end for last one standing (no ties possible I don't want to handle that edge case)
+
+                    // see the lobby PhotonHashTable thing to see how to keep track of players alive
+                    PhotonHashtable roomProperty = new PhotonHashtable
+                    {
+                        {PlayerRemaining, PhotonNetwork.PlayerList.Length}
+                    };
+
+                    PhotonNetwork.CurrentRoom.SetCustomProperties(roomProperty);
+                }
             }
 
             // Add in Painting Manager and Orb Value Manager classes manually
@@ -295,7 +342,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
                     GameObject playerObject = PhotonNetwork.LocalPlayer.TagObject as GameObject;
 
-                    if (!(m_levelType==LevelTypes.Level) && playerObject)
+                    if (!(m_levelType==LevelTypes.Level || m_levelType==LevelTypes.BossLevel || m_levelType == LevelTypes.PVP) && playerObject)
                     {
                         object playerAliveProperty;
                         bool spawnNewPlayerInstance = false;
@@ -391,6 +438,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
                 if (m_levelType == LevelTypes.Level)
                 {            
                     m_paintProgress = PaintingManager.paintingProgress();
+                    //print(m_paintProgress);
 
                     if (!m_isLoadingNewScene && m_paintProgress > m_paintPercentageNeededToWin)
                     {
@@ -407,6 +455,39 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
                         LoadLevel(m_levelAfterBeatingStage);
                     }
                 }
+
+                // PVP
+                if (m_levelType == LevelTypes.PVP)
+                {
+                    // Check if there is one player still remaining
+                    PhotonHashtable roomProperty = PhotonNetwork.CurrentRoom.CustomProperties;
+                    object playerRemainingProperty;
+                    if (!m_isLoadingNewScene && roomProperty.TryGetValue(PlayerRemaining, out playerRemainingProperty) && (int)playerRemainingProperty <= 1)
+                    {
+                        // somehow save the name for next stage
+                        string nameOfWinner = "Nobody";
+
+                        foreach (var player in PhotonNetwork.PlayerList)
+                        {
+                            object playerAliveProperty;
+
+                            if (player.CustomProperties.TryGetValue(PlayerAliveKey, out playerAliveProperty))
+                            {
+                                if ((bool)playerAliveProperty)
+                                {
+                                    nameOfWinner = player.NickName; // if this player is still alive, this player is the last remaining
+                                    break;
+                                }
+                            }
+                        }
+
+                        photonView.RPC("ChoosePVPWinner", RpcTarget.All, nameOfWinner);
+
+                        LoadLevel(m_levelAfterBeatingStage);
+                    }
+                }
+
+
                 if (!m_isLoadingNewScene)
                 {
                     bool isAnyPlayerAlive = false;
@@ -657,12 +738,26 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         }
     }
 
+    [PunRPC]
+    public void ChoosePVPWinner(string nameOfWinner)
+    {
+        SceneDataSharer.PVPWinner = nameOfWinner; // update the static var so that the winner of the PVP duel will be correctly displayed in the win scene
+    }
+
     /// <summary>
     /// Invoked by the Canvas button "Leave Room"
     /// </summary>
     public void LeaveRoom()
     {
         OrbManager.orbHistory.Clear(); // don't retain memory of spells after leaving game
+
+        if (TypeOfLevel == LevelTypes.None)
+        {
+            SceneDataSharer.PVPWinner = ""; // reset static vars
+        }
+
+        AudioScript audioScript = GameObject.FindGameObjectWithTag("SongAudio").GetComponent<AudioScript>();
+        audioScript.PlaySong(AudioScript.SongType.LOBBY);
 
         // Leave the room and disconnect
         PhotonNetwork.LeaveRoom();
@@ -684,6 +779,14 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
             if (m_leaveButton)
             {
                 m_leaveButton.interactable = false;
+            }
+
+            if (SceneManager.GetActiveScene().name == CutsceneName)
+            {
+                //Debug.Log("We're leaving the cutscene!");
+                GameObject playerObject = PhotonNetwork.LocalPlayer.TagObject as GameObject;
+                //playerObject.transform.Find("PlayerCamera").gameObject.SetActive(true); // re-enable camera
+                playerObject.GetComponentInChildren<Camera>().enabled = true; // re-enable camera
             }
 
             PhotonNetwork.LoadLevel(nameOfScene);        

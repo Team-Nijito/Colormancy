@@ -22,6 +22,9 @@ public class AutoAttackProjectileController : MonoBehaviour
     public float poisonedAttackDamage;
     public float poisonedAttackDuration;
 
+    public bool canAttackOtherPlayer = false;
+    public int shooterID; // AKA the photon view ID of the person who created this projectile, AKA the shooter
+
     [Space]
 
     [SerializeField]
@@ -59,20 +62,27 @@ public class AutoAttackProjectileController : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.CompareTag("Enemy"))
+        bool isEnemy = collision.gameObject.CompareTag("Enemy");
+        bool isPlayer = collision.gameObject.CompareTag("Player");
+
+        if (isEnemy || (canAttackOtherPlayer && isPlayer))
         {
             StatusEffectScript status = collision.gameObject.GetComponent<StatusEffectScript>();
             if (status.StatusExists(StatusEffect.StatusType.AutoAttackIncreasedDamage))
                 attackMultiplier += 0.5f;
 
             PhotonView photonView = PhotonView.Get(collision.gameObject);
-            photonView.RPC("TakeDamage", RpcTarget.All, attackDamage * attackMultiplier);
+            if (photonView.ViewID != shooterID)
+            {
+                // Don't hurt yourself with the projectile
+                photonView.RPC("TakeDamage", RpcTarget.All, attackDamage * attackMultiplier);
 
-            if (poisonedAttack)
-                status.RPCApplyStatus(StatusEffect.StatusType.DamageOverTime, poisonedAttackDuration, 1, poisonedAttackDamage);
+                if (poisonedAttack)
+                    status.RPCApplyStatus(StatusEffect.StatusType.DamageOverTime, poisonedAttackDuration, 1, poisonedAttackDamage);
+            }
         }
             
-        if (!collision.gameObject.CompareTag("Player"))
+        if ((canAttackOtherPlayer && isPlayer) || !isPlayer)
             Destroy(gameObject);
     }
 }

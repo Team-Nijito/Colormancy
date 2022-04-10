@@ -17,7 +17,7 @@ GameObject:
   - component: {fileID: 758168681078027296}
   m_Layer: 9
   m_Name: Orange Fireball
-  m_TagString: Untagged
+  m_TagString: Projectile
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -155,6 +155,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spellEffectMod: 0
+  PVPEnabled: 0
+  CasterPView: {fileID: 0}
   speed: 0.45
   lifetime: 3
   debug: 0

@@ -60,6 +60,8 @@ public class YellowOrb : Orb
         spellController.spellEffectMod = OrbValueManager.getShapeEffectMod(m_OrbElement) * spellDamageMultiplier;
 
         spellController.playerTransform = t;
+        spellController.PVPEnabled = getPVPStatus();
+        spellController.CasterPView = getCasterPView();
 
         for (int i = 0; i < 3; i++)
         {

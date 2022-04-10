@@ -56,6 +56,8 @@ namespace Chromaturgy
         [SerializeField]
         private bool m_isSpectateCamera = false;
 
+        private GameObject m_cameraPrefab; // Instantiate a camera prefab once a player returns back from a level
+
         private Vector3 m_movement = Vector3.zero;
 
         private PlayerMovement m_playerMovementScript;
@@ -71,6 +73,7 @@ namespace Chromaturgy
                 m_playerMovementScript = GetComponent<PlayerMovement>();
                 StartFollowing();
             }
+            m_cameraPrefab = Resources.Load<GameObject>("Main Camera"); // load the camera resource before we might need it
         }
 
         private void Update()
@@ -81,6 +84,12 @@ namespace Chromaturgy
             }
             else if (photonView.IsMine)
             {
+                if (!Camera.main)
+                {
+                    Instantiate(m_cameraPrefab);
+                    StartFollowing();
+                }
+
                 if (m_TCamera && m_isFollowing && (m_isSpectateCamera || (!m_isSpectateCamera && m_playerMovementScript.CanMove) ))
                 {
                     HandleCameraZoomInputs();

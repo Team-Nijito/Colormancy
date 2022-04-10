@@ -42,7 +42,8 @@ public class ReadyUpUI : MonoBehaviour
         m_gmScript = GameObject.Find("GameManager").GetComponent<GameManager>();
         m_oldButtonTextSize = m_readyButtonText.fontSize;
 
-        if (m_gmScript.TypeOfLevel == GameManager.LevelTypes.Level)
+        if (m_gmScript.TypeOfLevel == GameManager.LevelTypes.Level || m_gmScript.TypeOfLevel == GameManager.LevelTypes.BossLevel ||
+            m_gmScript.TypeOfLevel == GameManager.LevelTypes.PVP)
         {
             Destroy(gameObject);
         }

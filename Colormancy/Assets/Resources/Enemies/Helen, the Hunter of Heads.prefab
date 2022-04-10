@@ -357,6 +357,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_parentGameObject: {fileID: 3920937096604734629}
   m_isProjectile: 0
+  m_Slow: 0
+  SlowDuration: 0
+  SlowAmount: 0
   m_damage: 8
 --- !u!1 &3920937096604734629
 GameObject:
@@ -487,7 +490,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d383996a7ca6deb4e9ed18e84de36b20, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DebugMode: 1
+  DebugMode: 0
   ShankRange: 3
   ShankCooldown: 2
   ShunpoCooldown: 7
@@ -548,6 +551,7 @@ MonoBehaviour:
   - m_hitBoxObject: {fileID: 3680803293711643980}
     m_hitBoxScript: {fileID: 6874043050614557771}
   m_numPlayersCanHitInOneAttack: 4
+  Slow: 0
 --- !u!114 &3920937096604734631
 MonoBehaviour:
   m_ObjectHideFlags: 0

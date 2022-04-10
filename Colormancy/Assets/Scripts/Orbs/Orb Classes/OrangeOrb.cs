@@ -63,6 +63,13 @@ public class OrangeOrb : Orb
         spellController.greaterCast = greaterEffectMethod;
         spellController.lesserCast = lesserEffectMethod;
         spellController.spellEffectMod = OrbValueManager.getShapeEffectMod(m_OrbElement) * spellDamageMultiplier;
+        spellController.PVPEnabled = getPVPStatus();
+        spellController.CasterPView = getCasterPView();
+
+        if (getPVPStatus())
+        {
+            g.layer = LayerMask.NameToLayer("Default");
+        }
     }
 
     public static object Deserialize(byte[] data)

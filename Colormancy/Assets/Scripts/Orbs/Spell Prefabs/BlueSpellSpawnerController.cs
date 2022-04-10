@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Photon.Pun;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -13,6 +14,21 @@ public class BlueSpellSpawnerController : MonoBehaviour
     public Orb.GreaterCast greaterCast;
     public Orb.LesserCast lesserCast;
     public float spellEffectMod;
+
+    public bool IsPVPEnabled
+    {
+        get { return PVPEnabled; }
+        set { 
+            PVPEnabled = value;
+            if (value)
+            {
+                gameObject.layer = LayerMask.NameToLayer("Default");
+            }
+        }
+    }
+    private bool PVPEnabled = false;
+
+    public PhotonView CasterPView = null;
 
     [Space]
 
@@ -51,6 +67,11 @@ public class BlueSpellSpawnerController : MonoBehaviour
             sphere.GetComponent<Rigidbody>().velocity = behind * bMultiplier + Vector3.down * dMultiplier;
             sphere.GetComponent<BlueSpellSphereController>().spawner = transform;
             sphere.transform.parent = transform;
+
+            if (PVPEnabled)
+            {
+                sphere.layer = LayerMask.NameToLayer("Default");
+            }
         }
 
         if (transform.childCount == 0)
@@ -75,7 +96,14 @@ public class BlueSpellSpawnerController : MonoBehaviour
             if (!entitiesEntered.Contains(collider.gameObject))
             {
                 entitiesEntered.Add(collider.gameObject);
-                lesserCast(collider.gameObject, spellEffectMod, null);
+                if (PVPEnabled && PhotonView.Get(collider).ViewID != CasterPView.ViewID)
+                {
+                    greaterCast(collider.gameObject, spellEffectMod, null);
+                }
+                else
+                {
+                    lesserCast(collider.gameObject, spellEffectMod, null);
+                }
             }
         }
     }

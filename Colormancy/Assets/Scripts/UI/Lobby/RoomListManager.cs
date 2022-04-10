@@ -24,6 +24,7 @@ public class RoomListManager : MonoBehaviourPunCallbacks
 
     public override void OnRoomListUpdate(List<RoomInfo> roomList)
     {
+        //print("Updated rooms for " + PhotonNetwork.CloudRegion);
         foreach (RoomInfo info in roomList)
         {
             // Room is being removed from the list
@@ -62,6 +63,18 @@ public class RoomListManager : MonoBehaviourPunCallbacks
     public override void OnJoinedRoom()
     {
         // Clear the list of rooms whenever you join a room
+        ClearRoomList();
+    }
+
+    #endregion
+
+    #region Public functions
+
+    /// <summary>
+    /// Destroy every gameobject associated with a RoomItemUI in the m_roomList before clearing m_roomList
+    /// </summary>
+    public void ClearRoomList()
+    {
         foreach (RoomItemUI roomitem in m_roomList)
         {
             Destroy(roomitem.gameObject);

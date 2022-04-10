@@ -179,13 +179,16 @@ public class EnemyTargeting : MonoBehaviourPun
     [PunRPC]
     protected virtual void PlayerIsTargeted()
     {
-        if (m_enemMovement.DirectionToPlayer.magnitude > m_attackRange)
+        if (m_enemMovement)
         {
-            m_animManager.ChangeState(EnemyAnimationManager.EnemyState.Move);
-        }
-        else
-        {
-            m_animManager.ChangeState(EnemyAnimationManager.EnemyState.Attack);
+            if (m_enemMovement.DirectionToPlayer.magnitude > m_attackRange)
+            {
+                m_animManager.ChangeState(EnemyAnimationManager.EnemyState.Move);
+            }
+            else
+            {
+                m_animManager.ChangeState(EnemyAnimationManager.EnemyState.Attack);
+            }
         }
     }
 

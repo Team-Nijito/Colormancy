@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Photon.Pun;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -28,6 +29,9 @@ public class GreenSpellSpawnerController : MonoBehaviour
     private int currentTick;
     private bool spawnVine;
     private List<GameObject> entitiesEntered;
+
+    public bool PVPEnabled = false;
+    public PhotonView CasterPView = null;
 
     [Space]
 
@@ -150,7 +154,16 @@ public class GreenSpellSpawnerController : MonoBehaviour
                     if (g.CompareTag("Enemy"))
                         greaterCast(g, spellEffectMod, null);
                     else if (g.CompareTag("Player"))
-                        lesserCast(g, 1, null);
+                    {
+                        if (PVPEnabled && PhotonView.Get(g).ViewID != CasterPView.ViewID)
+                        {
+                            greaterCast(g, spellEffectMod, null);
+                        }
+                        else
+                        {
+                            lesserCast(g, 1, null);
+                        }
+                    }
                 }
             }
         }

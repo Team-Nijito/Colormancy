@@ -121,7 +121,10 @@ public class EnemyManager : MonoBehaviourPunCallbacks
     /// <returns></returns>
     private void UpdateDesiredEnemiesInRoom()
     {
-        m_desiredEnemiesOnField = (byte)(PhotonNetwork.CurrentRoom.PlayerCount * m_enemiesPerPlayer);
+        if (PhotonNetwork.CurrentRoom != null)
+        {
+            m_desiredEnemiesOnField = (byte)(PhotonNetwork.CurrentRoom.PlayerCount * m_enemiesPerPlayer);
+        }
     }
 
     #endregion

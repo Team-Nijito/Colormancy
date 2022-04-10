@@ -27,7 +27,7 @@ public class OrbManager : MonoBehaviourPun
     ManaScript mana;
     OrbTrayUIController uIController;
 
-    private readonly bool TestingMode = false;
+    private readonly bool TestingMode = true;
 
     [SerializeField]
     Dictionary<(Type, Type, Type), (float, float)> spellCooldowns = new Dictionary<(Type, Type, Type), (float, float)>(); // key: Orb Tuple, value: (current cooldown, Spell base cooldown)
@@ -35,6 +35,11 @@ public class OrbManager : MonoBehaviourPun
     SpellManager.Spell currentSpell;
 
     PlayerMovement playerMoveScript; // need a ref to this component so we can check if we're stunned or not, so we'll prevent casting while stunned
+
+    [SerializeField]
+    private HealthScript m_playerHealthScript = null; // need to ref to this component so we can fetch the GameManager in the scene, and then check if PVP is enabled
+
+    private bool m_PVPEnabled = false;
 
     // Start is called before the first frame update
     void Start()
@@ -114,6 +119,7 @@ public class OrbManager : MonoBehaviourPun
 
     public void AddSpellOrb(Orb orb, bool addToOrbHistory = false)
     {
+        orb.setCasterPView(PhotonView.Get(gameObject));
         orbs.Add(orb);
         if (addToOrbHistory)
         {
@@ -186,7 +192,8 @@ public class OrbManager : MonoBehaviourPun
 
     void CastSpell(Vector3 clickedPosition)
     {
-        currentSpell.Cast(transform, clickedPosition);
+        // Pass in the PVPStatus and our photonView whenever we invoke Cast.
+        currentSpell.Cast(transform, clickedPosition, m_PVPEnabled, photonView);
         spellCooldowns[currentSpell.GetOrbTuple()] = (Time.time + currentSpell.GetSpellCooldown() * (1f - (m_spellCooldownModifier / 100f)), currentSpell.GetSpellCooldown() * (1f - (m_spellCooldownModifier / 100f)));
 
         float cost = currentSpell.GetManaCost();
@@ -287,6 +294,16 @@ public class OrbManager : MonoBehaviourPun
         {
             UpdateOrbsFromPreviousScene();
         }
+
+        m_playerHealthScript.gameManagerUpdated += UpdateGameManager;
+    }
+
+    /// <summary>
+    /// attach this to an event in HealthScript whenever the GameManager is updated
+    /// </summary>
+    private void UpdateGameManager(GameManager temp)
+    {
+        photonView.RPC("SetPVPStatusAndPhotonView", RpcTarget.All, temp.TypeOfLevel == GameManager.LevelTypes.PVP);
     }
 
     /// <summary>
@@ -306,6 +323,23 @@ public class OrbManager : MonoBehaviourPun
         orbHistory.Clear();
         orbs.Clear();
     }
+
+    /// <summary>
+    /// (PunRPC) This sets the PVP status (according to the GM) and photon view of the caster for each orb.
+    /// This needs to be a PunRPC call so that the PVPEnabled bool would be accurately replicated across all clients
+    /// and the spell projectiles's layers would be updated accordingly.
+    /// </summary>
+    [PunRPC]
+    public void SetPVPStatusAndPhotonView(bool PVPEnabled)
+    {
+        //print($"RPC call result for {photonView.name}: {PVPEnabled}: orb count: {orbs.Count}");
+
+        m_PVPEnabled = true;
+
+        // Don't update the orbs for all players, because on client side, the client can only see their own orbs
+        // Not the orbs of others (your orb list and cooldowns are not synced across the server).
+    }
+
 
     public void AddSpellCooldownModifier(float deltaAmount)
     {

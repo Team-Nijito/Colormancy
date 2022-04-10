@@ -79,6 +79,9 @@ public class RedOrb : Orb
 
         spellController.endPosition = clickedPosition + Vector3.up * 1.6f;
         spellController.playerTransform = t;
+
+        spellController.PVPEnabled = getPVPStatus();
+        spellController.CasterPView = getCasterPView();
     }
 
     public static object Deserialize(byte[] data)

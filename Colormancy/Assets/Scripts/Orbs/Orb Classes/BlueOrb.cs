@@ -57,8 +57,15 @@ public class BlueOrb : Orb
         spellController.greaterCast = greaterEffectMethod;
         spellController.lesserCast = lesserEffectMethod;
         spellController.spellEffectMod = OrbValueManager.getShapeEffectMod(m_OrbElement) * spellDamageMultiplier;
+        spellController.IsPVPEnabled = getPVPStatus();
+        spellController.CasterPView = getCasterPView();
 
         spellController.playerTransform = t;
+
+        if (getPVPStatus())
+        {
+            g.layer = LayerMask.NameToLayer("Default");
+        }
     }
 
     public static object Deserialize(byte[] data)

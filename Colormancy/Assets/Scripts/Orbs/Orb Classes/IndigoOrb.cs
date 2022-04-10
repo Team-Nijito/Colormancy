@@ -61,6 +61,13 @@ public class IndigoOrb : Orb
             sphereController.greaterCast = greaterEffectMethod;
             sphereController.lesserCast = lesserEffectMethod;
             sphereController.spellEffectMod = OrbValueManager.getShapeEffectMod(m_OrbElement) * spellDamageMultiplier;
+            sphereController.PVPEnabled = getPVPStatus();
+            sphereController.CasterPView = getCasterPView();
+
+            if (getPVPStatus())
+            {
+                g.transform.GetChild(i).gameObject.layer = LayerMask.NameToLayer("Default");
+            }
 
             if ((i % 2 == 1 && m_Level == 2) /*|| (i % 4 != 0 && m_Level == 1)*/)
           

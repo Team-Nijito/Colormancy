@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Photon.Pun;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -21,6 +22,10 @@ public abstract class Orb
     protected SpellShape m_OrbShape;
     protected Element m_OrbElement;
     protected int m_Level = 1;
+
+    protected PhotonView m_casterView = null; // the PhotonView of the caster, used to prevent self damage
+    protected bool m_pvpEnabled = false;
+
     public GameObject m_UIPrefab;
     #endregion
 
@@ -29,12 +34,16 @@ public abstract class Orb
     public SpellShape getShape() { return m_OrbShape; }
     public Element getElement() { return m_OrbElement; }
     public int getLevel() { return m_Level; }
+    public PhotonView getCasterPView() { return m_casterView; }
+    public bool getPVPStatus() { return m_pvpEnabled; }
     #endregion
 
     #region Setters
     public void setShape(SpellShape e) { m_OrbShape = e; }
     public void setElement( Element e ) { m_OrbElement = e; }
     public void setLevel( int l ) { m_Level = l; }
+    public void setCasterPView(PhotonView newView ) { m_casterView = newView; }
+    public void setPVPStatus(bool newStatus) { m_pvpEnabled = newStatus; }
     #endregion
 
     //SpellTest will just be the player controller
