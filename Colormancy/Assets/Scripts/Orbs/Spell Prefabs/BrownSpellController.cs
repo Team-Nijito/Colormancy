@@ -8,6 +8,7 @@ public class BrownSpellController : MonoBehaviour
     public Orb.GreaterCast greaterCast;
     public Orb.LesserCast lesserCast;
     public float spellEffectMod;
+    public Transform playerTransform;
     private const Orb.Element element = Orb.Element.Earth;
 
     [Space]
@@ -90,12 +91,12 @@ public class BrownSpellController : MonoBehaviour
     private void OnTriggerEnter(Collider collider)
     {
         if (collider.gameObject.tag.Equals("Enemy"))
-            greaterCast(collider.gameObject, spellEffectMod, null);
+            greaterCast(collider.gameObject, spellEffectMod, null, playerTransform);
         else if (collider.gameObject.tag.Equals("Player"))
         {
             if (PVPEnabled && PhotonView.Get(collider).ViewID != CasterPView.ViewID)
             {
-                greaterCast(collider.gameObject, spellEffectMod, null);
+                greaterCast(collider.gameObject, spellEffectMod, null, playerTransform);
             }
             else
             {

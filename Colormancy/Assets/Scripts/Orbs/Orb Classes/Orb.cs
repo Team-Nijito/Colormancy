@@ -15,7 +15,7 @@ public abstract class Orb
     [System.Serializable]
     public enum Element
     {
-        Wrath, Fire, Light, Nature, Water, Poison, Earth, Wind, Darkness
+        Wrath, Fire, Light, Nature, Water, Poison, Earth, Wind, Darkness, AutoAttack
     }
 
     #region Orb Values
@@ -47,11 +47,11 @@ public abstract class Orb
     #endregion
 
     //SpellTest will just be the player controller
-    public delegate void GreaterCast(GameObject hit, float spellEffectMod, float[] data);
+    public delegate void GreaterCast(GameObject hit, float spellEffectMod, float[] data, Transform casterTransform);
     public delegate void LesserCast(GameObject hit, float spellEffectMod, float[] data);
 
     public abstract void CastShape(GreaterCast greaterEffectMethod, LesserCast lesserEffectMethod, Transform t, Vector3 clickedPosition, float spellDamageMultiplier);
-    public abstract void CastGreaterEffect(GameObject hit, float spellEffectMod, float[] data);
+    public abstract void CastGreaterEffect(GameObject hit, float spellEffectMod, float[] data, Transform casterTransform);
     //Will have to do something different and send over server for this one since most are for allies
     public abstract void CastLesserEffect(GameObject hit, float spellEffectMod, float[] data);
     public abstract void RevertHeldEffect(GameObject player);

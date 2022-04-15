@@ -5,12 +5,13 @@ using UnityEngine;
 
 public class ItemManager : MonoBehaviourPun
 {
-    public enum ItemTypes { Instant, OnHit };
 
     //Dictionary Keys are the items and the Values is the amount of that item the player has
     Dictionary<Item, int> instantItems = new Dictionary<Item, int>();
     Dictionary<Item, int> onHitItems = new Dictionary<Item, int>();
+    Dictionary<Item, int> damageMultiplierItems = new Dictionary<Item, int>();
 
+    [SerializeField] GameObject aegisGraphic;
     [SerializeField] GameObject itemParent;
 
     readonly bool DebugMode = true;
@@ -18,10 +19,11 @@ public class ItemManager : MonoBehaviourPun
     //For debug purposes
     Item lastAddedItem;
 
+    #region MonoBehaviour Methods
     // Start is called before the first frame update
     void Start()
     {
-        photonView.RPC("AddItem", RpcTarget.All, "C_SplatJacket");
+        photonView.RPC("AddItem", RpcTarget.All, "C_TargetAnalyzer");
     }
 
     // Update is called once per frame
@@ -44,7 +46,27 @@ public class ItemManager : MonoBehaviourPun
             }
         }
     }
+    #endregion
 
+    #region Public Methods
+    public void RPCAddItem(string itemName)
+    {
+        photonView.RPC("AddItem", RpcTarget.All, itemName);
+    }
+
+    public float DoDamageMultipliers(float spellDmgMultiplier)
+    {
+        foreach(Item item in damageMultiplierItems.Keys)
+        {
+            spellDmgMultiplier = item.DoDamageMultiplier(spellDmgMultiplier);
+        }
+
+        return spellDmgMultiplier;
+    }
+    #endregion
+
+
+    #region RPC Methods
     [PunRPC]
     public void AddItem(string itemName)
     {
@@ -57,6 +79,7 @@ public class ItemManager : MonoBehaviourPun
         lastAddedItem = item;
     }
 
+    [PunRPC]
     public void RemoveItem(Item item)
     {
         RemoveItemFromDictionaries(item);
@@ -83,43 +106,73 @@ public class ItemManager : MonoBehaviourPun
         return modifiedDamageValue;
     }
 
+    [PunRPC]
+    public void EnableAegis()
+    {
+        aegisGraphic.SetActive(true);
+    }
+
+    [PunRPC]
+    public void DisableAegis()
+    {
+        aegisGraphic.SetActive(false);
+    }
+    #endregion
+
+    #region Private Methods
     void AddItemToDictionaries(Item item)
     {
-        switch (item.ItemType)
+        foreach(Item.ItemTypes itemType in item.Types)
         {
-            case ItemTypes.Instant:
-                if (DebugMode)
-                    Debug.Log("ItemManager::AddItemToDictionaries - Adding to instant items");
-                CheckAndAdd(item, instantItems);
-                break;
-            case ItemTypes.OnHit:
-                if (DebugMode)
-                    Debug.Log("ItemManager::AddItemToDictionaries - Adding to on hit items");
-                CheckAndAdd(item, onHitItems);
-                break;
-            default:
-                Debug.LogError($"ItemManager::AddItemToDictionaries - Not yet implemented item type {item.ItemType}");
-                break;
+            switch (itemType)
+            {
+                case Item.ItemTypes.Instant:
+                    if (DebugMode)
+                        Debug.Log("ItemManager::AddItemToDictionaries - Adding to instant items");
+                    CheckAndAdd(item, instantItems);
+                    break;
+                case Item.ItemTypes.DamageTaken:
+                    if (DebugMode)
+                        Debug.Log("ItemManager::AddItemToDictionaries - Adding to on hit items");
+                    CheckAndAdd(item, onHitItems);
+                    break;
+                case Item.ItemTypes.DamageMultiplier:
+                    if (DebugMode)
+                        Debug.Log("ItemManager::AddItemToDictionaries - Adding to damage multiplier items");
+                    CheckAndAdd(item, damageMultiplierItems);
+                    break;
+                default:
+                    Debug.LogError($"ItemManager::AddItemToDictionaries - Not yet implemented item type {item.Types}");
+                    break;
+            }
         }
     }
 
     void RemoveItemFromDictionaries(Item item)
     {
-        switch (item.ItemType)
+        foreach(Item.ItemTypes itemType in item.Types)
         {
-            case ItemTypes.Instant:
-                if (DebugMode)
-                    Debug.Log("ItemManager::RemoveItemFromDictionaries - Removing from instant items");
-                HandleRemovingItem(item, instantItems);
-                break;
-            case ItemTypes.OnHit:
-                if (DebugMode)
-                    Debug.Log("ItemManager::RemoveItemFromDictionaries - Removing from on hit items");
-                HandleRemovingItem(item, onHitItems);
-                break;
-            default:
-                Debug.LogError($"ItemManager::RemoveItemFromDictionaries - Not yet implemented item type {item.ItemType}");
-                break;
+            switch (itemType)
+            {
+                case Item.ItemTypes.Instant:
+                    if (DebugMode)
+                        Debug.Log("ItemManager::RemoveItemFromDictionaries - Removing from instant items");
+                    HandleRemovingItem(item, instantItems);
+                    break;
+                case Item.ItemTypes.DamageTaken:
+                    if (DebugMode)
+                        Debug.Log("ItemManager::RemoveItemFromDictionaries - Removing from on hit items");
+                    HandleRemovingItem(item, onHitItems);
+                    break;
+                case Item.ItemTypes.DamageMultiplier:
+                    if (DebugMode)
+                        Debug.Log("ItemManager::RemoveItemFromDictionaries - Removing from damage multiplier items");
+                    HandleRemovingItem(item, damageMultiplierItems);
+                    break;
+                default:
+                    Debug.LogError($"ItemManager::RemoveItemFromDictionaries - Not yet implemented item type {item.Types}");
+                    break;
+            }
         }
     }
 
@@ -192,4 +245,5 @@ public class ItemManager : MonoBehaviourPun
             return false;
         }
     }
+    #endregion
 }

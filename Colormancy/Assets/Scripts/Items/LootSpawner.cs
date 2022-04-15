@@ -9,7 +9,7 @@ public class LootSpawner : MonoBehaviour
 {
     string pathToItems = "Items";
 
-    MMLootTable<MMLoot<ItemSO>, ItemSO> lootTable;
+    public static MMLootTable<MMLoot<ItemSO>, ItemSO> lootTable;
 
     // Start is called before the first frame update
     void Start()

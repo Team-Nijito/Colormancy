@@ -77,13 +77,13 @@ public class YellowSpellController : MonoBehaviour
     {
         if (collider.gameObject.CompareTag("Enemy"))
         {
-            greaterCast(collider.gameObject, spellEffectMod, null);
+            greaterCast(collider.gameObject, spellEffectMod, null, CasterPView.transform);
         }
         else if (collider.gameObject.CompareTag("Player"))
         {
             if (PVPEnabled && PhotonView.Get(collider.gameObject).ViewID != CasterPView.ViewID)
             {
-                greaterCast(collider.gameObject, spellEffectMod, null);
+                greaterCast(collider.gameObject, spellEffectMod, null, CasterPView.transform);
             }
             else
             {

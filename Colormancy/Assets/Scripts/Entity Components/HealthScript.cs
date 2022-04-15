@@ -65,6 +65,9 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     // max health after buffs / whatever
     private float m_maxEffectiveHealth;
 
+    //blocks 1 hit of damage, used by items
+    private bool m_hasAegis = false;
+
     [SerializeField]
     [Tooltip("Used for destroying dead enemies")]
     private float m_timeUntilDestroy = 3.0f;

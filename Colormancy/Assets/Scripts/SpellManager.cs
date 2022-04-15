@@ -13,7 +13,7 @@ public class SpellManager : MonoBehaviourPun
 
         float SpellCooldown;
         float SpellManaCost;
-        float SpellDmgMultiplier;
+        public float SpellDmgMultiplier;
         (System.Type, System.Type, System.Type) OrbTuple;
 
         Orb[] orbs;

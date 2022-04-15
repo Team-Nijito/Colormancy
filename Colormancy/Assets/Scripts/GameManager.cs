@@ -700,9 +700,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     {
         if (m_currentItem != null)
         {
-
-            //photonView.RPC("AddItem", m_playerItemManager.photonView.Owner, m_currentItem);
-            m_playerItemManager.AddItem(m_currentItem);
+            m_playerItemManager.RPCAddItem(m_currentItem);
+            //m_playerItemManager.AddItem(m_currentItem);
 
             CloseWindow();
         }

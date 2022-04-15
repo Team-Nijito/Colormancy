@@ -15,8 +15,8 @@ public class ItemPodium : Podium
     //[SerializeField]
     //private string[] waitingMessage = new string[] { "Somebody else is currently browsing this orb" }; // somebody else is currently looking at the orb
 
-    [SerializeField]
-    private ItemSO m_item;
+    [SerializeField] ItemSO m_item;
+    [SerializeField] bool randomItem = false;
     private ItemManager m_itemManager = null;
 
     //public enum OrbTypes { None, BlueOrb, BrownOrb, GreenOrb, IndigoOrb, OrangeOrb, QuicksilverOrb, RedOrb, VioletOrb, YellowOrb }
@@ -33,8 +33,12 @@ public class ItemPodium : Podium
     {
         if (Input.GetMouseButtonDown(0) && InRange)
         {
+            if (randomItem)
+            {
+                m_item = GetRandomItem();
+            }
+
             messages[0] = m_item.itemName;
-            //Uses name of ItemSO to pass into GameManager, we can change this to a string within the SO but this works for now
             manager.PopUpItem(messages, images, m_item.itemScriptName, m_itemManager, this);
             manager.ChangeGUIMode(AcceptButtonHandler.AcceptMode.GiveItem);
         }
@@ -132,5 +136,12 @@ public class ItemPodium : Podium
                 manager.CloseWindowVisually();
             }
         }
+    }
+
+    ItemSO GetRandomItem()
+    {
+        ItemSO newItem= LootSpawner.lootTable.GetLoot().Loot;
+        Debug.Log($"Random item was {newItem.itemName}");
+        return newItem;
     }
 }

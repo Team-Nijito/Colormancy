@@ -9,7 +9,7 @@ public class C_SplatJacket : Item
     public override void Init(GameObject playerGO)
     {
         base.Init(playerGO);
-        ItemType = ItemManager.ItemTypes.OnHit;
+        Types[0] = ItemTypes.DamageTaken;
     }
 
     public override void AddItemEffects(ItemManager manager)

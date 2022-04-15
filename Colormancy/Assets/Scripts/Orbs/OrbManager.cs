@@ -23,6 +23,7 @@ public class OrbManager : MonoBehaviourPun
     [Range(0f, 100f)]
     float m_spellCooldownModifier = 0f;
 
+    ItemManager itemManager;
     SpellManager manager;
     ManaScript mana;
     OrbTrayUIController uIController;
@@ -193,6 +194,7 @@ public class OrbManager : MonoBehaviourPun
     void CastSpell(Vector3 clickedPosition)
     {
         // Pass in the PVPStatus and our photonView whenever we invoke Cast.
+        currentSpell.SpellDmgMultiplier = itemManager.DoDamageMultipliers(currentSpell.SpellDmgMultiplier);
         currentSpell.Cast(transform, clickedPosition, m_PVPEnabled, photonView);
         spellCooldowns[currentSpell.GetOrbTuple()] = (Time.time + currentSpell.GetSpellCooldown() * (1f - (m_spellCooldownModifier / 100f)), currentSpell.GetSpellCooldown() * (1f - (m_spellCooldownModifier / 100f)));
 

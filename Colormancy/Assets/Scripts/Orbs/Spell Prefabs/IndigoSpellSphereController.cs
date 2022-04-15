@@ -16,14 +16,14 @@ public class IndigoSpellSphereController : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Enemy"))
         {
-            greaterCast(collision.gameObject, spellEffectMod, null);
+            greaterCast(collision.gameObject, spellEffectMod, null, CasterPView.transform);
             Destroy(gameObject);
         }
         else if (collision.gameObject.CompareTag("Player"))
         {
             if (PVPEnabled && PhotonView.Get(collision.gameObject).ViewID != CasterPView.ViewID)
             {
-                greaterCast(collision.gameObject, spellEffectMod, null);
+                greaterCast(collision.gameObject, spellEffectMod, null, CasterPView.transform);
                 Destroy(gameObject);
             }
             else
