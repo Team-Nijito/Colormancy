@@ -14,6 +14,9 @@ public class PaintProgressUI : MonoBehaviour
     [SerializeField]
     private RectTransform m_brush;
 
+    [SerializeField]
+    private Text m_percentageText;
+
     private readonly float m_paintFillGUIPercentWidthScreen = 0.416f;
     private readonly float m_brushInitialXPercentWidthBar = 0.25f; // percentage of bar width from left to right
     private readonly float m_brushEndXPercentWidthBar = 0.9583f; // percentage of bar width from left to right
@@ -48,7 +51,8 @@ public class PaintProgressUI : MonoBehaviour
     private void Update()
     {
         m_paintFillBar.fillAmount = m_gmScript.CurrentPaintPercentage / m_gmScript.PaintPercentageNeededToWin;
-        m_brush.position = new Vector2(m_brushInitialXPosition + m_brushTravelDistance * m_paintFillBar.fillAmount, m_brush.position.y);
+        //m_brush.position = new Vector2(m_brushInitialXPosition + m_brushTravelDistance * m_paintFillBar.fillAmount, m_brush.position.y);
+        m_percentageText.text = (int)(m_gmScript.CurrentPaintPercentage * 100) + "%";
     }
 
     #endregion

@@ -131,7 +131,6 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     // Start is called before the first frame update
     void Start()
     {
-        m_healthBarTransform = m_healthBar.transform;
         m_effectiveHealth = m_baseHealth;
         m_maxEffectiveHealth = m_baseHealth;
 
@@ -147,6 +146,10 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
             // so that if we ever invoke PhotonNetwork.PlayList
             // we can access a player's GameObject with: player.TagObject
             photonView.Owner.TagObject = gameObject;
+        }
+        else
+        {
+            m_healthBarTransform = m_healthBar.transform;
         }
     }
 
