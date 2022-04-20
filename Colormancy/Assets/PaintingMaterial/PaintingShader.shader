@@ -58,7 +58,7 @@ Shader "Unlit/PaintingShader"
 
                 col = lerp(col, paint, paint.a);
 
-                return col;
+                return paint;
             }
             ENDCG
         }
