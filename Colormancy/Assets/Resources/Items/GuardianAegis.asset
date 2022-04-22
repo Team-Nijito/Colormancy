@@ -12,8 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05cf828dcda26114e83db6d00522b8d2, type: 3}
   m_Name: GuardianAegis
   m_EditorClassIdentifier: 
-  itemName: 
-  itemDescription: 
+  itemName: Guardian Aegis
+  itemDescription: After 4 seconds of not taking damage, you gain a shield which
+    blocks the next damage you would take.
   itemFlavorText: 
   itemWeight: 1
-  itemScriptName: 
+  itemScriptName: R_Aegis

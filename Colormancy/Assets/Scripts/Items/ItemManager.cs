@@ -23,7 +23,7 @@ public class ItemManager : MonoBehaviourPun
     // Start is called before the first frame update
     void Start()
     {
-        photonView.RPC("AddItem", RpcTarget.All, "C_TargetAnalyzer");
+        photonView.RPC("AddItem", RpcTarget.All, "R_Aegis");
     }
 
     // Update is called once per frame

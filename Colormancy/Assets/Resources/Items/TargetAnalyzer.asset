@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05cf828dcda26114e83db6d00522b8d2, type: 3}
   m_Name: TargetAnalyzer
   m_EditorClassIdentifier: 
-  itemName: 
-  itemDescription: 
+  itemName: Target Analyzer
+  itemDescription: Your attacks have a 15% chance to deal double damage.
   itemFlavorText: 
   itemWeight: 1
-  itemScriptName: 
+  itemScriptName: C_TargetAnalyzer
