@@ -160,9 +160,14 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
             // we can access a player's GameObject with: player.TagObject
             photonView.Owner.TagObject = gameObject;
         }
+        else
+        {
+            m_healthBarTransform = m_healthBar.transform;
+        }
 
         if (OnTakeDamage == null)
             OnTakeDamage = new UnityEvent();
+
     }
 
     // Update is called once per frame

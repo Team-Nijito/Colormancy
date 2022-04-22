@@ -272,7 +272,7 @@ public class OrbManager : MonoBehaviourPun
         GameObject gUIController = null;
         if (photonView.IsMine && PhotonNetwork.IsConnected)
         {
-            gUIController = GameObject.Find("OrbTray");
+            gUIController = GameObject.Find("OrbTrayPanel");
         }
 
         if (gUIController)

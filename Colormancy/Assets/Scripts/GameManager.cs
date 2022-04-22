@@ -178,14 +178,16 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         if (SceneManager.GetActiveScene().name == "Office Level 1" || SceneManager.GetActiveScene().name == "Office Level 2")
         {
             AudioScript audioScript = GameObject.FindGameObjectWithTag("SongAudio").GetComponent<AudioScript>();
-            audioScript.PlaySong(AudioScript.SongType.STAGE);
+            if (audioScript)
+                audioScript.PlaySong(AudioScript.SongType.STAGE);
         }
 
         if (SceneManager.GetActiveScene().name == "Office Boss Cutscene" || SceneManager.GetActiveScene().name == "Office Level 3" ||
             SceneManager.GetActiveScene().name == "PlayerPVPScene")
         {
             AudioScript audioScript = GameObject.FindGameObjectWithTag("SongAudio").GetComponent<AudioScript>();
-            audioScript.PlaySong(AudioScript.SongType.BOSS);
+            if (audioScript)
+                audioScript.PlaySong(AudioScript.SongType.BOSS);
         }
 
         if ((SceneManager.GetActiveScene().name == WinSceneName) || !PhotonNetwork.InRoom)

@@ -21,8 +21,10 @@ public class PlayerGUI : MonoBehaviour
     {
         if (m_playerTarget && m_playerHealth && m_playerMana)
         {
-            m_healthBar.fillAmount = m_playerHealth.GetEffectiveHealth() / m_playerHealth.GetMaxEffectiveHealth();
-            m_ManaBar.fillAmount = m_playerMana.GetEffectiveMana() / m_playerMana.GetMaxEffectiveMana();
+            if (m_healthBar)
+                m_healthBar.fillAmount = m_playerHealth.GetEffectiveHealth() / m_playerHealth.GetMaxEffectiveHealth();
+            if (m_ManaBar)
+                m_ManaBar.fillAmount = m_playerMana.GetEffectiveMana() / m_playerMana.GetMaxEffectiveMana();
         }
         else
         {

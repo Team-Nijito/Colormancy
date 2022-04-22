@@ -55,19 +55,31 @@ public class SpawnGUI : MonoBehaviourPunCallbacks
                 }
                 else
                 {
+                    /*
+                     * no need for spawning healthbar
+                     * 
                     GameObject remoteBar = Instantiate(healthManaPrefab, new Vector2(0, remoteIndex * 150), Quaternion.identity);
                     remoteBar.transform.SetParent(BarPanel.transform);
                     remoteBar.GetComponent<PlayerGUI>().SetTarget(view.gameObject);
                     //print("Created remote health bar for player " + remoteIndex++);
+                    */
                 }
             }
         }
 
+        /*
+         * no need for spawning healthbar
+         * 
         //Create local players health bar at bottom left of screen
         GameObject bar = Instantiate(healthManaPrefab, new Vector2(0, 0), Quaternion.identity);
         bar.transform.SetParent(BarPanel.transform);
         bar.GetComponent<PlayerGUI>().SetTarget(localPlayer);
         //print("Created local health bar");
+        */
+
+        // set the target with the current player's health anyways
+        GameObject mainHud = GameObject.FindGameObjectWithTag("MainHud");
+        mainHud.GetComponent<PlayerGUI>().SetTarget(localPlayer);
     }
 
     public void ResetUIAfterSceneLoad()
@@ -77,10 +89,13 @@ public class SpawnGUI : MonoBehaviourPunCallbacks
         if (BarPanel && photonView.IsMine)
         {
             Transform canvas = GameObject.Find("Canvas").transform;
+            /*
+             * Removed, no longer next to the player
+             * 
             GameObject g_SpellUI = Instantiate(SpellUI, canvas.transform.position, Quaternion.identity, canvas);
             Vector2 uiPos = g_SpellUI.GetComponent<RectTransform>().anchoredPosition;
             g_SpellUI.GetComponent<RectTransform>().anchoredPosition = new Vector2(uiPos.x + 85, 0);
-
+            */
             SpawnExistingPlayersHealthBars();
         }
     }
