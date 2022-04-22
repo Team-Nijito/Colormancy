@@ -47,6 +47,7 @@ public class OrbManager : MonoBehaviourPun
     {
         manager = GetComponent<SpellManager>();
         mana = GetComponent<ManaScript>();
+        itemManager = GetComponent<ItemManager>();
         playerMoveScript = GetComponent<PlayerMovement>();
         Initialization();
     }

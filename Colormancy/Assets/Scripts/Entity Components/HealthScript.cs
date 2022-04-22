@@ -143,7 +143,6 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     // Start is called before the first frame update
     void Start()
     {
-        m_healthBarTransform = m_healthBar.transform;
         m_effectiveHealth = m_baseHealth;
         m_maxEffectiveHealth = m_baseHealth;
 
@@ -167,7 +166,6 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
 
         if (OnTakeDamage == null)
             OnTakeDamage = new UnityEvent();
-
     }
 
     // Update is called once per frame
