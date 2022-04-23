@@ -2636,7 +2636,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 668992278e673784cbcd6745c2c5a9bc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sceneNameToLoadIn: God Scene 1
+  sceneNameToLoadIn: Office Level 1
   m_roomNameInput: {fileID: 1532748599}
   m_playerCapacity: {fileID: 254031376}
   m_hideRoomFromLobby: {fileID: 1275016059}
@@ -2654,13 +2654,13 @@ MonoBehaviour:
   m_returnMainMenuButton: {fileID: 440082042}
   m_changeRegionDropdown: {fileID: 1528012120}
   m_playersMaxPlayersText: {fileID: 1460972723}
-  m_joinButtonGUIText: {fileID: 1053548465}
+  m_joinButtonGUIText: {fileID: 589752570}
   m_roomListGUI: {fileID: 1687849763}
   m_playerListGUI: {fileID: 1634356248}
   m_changeNameWindow: {fileID: 1466500685}
   m_createGameWindow: {fileID: 1527564839}
   m_joinGameWindow: {fileID: 883982515}
-  m_changeRegionWindow: {fileID: 1035704705}
+  m_changeRegionWindow: {fileID: 1064929057}
   m_roomListManager: {fileID: 1356722057}
 --- !u!4 &829801654
 Transform:
@@ -4926,7 +4926,6 @@ MonoBehaviour:
   m_roomItemUIPrefab: {fileID: -7602581692011280097, guid: 7749c914f6d53db44a2627608af8482d,
     type: 3}
   m_roomListParent: {fileID: 928804971}
-  m_waitListParent: {fileID: 1537326530}
   m_lobbyNetworkManager: {fileID: 829801653}
 --- !u!1 &1373459778
 GameObject:

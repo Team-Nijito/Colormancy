@@ -121,12 +121,12 @@ public class QuickSilverSpellController : MonoBehaviour
     private void OnTriggerEnter(Collider collider)
     {
         if (collider.gameObject.tag.Equals("Enemy"))
-            greaterCast(collider.gameObject, spellEffectMod, null);
+            greaterCast(collider.gameObject, spellEffectMod, null, CasterPView.transform);
         else if (collider.gameObject.tag.Equals("Player"))
         {
             if (PVPEnabled && PhotonView.Get(collider).ViewID != CasterPView.ViewID)
             {
-                greaterCast(collider.gameObject, spellEffectMod, null);
+                greaterCast(collider.gameObject, spellEffectMod, null, CasterPView.transform);
             }
             else
             {

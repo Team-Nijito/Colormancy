@@ -63,14 +63,14 @@ public class OrangeSpellController : MonoBehaviour
         foreach (Collider c in sphereCollisions)
         {
             if (c.gameObject.CompareTag("Enemy"))
-                greaterCast(c.gameObject, spellEffectMod, null);
+                greaterCast(c.gameObject, spellEffectMod, null, CasterPView.transform);
             else if (c.gameObject.CompareTag("Player"))
             {
                 PhotonView p = PhotonView.Get(c.gameObject);
                 
                 if (PVPEnabled && PhotonView.Get(c.gameObject).ViewID != CasterPView.ViewID)
                 {
-                    greaterCast(c.gameObject, spellEffectMod, null);
+                    greaterCast(c.gameObject, spellEffectMod, null, CasterPView.transform);
                 }
                 else
                 {

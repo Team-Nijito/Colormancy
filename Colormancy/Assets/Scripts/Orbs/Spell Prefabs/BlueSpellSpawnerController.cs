@@ -88,7 +88,7 @@ public class BlueSpellSpawnerController : MonoBehaviour
             if (!entitiesEntered.Contains(collider.gameObject))
             {
                 entitiesEntered.Add(collider.gameObject);
-                greaterCast(collider.gameObject, spellEffectMod, null);
+                greaterCast(collider.gameObject, spellEffectMod, null, playerTransform);
             }
         }
         else if (collider.gameObject.CompareTag("Player"))
@@ -98,7 +98,7 @@ public class BlueSpellSpawnerController : MonoBehaviour
                 entitiesEntered.Add(collider.gameObject);
                 if (PVPEnabled && PhotonView.Get(collider).ViewID != CasterPView.ViewID)
                 {
-                    greaterCast(collider.gameObject, spellEffectMod, null);
+                    greaterCast(collider.gameObject, spellEffectMod, null, playerTransform);
                 }
                 else
                 {

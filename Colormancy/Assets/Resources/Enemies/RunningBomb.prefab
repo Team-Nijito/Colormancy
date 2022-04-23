@@ -30021,6 +30021,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ca848426ea85fa48879e6f5999220fa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  OnTakeDamage:
+    m_PersistentCalls:
+      m_Calls: []
   m_isPlayer: 0
   m_healthBar: {fileID: 6410435768990744357}
   m_username: {fileID: 3356567029375608491}

@@ -114,7 +114,7 @@ public class RedSpellController : MonoBehaviour
                     Vector3 PlayerToEnemy = (hitCollider.gameObject.transform.position - transform.position).normalized;
                     float[] vectorData = { PlayerToEnemy.x, PlayerToEnemy.y, PlayerToEnemy.z };
 
-                    greaterCast(hitCollider.gameObject, spellEffectMod, vectorData);
+                    greaterCast(hitCollider.gameObject, spellEffectMod, vectorData, CasterPView.transform);
                 }
                 else if (hitCollider.CompareTag("Player"))
                 {
@@ -123,7 +123,7 @@ public class RedSpellController : MonoBehaviour
                         Vector3 PlayerToEnemy = (hitCollider.gameObject.transform.position - transform.position).normalized;
                         float[] vectorData = { PlayerToEnemy.x, PlayerToEnemy.y, PlayerToEnemy.z };
 
-                        greaterCast(hitCollider.gameObject, spellEffectMod, vectorData);
+                        greaterCast(hitCollider.gameObject, spellEffectMod, vectorData, CasterPView.transform);
                     }
                     else
                     {

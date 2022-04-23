@@ -152,12 +152,12 @@ public class GreenSpellSpawnerController : MonoBehaviour
                 if (g)
                 {
                     if (g.CompareTag("Enemy"))
-                        greaterCast(g, spellEffectMod, null);
+                        greaterCast(g, spellEffectMod, null, CasterPView.transform);
                     else if (g.CompareTag("Player"))
                     {
                         if (PVPEnabled && PhotonView.Get(g).ViewID != CasterPView.ViewID)
                         {
-                            greaterCast(g, spellEffectMod, null);
+                            greaterCast(g, spellEffectMod, null, CasterPView.transform);
                         }
                         else
                         {

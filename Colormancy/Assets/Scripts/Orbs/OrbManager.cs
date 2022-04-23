@@ -19,11 +19,16 @@ public class OrbManager : MonoBehaviourPun
 
     public List<Orb> orbs = new List<Orb>();
 
+    [SerializeField]
+    [Range(0f, 100f)]
+    float m_spellCooldownModifier = 0f;
+
+    ItemManager itemManager;
     SpellManager manager;
     ManaScript mana;
     OrbTrayUIController uIController;
 
-    private readonly bool TestingMode = false;
+    private readonly bool TestingMode = true;
 
     [SerializeField]
     Dictionary<(Type, Type, Type), (float, float)> spellCooldowns = new Dictionary<(Type, Type, Type), (float, float)>(); // key: Orb Tuple, value: (current cooldown, Spell base cooldown)
@@ -189,8 +194,9 @@ public class OrbManager : MonoBehaviourPun
     void CastSpell(Vector3 clickedPosition)
     {
         // Pass in the PVPStatus and our photonView whenever we invoke Cast.
+        currentSpell.SpellDmgMultiplier = itemManager.DoDamageMultipliers(currentSpell.SpellDmgMultiplier);
         currentSpell.Cast(transform, clickedPosition, m_PVPEnabled, photonView);
-        spellCooldowns[currentSpell.GetOrbTuple()] = (Time.time + currentSpell.GetSpellCooldown(), currentSpell.GetSpellCooldown());
+        spellCooldowns[currentSpell.GetOrbTuple()] = (Time.time + currentSpell.GetSpellCooldown() * (1f - (m_spellCooldownModifier / 100f)), currentSpell.GetSpellCooldown() * (1f - (m_spellCooldownModifier / 100f)));
 
         float cost = currentSpell.GetManaCost();
         if (cost > 0)
@@ -334,5 +340,20 @@ public class OrbManager : MonoBehaviourPun
 
         // Don't update the orbs for all players, because on client side, the client can only see their own orbs
         // Not the orbs of others (your orb list and cooldowns are not synced across the server).
+    }
+
+
+    public void AddSpellCooldownModifier(float deltaAmount)
+    {
+        m_spellCooldownModifier += deltaAmount;
+        m_spellCooldownModifier = Mathf.Clamp(m_spellCooldownModifier, 0f, 100f);
+    }    
+
+    public void SetSpellCooldownModifier(float modifier)
+    {
+        if (modifier >= 0f && modifier <= 100f)
+        {
+            m_spellCooldownModifier = modifier;
+        }
     }
 }

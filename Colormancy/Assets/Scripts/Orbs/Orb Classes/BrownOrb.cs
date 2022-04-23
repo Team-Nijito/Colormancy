@@ -31,7 +31,7 @@ public class BrownOrb : Orb
         mana.ChangeManaRegeneration(true, OrbValueManager.getHoldDecreaseValue(m_OrbElement));
     }
 
-    public override void CastGreaterEffect(GameObject hit, float spellEffectMod, float[] data)
+    public override void CastGreaterEffect(GameObject hit, float spellEffectMod, float[] data, Transform casterTransform)
     {
         float dmgMultiplier = 1;
         if (hit.GetComponent<StatusEffectScript>().StatusExists(StatusEffect.StatusType.SpellIncreasedDamage))

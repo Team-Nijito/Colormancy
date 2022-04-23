@@ -34,6 +34,8 @@ public class PlayerAttack : MonoBehaviourPun
     float m_poisonedAttackDamage;
     float m_poisonedAttackDuration;
 
+    PlayerProjectileSpawner m_projectileSpawner;
+    ItemManager m_itemManager;
     #endregion
 
     #region Monobehaviour callbacks
@@ -42,6 +44,8 @@ public class PlayerAttack : MonoBehaviourPun
     {
         m_photonViewID = PhotonView.Get(gameObject).ViewID;
 
+        m_projectileSpawner = GetComponent<PlayerProjectileSpawner>();
+        m_itemManager = GetComponent<ItemManager>();
         m_playerCharacter = GetComponent<PlayerMovement>().m_character;
         m_pmouseScript = GetComponent<PlayerMouse>();
 
@@ -139,10 +143,11 @@ public class PlayerAttack : MonoBehaviourPun
         Quaternion characterRotation = m_playerCharacter.transform.rotation;
 
         // do attack here (instantiate, add velocity, etc...)
-        GameObject g = Instantiate(Resources.Load("AutoAttackProjectile"), characterPosition + Vector3.up + characterForward, characterRotation) as GameObject;
+        GameObject g = m_projectileSpawner.SpawnProjectile(Orb.Element.AutoAttack, "AutoAttackProjectile", characterPosition + Vector3.up + characterForward, characterRotation);
+        //GameObject g = Instantiate(Resources.Load("AutoAttackProjectile"), characterPosition + Vector3.up + characterForward, characterRotation) as GameObject;
         AutoAttackProjectileController controller = g.GetComponent<AutoAttackProjectileController>();
         controller.playerColor = m_paintColor;
-        controller.attackDamage = m_attackDamage;
+        controller.attackDamage = m_attackDamage * m_itemManager.DoDamageMultipliers(1);
         controller.attackMultiplier = m_attackMultiplier;
         controller.poisonedAttack = m_poisonedAttack;
         controller.poisonedAttackDamage = m_poisonedAttackDamage;

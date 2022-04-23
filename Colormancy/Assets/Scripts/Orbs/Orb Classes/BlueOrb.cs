@@ -30,11 +30,13 @@ public class BlueOrb : Orb
         spell.AddDamageMultiplier(OrbValueManager.getHoldDecreaseValue(m_OrbElement));
     }
 
-    public override void CastGreaterEffect(GameObject hit, float spellEffectMod, float[] data)
+    public override void CastGreaterEffect(GameObject hit, float spellEffectMod, float[] data, Transform casterTransform)
     {
         float dmgMultiplier = 1;
         if (hit.GetComponent<StatusEffectScript>().StatusExists(StatusEffect.StatusType.SpellIncreasedDamage))
             dmgMultiplier += OrbValueManager.getGreaterEffectPercentile(Element.Water) / 100f;
+
+        PlayerProjectileSpawner playerProjectileSpawner = casterTransform.GetComponent<PlayerProjectileSpawner>();
 
         PhotonView photonView = hit.GetPhotonView();
         photonView.RPC("TakeDamage", RpcTarget.All, OrbValueManager.getGreaterEffectDamage(m_OrbElement, m_Level) * spellEffectMod * dmgMultiplier);

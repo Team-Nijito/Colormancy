@@ -14,6 +14,12 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     // manages the "health" for any object, includes: damage, healing, armor? (damage reduction)
     // only works on gameobjects with a child canvas and UI slider
 
+    #region Public Events
+
+    public UnityEvent OnTakeDamage; 
+
+    #endregion
+
     #region Public variables and accessors (c# properties)
 
     public float MaxEffectiveHealth { get { return m_maxEffectiveHealth; } private set { m_maxEffectiveHealth = value; } }
@@ -59,6 +65,9 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     // max health after buffs / whatever
     private float m_maxEffectiveHealth;
 
+    //blocks 1 hit of damage, used by items
+    private bool m_hasAegis = false;
+
     [SerializeField]
     [Tooltip("Used for destroying dead enemies")]
     private float m_timeUntilDestroy = 3.0f;
@@ -77,6 +86,8 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     #region Components
 
     // misc components
+    //Will be null if HealthScript is not attached to a player
+    private ItemManager m_itemManager;
     private ManaScript m_mScript;
     private StatusEffectScript m_statusEffectScript;
     private EnemyAnimationManager m_animManager;
@@ -104,6 +115,7 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
         m_isPlayer = GetComponent<CharacterController>() != null;
         if (m_isPlayer)
         {
+            m_itemManager = GetComponent<ItemManager>();
             m_mScript = GetComponent<ManaScript>();
             m_camController = GetComponent<Chromaturgy.CameraController>();
 
@@ -151,6 +163,9 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
         {
             m_healthBarTransform = m_healthBar.transform;
         }
+
+        if (OnTakeDamage == null)
+            OnTakeDamage = new UnityEvent();
     }
 
     // Update is called once per frame
