@@ -466,6 +466,9 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
         {
             if (m_isPlayer)
             {
+                photonView.RPC("OnHit", RpcTarget.Others, damageValue);
+                damageValue = m_itemManager.OnHit(damageValue);
+
                 StatusEffectScript status = GetComponent<StatusEffectScript>();
                 status.RPCClearStatusEffect(StatusEffect.StatusType.MovementIncreaseSpeed);
             }

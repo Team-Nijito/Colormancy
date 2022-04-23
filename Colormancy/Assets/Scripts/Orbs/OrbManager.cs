@@ -45,6 +45,7 @@ public class OrbManager : MonoBehaviourPun
     // Start is called before the first frame update
     void Start()
     {
+        itemManager = GetComponent<ItemManager>();
         manager = GetComponent<SpellManager>();
         mana = GetComponent<ManaScript>();
         playerMoveScript = GetComponent<PlayerMovement>();
