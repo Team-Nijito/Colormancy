@@ -898,7 +898,8 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 1998812238, guid: a3d3625ff32fb114a84439123b0eb5e5, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: a3d3625ff32fb114a84439123b0eb5e5, type: 3}
 --- !u!4 &748428769 stripped
 Transform:
@@ -906,6 +907,37 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 748428768}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &748428770 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2214567617875914224, guid: a3d3625ff32fb114a84439123b0eb5e5,
+    type: 3}
+  m_PrefabInstance: {fileID: 748428768}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &748428771
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 748428770}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68d551a1bd4a0844b946d89c8c204dea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  podiumStatus: 0
+  messages:
+  - Test Message 1
+  images: []
+  returnMessage:
+  - Do you want to return your orb?
+  maxCapMessage:
+  - You cannnot pick up any more orbs!
+  missingMessage:
+  - Somebody else currently has this orb
+  waitingMessage:
+  - Somebody else is currently browsing this orb
+  orbType: 1
 --- !u!1001 &813269184
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2310,7 +2342,7 @@ PrefabInstance:
     - target: {fileID: 1998812238, guid: a3d3625ff32fb114a84439123b0eb5e5, type: 3}
       propertyPath: m_item
       value: 
-      objectReference: {fileID: 11400000, guid: 3bea957c50e524343bb435d1046f88b3,
+      objectReference: {fileID: 11400000, guid: 7c5411d21c2f4ed4bab6039f85ddad1d,
         type: 2}
     - target: {fileID: 1998812238, guid: a3d3625ff32fb114a84439123b0eb5e5, type: 3}
       propertyPath: randomItem

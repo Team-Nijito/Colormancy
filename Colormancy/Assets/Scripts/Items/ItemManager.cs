@@ -70,6 +70,8 @@ public class ItemManager : MonoBehaviourPun
     [PunRPC]
     public void AddItem(string itemName)
     {
+        if (!photonView.IsMine)
+            return;
         if (DebugMode)
             Debug.Log($"Adding item for {itemName}");
         Item item = (Item)itemParent.AddComponent(System.Type.GetType(itemName));
@@ -93,6 +95,8 @@ public class ItemManager : MonoBehaviourPun
     [PunRPC]
     public float OnHit(float damageValue)
     {
+        if (!photonView.IsMine)
+            return damageValue;
         float modifiedDamageValue = damageValue;
         if (DebugMode)
             Debug.Log("On Hit Effects Triggered");

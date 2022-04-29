@@ -28,7 +28,7 @@ public class OrbManager : MonoBehaviourPun
     ManaScript mana;
     OrbTrayUIController uIController;
 
-    private readonly bool TestingMode = true;
+    private readonly bool TestingMode = false;
 
     [SerializeField]
     Dictionary<(Type, Type, Type), (float, float)> spellCooldowns = new Dictionary<(Type, Type, Type), (float, float)>(); // key: Orb Tuple, value: (current cooldown, Spell base cooldown)
@@ -119,10 +119,12 @@ public class OrbManager : MonoBehaviourPun
         }
     }
 
+    [PunRPC]
     public void AddSpellOrb(Orb orb, bool addToOrbHistory = false)
     {
         orb.setCasterPView(PhotonView.Get(gameObject));
-        orbs.Add(orb);
+        photonView.RPC("AddSpellOrbRPC", RpcTarget.All, orb);
+        //orbs.Add(orb);
         if (addToOrbHistory)
         {
             orbHistory.Add(orb); // sync across scenes
@@ -133,13 +135,20 @@ public class OrbManager : MonoBehaviourPun
 
     public void RemoveSpellOrb(Orb orb, bool removeFromOrbHistory = false)
     {
-        RemoveOrbFromList(orbs, orb);
+        RemoveOrbFromList(orb);
         if (removeFromOrbHistory)
         {
-            RemoveOrbFromList(orbHistory, orb); // sync across scenes
+            RemoveOrbFromHistoryList(orb); // sync across scenes
         }
         if (uIController)
             uIController.RemoveOrb(orb);
+    }
+
+    [PunRPC]
+    public void AddSpellOrbRPC(Orb orb)
+    {
+        Debug.Log($"Adding orb for {gameObject.name}");
+        orbs.Add(orb);
     }
 
     [PunRPC]
@@ -251,17 +260,45 @@ public class OrbManager : MonoBehaviourPun
     /// </summary>
     /// <param name="orbList">The list of orbs to search and permute</param>
     /// <param name="markedOrb">The orb to remove</param>
-    private void RemoveOrbFromList(List<Orb> orbList, Orb markedOrb)
+    /// 
+    private void RemoveOrbFromList(Orb markedOrb)
     {
         Orb elementToRemove = null;
-        foreach (Orb searchOrb in orbList)
+        foreach (Orb searchOrb in orbs)
         {
             if (searchOrb.getElement() == markedOrb.getElement())
             {
                 elementToRemove = searchOrb;
             }
         }
-        orbList.Remove(elementToRemove);
+        photonView.RPC("RemoveOrbRPC", RpcTarget.All, markedOrb);
+        //orbs.Remove(elementToRemove);
+    }
+
+    private void RemoveOrbFromHistoryList(Orb markedOrb)
+    {
+        Orb elementToRemove = null;
+        foreach (Orb searchOrb in orbHistory)
+        {
+            if (searchOrb.getElement() == markedOrb.getElement())
+            {
+                elementToRemove = searchOrb;
+            }
+        }
+        photonView.RPC("RemoveOrbHistoryRPC", RpcTarget.All, markedOrb);
+        //orbHistory.Remove(elementToRemove);
+    }
+
+    [PunRPC]
+    public void RemoveOrbRPC(Orb orb)
+    {
+        orbs.Remove(orb);
+    }
+
+    [PunRPC]
+    public void RemoveOrbHistoryRPC(Orb orb)
+    {
+        orbHistory.Remove(orb);
     }
 
     /// <summary>
