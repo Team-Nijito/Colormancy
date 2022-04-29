@@ -14,12 +14,6 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     // manages the "health" for any object, includes: damage, healing, armor? (damage reduction)
     // only works on gameobjects with a child canvas and UI slider
 
-    #region Public Events
-
-    public UnityEvent OnTakeDamage; 
-
-    #endregion
-
     #region Public variables and accessors (c# properties)
 
     public float MaxEffectiveHealth { get { return m_maxEffectiveHealth; } private set { m_maxEffectiveHealth = value; } }
@@ -160,9 +154,6 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
         {
             m_healthBarTransform = m_healthBar.transform;
         }
-
-        if (OnTakeDamage == null)
-            OnTakeDamage = new UnityEvent();
     }
 
     // Update is called once per frame
@@ -463,8 +454,8 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
         {
             if (m_isPlayer)
             {
-                photonView.RPC("OnHit", RpcTarget.Others, damageValue);
-                damageValue = m_itemManager.OnHit(damageValue);
+                photonView.RPC("OnTakeDamage", RpcTarget.Others, damageValue);
+                damageValue = m_itemManager.OnTakeDamage(damageValue);
 
                 StatusEffectScript status = GetComponent<StatusEffectScript>();
                 status.RPCClearStatusEffect(StatusEffect.StatusType.MovementIncreaseSpeed);

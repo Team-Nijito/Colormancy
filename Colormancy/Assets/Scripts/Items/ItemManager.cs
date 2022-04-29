@@ -19,6 +19,8 @@ public class ItemManager : MonoBehaviourPun
 
     readonly bool DebugMode = true;
 
+    SpawnpointBehaviour[] spawnpoints;
+
     //For debug purposes
     Item lastAddedItem;
 
@@ -27,6 +29,12 @@ public class ItemManager : MonoBehaviourPun
     void Start()
     {
         photonView.RPC("AddItem", RpcTarget.All, "L_SUPrincipal");
+
+        spawnpoints = FindObjectsOfType<SpawnpointBehaviour>();
+        foreach(SpawnpointBehaviour spawnpoint in spawnpoints)
+        {
+            //spawnpoint.spawnedEnemy.AddListener
+        }
     }
 
     // Update is called once per frame
@@ -127,7 +135,7 @@ public class ItemManager : MonoBehaviourPun
     /// <param name="damageValue">Original damage value</param>
     /// <returns>Modified damage value after item effects</returns>
     [PunRPC]
-    public float OnHit(float damageValue)
+    public float OnTakeDamage(float damageValue)
     {
         if (!photonView.IsMine)
             return damageValue;
@@ -137,7 +145,7 @@ public class ItemManager : MonoBehaviourPun
         foreach(Item item in onHitItems.Keys)
         {
             if (DebugMode)
-                Debug.Log($"ItemManager::OnHit - Triggering {item}");
+                Debug.Log($"ItemManager::OnTakeDamage - Triggering {item}");
             modifiedDamageValue = item.OnTakeDamage(modifiedDamageValue);
         }
 
