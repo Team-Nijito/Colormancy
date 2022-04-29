@@ -26,10 +26,15 @@ public class R_HighestPraise : Item
                 }
             }
         }
-
-        int randomChoice = Random.Range(0, availableOrbList.Count);
-        addedOrb = availableOrbList[randomChoice];
-        PlayerOrbManager.AddSpellOrb(addedOrb, true);
+        if (availableOrbList.Count > 0)
+        {
+            int randomChoice = Random.Range(0, availableOrbList.Count);
+            addedOrb = availableOrbList[randomChoice];
+            PlayerOrbManager.AddSpellOrb(addedOrb, true);
+        }else
+        {
+            Debug.LogError("No allies to get orb from");
+        }
     }
 
     public override void RemoveItemEffects()

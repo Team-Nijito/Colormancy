@@ -146,6 +146,7 @@ public class PlayerAttack : MonoBehaviourPun
         GameObject g = m_projectileSpawner.SpawnProjectile(Orb.Element.AutoAttack, "AutoAttackProjectile", characterPosition + Vector3.up + characterForward, characterRotation);
         //GameObject g = Instantiate(Resources.Load("AutoAttackProjectile"), characterPosition + Vector3.up + characterForward, characterRotation) as GameObject;
         AutoAttackProjectileController controller = g.GetComponent<AutoAttackProjectileController>();
+        m_itemManager.OnAutoAttack(g);
         controller.playerColor = m_paintColor;
         controller.attackDamage = m_attackDamage * m_itemManager.DoDamageMultipliers(1);
         controller.attackMultiplier = m_attackMultiplier;

@@ -5,7 +5,7 @@ using UnityEngine;
 
 public abstract class Item : MonoBehaviour
 {
-    public enum ItemTypes { Instant, DamageTaken, DamageMultiplier};
+    public enum ItemTypes { Instant, DamageTaken, DamageMultiplier, SpellCast, OnAutoAttack, OnKeyPressed};
 
     #region References for items to use, found on player prefab
     protected PlayerMovement PlayerMovement;
@@ -18,6 +18,8 @@ public abstract class Item : MonoBehaviour
 
     public List<ItemTypes> Types { get; protected set; }
     public int MaxItemAmount { get; protected set; }
+
+    public KeyCode KeyToPress { get; protected set; }
 
     /// <summary>
     /// Initialize protected variables for children to use
@@ -43,7 +45,10 @@ public abstract class Item : MonoBehaviour
     public abstract void AddItemEffects(ItemManager manager);
     public abstract void RemoveItemEffects();
 
-    public virtual float OnHitEffect(float damageValue) { Debug.LogError("This Item does not have an OnHitEffect"); return damageValue; }
+    public virtual float OnTakeDamage(float damageValue) { Debug.LogError("This Item does not have an OnHitEffect"); return damageValue; }
     public virtual float DoDamageMultiplier(float baseDamageMultiplier) { Debug.LogError("This Item does not have a DamageMultiplier effect"); return baseDamageMultiplier; }
+    public virtual void OnSpellCast() { Debug.LogError("This Item does not have a SpellCast effect"); }
+    public virtual void OnAutoAttack(GameObject shotAuto) { Debug.LogError("This Item does not have an on auto attack effect"); }
+    public virtual void OnKeyPressed() { Debug.LogError("This Item deos not have an on key pressed effect"); }
     #endregion
 }

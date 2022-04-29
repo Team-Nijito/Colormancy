@@ -59,7 +59,8 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
 
     private Animator m_animator;
     private Transform m_characterTransform;
-    private CharacterController m_controller;
+    [HideInInspector]
+    public CharacterController m_controller;
 
     #endregion
 

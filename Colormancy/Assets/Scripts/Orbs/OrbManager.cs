@@ -28,7 +28,7 @@ public class OrbManager : MonoBehaviourPun
     ManaScript mana;
     OrbTrayUIController uIController;
 
-    private readonly bool TestingMode = false;
+    private readonly bool TestingMode = true;
 
     [SerializeField]
     Dictionary<(Type, Type, Type), (float, float)> spellCooldowns = new Dictionary<(Type, Type, Type), (float, float)>(); // key: Orb Tuple, value: (current cooldown, Spell base cooldown)
@@ -185,6 +185,11 @@ public class OrbManager : MonoBehaviourPun
     [PunRPC]
     void ReduceAllCooldowns(float percentReduce)
     {
+        //Probably delete later
+        if (!photonView.IsMine)
+            return;
+
+        Debug.Log($"Reduced cooldowns for {gameObject.name}, by {percentReduce}");
         if (percentReduce <= 0)
         {
             throw new ArgumentException(string.Format("{0} is a positive percentage, and thus should be greater than zero", percentReduce), "percentReduce");
@@ -203,8 +208,11 @@ public class OrbManager : MonoBehaviourPun
 
     void CastSpell(Vector3 clickedPosition)
     {
-        // Pass in the PVPStatus and our photonView whenever we invoke Cast.
         currentSpell.SpellDmgMultiplier = itemManager.DoDamageMultipliers(currentSpell.SpellDmgMultiplier);
+        //Currently only used for Weaver's Way, can add more params later if necessary
+        itemManager.OnSpellCast();
+
+        // Pass in the PVPStatus and our photonView whenever we invoke Cast.
         currentSpell.Cast(transform, clickedPosition, m_PVPEnabled, photonView);
         spellCooldowns[currentSpell.GetOrbTuple()] = (Time.time + currentSpell.GetSpellCooldown() * (1f - (m_spellCooldownModifier / 100f)), currentSpell.GetSpellCooldown() * (1f - (m_spellCooldownModifier / 100f)));
 

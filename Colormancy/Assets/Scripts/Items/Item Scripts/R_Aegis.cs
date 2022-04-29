@@ -24,7 +24,7 @@ public class R_Aegis : Item
     {
     }
 
-    public override float OnHitEffect(float damageValue)
+    public override float OnTakeDamage(float damageValue)
     {
         currentCooldown = timeToActivate;
 

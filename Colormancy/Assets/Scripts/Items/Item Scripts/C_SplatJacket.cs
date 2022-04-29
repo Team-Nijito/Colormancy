@@ -21,7 +21,7 @@ public class C_SplatJacket : Item
 
     }
 
-    public override float OnHitEffect(float damageValue)
+    public override float OnTakeDamage(float damageValue)
     {
         var v = Enum.GetValues(typeof(Orb.Element));
         System.Random r = new System.Random();
