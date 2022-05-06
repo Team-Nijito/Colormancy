@@ -535,6 +535,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a8e6785b827f82e4fb944ea40320a7b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  hitBoxes: []
   m_paintColor: {r: 0.37201852, g: 0.7359005, b: 0.8301887, a: 0}
   m_attackSpeed: 0.7
   m_attackDamage: 5

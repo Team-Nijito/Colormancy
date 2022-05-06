@@ -16,6 +16,8 @@ public class PlayerMouse : MonoBehaviourPunCallbacks
     //private RaycastHit m_data;
     private Animator m_animator;
 
+    private bool m_bladeAttack = false;
+
     private void Start()
     {
         m_pmScript = GetComponent<PlayerMovement>();
@@ -43,8 +45,15 @@ public class PlayerMouse : MonoBehaviourPunCallbacks
                 if (m_animator && m_paScript.isAttackReady())
                 {
                     // Trigger attack animation 
-                    photonView.RPC("TriggerPlayerAttackAnim", RpcTarget.All);
-                    photonView.RPC("ShootPaintball", RpcTarget.All, false, mousePosition);
+                    if (!m_bladeAttack)
+                    {
+                        photonView.RPC("TriggerPlayerAttackAnim", RpcTarget.All);
+                        photonView.RPC("ShootPaintball", RpcTarget.All, false, mousePosition);
+                    }else
+                    {
+                        photonView.RPC("TriggerPlayerMeleeAttackAnim", RpcTarget.All);
+                        photonView.RPC("SwordAttack", RpcTarget.All);
+                    }
                 }
             }
         }
@@ -101,5 +110,24 @@ public class PlayerMouse : MonoBehaviourPunCallbacks
         // Trigger attack animation 
         m_animator.SetInteger("Action", 1);
         m_animator.SetTrigger("AttackTrigger");
+    }
+
+    [PunRPC]
+    public void TriggerPlayerMeleeAttackAnim()
+    {
+        // Trigger attack animation 
+        m_animator.SetInteger("Action", 2);
+        m_animator.SetTrigger("AttackTrigger");
+    }
+
+    [PunRPC]
+    public void ToggleBladeAttack()
+    {
+        m_bladeAttack = !m_bladeAttack;
+    }
+
+    public void RPCToggleBladeAttack()
+    {
+        photonView.RPC("ToggleBladeAttack", RpcTarget.All);
     }
 }

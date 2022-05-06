@@ -15,10 +15,13 @@ public class DetectHit : MonoBehaviour
     }
 
     [SerializeField]
+    [Tooltip("the parent gameobject with the PhotonView")]
     protected GameObject m_parentGameObject; // the parent gameobject with the PhotonView
     
     [SerializeField]
     protected bool m_isProjectile = false;
+    [SerializeField]
+    protected bool m_isPlayerHitbox = false;
 
     [SerializeField]
     protected bool m_Slow = false;
@@ -56,6 +59,19 @@ public class DetectHit : MonoBehaviour
 
     protected virtual void OnTriggerEnter(Collider other)
     {
+        if (m_isPlayerHitbox)
+        {
+            if (other.CompareTag("Enemy"))
+            {
+                Debug.Log("Enter enemy");
+                CheckApplyDamage(other, TriggerType.Enter);
+
+                if (m_isProjectile)
+                {
+                    Destroy(gameObject);
+                }
+            }
+        }
 
         if (other.CompareTag("Player"))
         {
@@ -104,6 +120,37 @@ public class DetectHit : MonoBehaviour
     protected void CheckApplyDamage(Collider player, TriggerType trigType)
     {
         PhotonView playerPhotonView = PhotonView.Get(player.gameObject);
+        if (m_isPlayerHitbox)
+        {
+            if (m_isProjectile)
+            {
+                if (trigType == TriggerType.Enter)
+                {
+                    playerPhotonView.RPC("TakeDamage", playerPhotonView.Owner, m_damage * m_damageMultiplier);
+                }
+                else
+                {
+                    playerPhotonView.RPC("TakeDamage", playerPhotonView.Owner, m_damage * m_damageMultiplier * Time.deltaTime);
+                }
+            }
+            else
+            {
+                if (trigType == TriggerType.Enter)
+                {
+                    if (m_Slow) // Apply a slow effect
+                    {
+                        StatusEffectScript script = player.gameObject.GetComponent<StatusEffectScript>();
+                        script.RPCApplyStatus(StatusEffect.StatusType.Slowdown, SlowDuration, 0, SlowAmount, "attack_slow");
+                    }
+                    playerPhotonView.RPC("TakeDamage", RpcTarget.All, m_damage * m_damageMultiplier);
+                }
+                else
+                {
+                    playerPhotonView.RPC("TakeDamage", playerPhotonView.Owner, m_damage * m_damageMultiplier * Time.deltaTime);
+                }
+            }
+        }
+
         if (playerPhotonView.IsMine)
         {
             if (m_isProjectile)

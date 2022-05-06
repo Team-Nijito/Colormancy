@@ -141,6 +141,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_parentGameObject: {fileID: 3708072817193241043}
   m_isProjectile: 0
+  m_isPlayerHitbox: 0
   m_Slow: 0
   SlowDuration: 0
   SlowAmount: 0

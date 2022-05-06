@@ -20,8 +20,6 @@ public class ItemManager : MonoBehaviourPun
 
     readonly bool DebugMode = true;
 
-    SpawnpointBehaviour[] spawnpoints;
-
     //For debug purposes
     Item lastAddedItem;
 
@@ -29,13 +27,7 @@ public class ItemManager : MonoBehaviourPun
     // Start is called before the first frame update
     void Start()
     {
-        photonView.RPC("AddItem", RpcTarget.All, "L_FWIH");
-
-        spawnpoints = FindObjectsOfType<SpawnpointBehaviour>();
-        foreach(SpawnpointBehaviour spawnpoint in spawnpoints)
-        {
-            //spawnpoint.spawnedEnemy.AddListener
-        }
+        photonView.RPC("AddItem", RpcTarget.All, "R_GentlemansBlade");
     }
 
     // Update is called once per frame

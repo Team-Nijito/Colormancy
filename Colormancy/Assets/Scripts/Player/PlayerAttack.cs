@@ -10,10 +10,14 @@ public class PlayerAttack : MonoBehaviourPun
     #region Private variables
 
     //public Rigidbody m_paintball;
+    public BoxCollider[] hitBoxes;
+
     public Color m_paintColor;
     [SerializeField]
     private float m_attackSpeed = .7f;
     private float m_attackSpeedMultiplier = 1f;
+    [SerializeField]
+    private float m_swordAttackSpeed = .6f;
 
     [SerializeField]
     private float m_attackDamage = 10f;
@@ -92,6 +96,12 @@ public class PlayerAttack : MonoBehaviourPun
         m_paintColor = new Color(inputColor.x, inputColor.y, inputColor.z);
     }
 
+    [PunRPC]
+    public void SwordAttack()
+    {
+        m_currentCooldown = m_swordAttackSpeed / m_attackSpeedMultiplier;
+    }
+
     /// <summary>
     /// Sets attack multiplier, but percentage based.
     /// </summary>
@@ -161,6 +171,34 @@ public class PlayerAttack : MonoBehaviourPun
         if (m_isPVPEnabled)
         {
             g.layer = LayerMask.NameToLayer("Default");
+        }
+    }
+
+    public void RPCEnableBoxCollider(int colliderNumber)
+    {
+        photonView.RPC("EnableBoxCollider", RpcTarget.All, colliderNumber);
+    }
+
+    [PunRPC]
+    public void EnableBoxCollider(int number)
+    {
+        if (number < hitBoxes.Length)
+        {
+            hitBoxes[number].enabled = true;
+        }
+    }
+
+    public void RPCDisableBoxCollider(int colliderNumber)
+    {
+        photonView.RPC("DisableBoxCollider", RpcTarget.All, colliderNumber);
+    }
+
+    [PunRPC]
+    public void DisableBoxCollider(int number)
+    {
+        if (number < hitBoxes.Length)
+        {
+            hitBoxes[number].enabled = false;
         }
     }
 

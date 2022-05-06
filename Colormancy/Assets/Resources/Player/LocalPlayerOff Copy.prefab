@@ -30,6 +30,70 @@ Transform:
   m_Father: {fileID: 5820395927475117108}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2680903231959633859
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5787793324905576114}
+  - component: {fileID: 3042021309707564113}
+  - component: {fileID: 5630548685723565922}
+  m_Layer: 9
+  m_Name: SwordHitbox
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5787793324905576114
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2680903231959633859}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 2.0785713, z: 1.1385714}
+  m_LocalScale: {x: 1.4285713, y: 1.4285713, z: 1.4285713}
+  m_Children: []
+  m_Father: {fileID: 8719925113848568518}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &3042021309707564113
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2680903231959633859}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 0
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &5630548685723565922
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2680903231959633859}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c2a7475681617442ac36e5e92071412, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_parentGameObject: {fileID: 5820395927475117105}
+  m_isProjectile: 0
+  m_isPlayerHitbox: 1
+  m_Slow: 0
+  SlowDuration: 0
+  SlowAmount: 0
+  m_damage: 12
 --- !u!1 &2857751031259479315
 GameObject:
   m_ObjectHideFlags: 0
@@ -374,6 +438,7 @@ MonoBehaviour:
   m_baseRunSpeed: 15
   m_hpScript: {fileID: 5820395927475117115}
   m_character: {fileID: 8719925113848596262}
+  m_controller: {fileID: 0}
 --- !u!114 &5820395927475117109
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -420,9 +485,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ca848426ea85fa48879e6f5999220fa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  OnTakeDamage:
-    m_PersistentCalls:
-      m_Calls: []
   m_isPlayer: 1
   m_healthBar: {fileID: 5820395927547718611}
   m_username: {fileID: 2672177483625422240}
@@ -458,8 +520,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a8e6785b827f82e4fb944ea40320a7b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  hitBoxes:
+  - {fileID: 3042021309707564113}
   m_paintColor: {r: 0.37201852, g: 0.7359005, b: 0.8301887, a: 0}
   m_attackSpeed: 0.7
+  m_swordAttackSpeed: 0.6
   m_attackDamage: 5
   m_attackMultiplier: 1
   m_playerHealthScript: {fileID: 5820395927475117115}
@@ -2713,6 +2778,7 @@ Transform:
   - {fileID: 8719925113848568530}
   - {fileID: 8088243446852111749}
   - {fileID: 8719925113848568522}
+  - {fileID: 5787793324905576114}
   m_Father: {fileID: 5820395927475117108}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

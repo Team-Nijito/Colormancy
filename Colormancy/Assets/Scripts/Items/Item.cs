@@ -14,6 +14,7 @@ public abstract class Item : MonoBehaviour
     protected HealthScript PlayerHealth;
     protected OrbManager PlayerOrbManager;
     protected PhotonView PlayerPhotonView;
+    protected PlayerMouse PlayerMouse;
     #endregion
 
     public List<ItemTypes> Types { get; protected set; }
@@ -39,6 +40,7 @@ public abstract class Item : MonoBehaviour
         PlayerHealth = playerGO.GetComponent<HealthScript>();
         PlayerOrbManager = playerGO.GetComponent<OrbManager>();
         PlayerPhotonView = playerGO.GetPhotonView();
+        PlayerMouse = playerGO.GetComponent<PlayerMouse>();
     }
 
     #region Abstract Functions
