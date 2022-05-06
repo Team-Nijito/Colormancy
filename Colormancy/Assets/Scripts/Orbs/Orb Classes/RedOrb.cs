@@ -49,6 +49,7 @@ public class RedOrb : Orb
         Vector3 launchVector = new Vector3(vector_x, vector_y, vector_z);
 
         PhotonView photonView = PhotonView.Get(hit);
+        casterTransform.GetComponent<ItemManager>().DamageDealt(hit, casterTransform);
         photonView.RPC("TakeDamage", RpcTarget.All, OrbValueManager.getGreaterEffectDamage(m_OrbElement, m_Level) * spellEffectMod * dmgMultiplier);
 
         float orbDuration = OrbValueManager.getGreaterEffectDuration(m_OrbElement, m_Level);

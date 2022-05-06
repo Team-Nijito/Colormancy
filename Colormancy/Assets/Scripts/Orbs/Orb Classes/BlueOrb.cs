@@ -36,9 +36,8 @@ public class BlueOrb : Orb
         if (hit.GetComponent<StatusEffectScript>().StatusExists(StatusEffect.StatusType.SpellIncreasedDamage))
             dmgMultiplier += OrbValueManager.getGreaterEffectPercentile(Element.Water) / 100f;
 
-        PlayerProjectileSpawner playerProjectileSpawner = casterTransform.GetComponent<PlayerProjectileSpawner>();
-
         PhotonView photonView = hit.GetPhotonView();
+        casterTransform.GetComponent<ItemManager>().DamageDealt(hit, casterTransform);
         photonView.RPC("TakeDamage", RpcTarget.All, OrbValueManager.getGreaterEffectDamage(m_OrbElement, m_Level) * spellEffectMod * dmgMultiplier);
 
         StatusEffectScript status = hit.GetComponent<StatusEffectScript>();

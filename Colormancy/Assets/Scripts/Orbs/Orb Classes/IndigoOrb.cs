@@ -38,6 +38,7 @@ public class IndigoOrb : Orb
             dmgMultiplier += OrbValueManager.getGreaterEffectPercentile(Element.Water) / 100f;
 
         PhotonView photonView = hit.GetPhotonView();
+        casterTransform.GetComponent<ItemManager>().DamageDealt(hit, casterTransform);
         photonView.RPC("TakeDamage", RpcTarget.All, OrbValueManager.getGreaterEffectDamage(m_OrbElement, m_Level) * spellEffectMod * dmgMultiplier);
 
         StatusEffectScript status = hit.GetComponent<StatusEffectScript>();

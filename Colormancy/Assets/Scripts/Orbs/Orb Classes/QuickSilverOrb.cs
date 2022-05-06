@@ -41,6 +41,7 @@ public class QuickSilverOrb : Orb
             dmgMultiplier += OrbValueManager.getGreaterEffectPercentile(Element.Water) / 100f;
 
         PhotonView photonView = PhotonView.Get(hit);
+        casterTransform.GetComponent<ItemManager>().DamageDealt(hit, casterTransform);
         photonView.RPC("TakeDamage", RpcTarget.All, OrbValueManager.getGreaterEffectDamage(m_OrbElement, m_Level) * spellEffectMod * dmgMultiplier);
     }
 
