@@ -12,7 +12,8 @@ public class ItemManager : MonoBehaviourPun
     Dictionary<Item, int> damageMultiplierItems = new Dictionary<Item, int>();
     Dictionary<Item, int> spellCastItems = new Dictionary<Item, int>();
     Dictionary<Item, int> onAutoAttackItems = new Dictionary<Item, int>();
-    Dictionary<Item, int> onKeyPressed = new Dictionary<Item, int>();
+    Dictionary<Item, int> onKeyPressedItems = new Dictionary<Item, int>();
+    Dictionary<Item, int> damageDealtItems = new Dictionary<Item, int>();
 
     [SerializeField] GameObject aegisGraphic;
     [SerializeField] GameObject itemParent;
@@ -28,7 +29,7 @@ public class ItemManager : MonoBehaviourPun
     // Start is called before the first frame update
     void Start()
     {
-        photonView.RPC("AddItem", RpcTarget.All, "L_SUPrincipal");
+        photonView.RPC("AddItem", RpcTarget.All, "L_FWIH");
 
         spawnpoints = FindObjectsOfType<SpawnpointBehaviour>();
         foreach(SpawnpointBehaviour spawnpoint in spawnpoints)
@@ -57,7 +58,7 @@ public class ItemManager : MonoBehaviourPun
         //    }
         //}
 
-        foreach(Item item in onKeyPressed.Keys)
+        foreach(Item item in onKeyPressedItems.Keys)
         {
             if (Input.GetKeyDown(item.KeyToPress))
             {
@@ -73,9 +74,31 @@ public class ItemManager : MonoBehaviourPun
         photonView.RPC("AddItem", RpcTarget.All, itemName);
     }
 
+    public void DamageDealt(GameObject hit, Transform sourcePosition)
+    {
+        if (!photonView.IsMine)
+            return;
+        if (DebugMode)
+        {
+            Debug.Log("Damage Dealt Effects Triggered");
+        }
+
+        foreach(Item item in damageDealtItems.Keys)
+        {
+            item.OnDamageDealt(hit, sourcePosition);
+        }
+    }
+
     public float DoDamageMultipliers(float spellDmgMultiplier)
     {
-        foreach(Item item in damageMultiplierItems.Keys)
+        if (!photonView.IsMine)
+            return spellDmgMultiplier;
+        if (DebugMode)
+        {
+            Debug.Log("Damage Multiplier Effects Triggered");
+        }
+
+        foreach (Item item in damageMultiplierItems.Keys)
         {
             spellDmgMultiplier = item.DoDamageMultiplier(spellDmgMultiplier);
         }
@@ -85,10 +108,13 @@ public class ItemManager : MonoBehaviourPun
 
     public void OnSpellCast()
     {
+        if (!photonView.IsMine)
+            return;
         if (DebugMode)
         {
             Debug.Log("Spell Cast Effects Triggered");
         }
+
         foreach(Item item in spellCastItems.Keys)
         {
             item.OnSpellCast();
@@ -97,10 +123,12 @@ public class ItemManager : MonoBehaviourPun
 
     public void OnAutoAttack(GameObject shotAuto)
     {
+        if (!photonView.IsMine)
+            return;
         if (DebugMode)
             Debug.Log("Auto attack effects triggered");
 
-        foreach(Item item in onAutoAttackItems.Keys)
+        foreach (Item item in onAutoAttackItems.Keys)
         {
             item.OnAutoAttack(shotAuto);
         }
@@ -200,7 +228,12 @@ public class ItemManager : MonoBehaviourPun
                 case Item.ItemTypes.OnKeyPressed:
                     if (DebugMode)
                         Debug.Log("ItemManager::AddItemToDictionaries - Adding to on key pressed items");
-                    CheckAndAdd(item, onKeyPressed);
+                    CheckAndAdd(item, onKeyPressedItems);
+                    break;
+                case Item.ItemTypes.DamageDealt:
+                    if (DebugMode)
+                        Debug.Log("ItemManager::AddItemToDictionaries - Adding to damage dealt items");
+                    CheckAndAdd(item, damageDealtItems);
                     break;
                 default:
                     Debug.LogError($"ItemManager::AddItemToDictionaries - Not yet implemented item type {item.Types}");
@@ -243,7 +276,12 @@ public class ItemManager : MonoBehaviourPun
                 case Item.ItemTypes.OnKeyPressed:
                     if (DebugMode)
                         Debug.Log("ItemManager::RemoveItemFromDictionaries - Removing from on key pressed items");
-                    HandleRemovingItem(item, onKeyPressed);
+                    HandleRemovingItem(item, onKeyPressedItems);
+                    break;
+                case Item.ItemTypes.DamageDealt:
+                    if (DebugMode)
+                        Debug.Log("ItemManager::RemoveItemFromDictionaries - Removing from damage dealt items");
+                    HandleRemovingItem(item, damageDealtItems);
                     break;
                 default:
                     Debug.LogError($"ItemManager::RemoveItemFromDictionaries - Not yet implemented item type {item.Types}");

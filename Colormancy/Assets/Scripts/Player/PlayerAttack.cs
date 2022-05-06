@@ -156,6 +156,7 @@ public class PlayerAttack : MonoBehaviourPun
 
         controller.canAttackOtherPlayer = m_isPVPEnabled; // enable hurting other friendly players
         controller.shooterID = m_photonViewID;
+        controller.shooterGo = gameObject;
 
         if (m_isPVPEnabled)
         {

@@ -9,6 +9,7 @@ TagManager:
   - SpellPreview
   - SongAudio
   - MainHud
+  - Environment
   layers:
   - Default
   - TransparentFX

@@ -24,6 +24,7 @@ public class AutoAttackProjectileController : MonoBehaviour
 
     public bool canAttackOtherPlayer = false;
     public int shooterID; // AKA the photon view ID of the person who created this projectile, AKA the shooter
+    public GameObject shooterGo; // AKA the photon view ID of the person who created this projectile, AKA the shooter
 
     [Space]
 
@@ -75,6 +76,7 @@ public class AutoAttackProjectileController : MonoBehaviour
             if (photonView.ViewID != shooterID)
             {
                 // Don't hurt yourself with the projectile
+                shooterGo.GetComponent<ItemManager>().DamageDealt(collision.gameObject, transform);
                 photonView.RPC("TakeDamage", RpcTarget.All, attackDamage * attackMultiplier);
 
                 if (poisonedAttack)
@@ -82,7 +84,7 @@ public class AutoAttackProjectileController : MonoBehaviour
             }
         }
             
-        if ((canAttackOtherPlayer && isPlayer) || !isPlayer)
+        //if ((canAttackOtherPlayer && isPlayer) || !isPlayer)
             Destroy(gameObject);
     }
 }

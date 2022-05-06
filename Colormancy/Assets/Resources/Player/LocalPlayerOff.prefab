@@ -453,6 +453,7 @@ MonoBehaviour:
   m_baseRunSpeed: 15
   m_hpScript: {fileID: 5820395927475117115}
   m_character: {fileID: 8719925113848596262}
+  m_controller: {fileID: 0}
 --- !u!114 &5820395927475117109
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -499,9 +500,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ca848426ea85fa48879e6f5999220fa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  OnTakeDamage:
-    m_PersistentCalls:
-      m_Calls: []
   m_isPlayer: 1
   m_healthBar: {fileID: 0}
   m_username: {fileID: 2672177483625422240}

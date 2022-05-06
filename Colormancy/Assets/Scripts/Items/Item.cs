@@ -5,7 +5,7 @@ using UnityEngine;
 
 public abstract class Item : MonoBehaviour
 {
-    public enum ItemTypes { Instant, DamageTaken, DamageMultiplier, SpellCast, OnAutoAttack, OnKeyPressed};
+    public enum ItemTypes { Instant, DamageTaken, DamageMultiplier, SpellCast, OnAutoAttack, OnKeyPressed, DamageDealt};
 
     #region References for items to use, found on player prefab
     protected PlayerMovement PlayerMovement;
@@ -49,6 +49,7 @@ public abstract class Item : MonoBehaviour
     public virtual float DoDamageMultiplier(float baseDamageMultiplier) { Debug.LogError("This Item does not have a DamageMultiplier effect"); return baseDamageMultiplier; }
     public virtual void OnSpellCast() { Debug.LogError("This Item does not have a SpellCast effect"); }
     public virtual void OnAutoAttack(GameObject shotAuto) { Debug.LogError("This Item does not have an on auto attack effect"); }
-    public virtual void OnKeyPressed() { Debug.LogError("This Item deos not have an on key pressed effect"); }
+    public virtual void OnKeyPressed() { Debug.LogError("This Item does not have an on key pressed effect"); }
+    public virtual void OnDamageDealt(GameObject hit, Transform sourcePosition) { Debug.LogError("This Item does not have an on damage dealt effect"); }
     #endregion
 }

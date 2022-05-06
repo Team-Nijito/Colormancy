@@ -448,7 +448,7 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
             }
         }
 
-        if (damageValue <= 0)
+        if (damageValue < 0)
             throw new ArgumentException(string.Format("{0} should be greater than zero", damageValue), "damageValue");
         if (photonView.IsMine)
         {
