@@ -27,7 +27,11 @@ public class ItemManager : MonoBehaviourPun
     // Start is called before the first frame update
     void Start()
     {
-        photonView.RPC("AddItem", RpcTarget.All, "R_Aegis");
+<<<<<<< HEAD
+        photonView.RPC("AddItem", RpcTarget.All, "R_GentlemansBlade");
+=======
+        photonView.RPC("AddItem", RpcTarget.All, "C_AttackSpeed");
+>>>>>>> 87ced054fabfed6d6fdd9e18c35ce4d5cb34f81e
     }
 
     // Update is called once per frame
@@ -50,14 +54,11 @@ public class ItemManager : MonoBehaviourPun
         //    }
         //}
 
-        if(photonView.IsMine)
+        foreach(Item item in onKeyPressedItems.Keys)
         {
-            foreach(Item item in onKeyPressedItems.Keys)
+            if (Input.GetKeyDown(item.KeyToPress))
             {
-                if (Input.GetKeyDown(item.KeyToPress))
-                {
-                    item.OnKeyPressed();
-                }
+                item.OnKeyPressed();
             }
         }
     }
