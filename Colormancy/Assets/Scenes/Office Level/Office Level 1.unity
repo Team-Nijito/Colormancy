@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.43807778, g: 0.48606116, b: 0.56633854, a: 1}
+  m_IndirectSpecularColor: {r: 0.5482909, g: 0.8549135, b: 0.9223467, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -97,7 +97,7 @@ LightmapSettings:
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
-  m_LightingDataAsset: {fileID: 112000000, guid: 9d180bc378107624f94e06d3d2e24f3b,
+  m_LightingDataAsset: {fileID: 112000000, guid: 9cf1b78ea09dacd48b87afcf16c01fd0,
     type: 2}
   m_UseShadowmask: 1
 --- !u!196 &4
@@ -121,7 +121,7 @@ NavMeshSettings:
     accuratePlacement: 0
     debug:
       m_Flags: 0
-  m_NavMeshData: {fileID: 23800000, guid: 01f16881a794dc44197aff6fc8ca3ee8, type: 2}
+  m_NavMeshData: {fileID: 23800000, guid: d18f60ec41d1f9946b168095aa8f935a, type: 2}
 --- !u!1001 &1000899
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3047,7 +3047,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 4294967295
+  m_StaticEditorFlags: 4294967287
   m_IsActive: 1
 --- !u!154 &59205104
 TerrainCollider:
