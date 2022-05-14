@@ -6,6 +6,9 @@ using PhotonHashtable = ExitGames.Client.Photon.Hashtable; // to use with Photon
 
 public class OrbPodium : Podium
 {
+    public enum PodiumStatus { Available, OutOfStock, Returnable, Waiting, AlreadyHaveOrb };
+    public PodiumStatus podiumStatus = PodiumStatus.Available;
+
     [SerializeField]
     private string[] returnMessage = new string[] { "Do you want to return your orb?" }; // the user has the orb, and is at the podium where they retrieved the orb at
     [SerializeField]

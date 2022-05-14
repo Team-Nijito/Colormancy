@@ -5,9 +5,6 @@ using UnityEngine;
 
 public abstract class Podium : MonoBehaviour
 {
-    public enum PodiumStatus { Available, OutOfStock, Returnable, Waiting, AlreadyHaveOrb };
-    public PodiumStatus podiumStatus = PodiumStatus.Available;
-
     protected SpriteRenderer indicatorSprite;
 
     [SerializeField]
