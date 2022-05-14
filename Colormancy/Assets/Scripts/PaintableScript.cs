@@ -48,6 +48,8 @@ public class PaintableScript : MonoBehaviour
     private List<Triangle> triangles;
     private TriangleTreeNode octTreeRoot;
 
+    public int width;
+
     public float threshold;
 
     // Start is called before the first frame update
@@ -101,13 +103,13 @@ public class PaintableScript : MonoBehaviour
         {
             for (int j = 0; j < 100; ++j)
             {
-                tex.SetPixel(i, j, Color.black);
+                tex.SetPixel(i, j, new Color(0, 0, 0, 0));
             }
         }
 
         for (int i = 0; i < octTreeRoot.triangles.Count; ++i)
         {
-            PaintTriangleUV(octTreeRoot.triangles[i], Vector3.one, 1.5f);
+            PaintTriangleUV(octTreeRoot.triangles[i], Vector3.one, 1.5f, Color.red);
         }
 
         tex.Apply();
@@ -133,7 +135,7 @@ public class PaintableScript : MonoBehaviour
         print(w);
     }
 
-    private void PaintTriangleUV(Triangle t, Vector3 source, float r)
+    private void PaintTriangleUV(Triangle t, Vector3 source, float r, Color c)
     {
         // get pixel location
         Vector2 v1 = t.uv1 * 100;
@@ -190,14 +192,14 @@ public class PaintableScript : MonoBehaviour
                     }
                     else
                     {
-                        float l = 1 - (distance - (r - threshold)) / threshold;
+                        float l = Mathf.Clamp01(1 - (distance - (r - threshold)) / threshold);
 
                         tex.SetPixel(column, row,
                             new Color(
-                                l,
-                                l,
-                                l,
-                                1));
+                                c.r,
+                                c.g,
+                                c.b,
+                                l));
                     }
                 }
                     
