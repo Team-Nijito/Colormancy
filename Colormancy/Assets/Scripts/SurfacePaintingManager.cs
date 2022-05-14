@@ -4,31 +4,37 @@ using UnityEngine;
 
 public class SurfacePaintingManager : MonoBehaviour
 {
-    private Texture2D tex;
-    public Material mat;
+    private static SurfacePaintingManager _instance;
+    public static SurfacePaintingManager Instance { get { return _instance; } }
 
-    // Start is called before the first frame update
-    void Start()
+    private List<PaintableScript> paintableScripts;
+
+    private void Awake()
     {
-        /*
-        tex = new Texture2D(64, 64);
-        tex.SetPixel(2, 2, new Color(0, 0, 0, 0));
-        tex.Apply();
+        if (_instance != null && _instance != this)
+        {
+            Destroy(this.gameObject);
+        }
+        else
+        {
+            _instance = this;
+        }
 
-        mat.SetTexture("_PaintTex", tex);
-
-        PaintSphere();
-        */
+        // instantiate scripts
+        paintableScripts = new List<PaintableScript>();
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+    public void AddPaintableScript(PaintableScript script) {
+        if (!paintableScripts.Contains(script))
+            paintableScripts.Add(script);
     }
 
-    public void PaintSphere()
+    public void PaintSphere(Vector3 worldPosition, float radius, Color c, float threshold)
     {
-
+        // optimize later
+        foreach (PaintableScript p in paintableScripts)
+        {
+            p.PaintMesh(worldPosition, radius, c, threshold);
+        }
     }
 }
