@@ -23,6 +23,15 @@ public class ItemPodium : Podium
 
     //public OrbTypes podiumType;
 
+    protected override void Start()
+    {
+        base.Start();
+        if (randomItem)
+        {
+            m_item = GetRandomItem();
+        }
+    }
+
     public override void CloseWindow()
     {
         base.CloseWindow();
@@ -33,11 +42,6 @@ public class ItemPodium : Podium
     {
         if (Input.GetMouseButtonDown(0) && InRange)
         {
-            if (randomItem)
-            {
-                m_item = GetRandomItem();
-            }
-
             messages[0] = m_item.itemName;
             manager.PopUpItem(messages, images, m_item.itemScriptName, m_itemManager, this);
             manager.ChangeGUIMode(AcceptButtonHandler.AcceptMode.GiveItem);

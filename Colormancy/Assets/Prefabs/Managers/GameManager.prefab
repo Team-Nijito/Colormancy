@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 7917960859537667781}
   - component: {fileID: -4774289116210966217}
   - component: {fileID: 4313626241771287747}
+  - component: {fileID: 5176874279127602734}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: GameController
@@ -45,14 +46,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cb2c5d223d05c594aa301b88e90de702, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_playerSpawnpoints: []
   m_defaultSpawn: {x: 0, y: 3, z: 0}
+  m_playerSpawnpoints: []
   m_playerPrefab: {fileID: 5820395927475117105, guid: 7f1c285412074014d837633f8e97020d,
     type: 3}
   m_levelType: 0
   m_OrbsNeededToStartGame: 2
   m_levelAfterReadyUp: Office Level 1
   m_levelAfterBeatingStage: YouWinScene
+  bossPodiumGo: {fileID: 0}
   m_paintPercentageNeededToWin: 0.75
   popUpBox: {fileID: 0}
   m_enemyManagerObject: {fileID: 1858970735588863969, guid: f3c0e5b18270531468bb1ff4a5ba57e5,
@@ -94,5 +96,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8d9ed3b9438915845b54968aa6c2fead, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &5176874279127602734
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1514547462070139307}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f1569527f0a092a4282139ad4905cabb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 

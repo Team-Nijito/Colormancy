@@ -184,7 +184,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2214567617875914227}
   - component: {fileID: 2214567617875914226}
-  - component: {fileID: 1998812238}
+  - component: {fileID: 3317451261389184184}
   m_Layer: 0
   m_Name: PodiumZone
   m_TagString: Untagged
@@ -221,7 +221,7 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 2.9706407, y: 2.719006, z: 3.876934}
   m_Center: {x: -0.066676855, y: 0.8595028, z: 0.023123026}
---- !u!114 &1998812238
+--- !u!114 &3317451261389184184
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -230,11 +230,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 2214567617875914224}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 703ade2de952de5498d8b840761d9959, type: 3}
+  m_Script: {fileID: 11500000, guid: 68d551a1bd4a0844b946d89c8c204dea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  podiumStatus: 0
   messages:
   - Test Message 1
   images: []
-  m_item: {fileID: 11400000, guid: 34275690af1b5064c9ff62fd78f8df3a, type: 2}
+  podiumStatus: 0
+  returnMessage:
+  - Do you want to return your orb?
+  maxCapMessage:
+  - You cannnot pick up any more orbs!
+  missingMessage:
+  - Somebody else currently has this orb
+  waitingMessage:
+  - Somebody else is currently browsing this orb
+  orbType: 1

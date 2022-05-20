@@ -962,7 +962,7 @@ MonoBehaviour:
   m_healthBar: {fileID: 8732252552817392623}
   m_username: {fileID: 7527247312539076479}
   m_gameManager: {fileID: 0}
-  m_baseHealth: 250
+  m_baseHealth: 100
   m_shieldHealth: 0
   m_armorPercentage: 0
   m_isRegenHealth: 0
