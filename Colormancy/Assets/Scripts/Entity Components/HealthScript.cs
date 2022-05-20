@@ -90,6 +90,7 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
     #region Regular event and callbacks
 
     public Action<GameManager> gameManagerUpdated;
+    public UnityEvent Died;
 
     #endregion
 
@@ -140,6 +141,9 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
         m_statusEffectScript = GetComponent<StatusEffectScript>();
         m_animManager = GetComponent<EnemyAnimationManager>();
 
+        if (Died == null)
+            Died = new UnityEvent();
+
         if (m_isPlayer)
         {
             m_spectateGhost = Resources.Load<GameObject>("Player/SpectateGhost"); // load the ghost for players
@@ -171,6 +175,7 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
             if (m_effectiveHealth <= 0 && transform.gameObject.CompareTag("Player") && !m_deathDebounce)
             {
                 m_deathDebounce = true;
+                Died.Invoke();
 
                 // inform the player's custom property that the player has died
                 PhotonHashtable playerProperties = PhotonNetwork.LocalPlayer.CustomProperties;
@@ -199,6 +204,7 @@ public class HealthScript : MonoBehaviourPunCallbacks, IPunObservable
                 m_deathDebounce = true;
                 // tell everyone this enemy is deceased
                 photonView.RPC("EnemyCleanup", RpcTarget.All);
+                Died.Invoke();
             }
         }
 

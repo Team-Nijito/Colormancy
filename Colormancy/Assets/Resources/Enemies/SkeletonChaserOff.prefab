@@ -909,6 +909,9 @@ MonoBehaviour:
   m_regenHealthPercentage: 1
   m_timeUntilDestroy: 3
   m_playAnimationOnDeathIfAttacking: 1
+  Died:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &-3158070480734117150
 MonoBehaviour:
   m_ObjectHideFlags: 0

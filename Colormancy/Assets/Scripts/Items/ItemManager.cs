@@ -18,7 +18,7 @@ public class ItemManager : MonoBehaviourPun
     [SerializeField] GameObject aegisGraphic;
     [SerializeField] GameObject itemParent;
 
-    readonly bool DebugMode = true;
+    readonly bool DebugMode = false;
 
     //For debug purposes
     Item lastAddedItem;
@@ -41,15 +41,6 @@ public class ItemManager : MonoBehaviourPun
         //        lastAddedItem = null;
         //    }
         //}
-
-        //if (Input.GetKeyDown(KeyCode.P))
-        //{
-        //    if (photonView.IsMine)
-        //    {
-        //        photonView.RPC("OnHit", RpcTarget.All, 0f);
-        //    }
-        //}
-
         if(photonView.IsMine)
         {
             foreach(Item item in onKeyPressedItems.Keys)

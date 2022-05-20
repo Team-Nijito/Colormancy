@@ -59,6 +59,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_parentGameObject: {fileID: 7526208280804268359}
   m_isProjectile: 0
+  m_isPlayerHitbox: 0
   m_Slow: 0
   SlowDuration: 0
   SlowAmount: 0
@@ -961,13 +962,16 @@ MonoBehaviour:
   m_healthBar: {fileID: 8732252552817392623}
   m_username: {fileID: 7527247312539076479}
   m_gameManager: {fileID: 0}
-  m_baseHealth: 1000
+  m_baseHealth: 250
   m_shieldHealth: 0
   m_armorPercentage: 0
   m_isRegenHealth: 0
   m_regenHealthPercentage: 1
   m_timeUntilDestroy: 3
   m_playAnimationOnDeathIfAttacking: 1
+  Died:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &7526208280804268367
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2238,6 +2242,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_parentGameObject: {fileID: 7526208280804268359}
   m_isProjectile: 0
+  m_isPlayerHitbox: 0
   m_Slow: 0
   SlowDuration: 0
   SlowAmount: 0
@@ -2288,6 +2293,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_parentGameObject: {fileID: 7526208280804268359}
   m_isProjectile: 0
+  m_isPlayerHitbox: 0
   m_Slow: 0
   SlowDuration: 0
   SlowAmount: 0

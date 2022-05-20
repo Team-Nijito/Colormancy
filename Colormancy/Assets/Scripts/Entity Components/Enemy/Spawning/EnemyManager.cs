@@ -19,6 +19,8 @@ public class EnemyManager : MonoBehaviourPunCallbacks
     // conditional field not compatable with arrays
     [SerializeField]
     private GameObject[] m_spawnpoints;
+    [SerializeField]
+    private GameObject m_levelBossSpawnpoint;
 
     [SerializeField]
     private GameObject[] m_enemyEntities;
@@ -154,6 +156,11 @@ public class EnemyManager : MonoBehaviourPunCallbacks
         m_numEnemiesOnField = numEnemies;
     }
 
+    public GameObject SummonLevelBoss(Vector3 pos)
+    {
+        return m_levelBossSpawnpoint.GetComponent<SpawnpointBehaviour>().SpawnBoss(m_enemyFolder, "Diane, Doer of Deeds");
+    }
+
     #endregion
 
     #region Photon functions
@@ -166,6 +173,11 @@ public class EnemyManager : MonoBehaviourPunCallbacks
     public override void OnPlayerLeftRoom(Player otherPlayer)
     {
         UpdateDesiredEnemiesInRoom();
+    }
+
+    public void SetEnemySpawnActive(bool val)
+    {
+        m_enemySpawnPointsActive = val;
     }
 
     #endregion

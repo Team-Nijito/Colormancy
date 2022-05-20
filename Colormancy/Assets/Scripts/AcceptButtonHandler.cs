@@ -10,7 +10,7 @@ public class AcceptButtonHandler : MonoBehaviour
     GameManager gameManager;
     Text textObj;
 
-    public enum AcceptMode { GiveOrb, RemoveOrb, CloseWindow, GiveItem }
+    public enum AcceptMode { GiveOrb, RemoveOrb, CloseWindow, GiveItem, SummonBoss }
 
     public AcceptMode CurrentMode { get { return m_currentMode; } private set { m_currentMode = value; } }
     private AcceptMode m_currentMode = AcceptMode.GiveOrb;
@@ -39,6 +39,9 @@ public class AcceptButtonHandler : MonoBehaviour
             case AcceptMode.GiveItem:
                 gameManager.AddCurrentItem();
                 break;
+            case AcceptMode.SummonBoss:
+                gameManager.SummonLevelBoss();
+                break;
             default:
                 Debug.LogWarning("Haven't implemented this AcceptMode! (see AcceptButtonHandler.cs line 46)");
                 break;
@@ -63,6 +66,9 @@ public class AcceptButtonHandler : MonoBehaviour
                 break;
             case AcceptMode.CloseWindow:
                 textObj.text = "Close";
+                break;
+            case AcceptMode.SummonBoss:
+                textObj.text = "Yes";
                 break;
             default:
                 Debug.LogWarning("Haven't implemented this AcceptMode! (see AcceptButtonHandler.cs line 46)");

@@ -150,6 +150,41 @@ public class SpawnpointBehaviour : MonoBehaviourPun
         m_isCurrentlySpawningEnemy = false;
     }
 
+    public GameObject SpawnBoss(GameObject parentFolder, string nameEntityToSpawn)
+    {
+        m_isCurrentlySpawningEnemy = true;
+        PhotonNetwork.SendAllOutgoingCommands(); // send the RPC immediately
+
+        string enemyName = "Enemies/";
+
+        if (m_spawnCustomEnemy && m_enemiesToSpawn.Length > 0)
+        {
+            if (m_enemiesToSpawn.Length == 0)
+            {
+                enemyName += m_enemiesToSpawn[0].name; // choose the only enemy
+            }
+            else
+            {
+                enemyName += m_enemiesToSpawn[Random.Range(0, m_enemiesToSpawn.Length)].name; // choose a random enemy
+            }
+        }
+        else
+        {
+            enemyName += nameEntityToSpawn;
+        }
+
+        GameObject entity = PhotonNetwork.InstantiateRoomObject(enemyName,
+                                                        m_spawnPointTrigger.transform.position,
+                                                        m_spawnPointTrigger.transform.rotation * Quaternion.Euler(0, 180f, 0),
+                                                        0);
+        m_spawnedEntity = entity;
+        entity.transform.parent = parentFolder.transform; // set the entity as a child of the parentFolder, for organizational purposes
+
+        m_isCurrentlySpawningEnemy = false;
+
+        return entity;
+    }
+
     // The progress gui faces the main camera (if it exists)
     private void ProgressPanelFaceCamera()
     {

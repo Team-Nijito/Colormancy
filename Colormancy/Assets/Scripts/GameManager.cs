@@ -110,6 +110,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     [Separator("Normal gameplay level properties")]
     [SerializeField]
     private string m_levelAfterBeatingStage = WinSceneName;
+    //Can change to instantiate in podium in after level is over, in this case we are just going to enable the GameObject when the level would be completed
+    [SerializeField] GameObject bossPodiumGo;
+    private bool bossPodiumEnabled = false;
 
     // Painting variables
     [Range(0, 1)]
@@ -440,12 +443,14 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
                 if (m_levelType == LevelTypes.Level)
                 {            
                     m_paintProgress = PaintingManager.paintingProgress();
+                    m_paintProgress = Mathf.Clamp(m_paintProgress, 0, 1);
                     //print(m_paintProgress);
 
-                    if (!m_isLoadingNewScene && m_paintProgress > m_paintPercentageNeededToWin)
+                    if (!m_isLoadingNewScene && m_paintProgress >= m_paintPercentageNeededToWin)
                     {
                         //TODO: add in loot acquisition here
-                        LoadLevel(m_levelAfterBeatingStage);
+                        //LoadLevel(m_levelAfterBeatingStage);
+                        EnableBossPodium();
                     }
                 }
 
@@ -727,6 +732,18 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
             m_orbPodium.CloseWindow();
     }
 
+    public void SummonLevelBoss()
+    {
+        GameObject bossGO = m_enemManager.SummonLevelBoss(bossPodiumGo.transform.position);
+        bossPodiumGo.SetActive(false);
+        bossGO.GetComponent<HealthScript>().Died.AddListener(BossDied);
+    }
+
+    public void BossDied()
+    {
+        LoadLevel(m_levelAfterBeatingStage);
+    }
+
     public void CloseWindowVisually()
     {
         if (WindowOpen)
@@ -823,7 +840,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         }
     }
 
-    public void PopUp(string[] messages, Sprite[] images)
+    public void PopUp(string[] messages, Sprite[] images, bool podiumStatus = false)
     {
         if (!WindowOpen)
         {
@@ -832,7 +849,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
             dialoguePage = 0;
 
             animator.SetTrigger("pop");
-            PodiumMessage = false;
+            PodiumMessage = podiumStatus;
             WindowOpen = true;
 
             SetPage();
@@ -895,6 +912,25 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
             CloseWindowVisually();
             m_orbPodium.CloseWindow();
         }
+    }
+
+    public void EnableBossPodium()
+    {
+        if (!bossPodiumEnabled)
+        {
+            if (bossPodiumGo == null)
+            {
+                Debug.LogError("Boss Podium GameObject not assigned in GameManager\n You can use any object with a LevelBossPodium Script attached to it");
+            }
+            else
+            {
+                Debug.Log("Boss Podium Spawned");
+                bossPodiumEnabled = true;
+                bossPodiumGo.SetActive(true);
+                m_enemManager.SetEnemySpawnActive(false);
+            }
+        }
+
     }
 
     /// <summary>
