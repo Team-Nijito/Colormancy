@@ -50,6 +50,16 @@ public class PaintableScript : MonoBehaviour
 
     public void PaintMesh(Vector3 worldPosition, float radius, Color c, float threshold)
     {
+        // check for radius intersection
+        Bounds b = meshExtend.MeshBounds;
+        Vector3 closestInBounds = MeshExtend.ClosestPointInBounds(b, transform.InverseTransformPoint(worldPosition));
+        closestInBounds = transform.TransformPoint(closestInBounds);
+
+        if (Vector3.Distance(closestInBounds, worldPosition) > radius) 
+        {
+            return;
+        } 
+
         // oh god do it the awful way
         for (int i = 0; i < meshExtend.TriangleCount; i++)
         {

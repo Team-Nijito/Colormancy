@@ -49,6 +49,7 @@ public class MeshExtend : MonoBehaviour
     private List<MeshTriangle> triangles;
     public int TriangleCount { get { return triangles.Count; } }
     private TriangleTreeNode octTreeRoot;
+    public Bounds MeshBounds { get { return octTreeRoot.bounds; } }
 
     void Awake()
     {
@@ -79,6 +80,11 @@ public class MeshExtend : MonoBehaviour
             // build the tree
 
             Bounds bounds = m.bounds;
+            bounds.size = new Vector3(
+                bounds.size.x * transform.localScale.x,
+                bounds.size.y * transform.localScale.y,
+                bounds.size.z * transform.localScale.z
+                );
             octTreeRoot = new TriangleTreeNode(bounds);
             octTreeRoot.triangles = triangles;
 
@@ -225,9 +231,9 @@ public class MeshExtend : MonoBehaviour
         Vector3 edge1, edge2, h, s, q;
         float a, f, u, v;
         edge1 = m.p2 - m.p1;
-        edge2 = m.p2 - m.p1;
+        edge2 = m.p3 - m.p1;
         h = Vector3.Cross(ray.direction, edge2);
-        a = 1 - Mathf.Abs(Vector3.Dot(edge1, h));
+        a = Vector3.Dot(edge1, h);
         if (a > -Mathf.Epsilon && a < Mathf.Epsilon)
         {
             return false;    // This ray is parallel to this triangle.
@@ -254,5 +260,14 @@ public class MeshExtend : MonoBehaviour
         }
         else // This means that there is a line intersection but not a ray intersection.
             return false;
+    }
+
+    public static Vector3 ClosestPointInBounds(Bounds bounds, Vector3 position)
+    {
+        return new Vector3(
+            Mathf.Clamp(position.x, bounds.min.x, bounds.max.x),
+            Mathf.Clamp(position.y, bounds.min.y, bounds.max.y),
+            Mathf.Clamp(position.z, bounds.min.z, bounds.max.z)
+            );
     }
 }
