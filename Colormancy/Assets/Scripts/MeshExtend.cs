@@ -183,4 +183,76 @@ public class MeshExtend : MonoBehaviour
     {
         return triangles[triangleIndex];
     }
+
+    public bool GetClosestRayIntersectionPoint(RayMagnitude ray, out Vector3 closestWorldIntersectionPoint, out MeshTriangle meshTriangle)
+    {
+        // TODO: improve this ray check
+        Vector3 closestPoint = new Vector3();
+        float closestDistance = 1000f;
+        int closestTriangleIndex = 0;
+
+        ray.origin = transform.InverseTransformPoint(ray.origin);
+
+        for (int i = 0; i < triangles.Count; i++)
+        {
+            if (IsRayIntersectingTriangle(ray, triangles[i], out Vector3 worldIntersectionPoint))
+            {
+                if (closestDistance > Vector3.Distance(ray.origin, worldIntersectionPoint))
+                {
+                    closestDistance = Vector3.Distance(ray.origin, worldIntersectionPoint);
+                    closestPoint = worldIntersectionPoint;
+                    closestTriangleIndex = i;
+                }
+            }
+        }
+
+        closestWorldIntersectionPoint = closestPoint;
+        closestWorldIntersectionPoint = transform.TransformPoint(closestWorldIntersectionPoint);
+        meshTriangle = triangles[closestTriangleIndex];
+        
+        if (closestDistance == 1000f)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    public static bool IsRayIntersectingTriangle(RayMagnitude ray, MeshTriangle m, out Vector3 localIntersectionPoint)
+    {
+        localIntersectionPoint = Vector3.zero;
+
+        Vector3 edge1, edge2, h, s, q;
+        float a, f, u, v;
+        edge1 = m.p2 - m.p1;
+        edge2 = m.p2 - m.p1;
+        h = Vector3.Cross(ray.direction, edge2);
+        a = 1 - Mathf.Abs(Vector3.Dot(edge1, h));
+        if (a > -Mathf.Epsilon && a < Mathf.Epsilon)
+        {
+            return false;    // This ray is parallel to this triangle.
+        }
+        f = 1.0f / a;
+        s = ray.origin - m.p1;
+        u = f * Vector3.Dot(s, h);
+        if (u < 0.0 || u > 1.0)
+        {
+            return false;
+        }
+        q = Vector3.Cross(s, edge1);
+        v = f * Vector3.Dot(ray.direction, q);
+        if (v < 0.0 || u + v > 1.0)
+        {
+            return false;
+        }
+        // At this stage we can compute t to find out where the intersection point is on the line.
+        float t = f * Vector3.Dot(edge2, q);
+        if (t > Mathf.Epsilon) // ray intersection
+        {
+            localIntersectionPoint = ray.origin + ray.direction * t;
+            return true;
+        }
+        else // This means that there is a line intersection but not a ray intersection.
+            return false;
+    }
 }
