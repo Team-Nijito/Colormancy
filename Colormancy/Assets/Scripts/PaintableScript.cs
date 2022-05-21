@@ -36,6 +36,8 @@ public class PaintableScript : MonoBehaviour
                 paintTex.SetPixel(i, j, new Color(0, 0, 0, 0));
             }
         }
+
+        paintTex.filterMode = FilterMode.Bilinear;
     }
 
     public void PaintMesh(Color c, float threshold)

@@ -8,6 +8,8 @@ public class TestPaint : MonoBehaviour
 
     public GameObject brushSphere;
 
+    public float threshold;
+
     // Update is called once per frame
     void Update()
     {
@@ -21,7 +23,7 @@ public class TestPaint : MonoBehaviour
             paintableScript.PaintMesh(Color.red, 0.1f);
         }
 
-        SurfacePaintingManager.Instance.PaintSphere(brushSphere.transform.position, 1f, Color.red, 0.1f);
+        SurfacePaintingManager.Instance.PaintSphere(brushSphere.transform.position, 1f, Color.red, threshold);
 
         if (Input.GetKeyDown(KeyCode.Alpha2))
         {
